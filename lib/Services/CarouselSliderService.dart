@@ -1,0 +1,76 @@
+import 'dart:convert';
+import 'package:cutomer_app/APIs/BaseUrl.dart';
+import 'package:http/http.dart' as http;
+
+class CarouselSliderService {
+  // Replace with your actual server URL
+
+  // Method to fetch image URLs from the API and return them
+  Future<List<String>> fetchImages() async {
+    final url = Uri.parse(
+        '$serverUrl/dashboard-images/getAllImages'); // Replace with your API endpoint
+    try {
+      final response = await http.get(url);
+      print("carouselPicture ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print("carouselPicture ${response.statusCode}");
+        print("carouselPicture body ${response}");
+        print("carouselPicture data ${data}");
+
+        // Assuming the API returns an array of objects, each containing 'carouselPicture'
+        List<String> imageUrls = [];
+
+        // Loop through the response data to extract 'carouselPicture' from each object
+        for (var item in data) {
+          if (item.containsKey('carouselPicture')) {
+            imageUrls.add(item['carouselPicture']);
+          }
+        }
+
+        return imageUrls;
+      } else {
+        print("carouselPicture ${response.statusCode}");
+        throw Exception('Failed to load images');
+      }
+    } catch (e) {
+      print("Error fetching images: $e");
+      return []; // Return an empty list if an error occurs
+    }
+  }
+
+  Future<List<String>> fetchServiceImages() async {
+    final url = Uri.parse(
+        '$serverUrl/service-images/getAllImages'); // Replace with your API endpoint
+    try {
+      final response = await http.get(url);
+      print("carouselPicture ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print("carouselPicture ${response.statusCode}");
+        print("carouselPicture body ${response}");
+        print("carouselPicture data ${data}");
+
+        // Assuming the API returns an array of objects, each containing 'carouselPicture'
+        List<String> imageUrls = [];
+
+        // Loop through the response data to extract 'carouselPicture' from each object
+        for (var item in data) {
+          if (item.containsKey('carouselPicture')) {
+            imageUrls.add(item['carouselPicture']);
+          }
+        }
+print("imageUrlsimageUrls lengrt ${imageUrls.length}");
+        return imageUrls;
+      } else {
+        print("carouselPicture ${response.statusCode}");
+        throw Exception('Failed to load images');
+      }
+    } catch (e) {
+      print("Error fetching images: $e");
+      return []; // Return an empty list if an error occurs
+    }
+  }
+}
