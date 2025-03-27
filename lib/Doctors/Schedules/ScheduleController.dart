@@ -1,4 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../Utils/Constant.dart';
+import '../../Widget/Bottomsheet.dart';
+import 'Schedule.dart';
 
 class ScheduleController extends GetxController {
   /// Language labels for doctor languages
@@ -82,5 +87,49 @@ class ScheduleController extends GetxController {
     selectedSlotIndex = -1;
     selectedDate = weekDates.isNotEmpty ? weekDates[0] : DateTime.now();
     timeSlots.clear();
+  }
+
+  void showReportBottomSheet({
+    required BuildContext context,
+    required String title,
+    required List<ReportOption> options,
+    void Function(String selected)? onSelected,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: mainColor,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ...options.map((option) => ListTile(
+                    // leading: Icon(option.icon, color: Colors.redAccent),
+                    title: Text(option.title),
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (onSelected != null) {
+                        onSelected(option.title);
+                      }
+                    },
+                  )),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

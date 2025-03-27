@@ -87,5 +87,5 @@ class ReportOption {
   final String title;
   final Color color;
 
-  ReportOption({required this.title, required this.color});
+  ReportOption({required this.title, required this.color, required IconData icon});
 }

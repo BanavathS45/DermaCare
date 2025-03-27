@@ -27,50 +27,50 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         widget.doctorData.doctor.availableSlots); // default selected
   }
 
-  TimeOfDay parseTimeOfDay(String timeStr) {
-    timeStr = timeStr
-        .replaceAll(RegExp(r'[\u00A0\u202F\u200B\uFEFF]'), ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+  // TimeOfDay parseTimeOfDay(String timeStr) {
+  //   timeStr = timeStr
+  //       .replaceAll(RegExp(r'[\u00A0\u202F\u200B\uFEFF]'), ' ')
+  //       .replaceAll(RegExp(r'\s+'), ' ')
+  //       .trim();
 
-    final format = DateFormat.jm(); // expects "hh:mm a"
-    final dt = format.parse(timeStr);
-    return TimeOfDay.fromDateTime(dt);
-  }
+  //   final format = DateFormat.jm(); // expects "hh:mm a"
+  //   final dt = format.parse(timeStr);
+  //   return TimeOfDay.fromDateTime(dt);
+  // }
 
-  List<Map<String, dynamic>> getFilteredSlots() {
-    final isToday = DateUtils.isSameDay(
-      scheduleController.selectedDate,
-      DateTime.now(),
-    );
+  // List<Map<String, dynamic>> getFilteredSlots() {
+  //   final isToday = DateUtils.isSameDay(
+  //     scheduleController.selectedDate,
+  //     DateTime.now(),
+  //   );
 
-    final now = TimeOfDay.now();
+  //   final now = TimeOfDay.now();
 
-    List<Map<String, dynamic>> rawSlots = scheduleController.timeSlots;
+  //   List<Map<String, dynamic>> rawSlots = scheduleController.timeSlots;
 
-    final cleaned = rawSlots.where((slot) {
-      final timeStr = slot["slot"] ?? "";
-      try {
-        final slotTime = parseTimeOfDay(timeStr);
+  //   final cleaned = rawSlots.where((slot) {
+  //     final timeStr = slot["slot"] ?? "";
+  //     try {
+  //       final slotTime = parseTimeOfDay(timeStr);
 
-        if (!isToday) return true;
+  //       if (!isToday) return true;
 
-        // Only keep future slots if today
-        return (slotTime.hour > now.hour) ||
-            (slotTime.hour == now.hour && slotTime.minute > now.minute);
-      } catch (e) {
-        print("❌ Failed to parse: $timeStr → $e");
-        return false;
-      }
-    }).toList();
+  //       // Only keep future slots if today
+  //       return (slotTime.hour > now.hour) ||
+  //           (slotTime.hour == now.hour && slotTime.minute > now.minute);
+  //     } catch (e) {
+  //       print("❌ Failed to parse: $timeStr → $e");
+  //       return false;
+  //     }
+  //   }).toList();
 
-    print(
-        "✅ Filtered Slots (${isToday ? 'Today' : 'Future'}): ${cleaned.length}");
-    for (var slot in scheduleController.timeSlots) {
-      print("🕒 Slot: ${slot["slot"]}, booked: ${slot["slotbooked"]}");
-    }
-    return cleaned;
-  }
+  //   print(
+  //       "✅ Filtered Slots (${isToday ? 'Today' : 'Future'}): ${cleaned.length}");
+  //   for (var slot in scheduleController.timeSlots) {
+  //     print("🕒 Slot: ${slot["slot"]}, booked: ${slot["slotbooked"]}");
+  //   }
+  //   return cleaned;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +204,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget timeslots() {
-    final filteredSlots = getFilteredSlots();
+    // final filteredSlots = getFilteredSlots();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,42 +219,45 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             IconButton(
               icon: const Icon(Icons.help, size: 20),
               onPressed: () {
-                showDialog(
+                showReportBottomSheet(
                   context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text("Slot Info"),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // ReportOption(title: "Booked Slot", color:  Colors.grey),
-                        // ReportOption(title: "Currently Selected", color:  Colors.blue),
-                        // ReportOption(title:"Available Slot", color:  Colors.white),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        child: const Text("OK"),
-                        onPressed: () => Navigator.pop(context),
-                      )
-                    ],
-                  ),
+                  title: "Slots",
+                  options: [
+                    ReportOption(
+                        icon: Icons.block,
+                        title: "Booked Slot",
+                        color: Colors.grey),
+                    ReportOption(
+                        icon: Icons.check_circle,
+                        title: "Currently selected",
+                        color: mainColor),
+                    ReportOption(
+                        icon: Icons.access_time,
+                        title: "Available Slots",
+                        color: Colors.white),
+                  ],
+                  onSelected: (selected) {
+                    print("User selected: $selected");
+                    // Handle your action here
+                  },
                 );
               },
             )
           ],
         ),
         const SizedBox(height: 10),
-        filteredSlots.isNotEmpty
+        scheduleController.timeSlots.isNotEmpty
             ? Column(
                 children: List.generate(
-                  (filteredSlots.length / 4).ceil(),
+                  (scheduleController.timeSlots.length / 4).ceil(),
                   (rowIndex) {
                     final startIndex = rowIndex * 4;
-                    final endIndex = (startIndex + 4 < filteredSlots.length)
-                        ? startIndex + 4
-                        : filteredSlots.length;
-                    final rowSlots =
-                        filteredSlots.sublist(startIndex, endIndex);
+                    final endIndex =
+                        (startIndex + 4 < scheduleController.timeSlots.length)
+                            ? startIndex + 4
+                            : scheduleController.timeSlots.length;
+                    final rowSlots = scheduleController.timeSlots
+                        .sublist(startIndex, endIndex);
 
                     return Row(
                       children: List.generate(4, (i) {
@@ -286,11 +289,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                     color: isBooked
                                         ? Colors.grey.shade300
                                         : isSelected
-                                            ? Colors.blue
+                                            ? mainColor
                                             : Colors.white,
                                     border: Border.all(
-                                      color:
-                                          isBooked ? Colors.grey : Colors.blue,
+                                      color: isBooked ? Colors.grey : mainColor,
                                     ),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -302,7 +304,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                           ? Colors.grey
                                           : isSelected
                                               ? Colors.white
-                                              : Colors.blue,
+                                              : mainColor,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
