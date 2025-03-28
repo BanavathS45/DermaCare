@@ -11,7 +11,9 @@ import 'Help/HelpDesk.dart';
 import 'Loading/FullScreeenLoader.dart';
 import 'NetworkCheck/NetworkService.dart';
 import 'Registration/RegisterScreen.dart';
+import 'Screens/ConsultationController.dart';
 import 'Screens/Consultations.dart';
+import 'Screens/PatientsDetails.dart';
 import 'Screens/splashScreen.dart';
 import 'SigninSignUp/LoginScreen.dart';
 import 'TreatmentAndServices/ServiceSelectionController.dart';
@@ -33,6 +35,7 @@ class MyApp extends StatelessWidget {
     Get.put(SelectedServicesController());
     Get.put(Dashboardcontroller());
     Get.put(Serviceselectioncontroller());
+    Get.put(Consultationcontroller());
 
     return GetMaterialApp(
         title: 'Derma Care',
@@ -88,7 +91,7 @@ class MyApp extends StatelessWidget {
         //   message: 'Your data is being sent securely.\nPlease wait...',
         //   logoPath: 'assets/surecare_launcher.png',
         // ),
-        // home: SplashScreen()
+        // home: PatientDetailsForm()
         // home: ConsultationsType(mobileNumber: '7842259803', username: 'prashanth',)
         // home: InvoicePage(bookingDetails: null,)
         // home: StateAndCity(

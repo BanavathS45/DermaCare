@@ -79,7 +79,7 @@ class _ServiceCardState extends State<ServiceCard> {
                             width: double.infinity, // Full width
 
                             fit: BoxFit
-                                .contain, // Covers the container proportionally
+                                .cover, // Covers the container proportionally
                           )
                         : Image.asset(
                             'assets/default_image.png',
@@ -95,12 +95,13 @@ class _ServiceCardState extends State<ServiceCard> {
                 padding: const EdgeInsets.only(bottom: 7.0),
                 child: Text(
                   widget.service.categoryName,
+
                   // Null check
                   style: TextStyle(
                     fontSize: 15.0,
                     fontWeight: FontWeight.bold,
                     color: mainColor,
-                    height: 1,
+                    height: 1.2,
                   ),
 
                   textAlign: TextAlign.center,

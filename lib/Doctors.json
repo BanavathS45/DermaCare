@@ -11,7 +11,6 @@
       "doctor": {
         "name": "Dr. Anjali Mehta",
         "gender": "Female",
-
         "specialization": "Dermato-Genetics",
         "experienceYears": 12,
         "qualification": "MD",

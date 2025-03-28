@@ -44,6 +44,7 @@ class ScheduleController extends GetxController {
   List<Map<String, dynamic>> timeSlots = [];
 
   DateTime selectedDate = DateTime.now();
+  var selectedSlotText = "".obs;
 
   /// Currently selected indices
   int selectedDayIndex = 0;
@@ -52,11 +53,7 @@ class ScheduleController extends GetxController {
   /// List of 7 dates from today
   List<DateTime> weekDates = [];
 
-  /// The date corresponding to selectedDayIndex
-  // DateTime selectedDate = DateTime.now();
-
-  /// List of time slots (with booking info)
-  // List<Map<String, dynamic>> timeSlots = [];
+ 
 
   /// Initialize 7-day calendar
   void initializeWeekDates() {

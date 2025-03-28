@@ -32,6 +32,27 @@ class SiginSignUpController extends GetxController {
     }
     return null; // ✅ Valid input
   }
+  String? validateAge(String? value) {
+  if (value == null || value.isEmpty) {
+    return "Please enter your age";
+  }
+
+  final numericRegex = RegExp(r'^\d+$'); // Only digits
+  if (!numericRegex.hasMatch(value)) {
+    return "Age must be a number";
+  }
+
+  final age = int.tryParse(value);
+  if (age == null || age <= 0) {
+    return "Enter a valid age";
+  }
+  if (age > 120) {
+    return "Age must be less than or equal to 120";
+  }
+
+  return null; // ✅ Valid
+}
+
 
   String? validateMobileNumber(String? value) {
     value = value?.trim();

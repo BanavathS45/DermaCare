@@ -3,7 +3,10 @@ import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import '../BottomNavigation/BottomNavigation.dart';
+import 'ConfirmBookingDetails.dart';
+import 'ConsultationController.dart';
 
 class ConsultationsType extends StatefulWidget {
   final String mobileNumber;
@@ -20,6 +23,7 @@ class ConsultationsType extends StatefulWidget {
 }
 
 class ConsultationsTypeState extends State<ConsultationsType> {
+  final consultationcontroller = Get.find<Consultationcontroller>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,7 +174,10 @@ class ConsultationsTypeState extends State<ConsultationsType> {
       onTap: () {
         switch (id) {
           case 1:
-            showSnackbar("Success", "Service and Treatment", "success");
+            showSnackbar("Success", "Service and Treatment ${id}", "success");
+
+            consultationcontroller.setConsultationId(1);
+
             Get.offAll(BottomNavController(
               mobileNumber: widget.mobileNumber,
               username: widget.username,
@@ -178,10 +185,18 @@ class ConsultationsTypeState extends State<ConsultationsType> {
             ));
             break;
           case 2:
-            showSnackbar("Warning", "In-Clinic", "warning");
+            consultationcontroller.setConsultationId(2);
+            showSnackbar("Warning", "In-Clinic ${id}", "warning");
+            // Get.to(Confirmbookingdetails(
+            //     // doctor: widget.doctorData,
+            //     ));
             break;
           case 3:
-            showSnackbar("Success", "Video Consultation", "success");
+            consultationcontroller.setConsultationId(3);
+            showSnackbar("Success", "Video Consultation ${id}", "success");
+            // Get.to(Confirmbookingdetails(
+            //     // doctor: widget.doctorData,
+            //     ));
             break;
         }
       },

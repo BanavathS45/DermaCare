@@ -1,6 +1,18 @@
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:timeago/timeago.dart';
+import '../../Controller/CustomerController.dart';
+import '../../Registration/RegisterController.dart';
+import '../../Screens/ConfirmBookingDetails.dart';
+import '../../Screens/ConsultationController.dart';
+import '../../Screens/PatientDetailsFormController.dart';
+import '../../Screens/PatientModel.dart';
+import '../../Screens/PatientsDetails.dart';
+import '../../Utils/DateConverter.dart';
+import '../../Utils/GradintColor.dart';
 import '../../Widget/Bottomsheet.dart';
 import '../ListOfDoctors/DoctorModel.dart';
 import 'package:intl/intl.dart';
@@ -17,60 +29,23 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final ScrollController _dateScrollController = ScrollController();
-  ScheduleController scheduleController = ScheduleController();
+  // final scheduleController = Get.find<ScheduleController>();
 
+  final scheduleController = Get.put(ScheduleController());
+  final patientdetailsformcontroller = Get.put(Patientdetailsformcontroller());
+  final selectedServicesController = Get.find<SelectedServicesController>();
+  final consultationController = Get.find<Consultationcontroller>();
+  final registercontroller = Get.put(Registercontroller());
+  int? id;
   @override
   void initState() {
     super.initState();
     scheduleController.initializeWeekDates();
     scheduleController.setTimeSlots(
         widget.doctorData.doctor.availableSlots); // default selected
+
+    id = consultationController.consultationId.value;
   }
-
-  // TimeOfDay parseTimeOfDay(String timeStr) {
-  //   timeStr = timeStr
-  //       .replaceAll(RegExp(r'[\u00A0\u202F\u200B\uFEFF]'), ' ')
-  //       .replaceAll(RegExp(r'\s+'), ' ')
-  //       .trim();
-
-  //   final format = DateFormat.jm(); // expects "hh:mm a"
-  //   final dt = format.parse(timeStr);
-  //   return TimeOfDay.fromDateTime(dt);
-  // }
-
-  // List<Map<String, dynamic>> getFilteredSlots() {
-  //   final isToday = DateUtils.isSameDay(
-  //     scheduleController.selectedDate,
-  //     DateTime.now(),
-  //   );
-
-  //   final now = TimeOfDay.now();
-
-  //   List<Map<String, dynamic>> rawSlots = scheduleController.timeSlots;
-
-  //   final cleaned = rawSlots.where((slot) {
-  //     final timeStr = slot["slot"] ?? "";
-  //     try {
-  //       final slotTime = parseTimeOfDay(timeStr);
-
-  //       if (!isToday) return true;
-
-  //       // Only keep future slots if today
-  //       return (slotTime.hour > now.hour) ||
-  //           (slotTime.hour == now.hour && slotTime.minute > now.minute);
-  //     } catch (e) {
-  //       print("❌ Failed to parse: $timeStr → $e");
-  //       return false;
-  //     }
-  //   }).toList();
-
-  //   print(
-  //       "✅ Filtered Slots (${isToday ? 'Today' : 'Future'}): ${cleaned.length}");
-  //   for (var slot in scheduleController.timeSlots) {
-  //     print("🕒 Slot: ${slot["slot"]}, booked: ${slot["slotbooked"]}");
-  //   }
-  //   return cleaned;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -80,78 +55,149 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         onNotificationPressed: () {},
         onSettingPressed: () {},
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Month & Arrow
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  DateFormat('MMMM yyyy')
-                      .format(scheduleController.selectedDate),
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: Icon(Icons.keyboard_arrow_right, color: mainColor),
-                  onPressed: () {
-                    _dateScrollController.animateTo(
-                      _dateScrollController.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeOut,
-                    );
-                  },
-                )
-              ],
-            ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Month & Arrow
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    DateFormat('MMMM yyyy')
+                        .format(scheduleController.selectedDate),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.keyboard_arrow_right, color: mainColor),
+                    onPressed: () {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _dateScrollController.animateTo(
+                          _dateScrollController.position.maxScrollExtent,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOut,
+                        );
+                      });
+                    },
+                  ),
+                ],
+              ),
 
-            // Date row
-            showDays(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      DateFormat('MMMM yyyy').format(
-                          scheduleController.selectedDate), // e.g., March 2025
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      DateFormat('EEEE, dd MMMM').format(scheduleController
-                          .selectedDate), // e.g., Tuesday, 26 March
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              const SizedBox(height: 12),
+              showDays(),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        DateFormat('MMMM yyyy')
+                            .format(scheduleController.selectedDate),
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        DateFormat('EEEE, dd MMMM')
+                            .format(scheduleController.selectedDate),
+                        style: TextStyle(
+                            fontSize: 14, color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
 
-            // Available Time Title
+              const SizedBox(height: 24),
+              timeslots(),
 
-            timeslots(),
-            SizedBox(
-              height: 20,
-            ),
+              const SizedBox(height: 24),
+              Divider(color: secondaryColor),
+              const SizedBox(height: 12),
+              languagesKnown(),
+              Divider(color: secondaryColor),
 
-            Divider(
-              height: 3,
-              color: secondaryColor,
-            ),
-            languagesKnown(),
-            Divider(
-              height: 3,
-              color: secondaryColor,
-            ),
-          ],
+              PatientDetailsForm(), // ✅ Add your working form here
+
+              const SizedBox(height: 40),
+              Obx(() => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: selectedServicesController.selectedServices
+                        .map((service) {
+                      return Text(
+                        "${service.serviceName} (Qty: ${service.discountedCost})",
+                        style: TextStyle(fontSize: 16),
+                      );
+                    }).toList(),
+                  )),
+
+              Obx(() {
+                return Text(
+                    "Consultation ID: ${consultationController.consultationId.value}");
+              }),
+              Obx(() {
+                return Text(
+                    "Consultation ID: ${consultationController.consultationId.value}");
+              }),
+              Obx(() {
+                return Text(
+                    "Consultation ID: ${consultationController.consultationId.value}");
+              }),
+            ],
+          ),
         ),
       ),
+      bottomNavigationBar: Container(
+          height: 80,
+          decoration: BoxDecoration(
+            gradient: appGradient(),
+          ),
+          child: TextButton(
+              onPressed: () {
+                if (patientdetailsformcontroller.formKey.currentState!
+                    .validate()) {
+                  if (scheduleController.selectedSlotText.value.isNotEmpty) {
+                    showSnackbar("Success", "Form Validated", "success");
+
+                    Patientmodel patientmodel = Patientmodel(
+                        patientName:
+                            patientdetailsformcontroller.nameController.text,
+                        patientAge:
+                            patientdetailsformcontroller.ageController.text,
+                        gender: registercontroller.selectedGender,
+                        bookingFor: patientdetailsformcontroller.selectedFor,
+                        problem:
+                            patientdetailsformcontroller.notesController.text,
+                        monthYear: DateFormat('MMMM dd, yyyy')
+                            .format(scheduleController.selectedDate),
+                        dayDate: DateFormat('EEEE')
+                            .format(scheduleController.selectedDate),
+                        slot: scheduleController.selectedSlotText.value);
+
+                    print("patientmodel ${patientmodel.toJson()}");
+                    Get.to(Confirmbookingdetails(
+                      doctor: widget.doctorData,
+                      patient: patientmodel,
+                    ));
+                  } else {
+                    showSnackbar("Warning", "Please Select Slot", "warning");
+                  }
+                } else {
+                  showSnackbar("Warning",
+                      "Please fill the Patient Details Form", "warning");
+                }
+              },
+              child: Text(
+                "CONTINUE",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
+              ))),
     );
   }
 
@@ -203,7 +249,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  Widget timeslots() {
+  timeslots() {
     // final filteredSlots = getFilteredSlots();
 
     return Column(
@@ -265,10 +311,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           final slotData = rowSlots[i];
                           final slotText = slotData["slot"];
                           final isBooked = slotData["slotbooked"] == true;
-                          final actualIndex =
-                              scheduleController.timeSlots.indexOf(slotData);
+                          final actualIndex = startIndex + i;
+
                           final isSelected = actualIndex ==
                               scheduleController.selectedSlotIndex;
+
+                          print("sdfsdfsdfdsfd${isBooked}");
 
                           return Expanded(
                             child: Padding(
@@ -279,6 +327,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                     setState(() {
                                       scheduleController.selectedSlotIndex =
                                           actualIndex;
+                                      scheduleController
+                                          .selectedSlotText.value = slotText;
                                     });
                                   }
                                 },
@@ -326,6 +376,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 "No available slots",
                 style: TextStyle(color: Colors.red),
               ),
+        // Obx(() => Text(
+        //       scheduleController.selectedSlotText.value.isNotEmpty
+        //           ? "Selected Time: ${scheduleController.selectedSlotText.value}"
+        //           : "No time slot selected",
+        //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        //     )),
       ],
     );
   }

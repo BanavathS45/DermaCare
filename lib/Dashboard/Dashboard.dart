@@ -196,27 +196,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: dashboardcontroller.services.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 2,
-                        mainAxisSpacing: 20,
-                      ),
-                      itemBuilder: (context, index) {
-                        final service = dashboardcontroller.services[index];
-                        return ServiceCard(
-                          mobileNumber: widget.mobileNumber,
-                          username: widget.username,
-                          service: service,
-                        );
-                      },
+                  GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: dashboardcontroller.services.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 1,
+                      mainAxisSpacing: 5,
                     ),
+                    itemBuilder: (context, index) {
+                      final service = dashboardcontroller.services[index];
+                      return ServiceCard(
+                        mobileNumber: widget.mobileNumber,
+                        username: widget.username,
+                        service: service,
+                      );
+                    },
                   ),
                 ],
               ),

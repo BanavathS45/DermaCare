@@ -10,13 +10,11 @@ String formatDate(String date) {
   }
 }
 
-  DateTime parseDate(String dateStr) {
-    // Define the date format as 'dd-MM-yyyy'
-    DateFormat dateFormat = DateFormat('dd-MM-yyyy');
-    return dateFormat.parse(dateStr); // Parse the string into DateTime
-  }
-
- 
+DateTime parseDate(String dateStr) {
+  // Define the date format as 'dd-MM-yyyy'
+  DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+  return dateFormat.parse(dateStr); // Parse the string into DateTime
+}
 
 String formatDateTime(String date) {
   DateTime parsedDate;
@@ -36,4 +34,9 @@ String formatDateTime(String date) {
       DateFormat('EE, dd MMMM yyyy, hh:mm a').format(parsedDate);
 
   return formattedDateTime;
+}
+
+String formatTime(String time24h) {
+  final parsedTime = DateFormat("HH:mm").parse(time24h); // e.g., "14:30"
+  return DateFormat("h:mm a").format(parsedTime); // e.g., "2:30 PM"
 }
