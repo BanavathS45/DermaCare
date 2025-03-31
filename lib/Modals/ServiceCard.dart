@@ -98,11 +98,11 @@ class _ServiceCardState extends State<ServiceCard> {
 
                   // Null check
                   style: TextStyle(
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    color: mainColor,
-                    height: 1.2,
-                  ),
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold,
+                      color: mainColor,
+                      height: 1.2,
+                      wordSpacing: 0),
 
                   textAlign: TextAlign.center,
                 ),

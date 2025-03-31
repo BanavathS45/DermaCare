@@ -2,6 +2,7 @@ import 'package:cutomer_app/Routes/Navigation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 
 import 'BottomNavigation/BottomNavigation.dart';
 import 'Controller/CustomerController.dart';
@@ -11,9 +12,9 @@ import 'Help/HelpDesk.dart';
 import 'Loading/FullScreeenLoader.dart';
 import 'NetworkCheck/NetworkService.dart';
 import 'Registration/RegisterScreen.dart';
-import 'Screens/ConsultationController.dart';
-import 'Screens/Consultations.dart';
-import 'Screens/PatientsDetails.dart';
+import 'ConfirmBooking/ConsultationController.dart';
+import 'ConfirmBooking/Consultations.dart';
+
 import 'Screens/splashScreen.dart';
 import 'SigninSignUp/LoginScreen.dart';
 import 'TreatmentAndServices/ServiceSelectionController.dart';
@@ -21,8 +22,15 @@ import 'Utils/Constant.dart';
 import 'Utils/CountryAndState.dart';
 import 'Utils/InvoiceDownload.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
+  // ✅ Init only ONCE here
+  await PhonePePaymentSdk.init(
+    "SANDBOX", // or "PRODUCTION"
+    null,
+    "PGTESTPAYUAT", // your merchantId
+    true,
+  );
   NetworkService().initialize();
 }
 
@@ -61,7 +69,8 @@ class MyApp extends StatelessWidget {
                 ButtonTextTheme.primary, // Ensure text is styled properly
           ),
           floatingActionButtonTheme: const FloatingActionButtonThemeData(
-            backgroundColor: Color(0xFF4C3C7D), // FAB background color
+            backgroundColor: mainColor,
+            foregroundColor: Colors.white, // FAB background color
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(

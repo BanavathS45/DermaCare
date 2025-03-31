@@ -1,14 +1,23 @@
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 
- 
-
 /// 🌈 Reusable App Gradient (top-left to bottom-right)
 LinearGradient appGradient() {
   return const LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [secondaryColor, mainColor],
+  );
+}
+
+LinearGradient acrdGradient() {
+  return const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color.fromARGB(255, 202, 214, 255), // equivalent to #CAD6FF
+      Color.fromARGB(255, 121, 128, 153), // example shade close to #798099
+    ],
   );
 }
 
@@ -31,8 +40,6 @@ ButtonStyle transparentButtonStyle({double radius = 8.0}) {
     ),
   );
 }
-
- 
 
 class GradientText extends StatelessWidget {
   final String text;
@@ -62,4 +69,3 @@ class GradientText extends StatelessWidget {
     );
   }
 }
-

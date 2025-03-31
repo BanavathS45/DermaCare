@@ -114,6 +114,7 @@
           "rejected": false,
           "rejectionReason": null
         }
+        
       }
     },
     {
@@ -277,9 +278,9 @@
           "videoConsultationFee": 900
         },
         "status": {
-          "accepted": true,
-          "rejected": false,
-          "rejectionReason": null
+          "accepted": false,
+          "rejected": true,
+          "rejectionReason": "I am not available at the moment."
         }
       }
     },

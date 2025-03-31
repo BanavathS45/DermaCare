@@ -171,8 +171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   const EdgeInsets.symmetric(horizontal: 8.0),
                               child: SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.95,
-                                child:
-                                    buildAppointmentCard(appointment, context),
+                                // child: AppointmentCard(),
                               ),
                             );
                           },

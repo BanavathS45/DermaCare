@@ -426,11 +426,11 @@ class _ProviderDetailsState extends State<ProviderDetails> {
                             ),
                           ],
                         ),
-                        InfoTile(
-                          icon: Icons.calendar_today,
-                          label: "Experience",
-                          value: "${providerInfo.yearsOfExperience} year(s)",
-                        ),
+                        // InfoTile(
+                        //   icon: Icons.calendar_today,
+                        //   label: "Experience",
+                        //   value: "${providerInfo.yearsOfExperience} year(s)",
+                        // ),
                       ],
                     ),
                     const SizedBox(height: 16),

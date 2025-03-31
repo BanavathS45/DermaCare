@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timeago/timeago.dart';
 import '../../Controller/CustomerController.dart';
+import '../../PatientsDetails/PatientDetailsFormController.dart';
+import '../../PatientsDetails/PatientModel.dart';
+import '../../PatientsDetails/PatientsDetails.dart';
 import '../../Registration/RegisterController.dart';
-import '../../Screens/ConfirmBookingDetails.dart';
-import '../../Screens/ConsultationController.dart';
-import '../../Screens/PatientDetailsFormController.dart';
-import '../../Screens/PatientModel.dart';
-import '../../Screens/PatientsDetails.dart';
+import '../../ConfirmBooking/ConfirmBookingDetails.dart';
+import '../../ConfirmBooking/ConsultationController.dart';
+
 import '../../Utils/DateConverter.dart';
 import '../../Utils/GradintColor.dart';
 import '../../Widget/Bottomsheet.dart';
@@ -123,36 +124,23 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
               PatientDetailsForm(), // ✅ Add your working form here
 
-              const SizedBox(height: 40),
-              Obx(() => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: selectedServicesController.selectedServices
-                        .map((service) {
-                      return Text(
-                        "${service.serviceName} (Qty: ${service.discountedCost})",
-                        style: TextStyle(fontSize: 16),
-                      );
-                    }).toList(),
-                  )),
-
-              Obx(() {
-                return Text(
-                    "Consultation ID: ${consultationController.consultationId.value}");
-              }),
-              Obx(() {
-                return Text(
-                    "Consultation ID: ${consultationController.consultationId.value}");
-              }),
-              Obx(() {
-                return Text(
-                    "Consultation ID: ${consultationController.consultationId.value}");
-              }),
+              // const SizedBox(height: 40),
+              // Obx(() => Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: selectedServicesController.selectedServices
+              //           .map((service) {
+              //         return Text(
+              //           "${service.serviceName} (Qty: ${service.discountedCost})",
+              //           style: TextStyle(fontSize: 16),
+              //         );
+              //       }).toList(),
+              //     )),
             ],
           ),
         ),
       ),
       bottomNavigationBar: Container(
-          height: 80,
+          height: 60,
           decoration: BoxDecoration(
             gradient: appGradient(),
           ),

@@ -1,16 +1,24 @@
+import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
+import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
 import 'package:cutomer_app/ServiceSumarry/ServiceIDModal.dart';
+import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../BottomNavigation/BottomNavigation.dart';
+import '../Doctors/ListOfDoctors/DoctorController.dart';
+import '../Doctors/ListOfDoctors/DoctorService.dart';
 import '../Utils/AdreessFormat.dart';
 
 class SuccessScreen extends StatefulWidget {
-  final BookingDetails serviceDetails;
+  final HospitalDoctorModel serviceDetails;
+  final Patientmodel patient;
   final String paymentId;
 
   const SuccessScreen({
     super.key,
     required this.serviceDetails,
     required this.paymentId,
+    required this.patient,
   });
 
   @override
@@ -18,16 +26,24 @@ class SuccessScreen extends StatefulWidget {
 }
 
 class _SuccessScreenState extends State<SuccessScreen> {
+  DoctorService service = DoctorService();
+  final doctorcontroller = Get.put(Doctorcontroller());
+
+  var getDoctor;
+
   @override
   void initState() {
     super.initState();
-    print("servicesAddedList: ${widget..serviceDetails.servicesAdded}");
+    print("servicesAddedList: ${widget..serviceDetails}");
+    getDoctor = service.getDoctorById(widget.serviceDetails.id);
+    doctorcontroller.setDoctorId(widget.serviceDetails.id);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(gradient: appGradient()),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -41,200 +57,127 @@ class _SuccessScreenState extends State<SuccessScreen> {
                 const Icon(
                   Icons.check_circle,
                   size: 100,
-                  color: Colors.green,
+                  color: Colors.white,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Hi, ${widget.serviceDetails.patientName}',
+                  'Congratulation',
                   style: const TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Your Booking is Confirmed!',
+                  'Payment is Successfully',
                   style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 const Text(
                   'Thank you for trusting us! Our team is ready to serve you with excellence.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Payment Details".toUpperCase(),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                            ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        "Payment has been successfully processed!",
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        children: [
-                          Icon(Icons.payment, color: Colors.blue),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Payment ID: ",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                const SizedBox(height: 40),
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.white),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          "You have successfully booked an appointment with",
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.normal,
+                                    color: Colors.white,
                                   ),
-                                  TextSpan(
-                                    text: "${widget.paymentId}",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: Colors.black,
-                                        ),
-                                  ),
-                                ],
-                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          "${widget.serviceDetails.doctor.name}, ${widget.serviceDetails.doctor.qualification}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 25),
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: 25,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_month,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text("${widget.patient.monthYear}",
+                                    style: TextStyle(color: Colors.white)),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Icon(Icons.currency_rupee, color: Colors.orange),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "Amount Paid: ",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                  TextSpan(
-                                    text:
-                                        "₹ ${widget.serviceDetails.payAmount.toStringAsFixed(0)}",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: Colors.black,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      "Service Details".toUpperCase(),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                          ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.timer,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  "${widget.patient.dayDate}, ${widget.patient.slot}",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  '📍 Address: ${formatAddressModel(widget.serviceDetails.addressDto)}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Services Booked:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
                 const SizedBox(height: 8),
-                // Ensure this part properly renders the services
-                if (widget.serviceDetails.servicesAdded.isNotEmpty)
-                  ...widget.serviceDetails.servicesAdded.map((service) {
-                    final serviceName =
-                        service.serviceName ?? 'Unknown Service';
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: Text(
-                        '- $serviceName',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    );
-                  }).toList()
-                else
-                  const Text(
-                    'No services added.',
-                    style: TextStyle(fontSize: 16, color: Colors.red),
-                  ),
-                const SizedBox(height: 32),
               ],
             ),
           ),
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.transparent,
-        child: ElevatedButton(
+      bottomNavigationBar: Container(
+        width: double.infinity,
+        height: 60,
+        decoration: BoxDecoration(gradient: appGradient()),
+        child: TextButton(
           onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (ctx) => BottomNavController(
-                  mobileNumber: widget.serviceDetails.customerNumber,
-                  username: widget.serviceDetails.patientName,
-                  index: 1,
-                ),
+            Get.to(
+              BottomNavController(
+                mobileNumber: widget.serviceDetails.hospital.contactNumber,
+                username: widget.serviceDetails.doctor.name,
+                index: 1,
               ),
-              (route) => false,
             );
           },
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          ),
           child: Text(
-            'View Booking Details'.toUpperCase(),
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            "View Booking Details".toUpperCase(),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
       ),

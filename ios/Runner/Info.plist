@@ -52,6 +52,13 @@
 <array>
   <string>tel</string>
 </array>
+<array>
+    <string>ppemerchantsdkv1</string>
+    <string>ppemerchantsdkv2</string>
+    <string>ppemerchantsdkv3</string>
+    <string>paytmmp</string>
+    <string>gpay</string>
+</array>
 
 </dict>
 </plist>

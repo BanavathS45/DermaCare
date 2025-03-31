@@ -14,13 +14,16 @@ class Doctorcontroller extends GetxController {
   RxDouble selectedRating = 0.0.obs;
 
   RxList<String> cityList = <String>[].obs;
-
- 
+  RxString doctorId = "".obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchDoctors();
+  }
+
+  setDoctorId(String DoctorId) {
+    doctorId.value = DoctorId;
   }
 
   Future<void> fetchDoctors() async {
@@ -38,6 +41,14 @@ class Doctorcontroller extends GetxController {
     } catch (e) {
       print("Fetch error: $e");
     }
+  }
+
+  var isLoading = false.obs;
+
+  void refreshDoctors() async {
+    isLoading.value = true;
+    await fetchDoctors();
+    isLoading.value = false;
   }
 
   void toggleFavorite(HospitalDoctorModel doctor) {

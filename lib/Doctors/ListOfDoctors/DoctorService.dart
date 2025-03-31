@@ -32,6 +32,42 @@ class DoctorService {
       return Future.error('Failed to fetch data: $e');
     }
   }
+
+  Future<HospitalDoctorModel?> getDoctorById(String doctorId) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        List<dynamic> jsonData = jsonDecode(response.body);
+
+        var doctorJson = jsonData.firstWhere(
+          (item) => item['id'] == doctorId,
+          orElse: () => null,
+        );
+
+        if (doctorJson != null) {
+          final doctor = HospitalDoctorModel.fromJson(doctorJson);
+
+          // ✅ Print doctor details
+          print("✅ Doctor Found:");
+          print("ID: ${doctor.id}");
+          print("Name: ${doctor.doctor.name}");
+          print("Specialization: ${doctor.doctor.specialization}");
+          print("Hospital: ${doctor.hospital.name}");
+          print("City: ${doctor.hospital.city}");
+
+          return doctor;
+        } else {
+          print("❌ Doctor with ID $doctorId not found.");
+          return null;
+        }
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("❌ Error in getDoctorById: $e");
+      return null;
+    }
+  }
 }
 
 // }

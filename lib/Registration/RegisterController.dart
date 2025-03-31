@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 import '../BottomNavigation/BottomNavigation.dart';
-import '../Screens/Consultations.dart';
+import '../ConfirmBooking/Consultations.dart';
 import 'RegisterModel.dart';
 import '../Utils/ScaffoldMessageSnacber.dart';
 import '../Utils/ShowSnackBar copy.dart';

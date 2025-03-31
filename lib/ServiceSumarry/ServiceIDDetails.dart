@@ -175,25 +175,25 @@ class _ServiceiddetailsState extends State<Serviceiddetails> {
       totalDiscountedAmount: widget.discountedAmount,
     );
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (ctx) => RazorpaySubscription(
-          onPaymentInitiated: () {
-            // Delay snackbar execution until after the widget has been built
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessageSnackbar.show(
-                context: ctx, // Use the new context from builder
-                message: "Payment process initiated from Previous Screen.",
-                type: SnackbarType.success,
-                durationInSeconds: 5,
-              );
-            });
-          },
-          serviceDetails: serviceDetails,
-        ),
-      ),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (ctx) => RazorpaySubscription(
+    //       onPaymentInitiated: () {
+    //         // Delay snackbar execution until after the widget has been built
+    //         WidgetsBinding.instance.addPostFrameCallback((_) {
+    //           ScaffoldMessageSnackbar.show(
+    //             context: ctx, // Use the new context from builder
+    //             message: "Payment process initiated from Previous Screen.",
+    //             type: SnackbarType.success,
+    //             durationInSeconds: 5,
+    //           );
+    //         });
+    //       },
+    //       serviceDetails: serviceDetails,
+    //     ),
+    //   ),
+    // );
   }
 
   Future<void> fetchUserServices() async {

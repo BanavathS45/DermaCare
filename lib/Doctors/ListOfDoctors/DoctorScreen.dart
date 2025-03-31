@@ -64,7 +64,22 @@ class Doctorscreen extends StatelessWidget {
             ),
             Expanded(
               child: doctorcontroller.filteredDoctors.isEmpty
-                  ? const Center(child: Text("No doctors found"))
+                  ? Column(
+                      children: [
+                        Center(
+                          child: Text("No doctors found"),
+                        ),
+                        doctorcontroller.filteredDoctors.isEmpty
+                            ? FloatingActionButton(
+                                onPressed: () {
+                                  print("I am calling refresh");
+                                  doctorcontroller.refreshDoctors();
+                                },
+                                child: Icon(Icons.refresh),
+                              )
+                            : SizedBox.shrink(),
+                      ],
+                    )
                   : ListView.builder(
                       itemCount: doctorcontroller.filteredDoctors.length,
                       itemBuilder: (context, index) {

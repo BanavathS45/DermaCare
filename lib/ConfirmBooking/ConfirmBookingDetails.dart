@@ -1,13 +1,17 @@
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
+import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controller/CustomerController.dart';
 import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
+import '../PatientsDetails/PatientModel.dart';
+import '../Payments/AllPayments.dart';
 import '../Utils/Constant.dart';
 
+import '../Utils/ScaffoldMessageSnacber.dart';
 import 'ConsultationController.dart';
-import 'PatientModel.dart';
 
 class Confirmbookingdetails extends StatefulWidget {
   final HospitalDoctorModel doctor;
@@ -24,6 +28,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final consultationController = Get.find<Consultationcontroller>();
   Doctor? doctor;
   Hospital? hospital;
+  int? consultationFee;
+  bool isProcessing = false;
 
   @override
   void initState() {
@@ -55,23 +61,33 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             infoRow("Patient Name", widget.patient.patientName),
             infoRow("Patient Age", "${widget.patient.patientAge} Yrs"),
             infoRow("Patient Gender", widget.patient.gender),
+            Divider(
+              height: 1,
+              color: secondaryColor,
+            ),
             infoColumn("Patient Problem", widget.patient.problem),
-
-            // Consultation Type + Fee
-            // Obx(() => Padding(
-            //       padding: const EdgeInsets.symmetric(horizontal: 16),
-            //       child: Column(
-            //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         children: [
-            //           const SizedBox(height: 10),
-            //           Text(
-            //             "Consultation ID: ${consultationController.consultationId.value}",
-            //             style: const TextStyle(fontSize: 16),
-            //           ),
-            //         ],
-            //       ),
-            //     )),
           ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        width: double.infinity,
+        height: 60,
+        decoration: BoxDecoration(gradient: appGradient()),
+        child: TextButton(
+          onPressed: () {
+            Get.to(RazorpaySubscription(
+              context: context,
+              amount: consultationFee.toString(),
+              onPaymentInitiated: () {
+                showSnackbar("Warning", "Paytments Initiated", "warning");
+              },
+              serviceDetails: widget.doctor, patient: widget.patient,
+            ));
+          },
+          child: Text(
+            "Booking & Pay",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
         ),
       ),
     );
@@ -120,10 +136,6 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
       ),
       child: Container(
-        // decoration: BoxDecoration(
-        //   gradient: appGradient(),
-        //   // borderRadius: BorderRadius.circular(16),
-        // ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -246,10 +258,9 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   }
 
   Widget _getServiceButton(int id) {
-    id = 2; // ✅ Test case 2
+    // id = 2; // ✅ Test case 2
     Color color;
     String consultationType;
-    int consultationFee;
 
     switch (id) {
       case 1:
@@ -280,8 +291,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _serviceButton(consultationType, color, id, consultationFee),
-        SlotBookingAndConsltation(consultationType, consultationFee, id),
+        _serviceButton(consultationType, color, id, consultationFee!),
+        SlotBookingAndConsltation(consultationType, consultationFee!, id),
       ],
     );
   }
@@ -375,6 +386,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
                 ),
               ),
               child: Column(
