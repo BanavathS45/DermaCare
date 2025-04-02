@@ -27,7 +27,7 @@ class SuccessScreen extends StatefulWidget {
 
 class _SuccessScreenState extends State<SuccessScreen> {
   DoctorService service = DoctorService();
-  final doctorcontroller = Get.put(Doctorcontroller());
+  final doctorController = Get.put(DoctorController());
 
   var getDoctor;
 
@@ -35,8 +35,8 @@ class _SuccessScreenState extends State<SuccessScreen> {
   void initState() {
     super.initState();
     print("servicesAddedList: ${widget..serviceDetails}");
-    getDoctor = service.getDoctorById(widget.serviceDetails.id);
-    doctorcontroller.setDoctorId(widget.serviceDetails.id);
+    getDoctor = service.getDoctorById(widget.serviceDetails.doctor.doctorId);
+    doctorController.setDoctorId(widget.serviceDetails.doctor.doctorId);
   }
 
   @override

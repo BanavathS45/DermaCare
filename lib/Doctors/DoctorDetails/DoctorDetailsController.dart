@@ -5,10 +5,12 @@ import '../../Inputs/CustomInputField.dart';
 import '../../Inputs/CustomTextAera.dart';
 import '../../Utils/Constant.dart';
 import '../../Utils/GradintColor.dart';
+import '../../Widget/CommentCOntroller.dart';
 import 'ReportController.dart';
 
 class Doctordetailscontroller extends GetxController {
   TextEditingController moreDetails = TextEditingController();
+
 
   Widget iconText(IconData icon, String text) {
     return Row(

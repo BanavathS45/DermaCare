@@ -15,10 +15,7 @@ class AppointmentCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         print("dfhjdsfkhdsjkfhdshfjd");
-        Get.to(
-          AppointmentPreview(
-          
-        ));
+        Get.to(AppointmentPreview());
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),

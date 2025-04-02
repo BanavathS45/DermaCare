@@ -7,10 +7,13 @@ import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 import '../Doctors/Schedules/Schedule.dart';
 import '../Utils/GradintColor.dart';
 
-Widget buildDoctorCard(BuildContext context, HospitalDoctorModel item,
-    Doctorcontroller controller) {
-  final doctor = item.doctor;
-  final hospital = item.hospital;
+Widget buildDoctorCard(
+  BuildContext context,
+  HospitalDoctorModel doctorModel,
+  DoctorController controller,
+) {
+  final doctor = doctorModel.doctor;
+  final hospital = doctorModel.hospital;
 
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -54,7 +57,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel item,
                   Icons.favorite,
                   color: doctor.favorites ? Colors.yellow : Colors.white60,
                 ),
-                onPressed: () => controller.toggleFavorite(item),
+                onPressed: () => controller.toggleFavorite(doctorModel),
               ),
             ],
           ),
@@ -117,26 +120,57 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel item,
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              Column(
-                                children: [
-                                  Icon(
-                                    Icons.verified,
-                                    size: 16,
-                                    color: mainColor,
-                                  ),
-                                  Text(
-                                    "Verified",
-                                    style: TextStyle(fontSize: 10),
-                                  )
-                                ],
+                              SizedBox(
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    // Verified Badge at Top
+                                    Column(
+                                      children: [
+                                        Icon(
+                                          Icons.verified,
+                                          size: 16,
+                                          color: mainColor,
+                                        ),
+                                        Text(
+                                          "Verified",
+                                          style: TextStyle(fontSize: 10),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               )
                             ],
                           ),
-                          Text(
-                            doctor.specialization,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  "${doctor.specialization} ",
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              // Availability at Bottom
+                              Text(
+                                doctor.availablity
+                                    ? "Available\nNow"
+                                    : "Not\nAvailable",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: doctor.availablity
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -173,7 +207,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel item,
                 children: [
                   InkWell(
                     onTap: () {
-                      Get.to(() => DoctorDetailScreen(doctorData: item));
+                      Get.to(() => DoctorDetailScreen(doctorData: doctorModel));
 
                       // Navigator.push(
                       //   context,
@@ -203,7 +237,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel item,
                   ),
                   InkWell(
                     onTap: () {
-                      Get.to(() => ScheduleScreen(doctorData: item));
+                      Get.to(() => ScheduleScreen(doctorData: doctorModel));
 
                       // Navigator.push(
                       //   context,
@@ -238,7 +272,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel item,
   );
 }
 
-Widget buildFilters(Doctorcontroller controller) {
+Widget buildFilters(DoctorController controller) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
     child: Column(

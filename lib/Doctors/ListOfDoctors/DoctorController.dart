@@ -2,10 +2,13 @@ import 'package:get/get.dart';
 import 'DoctorModel.dart';
 import 'DoctorService.dart';
 
-class Doctorcontroller extends GetxController {
-  DoctorService doctorService = DoctorService();
-  RxList<HospitalDoctorModel> allDoctors = <HospitalDoctorModel>[].obs;
+class DoctorController extends GetxController {
+  final DoctorService doctorService = DoctorService();
+
+  RxList<ServiceModel> allServices = <ServiceModel>[].obs;
+  RxList<HospitalDoctorModel> allDoctorsFlat = <HospitalDoctorModel>[].obs;
   RxList<HospitalDoctorModel> filteredDoctors = <HospitalDoctorModel>[].obs;
+  RxInt appointmentCount = 11.obs;
 
   RxString selectedGender = 'All'.obs;
   RxString selectedCity = 'All'.obs;
@@ -15,50 +18,64 @@ class Doctorcontroller extends GetxController {
 
   RxList<String> cityList = <String>[].obs;
   RxString doctorId = "".obs;
+  RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchDoctors();
+    if (allDoctorsFlat.isEmpty) {
+    fetchDoctors(); // ✅ Only fetch if not already loaded
+  }
+   
   }
 
-  setDoctorId(String DoctorId) {
-    doctorId.value = DoctorId;
+  void setDoctorId(String id) {
+    doctorId.value = id;
   }
+  
 
   Future<void> fetchDoctors() async {
-    print("iam calling from fetchDoctors:  "); // 👈 Add this
+    print("🌀 Fetching doctors from API...");
 
     try {
-      final doctors = await doctorService.fetchDoctorAndHospital();
-      print("Total Doctors fetched: ${doctors.length}"); // 👈 Add this
-      allDoctors.value = doctors;
+      isLoading.value = true;
 
-      final cities = doctors.map((e) => e.hospital.city).toSet().toList();
+      final services = await doctorService.fetchServices();
+      allServices.value = services;
+
+      final List<HospitalDoctorModel> extractedDoctors = [];
+
+      for (var service in services) {
+        for (var hospital in service.hospitals) {
+          for (var doctor in hospital.doctors) {
+            extractedDoctors.add(doctor);
+          }
+        }
+      }
+
+      allDoctorsFlat.value = extractedDoctors;
+
+      // Get unique cities
+      final cities =
+          extractedDoctors.map((d) => d.hospital.city).toSet().toList();
       cityList.value = ['All', ...cities];
 
       applyFilters();
     } catch (e) {
-      print("Fetch error: $e");
+      print("❌ Fetch error: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  var isLoading = false.obs;
-
-  void refreshDoctors() async {
-    isLoading.value = true;
-    await fetchDoctors();
-    isLoading.value = false;
-  }
-
-  void toggleFavorite(HospitalDoctorModel doctor) {
-    doctor.doctor.favorites = !doctor.doctor.favorites;
-    allDoctors.refresh();
+  void toggleFavorite(HospitalDoctorModel doctorModel) {
+    doctorModel.doctor.favorites = !doctorModel.doctor.favorites;
+    allDoctorsFlat.refresh();
     applyFilters();
   }
 
   void applyFilters() {
-    List<HospitalDoctorModel> filtered = List.from(allDoctors);
+    List<HospitalDoctorModel> filtered = List.from(allDoctorsFlat);
 
     if (selectedGender.value != 'All') {
       filtered = filtered
@@ -86,5 +103,11 @@ class Doctorcontroller extends GetxController {
     }
 
     filteredDoctors.value = filtered;
+  }
+
+  void refreshDoctors() async {
+    isLoading.value = true;
+    await fetchDoctors();
+    isLoading.value = false;
   }
 }

@@ -81,7 +81,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               onPaymentInitiated: () {
                 showSnackbar("Warning", "Paytments Initiated", "warning");
               },
-              serviceDetails: widget.doctor, patient: widget.patient,
+              serviceDetails: widget.doctor,
+              patient: widget.patient,
             ));
           },
           child: Text(

@@ -8,7 +8,7 @@ import '../ListOfDoctors/DoctorModel.dart';
 
 class Allfeedbacks extends StatefulWidget {
   final HospitalDoctorModel item;
-  final Doctorcontroller controller;
+  final DoctorController controller;
 
   const Allfeedbacks({super.key, required this.item, required this.controller});
 

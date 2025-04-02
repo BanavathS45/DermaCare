@@ -20,7 +20,7 @@ class AppointmentPage extends StatefulWidget {
 
 class _AppointmentPageState extends State<AppointmentPage>
     with AutomaticKeepAliveClientMixin {
-  final Doctorcontroller doctorcontroller = Get.put(Doctorcontroller());
+  final DoctorController doctorController = Get.put(DoctorController());
   final DoctorService doctorService = DoctorService();
 
   bool isLoading = true;
@@ -36,7 +36,8 @@ class _AppointmentPageState extends State<AppointmentPage>
 
   Future<void> _fetchDoctor() async {
     final result =
-        await doctorService.getDoctorById(doctorcontroller.doctorId.toString());
+        await doctorService.getDoctorById(doctorController.doctorId.toString());
+
     if (result != null) {
       setState(() {
         doctor = result;

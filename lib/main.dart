@@ -8,6 +8,8 @@ import 'BottomNavigation/BottomNavigation.dart';
 import 'Controller/CustomerController.dart';
 import 'CustomerRating/CustomerRating.dart';
 import 'Dashboard/DashBoardController.dart';
+import 'Doctors/DoctorInputData.dart';
+import 'Doctors/ListOfDoctors/DoctorController.dart';
 import 'Help/HelpDesk.dart';
 import 'Loading/FullScreeenLoader.dart';
 import 'NetworkCheck/NetworkService.dart';
@@ -23,15 +25,22 @@ import 'Utils/CountryAndState.dart';
 import 'Utils/InvoiceDownload.dart';
 
 void main() async {
-  runApp(const MyApp());
-  // ✅ Init only ONCE here
+  WidgetsFlutterBinding.ensureInitialized();
+
   await PhonePePaymentSdk.init(
     "SANDBOX", // or "PRODUCTION"
     null,
-    "PGTESTPAYUAT", // your merchantId
+    "PGTESTPAYUAT",
     true,
   );
   NetworkService().initialize();
+
+  Get.lazyPut(() => SelectedServicesController());
+  Get.lazyPut(() => Dashboardcontroller());
+  Get.lazyPut(() => Serviceselectioncontroller());
+  Get.lazyPut(() => Consultationcontroller());
+  Get.lazyPut(() => DoctorController());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -40,10 +49,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Get.put(SelectedServicesController());
-    Get.put(Dashboardcontroller());
-    Get.put(Serviceselectioncontroller());
-    Get.put(Consultationcontroller());
+    // Get.put(SelectedServicesController());
+    // Get.put(Dashboardcontroller());
+    // Get.put(Serviceselectioncontroller());
+    // Get.put(Consultationcontroller());
+    // Get.put(DoctorController());
 
     return GetMaterialApp(
         title: 'Derma Care',
@@ -100,7 +110,7 @@ class MyApp extends StatelessWidget {
         //   message: 'Your data is being sent securely.\nPlease wait...',
         //   logoPath: 'assets/surecare_launcher.png',
         // ),
-        // home: PatientDetailsForm()
+        // home: DoctorProfileForm()
         // home: ConsultationsType(mobileNumber: '7842259803', username: 'prashanth',)
         // home: InvoicePage(bookingDetails: null,)
         // home: StateAndCity(

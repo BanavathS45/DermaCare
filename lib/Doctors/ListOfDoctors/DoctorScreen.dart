@@ -1,9 +1,9 @@
+import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../Utils/Constant.dart';
 import '../../Utils/Header.dart';
 import '../../Widget/DoctorCard.dart';
-import 'DoctorController.dart';
 
 class Doctorscreen extends StatelessWidget {
   final String mobileNumber;
@@ -11,7 +11,7 @@ class Doctorscreen extends StatelessWidget {
 
   Doctorscreen({required this.mobileNumber, required this.username});
 
-  final Doctorcontroller doctorcontroller = Get.put(Doctorcontroller());
+  final DoctorController doctorController = Get.find<DoctorController>();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class Doctorscreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildFilters(doctorcontroller),
+            buildFilters(doctorController),
             Padding(
               padding: EdgeInsets.only(left: 15.0),
               child: Row(
@@ -51,7 +51,7 @@ class Doctorscreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        "${doctorcontroller.filteredDoctors.length} ",
+                        "${doctorController.filteredDoctors.length} ",
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -63,17 +63,17 @@ class Doctorscreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: doctorcontroller.filteredDoctors.isEmpty
+              child: doctorController.filteredDoctors.isEmpty
                   ? Column(
                       children: [
                         Center(
                           child: Text("No doctors found"),
                         ),
-                        doctorcontroller.filteredDoctors.isEmpty
+                        doctorController.filteredDoctors.isEmpty
                             ? FloatingActionButton(
                                 onPressed: () {
                                   print("I am calling refresh");
-                                  doctorcontroller.refreshDoctors();
+                                  doctorController.refreshDoctors();
                                 },
                                 child: Icon(Icons.refresh),
                               )
@@ -81,12 +81,12 @@ class Doctorscreen extends StatelessWidget {
                       ],
                     )
                   : ListView.builder(
-                      itemCount: doctorcontroller.filteredDoctors.length,
+                      itemCount: doctorController.filteredDoctors.length,
                       itemBuilder: (context, index) {
                         return buildDoctorCard(
                           context,
-                          doctorcontroller.filteredDoctors[index],
-                          doctorcontroller,
+                          doctorController.filteredDoctors[index],
+                          doctorController,
                         );
                       },
                     ),

@@ -20,7 +20,7 @@ class DoctorDetailScreen extends StatelessWidget {
     final doctor = doctorData.doctor;
     final hospital = doctorData.hospital;
     Doctordetailscontroller doctordetailscontroller = Doctordetailscontroller();
-    final Doctorcontroller doctorcontroller = Get.put(Doctorcontroller());
+    final DoctorController doctorController = Get.put(DoctorController());
     return Scaffold(
       appBar: CommonHeader(
         title: "Doctor Information",
@@ -256,7 +256,7 @@ class DoctorDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
             doctordetailscontroller.buildReportContactSection(
                 context, doctordetailscontroller.moreDetails),
-            buildRatingAndFeedback(context, doctorData, doctorcontroller),
+            buildRatingAndFeedback(context, doctorData, doctorController),
           ],
         ),
       ),
