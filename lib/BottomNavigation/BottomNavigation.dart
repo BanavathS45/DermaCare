@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../Dashboard/Dashboard.dart';
+import '../Doctors/ListOfDoctors/DoctorController.dart';
 import 'Appoinments/Appoinments.dart';
 import 'Profile/Profile.dart';
 import 'Wellness/Wellness.dart';
@@ -22,12 +24,13 @@ class BottomNavController extends StatefulWidget {
 
 class _BottomNavControllerState extends State<BottomNavController> {
   late int _selectedIndex;
-
+  final doctorController = Get.find<DoctorController>();
   late List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
+    print("doctorController.appointmentCount ${doctorController.appointmentCount}");
     _selectedIndex = widget.index;
 
     // Initialize pages
@@ -77,13 +80,43 @@ class _BottomNavControllerState extends State<BottomNavController> {
           onTap: _onItemTapped,
           selectedItemColor: Colors.amber,
           unselectedItemColor: Colors.white,
-          items: const <BottomNavigationBarItem>[
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
               label: 'Services',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline_rounded),
+              
+              icon: Stack(
+                children: [
+                  const Icon(Icons.calendar_month),
+                  if (doctorController.appointmentCount.value > 0)
+                    Positioned(
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          doctorController.appointmentCount.value > 10
+                              ? '10+'
+                              : '${doctorController.appointmentCount.value}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
               label: 'Appointment',
             ),
             BottomNavigationBarItem(
@@ -91,8 +124,8 @@ class _BottomNavControllerState extends State<BottomNavController> {
               label: 'Profile',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month_outlined),
-              label: 'Wellness',
+              icon: Icon(Icons.video_call),
+              label: 'Video Consultation',
             ),
           ],
         ),

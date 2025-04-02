@@ -8,7 +8,7 @@ class DoctorController extends GetxController {
   RxList<ServiceModel> allServices = <ServiceModel>[].obs;
   RxList<HospitalDoctorModel> allDoctorsFlat = <HospitalDoctorModel>[].obs;
   RxList<HospitalDoctorModel> filteredDoctors = <HospitalDoctorModel>[].obs;
-  RxInt appointmentCount = 11.obs;
+  RxInt appointmentCount = 0.obs;
 
   RxString selectedGender = 'All'.obs;
   RxString selectedCity = 'All'.obs;
@@ -23,16 +23,19 @@ class DoctorController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (allDoctorsFlat.isEmpty) {
+
     fetchDoctors(); // ✅ Only fetch if not already loaded
   }
-   
-  }
 
-  void setDoctorId(String id) {
+  void setDoctorId(String id) async {
     doctorId.value = id;
+
+    final doctor = await doctorService.getDoctorById(id);
+    if (doctor != null) {
+      // ✅ Example: Update appointmentCount based on doctor logic
+      appointmentCount.value = doctor.doctor.bookingSlots.length;
+    }
   }
-  
 
   Future<void> fetchDoctors() async {
     print("🌀 Fetching doctors from API...");
