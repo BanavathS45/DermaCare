@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../Utils/Constant.dart';
 import '../../Widget/Bottomsheet.dart';
+import '../ListOfDoctors/DoctorModel.dart';
 import 'Schedule.dart';
 
 class ScheduleController extends GetxController {
@@ -41,49 +43,113 @@ class ScheduleController extends GetxController {
     // Add more tribal/regional languages as needed
   };
 
-  List<Map<String, dynamic>> timeSlots = [];
-
-  DateTime selectedDate = DateTime.now();
-  var selectedSlotText = "".obs;
+  // DateTime selectedDate = DateTime.now();
+  // var selectedSlotText = "".obs;
 
   /// Currently selected indices
-  int selectedDayIndex = 0;
-  int selectedSlotIndex = -1;
+  // int selectedSlotIndex = -1;
 
   /// List of 7 dates from today
-  List<DateTime> weekDates = [];
-
- 
+  // List<DateTime> weekDates = [];
 
   /// Initialize 7-day calendar
+  // void initializeWeekDates() {
+  //   final today = DateTime.now();
+  //   weekDates = List.generate(7, (index) => today.add(Duration(days: index)));
+  //   selectedDate = weekDates[0];
+  // }
+
+  // /// Set time slots from doctor data (like availableSlots)
+  // void setTimeSlots(List<Map<String, dynamic>> slots) {
+  //   timeSlots = slots;
+  // }
+
+  // /// Select a date by index
+  // void selectDate(int index) {
+  //   selectedDayIndex = index;
+  //   selectedDate = weekDates[index];
+  // }
+
+  // /// Select a time slot by index
+  // void selectSlot(int index) {
+  //   selectedSlotIndex = index;
+  // }
+
+  // /// Reset all selections
+  // void reset() {
+  //   selectedDayIndex = 0;
+  //   selectedSlotIndex = -1;
+  //   selectedDate = weekDates.isNotEmpty ? weekDates[0] : DateTime.now();
+  //   timeSlots.clear();
+  // }
+
+  final Rx<DateTime> selectedDate = DateTime.now().obs;
+  final RxList<Slot> currentSlots = <Slot>[].obs;
+  final RxInt selectedSlotIndex = (-1).obs;
+  final RxString selectedSlotText = ''.obs;
+  List<Map<String, dynamic>> timeSlots = [];
+  int selectedDayIndex = 0;
+  List<DateTime> weekDates = [];
+
   void initializeWeekDates() {
     final today = DateTime.now();
     weekDates = List.generate(7, (index) => today.add(Duration(days: index)));
-    selectedDate = weekDates[0];
+    selectedDate.value = weekDates[0];
   }
 
-  /// Set time slots from doctor data (like availableSlots)
-  void setTimeSlots(List<Map<String, dynamic>> slots) {
-    timeSlots = slots;
+  void setDoctorSlots(List<DoctorSlot> allSlots) {
+    final date = selectedDate.value;
+    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+
+    final slotsForDate =
+        allSlots.firstWhereOrNull((e) => e.date == dateStr)?.availableSlots ??
+            [];
+
+    // 🕐 Filter only if selected date is today
+    if (DateFormat('yyyy-MM-dd').format(DateTime.now()) == dateStr) {
+      final now = DateTime.now();
+
+      final filtered = slotsForDate.where((slot) {
+        final slotTime = _parseSlotTime(slot.slot);
+        return slotTime.isAfter(now);
+      }).toList();
+
+      currentSlots.assignAll(filtered);
+    } else {
+      currentSlots.assignAll(slotsForDate);
+    }
   }
 
-  /// Select a date by index
-  void selectDate(int index) {
-    selectedDayIndex = index;
-    selectedDate = weekDates[index];
+  DateTime _parseSlotTime(String slot) {
+    final date = selectedDate.value;
+    final parsedTime = DateFormat('hh:mm a').parse(slot); // e.g. "01:00 PM"
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+      parsedTime.hour,
+      parsedTime.minute,
+    );
   }
 
-  /// Select a time slot by index
-  void selectSlot(int index) {
-    selectedSlotIndex = index;
+  void selectDate(DateTime date, List<DoctorSlot> allSlots) {
+    selectedDate.value = date;
+    selectedSlotIndex.value = -1;
+    selectedSlotText.value = '';
+    _updateSlotsForDate(allSlots, date);
   }
 
-  /// Reset all selections
-  void reset() {
-    selectedDayIndex = 0;
-    selectedSlotIndex = -1;
-    selectedDate = weekDates.isNotEmpty ? weekDates[0] : DateTime.now();
-    timeSlots.clear();
+  void _updateSlotsForDate(List<DoctorSlot> allSlots, DateTime date) {
+    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+    final slotData =
+        allSlots.firstWhereOrNull((e) => e.date == dateStr)?.availableSlots ??
+            [];
+    currentSlots.assignAll(slotData);
+  }
+
+  void selectSlot(int index, String slotText) {
+    selectedSlotIndex.value = index;
+    selectedSlotText.value = slotText;
   }
 
   void showReportBottomSheet({

@@ -10,6 +10,7 @@ import 'CustomerRating/CustomerRating.dart';
 import 'Dashboard/DashBoardController.dart';
 import 'Doctors/DoctorInputData.dart';
 import 'Doctors/ListOfDoctors/DoctorController.dart';
+import 'Doctors/Schedules/ScheduleController.dart';
 import 'Help/HelpDesk.dart';
 import 'Loading/FullScreeenLoader.dart';
 import 'NetworkCheck/NetworkService.dart';
@@ -35,11 +36,13 @@ void main() async {
   );
   NetworkService().initialize();
 
-  Get.lazyPut(() => SelectedServicesController());
-  Get.lazyPut(() => Dashboardcontroller());
-  Get.lazyPut(() => Serviceselectioncontroller());
-  Get.lazyPut(() => Consultationcontroller());
-  Get.lazyPut(() => DoctorController());
+  Get.put(SelectedServicesController());
+  Get.put(Dashboardcontroller());
+  Get.put(Serviceselectioncontroller());
+  Get.put(Consultationcontroller());
+  Get.put(DoctorController());
+  Get.put(ScheduleController()); // ✅ FIXED// 👈 This registers it eagerly
+
   runApp(const MyApp());
 }
 

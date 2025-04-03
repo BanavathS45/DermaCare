@@ -26,25 +26,96 @@
               ],
               "availableDays": "Mon - Sat",
               "availableTimings": "09:00 AM - 05:00 PM",
-              "availableSlots": [
-                { "slot": "09:00 AM", "slotbooked": false },
-                { "slot": "09:30 AM", "slotbooked": false },
-                { "slot": "10:00 AM", "slotbooked": true },
-                { "slot": "10:30 AM", "slotbooked": false },
-                { "slot": "11:00 AM", "slotbooked": false },
-                { "slot": "11:30 AM", "slotbooked": false },
-                { "slot": "12:00 PM", "slotbooked": false },
-                { "slot": "12:30 PM", "slotbooked": false },
-                { "slot": "01:00 PM", "slotbooked": false },
-                { "slot": "01:30 PM", "slotbooked": false },
-                { "slot": "02:00 PM", "slotbooked": false },
-                { "slot": "02:30 PM", "slotbooked": false },
-                { "slot": "03:00 PM", "slotbooked": false },
-                { "slot": "03:30 PM", "slotbooked": false },
-                { "slot": "04:00 PM", "slotbooked": false },
-                { "slot": "04:30 PM", "slotbooked": false },
-                { "slot": "05:00 PM", "slotbooked": false }
+              "slots": [
+                {
+                  "date": "2025-04-03",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": true },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-04",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": true },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-05",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-06",
+                  "availableSlots": [
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-07",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-08",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-09",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": true },
+                    { "slot": "09:30 AM", "slotbooked": false }
+                  ]
+                }
               ],
+
               "languagesKnown": ["English", "Hindi", "Telugu"],
               "profile": "Specializes in diagnosing and treating hereditary skin disorders and improving personalized skincare treatments.",
               "profileImage": "https://randomuser.me/api/portraits/women/44.jpg",
@@ -67,7 +138,8 @@
                     "rating": 4,
                     "comment": "Dr. Mehta is amazing! She helped me treat my acne which I’ve been struggling with for years. She explained everything so clearly and the prescription worked like magic within weeks. Highly recommend Derma Care!",
                     "rated": true,
-                    "createAt": "2025-03-27T10:00:00Z"
+                    "createAt": "2025-03-27T10:00:00Z",
+                    "replies": []
                   },
                   {
                     "userId": "676e6648d8bb6d014787a101",
@@ -162,22 +234,91 @@
               ],
               "availableDays": "Tue - Sat",
               "availableTimings": "10:00 AM - 05:00 PM",
-              "availableSlots": [
-                { "slot": "10:00 AM", "slotbooked": true },
-                { "slot": "10:30 AM", "slotbooked": false },
-                { "slot": "11:00 AM", "slotbooked": false },
-                { "slot": "11:30 AM", "slotbooked": false },
-                { "slot": "12:00 PM", "slotbooked": false },
-                { "slot": "12:30 PM", "slotbooked": false },
-                { "slot": "01:00 PM", "slotbooked": false },
-                { "slot": "01:30 PM", "slotbooked": false },
-                { "slot": "02:00 PM", "slotbooked": false },
-                { "slot": "02:30 PM", "slotbooked": false },
-                { "slot": "03:00 PM", "slotbooked": false },
-                { "slot": "03:30 PM", "slotbooked": false },
-                { "slot": "04:00 PM", "slotbooked": false },
-                { "slot": "04:30 PM", "slotbooked": false },
-                { "slot": "05:00 PM", "slotbooked": false }
+              "slots": [
+                {
+                  "date": "2025-04-03",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": true },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-04",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": true },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-05",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-06",
+                  "availableSlots": [
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-07",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-08",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-09",
+                  "availableSlots": []
+                }
               ],
               "languagesKnown": ["English", "Hindi", "Marathi"],
               "profile": "Expert in cosmetic skin care, lasers and rejuvenation treatments.",
@@ -252,24 +393,91 @@
               "focusAreas": ["Eczema", "Infant Rashes", "Birthmark Management"],
               "availableDays": "Mon - Sat",
               "availableTimings": "11:00 AM - 05:00 PM",
-              "availableSlots": [
-                { "slot": "09:00 AM", "slotbooked": false },
-                { "slot": "09:30 AM", "slotbooked": false },
-                { "slot": "10:00 AM", "slotbooked": true },
-                { "slot": "10:30 AM", "slotbooked": false },
-                { "slot": "11:00 AM", "slotbooked": false },
-                { "slot": "11:30 AM", "slotbooked": false },
-                { "slot": "12:00 PM", "slotbooked": false },
-                { "slot": "12:30 PM", "slotbooked": false },
-                { "slot": "01:00 PM", "slotbooked": false },
-                { "slot": "01:30 PM", "slotbooked": false },
-                { "slot": "02:00 PM", "slotbooked": false },
-                { "slot": "02:30 PM", "slotbooked": false },
-                { "slot": "03:00 PM", "slotbooked": false },
-                { "slot": "03:30 PM", "slotbooked": false },
-                { "slot": "04:00 PM", "slotbooked": false },
-                { "slot": "04:30 PM", "slotbooked": false },
-                { "slot": "05:00 PM", "slotbooked": false }
+              "slots": [
+                {
+                  "date": "2025-04-03",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": true },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-04",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": true },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-05",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-06",
+                  "availableSlots": [
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-07",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-08",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-09",
+                  "availableSlots": []
+                }
               ],
               "languagesKnown": ["English", "Hindi", "Urdu"],
               "profile": "Provides gentle, expert care for skin conditions in children and infants.",
@@ -335,20 +543,91 @@
               "focusAreas": ["Hair Transplant", "Hair Fall", "Dandruff"],
               "availableDays": "Tue - Sat",
               "availableTimings": "09:00 AM - 05:00 PM",
-              "availableSlots": [
-                { "slot": "11:00 AM", "slotbooked": false },
-                { "slot": "11:30 AM", "slotbooked": false },
-                { "slot": "12:00 PM", "slotbooked": true },
-                { "slot": "12:30 PM", "slotbooked": false },
-                { "slot": "01:00 PM", "slotbooked": false },
-                { "slot": "01:30 PM", "slotbooked": false },
-                { "slot": "02:00 PM", "slotbooked": false },
-                { "slot": "02:30 PM", "slotbooked": false },
-                { "slot": "03:00 PM", "slotbooked": false },
-                { "slot": "03:30 PM", "slotbooked": false },
-                { "slot": "04:00 PM", "slotbooked": false },
-                { "slot": "04:30 PM", "slotbooked": false },
-                { "slot": "05:00 PM", "slotbooked": false }
+              "slots": [
+                {
+                  "date": "2025-04-03",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": true },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-04",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": true },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-05",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-06",
+                  "availableSlots": [
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-07",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-08",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-09",
+                  "availableSlots": []
+                }
               ],
               "languagesKnown": ["English", "Hindi", "Kannada"],
               "profile": "Leading hair specialist with expertise in transplant and scalp care.",
@@ -429,22 +708,91 @@
               "focusAreas": ["Psoriasis", "Vitiligo", "Chronic Eczema"],
               "availableDays": "Tue - Sat",
               "availableTimings": "10:00 AM - 05:00 PM",
-              "availableSlots": [
-                { "slot": "10:00 AM", "slotbooked": false },
-                { "slot": "10:30 AM", "slotbooked": false },
-                { "slot": "11:00 AM", "slotbooked": false },
-                { "slot": "11:30 AM", "slotbooked": false },
-                { "slot": "12:00 PM", "slotbooked": false },
-                { "slot": "12:30 PM", "slotbooked": false },
-                { "slot": "01:00 PM", "slotbooked": false },
-                { "slot": "01:30 PM", "slotbooked": false },
-                { "slot": "02:00 PM", "slotbooked": false },
-                { "slot": "02:30 PM", "slotbooked": false },
-                { "slot": "03:00 PM", "slotbooked": false },
-                { "slot": "03:30 PM", "slotbooked": false },
-                { "slot": "04:00 PM", "slotbooked": false },
-                { "slot": "04:30 PM", "slotbooked": false },
-                { "slot": "05:00 PM", "slotbooked": false }
+              "slots": [
+                {
+                  "date": "2025-04-03",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": true },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-04",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": true },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-05",
+                  "availableSlots": [
+                    { "slot": "09:00 AM", "slotbooked": false },
+                    { "slot": "09:30 AM", "slotbooked": false },
+                    { "slot": "10:00 AM", "slotbooked": false },
+                    { "slot": "10:30 AM", "slotbooked": false },
+                    { "slot": "11:00 AM", "slotbooked": false },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-06",
+                  "availableSlots": [
+                    { "slot": "12:00 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "01:00 PM", "slotbooked": false },
+                    { "slot": "01:30 PM", "slotbooked": false },
+                    { "slot": "02:00 PM", "slotbooked": false },
+                    { "slot": "02:30 PM", "slotbooked": false },
+                    { "slot": "03:00 PM", "slotbooked": false },
+                    { "slot": "03:30 PM", "slotbooked": false },
+                    { "slot": "04:00 PM", "slotbooked": false },
+                    { "slot": "04:30 PM", "slotbooked": false },
+                    { "slot": "05:00 PM", "slotbooked": false }
+                  ]
+                },
+                {
+                  "date": "2025-04-07",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-08",
+                  "availableSlots": []
+                },
+                {
+                  "date": "2025-04-09",
+                  "availableSlots": []
+                }
               ],
               "languagesKnown": ["English", "Telugu", "Gujarati"],
               "profile": "Experienced in managing long-term dermatological diseases using medical therapies.",
