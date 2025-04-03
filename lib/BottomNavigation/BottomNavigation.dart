@@ -30,7 +30,8 @@ class _BottomNavControllerState extends State<BottomNavController> {
   @override
   void initState() {
     super.initState();
-    print("doctorController.appointmentCount ${doctorController.appointmentCount}");
+    print(
+        "doctorController.appointmentCount ${doctorController.appointmentCount}");
     _selectedIndex = widget.index;
 
     // Initialize pages
@@ -86,7 +87,6 @@ class _BottomNavControllerState extends State<BottomNavController> {
               label: 'Services',
             ),
             BottomNavigationBarItem(
-              
               icon: Stack(
                 children: [
                   const Icon(Icons.calendar_month),
@@ -123,10 +123,44 @@ class _BottomNavControllerState extends State<BottomNavController> {
               icon: Icon(Icons.person_2_outlined),
               label: 'Profile',
             ),
+
             BottomNavigationBarItem(
-              icon: Icon(Icons.video_call),
+              icon: Stack(
+                children: [
+                  const Icon(Icons.video_call),
+                  if (doctorController.appointmentCount.value > 0)
+                    Positioned(
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          doctorController.appointmentCount.value > 10
+                              ? '10+'
+                              : '${doctorController.appointmentCount.value}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
               label: 'Video Consultation',
             ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.video_call),
+            //   label: 'Video Consultation',
+            // ),
           ],
         ),
       ),
