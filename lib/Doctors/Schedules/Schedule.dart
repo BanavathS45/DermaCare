@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Doctors/Schedules/ScheduleController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -17,7 +18,6 @@ import '../../Utils/GradintColor.dart';
 import '../../Widget/Bottomsheet.dart';
 import '../ListOfDoctors/DoctorModel.dart';
 import 'package:intl/intl.dart';
-import 'scheduleController.dart';
 
 class ScheduleScreen extends StatefulWidget {
   final HospitalDoctorModel doctorData;
@@ -32,18 +32,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final ScrollController _dateScrollController = ScrollController();
   // final scheduleController = Get.find<ScheduleController>();
 
-  final scheduleController = Get.put(ScheduleController());
+  final scheduleController = Get.find<ScheduleController>();
   final patientdetailsformcontroller = Get.put(Patientdetailsformcontroller());
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final registercontroller = Get.put(Registercontroller());
   int? id;
+  List<DoctorSlot>? slots;
+
   @override
   void initState() {
     super.initState();
     scheduleController.initializeWeekDates();
-    scheduleController.setTimeSlots(
-        widget.doctorData.doctor.availableSlots); // default selected
+    scheduleController.setDoctorSlots(widget.doctorData.doctor.slots);
+
+    //  controller.setDoctorSlots(widget.doctor.slots);
 
     id = consultationController.consultationId.value;
   }
@@ -68,7 +71,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 children: [
                   Text(
                     DateFormat('MMMM yyyy')
-                        .format(scheduleController.selectedDate),
+                        .format(scheduleController.selectedDate.value),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -97,14 +100,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     children: [
                       Text(
                         DateFormat('MMMM yyyy')
-                            .format(scheduleController.selectedDate),
+                            .format(scheduleController.selectedDate.value),
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         DateFormat('EEEE, dd MMMM')
-                            .format(scheduleController.selectedDate),
+                            .format(scheduleController.selectedDate.value),
                         style: TextStyle(
                             fontSize: 14, color: Colors.grey.shade600),
                       ),
@@ -161,9 +164,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         problem:
                             patientdetailsformcontroller.notesController.text,
                         monthYear: DateFormat('MMMM dd, yyyy')
-                            .format(scheduleController.selectedDate),
+                            .format(scheduleController.selectedDate.value),
                         dayDate: DateFormat('EEEE')
-                            .format(scheduleController.selectedDate),
+                            .format(scheduleController.selectedDate.value),
                         slot: scheduleController.selectedSlotText.value);
 
                     print("patientmodel ${patientmodel.toJson()}");
@@ -280,31 +283,29 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ],
         ),
         const SizedBox(height: 10),
-        scheduleController.timeSlots.isNotEmpty
+        scheduleController.currentSlots.isNotEmpty
             ? Column(
                 children: List.generate(
-                  (scheduleController.timeSlots.length / 4).ceil(),
+                  (scheduleController.currentSlots.length / 4).ceil(),
                   (rowIndex) {
                     final startIndex = rowIndex * 4;
-                    final endIndex =
-                        (startIndex + 4 < scheduleController.timeSlots.length)
-                            ? startIndex + 4
-                            : scheduleController.timeSlots.length;
-                    final rowSlots = scheduleController.timeSlots
+                    final endIndex = (startIndex + 4 <
+                            scheduleController.currentSlots.length)
+                        ? startIndex + 4
+                        : scheduleController.currentSlots.length;
+                    final rowSlots = scheduleController.currentSlots
                         .sublist(startIndex, endIndex);
 
                     return Row(
                       children: List.generate(4, (i) {
                         if (i < rowSlots.length) {
                           final slotData = rowSlots[i];
-                          final slotText = slotData["slot"];
-                          final isBooked = slotData["slotbooked"] == true;
+                          final slotText = slotData.slot;
+                          final isBooked = slotData.slotbooked;
                           final actualIndex = startIndex + i;
 
                           final isSelected = actualIndex ==
-                              scheduleController.selectedSlotIndex;
-
-                          print("sdfsdfsdfdsfd${isBooked}");
+                              scheduleController.selectedSlotIndex.value;
 
                           return Expanded(
                             child: Padding(
@@ -313,10 +314,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                 onTap: () {
                                   if (!isBooked) {
                                     setState(() {
-                                      scheduleController.selectedSlotIndex =
-                                          actualIndex;
-                                      scheduleController
-                                          .selectedSlotText.value = slotText;
+                                      scheduleController.selectSlot(
+                                          actualIndex, slotText);
                                     });
                                   }
                                 },
@@ -330,8 +329,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                             ? mainColor
                                             : Colors.white,
                                     border: Border.all(
-                                      color: isBooked ? Colors.grey : mainColor,
-                                    ),
+                                        color:
+                                            isBooked ? Colors.grey : mainColor),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   alignment: Alignment.center,
@@ -351,25 +350,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             ),
                           );
                         } else {
-                          return const Expanded(
-                            child: SizedBox(height: 48),
-                          );
+                          return const Expanded(child: SizedBox(height: 48));
                         }
                       }),
                     );
                   },
                 ),
               )
-            : const Text(
-                "No available slots",
-                style: TextStyle(color: Colors.red),
-              ),
-        // Obx(() => Text(
-        //       scheduleController.selectedSlotText.value.isNotEmpty
-        //           ? "Selected Time: ${scheduleController.selectedSlotText.value}"
-        //           : "No time slot selected",
-        //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        //     )),
+            : const Text("No available slots",
+                style: TextStyle(color: Colors.red)),
       ],
     );
   }
@@ -388,7 +377,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             onTap: () {
               setState(() {
                 scheduleController.selectedDayIndex = index;
-                scheduleController.selectedDate = date;
+                scheduleController.selectedDate.value = date;
+                scheduleController
+                    .setDoctorSlots(widget.doctorData.doctor.slots);
               });
             },
             child: Container(
@@ -418,4 +409,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ),
     );
   }
+
+
 }

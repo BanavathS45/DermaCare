@@ -144,7 +144,9 @@ class Doctor {
   final List<String> focusAreas;
   final String availableDays;
   final String availableTimings;
-  final List<Map<String, dynamic>> availableSlots;
+  // final List<Map<String, dynamic>> availableSlots;
+  final List<DoctorSlot> slots;
+
   final List<String> languagesKnown;
   final String profile;
   final String profileImage;
@@ -169,7 +171,8 @@ class Doctor {
     required this.focusAreas,
     required this.availableDays,
     required this.availableTimings,
-    required this.availableSlots,
+    // required this.availableSlots,
+    required this.slots,
     required this.languagesKnown,
     required this.profile,
     required this.profileImage,
@@ -196,8 +199,10 @@ class Doctor {
       focusAreas: List<String>.from(json['focusAreas'] ?? []),
       availableDays: json['availableDays'] ?? '',
       availableTimings: json['availableTimings'] ?? '',
-      availableSlots:
-          List<Map<String, dynamic>>.from(json['availableSlots'] ?? []),
+      // availableSlots:List<Map<String, dynamic>>.from(json['availableSlots'] ?? []),
+      slots:
+          (json['slots'] as List).map((e) => DoctorSlot.fromJson(e)).toList(),
+
       languagesKnown: List<String>.from(json['languagesKnown'] ?? []),
       profile: json['profile'] ?? '',
       profileImage: json['profileImage'] ?? '',
@@ -226,7 +231,8 @@ class Doctor {
         'focusAreas': focusAreas,
         'availableDays': availableDays,
         'availableTimings': availableTimings,
-        'availableSlots': availableSlots,
+        // 'availableSlots': availableSlots,
+        'slots': slots.map((e) => e.toJson()).toList(),
         'languagesKnown': languagesKnown,
         'profile': profile,
         'profileImage': profileImage,
@@ -242,6 +248,47 @@ class Doctor {
         'bookingSlots': bookingSlots,
         'fee': fee.toJson(),
         'status': status.toJson(),
+      };
+}
+
+class DoctorSlot {
+  final String date;
+  final List<Slot> availableSlots;
+
+  DoctorSlot({
+    required this.date,
+    required this.availableSlots,
+  });
+
+  factory DoctorSlot.fromJson(Map<String, dynamic> json) {
+    return DoctorSlot(
+      date: json['date'],
+      availableSlots: List<Slot>.from(
+        json['availableSlots'].map((e) => Slot.fromJson(e)),
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'date': date,
+        'availableSlots': availableSlots.map((e) => e.toJson()).toList(),
+      };
+}
+
+class Slot {
+  final String slot;
+  final bool slotbooked;
+
+  Slot({required this.slot, required this.slotbooked});
+
+  factory Slot.fromJson(Map<String, dynamic> json) => Slot(
+        slot: json['slot'],
+        slotbooked: json['slotbooked'],
+      );
+
+  Map<String, dynamic> toJson() => {
+        'slot': slot,
+        'slotbooked': slotbooked,
       };
 }
 
