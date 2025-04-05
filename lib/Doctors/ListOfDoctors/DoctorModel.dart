@@ -34,6 +34,12 @@ class ServiceHospitalModel {
   final String address;
   final String city;
   final String contactNumber;
+  final int hospitalOveralRating;
+  final String hospitalRegistrations;
+  final String openingTime;
+  final String closingTime;
+  final String hospitalLogo;
+  final List<dynamic> hospitalDoucuments;
   final List<HospitalDoctorModel> doctors;
 
   ServiceHospitalModel({
@@ -42,6 +48,12 @@ class ServiceHospitalModel {
     required this.address,
     required this.city,
     required this.contactNumber,
+    required this.hospitalOveralRating,
+    required this.hospitalRegistrations,
+    required this.openingTime,
+    required this.closingTime,
+    required this.hospitalLogo,
+    required this.hospitalDoucuments,
     required this.doctors,
   });
 
@@ -52,14 +64,26 @@ class ServiceHospitalModel {
       city: json['city'] ?? '',
       contactNumber: json['contactNumber'] ?? '',
       hospitalId: json['hospitalId'],
+      hospitalOveralRating: json['hospitalOveralRating'] ?? 0,
+      hospitalRegistrations: json['hospitalRegistrations'] ?? '',
+      openingTime: json['openingTime'] ?? '',
+      closingTime: json['closingTime'] ?? '',
+      hospitalLogo: json['hospitalLogo'] ?? '',
+      hospitalDoucuments: json['hospitalDoucuments'] ?? [],
     );
 
     return ServiceHospitalModel(
-      hospitalId: json['hospitalId'] ?? '',
-      name: hospitalInfo.name,
-      address: hospitalInfo.address,
-      city: hospitalInfo.city,
-      contactNumber: hospitalInfo.contactNumber,
+      hospitalId: json['hospitalId'],
+      name: json['name'] ?? '',
+      address: json['address'] ?? '',
+      city: json['city'] ?? '',
+      contactNumber: json['contactNumber'] ?? '',
+      hospitalOveralRating: json['hospitalOveralRating'] ?? 0,
+      hospitalRegistrations: json['hospitalRegistrations'] ?? '',
+      openingTime: json['openingTime'] ?? '',
+      closingTime: json['closingTime'] ?? '',
+      hospitalLogo: json['hospitalLogo'] ?? '',
+      hospitalDoucuments: json['hospitalDoucuments'] ?? [],
       doctors: (json['doctors'] as List)
           .map((docJson) => HospitalDoctorModel(
                 id: docJson['doctorId'] ?? '',
@@ -77,6 +101,11 @@ class ServiceHospitalModel {
         'address': address,
         'city': city,
         'contactNumber': contactNumber,
+        'hospitalOveralRating': hospitalOveralRating,
+        'hospitalRegistrations': hospitalRegistrations,
+        'openingTime': openingTime,
+        'closingTime': closingTime,
+        'hospitalLogo': hospitalLogo,
         'doctors': doctors.map((e) => e.toJson()).toList(),
       };
 }
@@ -108,6 +137,12 @@ class Hospital {
   final String address;
   final String city;
   final String contactNumber;
+  final int hospitalOveralRating;
+  final String hospitalRegistrations;
+  final String openingTime;
+  final String closingTime;
+  final String hospitalLogo;
+  final List<dynamic> hospitalDoucuments;
 
   Hospital({
     required this.hospitalId,
@@ -115,6 +150,12 @@ class Hospital {
     required this.address,
     required this.city,
     required this.contactNumber,
+    required this.hospitalOveralRating,
+    required this.hospitalRegistrations,
+    required this.openingTime,
+    required this.closingTime,
+    required this.hospitalLogo,
+    required this.hospitalDoucuments,
   });
 
   factory Hospital.fromJson(Map<String, dynamic> json) => Hospital(
@@ -123,6 +164,12 @@ class Hospital {
         address: json['address'] ?? '',
         city: json['city'] ?? '',
         contactNumber: json['contactNumber'] ?? '',
+        hospitalOveralRating: json['hospitalOveralRating'] ?? 0,
+        hospitalRegistrations: json['hospitalRegistrations'] ?? '',
+        openingTime: json['openingTime'] ?? '',
+        closingTime: json['closingTime'] ?? '',
+        hospitalLogo: json['hospitalLogo'] ?? '',
+        hospitalDoucuments: json['hospitalDoucuments'] ?? [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -131,6 +178,12 @@ class Hospital {
         'address': address,
         'city': city,
         'contactNumber': contactNumber,
+        'hospitalOveralRating': hospitalOveralRating,
+        'hospitalRegistrations': hospitalRegistrations,
+        'openingTime': openingTime,
+        'closingTime': closingTime,
+        'hospitalLogo': hospitalLogo,
+        'hospitalDoucuments': hospitalDoucuments,
       };
 }
 

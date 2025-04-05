@@ -40,7 +40,8 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
     // Payment options
     options = {
       'key': 'rzp_test_2z0PiIllMZDHrE',
-      'amount': (widget.amount * 100), // Amount in paise
+      'amount': (double.parse(widget.amount) * 100).toInt(), // Amount in paise
+
       'name': 'Derma Care',
       'description': 'Service Charges',
       'prefill': {
@@ -145,7 +146,6 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
   }
 }
 
-
 // =================PhonePay==============
 
 // import 'dart:convert' show base64Encode, jsonEncode, utf8;
@@ -156,11 +156,23 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
 
 // import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 
-// class PhonepePg {
-//   final int amount;
-//   final BuildContext context;
+// import '../Doctors/ListOfDoctors/DoctorModel.dart';
+// import '../PatientsDetails/PatientModel.dart';
 
-//   PhonepePg({required this.context, required this.amount});
+// class PhonepePg {
+//   final VoidCallback? onPaymentInitiated;
+//   final HospitalDoctorModel serviceDetails;
+//   final String amount;
+//   final BuildContext context;
+//   final Patientmodel patient;
+
+//   PhonepePg({
+//     required this.context,
+//     required this.amount,
+//     required this.onPaymentInitiated,
+//     required this.serviceDetails,
+//     required this.patient,
+//   });
 
 //   final String merchantId = "PGTESTPAYUAT";
 //   final String salt = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";

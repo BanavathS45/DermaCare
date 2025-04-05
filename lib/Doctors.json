@@ -10,6 +10,12 @@
           "address": "123 Wellness Street, Banjara Hills",
           "city": "Hyderabad",
           "contactNumber": "+91 98765 43210",
+          "hospitalOveralRating": 5,
+          "hospitalRegistrations": "78798899",
+          "openingTime": "09-00AM",
+          "closingTime": "05-00PM",
+          "hospitalLogo": "",
+          "hospitalDoucuments": [],
           "doctors": [
             {
               "doctorId": "DC_1",
@@ -18,6 +24,7 @@
               "specialization": "Dermato-Genetics",
               "experienceYears": 12,
               "qualification": "MD",
+              "license": "",
               "focusAreas": [
                 "Genetic Skin Disorders",
                 "Hair Loss Solutions",
@@ -113,6 +120,15 @@
                     { "slot": "09:00 AM", "slotbooked": true },
                     { "slot": "09:30 AM", "slotbooked": false }
                   ]
+                },
+                {
+                  "date": "2025-04-10",
+                  "availableSlots": [
+                    { "slot": "11:00 AM", "slotbooked": true },
+                    { "slot": "11:30 AM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false },
+                    { "slot": "12:30 PM", "slotbooked": false }
+                  ]
                 }
               ],
 
@@ -139,6 +155,7 @@
                     "comment": "Dr. Mehta is amazing! She helped me treat my acne which I’ve been struggling with for years. She explained everything so clearly and the prescription worked like magic within weeks. Highly recommend Derma Care!",
                     "rated": true,
                     "createAt": "2025-03-27T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   },
                   {
@@ -147,6 +164,7 @@
                     "comment": "Satisfied with the consultation. I visited for hair fall treatment and got a clear understanding of the issue. Doctor prescribed a customized solution. Clinic was well-maintained and organized.",
                     "rated": false,
                     "createAt": "2025-03-27T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": [
                       {
                         "userId": "admin001",
@@ -166,6 +184,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2025-03-27T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   },
                   {
@@ -174,6 +193,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2025-03-27T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": [
                       {
                         "userId": "clinic_staff",
@@ -188,6 +208,7 @@
                     "comment": "Excellent Doctor ",
                     "rated": false,
                     "createAt": "2025-03-27T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   },
                   {
@@ -196,6 +217,7 @@
                     "comment": "fsdfsdfdsfsdfdsfsdfdfds",
                     "rated": false,
                     "createAt": "2025-03-27T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": [
                       {
                         "userId": "admin001",
@@ -224,6 +246,7 @@
               "name": "Dr. Rohan Deshmukh",
               "gender": "Male",
               "qualification": "MBBS, MD ",
+              "license": "",
 
               "specialization": "Cosmetic Dermatology",
               "experienceYears": 9,
@@ -335,6 +358,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   },
                   {
@@ -343,6 +367,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": [
                       {
                         "userId": "admin002",
@@ -357,6 +382,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   }
                 ]
@@ -382,12 +408,19 @@
           "address": "45 Jubilee Road, Indiranagar",
           "city": "Bangalore",
           "contactNumber": "+91 99876 11223",
+          "hospitalOveralRating": 5,
+          "hospitalRegistrations": "78798899",
+          "openingTime": "",
+          "closingTime": "",
+          "hospitalLogo": "",
+          "hospitalDoucuments": [],
           "doctors": [
             {
               "doctorId": "DC_3",
               "name": "Dr. Fatima Shaikh",
               "gender": "Female",
               "qualification": "MBBS, DDVL",
+              "license": "",
               "specialization": "Pediatric Dermatology",
               "experienceYears": 7,
               "focusAreas": ["Eczema", "Infant Rashes", "Birthmark Management"],
@@ -494,6 +527,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   },
                   {
@@ -502,6 +536,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": [
                       {
                         "userId": "admin002",
@@ -516,6 +551,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   }
                 ]
@@ -538,6 +574,7 @@
               "name": "Dr. Arvind Rao",
               "gender": "Male",
               "qualification": "MD",
+              "license": "",
               "specialization": "Trichology",
               "experienceYears": 10,
               "focusAreas": ["Hair Transplant", "Hair Fall", "Dandruff"],
@@ -644,6 +681,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   },
                   {
@@ -652,6 +690,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   },
                   {
@@ -660,6 +699,7 @@
                     "comment": "Excellent Doctor, very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": [
                       {
                         "userId": "admin002",
@@ -697,12 +737,19 @@
           "address": "56 Blossom Lane, Anna Nagar",
           "city": "Chennai",
           "contactNumber": "+91 98456 78900",
+          "hospitalOveralRating": 5,
+          "hospitalRegistrations": "78798899",
+          "openingTime": "",
+          "closingTime": "",
+          "hospitalLogo": "",
+          "hospitalDoucuments": [],
           "doctors": [
             {
               "doctorId": "DC_5",
               "name": "Dr. Sneha Reddy",
               "gender": "Female",
               "qualification": "MBBS",
+              "license": "",
               "specialization": "Clinical Dermatology",
               "experienceYears": 8,
               "focusAreas": ["Psoriasis", "Vitiligo", "Chronic Eczema"],
@@ -809,6 +856,7 @@
                     "comment": "very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": []
                   },
                   {
@@ -817,6 +865,7 @@
                     "comment": "very knowledgeable and caring.",
                     "rated": false,
                     "createAt": "2024-03-29T10:00:00Z",
+                    "hospitalRating": 5,
                     "replies": [
                       {
                         "userId": "admin002",

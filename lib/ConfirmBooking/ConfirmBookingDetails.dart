@@ -11,6 +11,7 @@ import '../Payments/AllPayments.dart';
 import '../Utils/Constant.dart';
 
 import '../Utils/ScaffoldMessageSnacber.dart';
+import 'ConfirmBookingController.dart';
 import 'ConsultationController.dart';
 
 class Confirmbookingdetails extends StatefulWidget {
@@ -26,16 +27,27 @@ class Confirmbookingdetails extends StatefulWidget {
 class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
+  final confirmbookingcontroller = Get.find<Confirmbookingcontroller>();
   Doctor? doctor;
   Hospital? hospital;
-  int? consultationFee;
-  bool isProcessing = false;
-
-  @override
   void initState() {
     super.initState();
     doctor = widget.doctor.doctor;
     hospital = widget.doctor.hospital;
+    final id = consultationController.consultationId.value;
+
+    // Get consultation fee based on type
+    if (id == 1) {
+      confirmbookingcontroller.consultationFee = doctor!.fee.treatmentFee;
+    } else if (id == 2) {
+      confirmbookingcontroller.consultationFee = doctor!.fee.inClinicFee;
+    } else if (id == 3) {
+      confirmbookingcontroller.consultationFee =
+          doctor!.fee.videoConsultationFee;
+    } else {
+      confirmbookingcontroller.consultationFee = 0;
+    }
+    confirmbookingcontroller.calculations();
   }
 
   @override
@@ -53,10 +65,29 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Doctor Info Card
-            profileCard(),
-            _getServiceButton(consultationController.consultationId.value),
+            Card(
+                color: const Color.fromARGB(241, 246, 246, 246),
+                child: Column(
+                  children: [
+                    profileCard(),
+                    _getServiceButton(
+                        consultationController.consultationId.value),
+                  ],
+                )),
 
             const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Patient Details",
+                style: TextStyle(
+                    color: mainColor,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            const SizedBox(height: 10),
             infoRow("Booking For", widget.patient.bookingFor),
             infoRow("Patient Name", widget.patient.patientName),
             infoRow("Patient Age", "${widget.patient.patientAge} Yrs"),
@@ -65,7 +96,49 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               height: 1,
               color: secondaryColor,
             ),
+            SizedBox(
+              height: 15,
+            ),
             infoColumn("Patient Problem", widget.patient.problem),
+
+            SizedBox(
+              height: 15,
+            ),
+            Divider(
+              height: 1,
+              color: secondaryColor,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            // patyment imaformation
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Payment Details",
+                style: TextStyle(
+                    color: mainColor,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            infoRow("Service Cost (Before Discount)",
+                "₹${confirmbookingcontroller.serviceCost}"),
+            infoRow("Total Discount (Services Only)",
+                "₹${confirmbookingcontroller.discount}"),
+            infoRow("Service Cost (After Discount)",
+                "₹${confirmbookingcontroller.discountedCost}"),
+
+            infoRow("Tax",
+                "₹${confirmbookingcontroller.taxAmount.toStringAsFixed(0)}"),
+            infoRow("Total Payable Amount",
+                "₹${confirmbookingcontroller.totalCost}"),
+            SizedBox(
+              height: 25,
+            ),
           ],
         ),
       ),
@@ -75,9 +148,12 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         decoration: BoxDecoration(gradient: appGradient()),
         child: TextButton(
           onPressed: () {
+            print(
+                "PayAmount to be confirmbookingcontroller ${confirmbookingcontroller.totalCost.toString()}");
+
             Get.to(RazorpaySubscription(
               context: context,
-              amount: consultationFee.toString(),
+              amount: confirmbookingcontroller.totalCost.toString(),
               onPaymentInitiated: () {
                 showSnackbar("Warning", "Paytments Initiated", "warning");
               },
@@ -86,7 +162,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             ));
           },
           child: Text(
-            "Booking & Pay",
+            "BOOKING & PAY (₹ ${confirmbookingcontroller.totalCost})",
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
@@ -266,34 +342,37 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     switch (id) {
       case 1:
         color = Colors.white;
-        consultationFee = doctor!.fee.treatmentFee;
+        confirmbookingcontroller.consultationFee = doctor!.fee.treatmentFee;
         consultationType = "Services And Treatments Fee";
 
         break;
       case 2:
         color = Colors.white;
-        consultationFee = doctor!.fee.inClinicFee;
+        confirmbookingcontroller.consultationFee = doctor!.fee.inClinicFee;
         consultationType = "In-Clinic Fee";
 
         break;
       case 3:
         color = Colors.white;
-        consultationFee = doctor!.fee.videoConsultationFee;
+        confirmbookingcontroller.consultationFee =
+            doctor!.fee.videoConsultationFee;
         consultationType = "Consultation Fee";
 
         break;
       default:
         color = Colors.grey;
         consultationType = "Consultation Fee";
-        consultationFee = 0;
+        confirmbookingcontroller.consultationFee = 0;
     }
 
     // return _serviceButton(consultationType, color, id, consultationFee);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _serviceButton(consultationType, color, id, consultationFee!),
-        SlotBookingAndConsltation(consultationType, consultationFee!, id),
+        _serviceButton(consultationType, color, id,
+            confirmbookingcontroller.consultationFee!),
+        SlotBookingAndConsltation(
+            consultationType, confirmbookingcontroller.consultationFee!, id),
       ],
     );
   }

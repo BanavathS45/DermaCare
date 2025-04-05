@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 
 import 'BottomNavigation/BottomNavigation.dart';
+import 'ConfirmBooking/ConfirmBookingController.dart';
 import 'Controller/CustomerController.dart';
 import 'CustomerRating/CustomerRating.dart';
 import 'Dashboard/DashBoardController.dart';
@@ -42,7 +43,7 @@ void main() async {
   Get.put(Consultationcontroller());
   Get.put(DoctorController());
   Get.put(ScheduleController()); // ✅ FIXED// 👈 This registers it eagerly
-
+  Get.put(Confirmbookingcontroller()); // ✅ FIXED// 👈 This registers it eagerly
   runApp(const MyApp());
 }
 
