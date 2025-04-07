@@ -7,7 +7,7 @@ import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'BottomNavigation/BottomNavigation.dart';
 import 'ConfirmBooking/ConfirmBookingController.dart';
 import 'Controller/CustomerController.dart';
-import 'CustomerRating/CustomerRating.dart';
+
 import 'Dashboard/DashBoardController.dart';
 import 'Doctors/DoctorInputData.dart';
 import 'Doctors/ListOfDoctors/DoctorController.dart';
@@ -20,11 +20,13 @@ import 'ConfirmBooking/ConsultationController.dart';
 import 'ConfirmBooking/Consultations.dart';
 
 import 'Screens/splashScreen.dart';
+import 'SigninSignUp/LoginProvider.dart';
 import 'SigninSignUp/LoginScreen.dart';
 import 'TreatmentAndServices/ServiceSelectionController.dart';
 import 'Utils/Constant.dart';
 import 'Utils/CountryAndState.dart';
 import 'Utils/InvoiceDownload.dart';
+// import 'VideoCalling/VideoCalling.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -106,15 +108,20 @@ class MyApp extends StatelessWidget {
         //   username: "prashanth",
         //   index: 0,
         // ),
-        home: ConsultationsType(
-          username: 'prashanth',
-          mobileNumber: '7842259803',
-        )
+        // home: ConsultationsType(
+        //   username: 'prashanth',
+        //   mobileNumber: '7842259803',
+        // )
         // home: FullscreenLoader(
         //   message: 'Your data is being sent securely.\nPlease wait...',
         //   logoPath: 'assets/surecare_launcher.png',
         // ),
         // home: DoctorProfileForm()
+        home: BiometricAuthScreen(
+          toggleTheme: () {},
+        )
+        //  home: HomeScreen()
+
         // home: ConsultationsType(mobileNumber: '7842259803', username: 'prashanth',)
         // home: InvoicePage(bookingDetails: null,)
         // home: StateAndCity(

@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'dart:io';
 
-import 'package:cutomer_app/Utils/AdreessFormat.dart';
 import 'package:cutomer_app/Utils/PDFPreview.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -151,8 +150,6 @@ class InvoicePage {
                           ),
                         ),
                         pw.Text(appointment.patientName,
-                            style: pw.TextStyle(font: ttf)),
-                        pw.Text("${formataddress(appointment.addressDto)}",
                             style: pw.TextStyle(font: ttf)),
                         pw.Text("${appointment.customerNumber}",
                             style: pw.TextStyle(font: ttf)),

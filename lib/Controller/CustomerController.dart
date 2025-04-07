@@ -1,4 +1,4 @@
-import 'package:cutomer_app/Modals/AddressModal.dart';
+
 import 'package:get/get.dart';
  
 
@@ -31,47 +31,3 @@ class LocationController extends GetxController {
     subLocality.value = subLoc;
   }
 }
-
-
-
-
- 
-// class SelectDateTimeController extends GetxController {
-//   // Observables for data binding
-//   var nameController = ''.obs;
-//   var ageController = 0.obs;
-//   var emailController = ''.obs;
-//   var gender = "Unknown".obs;
-//   var relation = ''.obs;
-//   var saveAs = "Others".obs;
-//   var mobileNumber = ''.obs;
-//   var formattedAddress = ''.obs;
-//   var username = ''.obs;
-// var addressmodal = Rx<AddressModel?>(null);
-//   // Function to set initial values
-//   void setInitialValues({
-//     required String patientname,
-//     required int age,
-//     required String email,
-//     required String gender,
-//     required String relation,
-//     required String saveAs,
-//     required String mobileNumber,
-//     required String formattedAddress,
-//     required String username,
-//     required String addressmodal,
-//   }) {
-//     nameController.value = patientname;
-//     ageController.value = age;
-//     emailController.value = email;
-//     this.gender.value = gender;
-//     this.relation.value = relation;
-//     this.saveAs.value = saveAs;
-//     this.mobileNumber.value = mobileNumber;
-//     this.formattedAddress.value = formattedAddress;
-//     this.username.value = username;
-//     this.addressmodal.value = addressmodal;
-//   }
-// }
- 
- 

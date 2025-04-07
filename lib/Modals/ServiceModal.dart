@@ -74,3 +74,23 @@ class Service {
     );
   }
 }
+
+// [
+//   {
+//     "question": "What are the benefits of this service?",
+//     "answers": [
+//       "Fast and reliable service",
+//       "24/7 customer support",
+//       "Affordable pricing"
+//     ]
+//   },
+//   {
+//     "question": "How to book an appointment?",
+//     "answers": [
+//       "Select a service",
+//       "Choose a date and time",
+//       "Confirm your booking"
+//     ]
+//   }
+// ]
+

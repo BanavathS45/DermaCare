@@ -3,11 +3,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../APIs/FetchAddress.dart';
+
 import '../APIs/FetchServices.dart';
 import '../Controller/CustomerController.dart';
 import '../Doctors/ListOfDoctors/DoctorScreen.dart';
-import '../Modals/AddressModal.dart';
 import '../Modals/ServiceModal.dart';
 import '../Services/CarouselSliderService.dart';
 
@@ -86,7 +85,6 @@ class Serviceselectioncontroller extends GetxController {
     );
   }
 
-  Fetchaddress fetchFirstAddress = Fetchaddress();
 
   void navigateToConfirmation(
       {String? mobileNumber,
@@ -96,18 +94,9 @@ class Serviceselectioncontroller extends GetxController {
     try {
       // Fetch the first address
       // AddressModel? firstAddress =
-      //     await fetchFirstAddress.fetchFirstAddress(mobileNumber!);
-      AddressModel? firstAddress = AddressModel(
-          houseNo: "dfsd",
-          street: "street",
-          city: "city",
-          state: "state",
-          postalCode: "504293",
-          country: "country",
-          latitude: 45.343434,
-          longitude: 34.324234);
+      //     await fetchFirstAddress.fetchFirstAddress(mobileNumber!); 
 
-      if (firstAddress != null) {
+      
         // Use the instance of the SelectedServicesController to update selected services
         List<Service> selectedServices =
             services.where((service) => service.quantity > 0).toList();
@@ -124,10 +113,7 @@ class Serviceselectioncontroller extends GetxController {
               mobileNumber: mobileNumber!,
               username: username!,
             ));
-      } else {
-        print('No address available');
-        // Handle case when no address is found
-      }
+    
     } catch (e) {
       print('Error fetching address: $e');
       // Handle error

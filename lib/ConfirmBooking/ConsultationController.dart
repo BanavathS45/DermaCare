@@ -1,4 +1,4 @@
-import 'package:cutomer_app/AddPatient/AddPatientOther.dart';
+ 
 import 'package:get/get.dart';
 
 class Consultationcontroller extends GetxController {

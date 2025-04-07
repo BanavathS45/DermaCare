@@ -178,7 +178,8 @@ class ConsultationsTypeState extends State<ConsultationsType> {
 
             consultationcontroller.setConsultationId(1);
 
-            Get.offAll(BottomNavController(
+            Get.offAll(
+              BottomNavController(
               mobileNumber: widget.mobileNumber,
               username: widget.username,
               index: 0,

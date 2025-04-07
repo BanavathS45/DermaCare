@@ -1,13 +1,11 @@
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
 import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
-import 'package:cutomer_app/ServiceSumarry/ServiceIDModal.dart';
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../BottomNavigation/BottomNavigation.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/ListOfDoctors/DoctorService.dart';
-import '../Utils/AdreessFormat.dart';
 
 class SuccessScreen extends StatefulWidget {
   final HospitalDoctorModel serviceDetails;
@@ -167,7 +165,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
         decoration: BoxDecoration(gradient: appGradient()),
         child: TextButton(
           onPressed: () {
-            Get.to(
+            Get.offAll(
               BottomNavController(
                 mobileNumber: widget.serviceDetails.hospital.contactNumber,
                 username: widget.serviceDetails.doctor.name,

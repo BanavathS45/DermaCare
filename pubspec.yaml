@@ -80,6 +80,7 @@ dependencies:
   phonepe_payment_sdk: ^2.0.2
   crypto: ^3.0.3
   uuid: ^4.1.0
+  local_auth: ^2.1.6
 
   # ext_storage: ^1.0.3
   # storage_path: ^0.2.0
