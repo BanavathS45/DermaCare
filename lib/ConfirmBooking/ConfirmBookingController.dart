@@ -14,10 +14,7 @@ class Confirmbookingcontroller extends GetxController {
   int totalCost = 0;
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
-  @override
   calculations() {
-   
-
     // Get values from SelectedServicesController
     final selectedServices = selectedServicesController.selectedServices;
 

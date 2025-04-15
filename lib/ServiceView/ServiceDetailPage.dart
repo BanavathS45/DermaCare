@@ -1,25 +1,36 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:cutomer_app/ServiceView/FetchViewService.dart';
 import 'package:flutter/material.dart';
 import '../APIs/BaseUrl.dart';
+import '../Doctors/ListOfDoctors/DoctorScreen.dart';
 import '../Loading/SkeletonLoder.dart';
+import '../TreatmentAndServices/ServiceSelectionController.dart';
 import '../Utils/ConvertMinToHours.dart';
+import '../Utils/GradintColor.dart';
 import '../Utils/Header.dart';
 import 'ServiceDetail.dart';
 
 class ServiceDetailsPage extends StatefulWidget {
+  final String mobileNumber;
+  final String username;
+
   const ServiceDetailsPage(
       {super.key,
       required this.categoryName,
       required this.categoryId,
       required this.serviceId,
-      required this.serviceName});
+      required this.serviceName,
+      required this.servicePrice,
+      required this.mobileNumber,
+      required this.username});
   final String categoryName;
   final String categoryId;
   final String serviceId;
   final String serviceName;
+  final String servicePrice;
 
   @override
   _ServiceDetailsPageState createState() => _ServiceDetailsPageState();
@@ -33,6 +44,8 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
 
   late AnimationController _animationController;
   late Animation<Color?> _skeletonColorAnimation;
+  final Serviceselectioncontroller serviceselectioncontroller =
+      Get.put(Serviceselectioncontroller());
 
   // Replace with your data model.
 
@@ -235,11 +248,74 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                             service.preparation,
                             style: const TextStyle(fontSize: 16),
                           ),
+                          const SizedBox(height: 16),
                         ],
                       ),
                     );
                   },
                 ),
+      bottomNavigationBar: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          gradient: appGradient(),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: () {
+                serviceselectioncontroller.showAddedItemsAlert(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "₹ ${widget.servicePrice}",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: 30,
+              width: 1,
+              color: Colors.white.withOpacity(0.5),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            TextButton(
+              onPressed: () {
+                Get.to(() => Doctorscreen(
+                      mobileNumber: widget.mobileNumber,
+                      username: widget.username,
+                    ));
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: const Text(
+                  "CONTINUE",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -108,18 +108,18 @@ class MyApp extends StatelessWidget {
         //   username: "prashanth",
         //   index: 0,
         // ),
-        // home: ConsultationsType(
-        //   username: 'prashanth',
-        //   mobileNumber: '7842259803',
-        // )
+        home: ConsultationsType(
+          username: 'prashanth',
+          mobileNumber: '7842259803',
+        )
         // home: FullscreenLoader(
         //   message: 'Your data is being sent securely.\nPlease wait...',
         //   logoPath: 'assets/surecare_launcher.png',
         // ),
         // home: DoctorProfileForm()
-        home: BiometricAuthScreen(
-          toggleTheme: () {},
-        )
+        // home: BiometricAuthScreen(
+        //   toggleTheme: () {},
+        // )
         //  home: HomeScreen()
 
         // home: ConsultationsType(mobileNumber: '7842259803', username: 'prashanth',)

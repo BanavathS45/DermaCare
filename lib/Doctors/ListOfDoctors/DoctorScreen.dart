@@ -92,7 +92,7 @@ class Doctorscreen extends StatelessWidget {
                     ),
             ),
             SizedBox(
-              height: 40,
+              height: 10,
             )
           ],
         );

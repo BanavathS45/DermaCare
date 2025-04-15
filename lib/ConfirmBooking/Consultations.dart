@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import '../BottomNavigation/BottomNavigation.dart';
+import '../Screens/CategoryAndServicesForm.dart';
 import 'ConfirmBookingDetails.dart';
 import 'ConsultationController.dart';
 
@@ -178,8 +179,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
 
             consultationcontroller.setConsultationId(1);
 
-            Get.offAll(
-              BottomNavController(
+            Get.offAll(BottomNavController(
               mobileNumber: widget.mobileNumber,
               username: widget.username,
               index: 0,
@@ -188,16 +188,20 @@ class ConsultationsTypeState extends State<ConsultationsType> {
           case 2:
             consultationcontroller.setConsultationId(2);
             showSnackbar("Warning", "In-Clinic ${id}", "warning");
-            // Get.to(Confirmbookingdetails(
-            //     // doctor: widget.doctorData,
-            //     ));
+            Get.to(CategoryAndServicesForm(
+               mobileNumber: widget.mobileNumber,
+              username: widget.username,
+                // doctor: widget.doctorData,
+                ));
             break;
           case 3:
             consultationcontroller.setConsultationId(3);
             showSnackbar("Success", "Video Consultation ${id}", "success");
-            // Get.to(Confirmbookingdetails(
-            //     // doctor: widget.doctorData,
-            //     ));
+            Get.to(CategoryAndServicesForm(
+               mobileNumber: widget.mobileNumber,
+              username: widget.username,
+                // doctor: widget.doctorData,
+                ));
             break;
         }
       },

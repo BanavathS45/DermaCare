@@ -146,4 +146,28 @@ class DoctorService {
     print("❌ Doctor with ID $doctorId not found.");
     return null;
   }
+  Future<HospitalDoctorModel?> getDoctorNotification(String doctorId) async {
+    final services = await fetchServices();
+
+    // doctorController.setDoctorId(services.length.toString());
+
+    for (var service in services) {
+      for (var hospital in service.hospitals) {
+        for (var doctor in hospital.doctors) {
+          if (doctor.doctor.doctorId == doctorId) {
+            print("✅ Doctor Found:");
+            print("ID: ${doctor.doctor.doctorId}");
+            print("Name: ${doctor.doctor.name}");
+            print("Specialization: ${doctor.doctor.specialization}");
+            print("Hospital: ${doctor.hospital.name}");
+            print("City: ${doctor.hospital.city}");
+            return doctor;
+          }
+        }
+      }
+    }
+
+    print("❌ Doctor with ID $doctorId not found.");
+    return null;
+  }
 }

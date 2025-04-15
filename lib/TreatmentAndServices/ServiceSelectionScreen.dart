@@ -250,23 +250,84 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                                                   )
                                                 : Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      ElevatedButton(
+                                                      // ElevatedButton(
+                                                      //   onPressed: () {
+                                                      //     setState(() {
+                                                      //       service.quantity++;
+                                                      //       serviceselectioncontroller
+                                                      //           .updateTotal();
+                                                      //     });
+                                                      //   },
+                                                      //   style: ElevatedButton
+                                                      //       .styleFrom(
+                                                      //     backgroundColor:
+                                                      //         mainColor,
+                                                      //     foregroundColor:
+                                                      //         Colors.white,
+                                                      //     padding:
+                                                      //         const EdgeInsets
+                                                      //             .symmetric(
+                                                      //             horizontal:
+                                                      //                 16,
+                                                      //             vertical: 8),
+                                                      //     textStyle:
+                                                      //         const TextStyle(
+                                                      //             fontSize: 14),
+                                                      //   ),
+                                                      //   child: const Text(
+                                                      //       "Select"),
+                                                      // ),
+
+                                                      OutlinedButton(
                                                         onPressed: () {
-                                                          setState(() {
-                                                            service.quantity++;
-                                                            serviceselectioncontroller
-                                                                .updateTotal();
-                                                          });
+                                                          serviceselectioncontroller
+                                                              .navigateToConfirmation(
+                                                            categoryId: widget
+                                                                .categoryId,
+                                                            categoryName: widget
+                                                                .categoryName,
+                                                            serviceId: service
+                                                                .serviceId,
+                                                          );
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  ServiceDetailsPage(
+                                                                categoryName:
+                                                                    service
+                                                                        .categoryName,
+                                                                serviceId: service
+                                                                    .serviceId,
+                                                                serviceName: service
+                                                                    .serviceName,
+                                                                categoryId: widget
+                                                                    .categoryId,
+                                                                servicePrice: service
+                                                                    .finalCost
+                                                                    .toStringAsFixed(
+                                                                        0)
+                                                                    .toString(),
+                                                                mobileNumber: widget
+                                                                    .mobileNumber,
+                                                                username: widget
+                                                                    .username,
+                                                              ),
+                                                            ),
+                                                          );
                                                         },
-                                                        style: ElevatedButton
+                                                        style: OutlinedButton
                                                             .styleFrom(
-                                                          backgroundColor:
-                                                              mainColor,
+                                                          side: BorderSide(
+                                                              color:
+                                                                  secondaryColor),
                                                           foregroundColor:
-                                                              Colors.white,
+                                                              secondaryColor,
                                                           padding:
                                                               const EdgeInsets
                                                                   .symmetric(
@@ -276,67 +337,16 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                                                           textStyle:
                                                               const TextStyle(
                                                                   fontSize: 14),
-                                                        ),
-                                                        child:
-                                                            const Text("Add"),
-                                                      ),
-                                                      const SizedBox(width: 50),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 10.0),
-                                                        child: OutlinedButton(
-                                                          onPressed: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        ServiceDetailsPage(
-                                                                  categoryName:
-                                                                      service
-                                                                          .categoryName,
-                                                                  serviceId: service
-                                                                      .serviceId,
-                                                                  serviceName:
-                                                                      service
-                                                                          .serviceName,
-                                                                  categoryId: widget
-                                                                      .categoryId,
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                          style: OutlinedButton
-                                                              .styleFrom(
-                                                            side: BorderSide(
-                                                                color:
-                                                                    secondaryColor),
-                                                            foregroundColor:
-                                                                secondaryColor,
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        16,
-                                                                    vertical:
-                                                                        8),
-                                                            textStyle:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        14),
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
                                                           ),
-                                                          child: const Text(
-                                                              "Info"),
                                                         ),
+                                                        child: const Text(
+                                                            "Select"),
                                                       ),
                                                     ],
                                                   )
@@ -373,82 +383,6 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                               );
                             },
                           ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Obx(
-        () => Container(
-          height: 80,
-          decoration: BoxDecoration(
-            gradient: appGradient(),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  serviceselectioncontroller.showAddedItemsAlert(context);
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "₹ ${serviceselectioncontroller.totalPrice.value.toStringAsFixed(0)}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Added Items(${serviceselectioncontroller.totalItems.value})",
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.arrow_drop_up,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 40,
-                width: 1,
-                color: Colors.white.withOpacity(0.5),
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-              ),
-              TextButton(
-                onPressed: serviceselectioncontroller.totalItems.value > 0
-                    ? () => serviceselectioncontroller.navigateToConfirmation(
-                          mobileNumber: widget.mobileNumber,
-                          username: widget.username,
-                          categoryId: widget.categoryId,
-                          categoryName: widget.categoryName,
-                        )
-                    : null,
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                child: const Text(
-                  "CONTINUE",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
               ),
             ],
           ),

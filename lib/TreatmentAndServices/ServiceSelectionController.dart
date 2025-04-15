@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 import '../APIs/FetchServices.dart';
 import '../Controller/CustomerController.dart';
 import '../Doctors/ListOfDoctors/DoctorScreen.dart';
@@ -85,35 +84,32 @@ class Serviceselectioncontroller extends GetxController {
     );
   }
 
-
   void navigateToConfirmation(
-      {String? mobileNumber,
-      String? username,
-      String? categoryId,
-      String? categoryName}) async {
+      {String? categoryId, String? categoryName, String? serviceId}) async {
     try {
       // Fetch the first address
       // AddressModel? firstAddress =
-      //     await fetchFirstAddress.fetchFirstAddress(mobileNumber!); 
+      //     await fetchFirstAddress.fetchFirstAddress(mobileNumber!);
 
-      
-        // Use the instance of the SelectedServicesController to update selected services
-        List<Service> selectedServices =
-            services.where((service) => service.quantity > 0).toList();
+      // Use the instance of the SelectedServicesController to update selected services
+      // Replace with your actual serviceId
 
+// Find the service with that ID
+      Service? selectedService = services.firstWhere(
+        (service) => service.serviceId == serviceId,
+      );
+
+// Only proceed if found
+      if (selectedService != null) {
         final selectedServicesController =
             Get.find<SelectedServicesController>();
-        selectedServicesController.updateSelectedServices(selectedServices);
+        selectedServicesController
+            .updateSelectedServices([selectedService]); // Pass as a list
         selectedServicesController.categoryId.value = categoryId!;
         selectedServicesController.categoryName.value = categoryName!;
-
-        // Navigate to PatientDetailScreen with the first address
-
-        Get.to(() => Doctorscreen(
-              mobileNumber: mobileNumber!,
-              username: username!,
-            ));
-    
+      } else {
+        print("Service with ID $serviceId not found.");
+      }
     } catch (e) {
       print('Error fetching address: $e');
       // Handle error

@@ -9,6 +9,13 @@ LinearGradient appGradient() {
     colors: [secondaryColor, mainColor],
   );
 }
+LinearGradient appGradientGrey() {
+  return const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Colors.grey, Color.fromARGB(153, 158, 158, 158)],
+  );
+}
 
 LinearGradient acrdGradient() {
   return const LinearGradient(

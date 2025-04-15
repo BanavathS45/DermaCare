@@ -52,6 +52,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
   @override
   Widget build(BuildContext context) {
+    final id = consultationController.consultationId.value;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: CommonHeader(
@@ -65,15 +66,12 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Doctor Info Card
-            Card(
-                color: const Color.fromARGB(241, 246, 246, 246),
-                child: Column(
-                  children: [
-                    profileCard(),
-                    _getServiceButton(
-                        consultationController.consultationId.value),
-                  ],
-                )),
+            Column(
+              children: [
+                profileCard(),
+                _getServiceButton(consultationController.consultationId.value),
+              ],
+            ),
 
             const SizedBox(height: 20),
             Padding(
@@ -125,17 +123,27 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             SizedBox(
               height: 15,
             ),
-            infoRow("Service Cost (Before Discount)",
-                "₹${confirmbookingcontroller.serviceCost}"),
-            infoRow("Total Discount (Services Only)",
-                "₹${confirmbookingcontroller.discount}"),
-            infoRow("Service Cost (After Discount)",
-                "₹${confirmbookingcontroller.discountedCost}"),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (id == 1) ...[
+                  infoRow("Service Cost (Before Discount)",
+                      "₹${confirmbookingcontroller.serviceCost}"),
+                  infoRow("Total Discount (Services Only)",
+                      "₹${confirmbookingcontroller.discount}"),
+                  infoRow("Service Cost (After Discount)",
+                      "₹${confirmbookingcontroller.discountedCost}"),
+                  infoRow("Tax",
+                      "₹${confirmbookingcontroller.taxAmount.toStringAsFixed(0)}"),
+                  infoRow("Total Payable Amount",
+                      "₹${confirmbookingcontroller.totalCost}"),
+                ] else ...[
+                  infoRow("Service Cost",
+                      "₹${confirmbookingcontroller.consultationFee!}"),
+                ]
+              ],
+            ),
 
-            infoRow("Tax",
-                "₹${confirmbookingcontroller.taxAmount.toStringAsFixed(0)}"),
-            infoRow("Total Payable Amount",
-                "₹${confirmbookingcontroller.totalCost}"),
             SizedBox(
               height: 25,
             ),
@@ -162,7 +170,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             ));
           },
           child: Text(
-            "BOOKING & PAY (₹ ${confirmbookingcontroller.totalCost})",
+            "BOOKING & PAY (₹ ${id == 1 ? confirmbookingcontroller.totalCost : confirmbookingcontroller.consultationFee!})",
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
@@ -207,128 +215,122 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   }
 
   Widget profileCard() {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              mainColor,
-              secondaryColor,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            mainColor,
+            secondaryColor,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.topRight,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 20,
-              ),
-              Column(
-                children: [
-                  Text(
-                    "${hospital!.name}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 20,
+            ),
+            Column(
+              children: [
+                Text(
+                  "${hospital!.name}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.white,
                   ),
-                  Text(
-                    hospital!.city,
-                    style: const TextStyle(
-                        color: Color.fromARGB(255, 209, 207, 207)),
-                    overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+                Text(
+                  hospital!.city,
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 209, 207, 207)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Doctor Image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    doctor!.profileImage.isNotEmpty
+                        ? doctor!.profileImage
+                        : "https://via.placeholder.com/150",
+                    width: 90,
+                    height: 90,
+                    fit: BoxFit.cover,
                   ),
-                ],
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Doctor Image
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      doctor!.profileImage.isNotEmpty
-                          ? doctor!.profileImage
-                          : "https://via.placeholder.com/150",
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                ),
 
-                  const SizedBox(width: 12),
+                const SizedBox(width: 12),
 
-                  // Text Section
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 8),
-                        Text(
-                          "${doctor!.name}",
-                          style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white),
-                          overflow: TextOverflow.ellipsis,
+                // Text Section
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      Text(
+                        "${doctor!.name}",
+                        style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        doctor!.qualification,
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        doctor!.specialization,
+                        style: const TextStyle(
+                          color: Color.fromARGB(255, 206, 211, 207),
+                          fontWeight: FontWeight.w500,
                         ),
-                        Text(
-                          doctor!.qualification,
-                          style: const TextStyle(
-                              fontSize: 14, color: Colors.white),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          doctor!.specialization,
-                          style: const TextStyle(
-                            color: Color.fromARGB(255, 206, 211, 207),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 10),
-                        Align(
-                            alignment: Alignment.centerRight,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Get.to(() => DoctorDetailScreen(
-                                    doctorData: widget.doctor));
-                              },
-                              style: OutlinedButton.styleFrom(
-                                padding: EdgeInsets.all(0),
-                                side: const BorderSide(
-                                    color: Colors.white,
-                                    width: 1), // ✅ White border
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // ✅ Rounded corners
-                                ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 10),
+                      Align(
+                          alignment: Alignment.centerRight,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Get.to(() => DoctorDetailScreen(
+                                  doctorData: widget.doctor));
+                            },
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.all(0),
+                              side: const BorderSide(
+                                  color: Colors.white,
+                                  width: 1), // ✅ White border
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    8), // ✅ Rounded corners
                               ),
-                              child: const Text(
-                                "About",
-                                style: TextStyle(
-                                    color:
-                                        Colors.white), // ✅ Optional: white text
-                              ),
-                            )),
-                      ],
-                    ),
+                            ),
+                            child: const Text(
+                              "About",
+                              style: TextStyle(
+                                  color:
+                                      Colors.white), // ✅ Optional: white text
+                            ),
+                          )),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -425,94 +427,131 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   }
 
   Widget SlotBookingAndConsltation(String title, int fee, int id) {
+    final services = selectedServicesController.selectedServices;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-      child: Container(
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Column(children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: mainColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: mainColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    widget.patient.monthYear,
+                    style: const TextStyle(fontSize: 14),
                   ),
                 ),
-                child: Text(
-                  widget.patient.monthYear,
-                  style: TextStyle(fontSize: 14),
-                ),
               ),
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Text(
-              "${widget.patient.dayDate}, ${widget.patient.slot}",
-              style: TextStyle(fontSize: 14),
-            ),
-          ]),
-          SizedBox(
-            width: 5,
+              const SizedBox(height: 5),
+              Text(
+                "${widget.patient.dayDate}, ${widget.patient.slot}",
+                style: const TextStyle(fontSize: 14),
+              ),
+            ],
           ),
+          const SizedBox(width: 5),
           Expanded(
-            child: Container(
-              // color: mainColor,
-              decoration: BoxDecoration(
-                color: mainColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Obx(() => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: selectedServicesController.selectedServices
-                              .map((service) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    // "${service.serviceName} (Discounted: ₹${service.discountedCost})",
-                                    "${id == 1 ? service.serviceName : title} ",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                    maxLines: 2,
-                                  ),
-                                  Text(
-                                    "Price: ₹ ${id == 1 ? (service.discountedCost + doctor!.fee.treatmentFee).toStringAsFixed(0) : fee}",
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Colors.white),
-                                  ),
-                                  Text(
-                                    "Including Treatment fee and Doctor Consultation Fee",
-                                    style: const TextStyle(
-                                        fontSize: 11, color: Colors.grey),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
+            child: id == 1
+                ? Obx(() {
+                    if (services.isEmpty) {
+                      return const Text(
+                        "No services selected",
+                        style: TextStyle(color: Colors.white),
+                      );
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: services.map((service) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                service.serviceName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: mainColor,
+                                ),
+                                maxLines: 2,
                               ),
-                            );
-                          }).toList(),
-                        ),
-                      )),
-                ],
-              ),
-            ),
+                              Text(
+                                "Price: ₹ ${(service.discountedCost + doctor!.fee.treatmentFee).toStringAsFixed(0)}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: mainColor,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: const Text(
+                                  "Including Treatment fee and Doctor Consultation Fee",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  })
+                : Obx(() {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: services.map((service) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${service.serviceName}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: mainColor,
+                              ),
+                              maxLines: 2,
+                            ),
+                            Text(
+                              "${title}", // Replace with the correct field
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: mainColor,
+                              ),
+                              maxLines: 2,
+                            ),
+                            Text(
+                              "Price: ₹ ${fee}", // Replace with the correct field
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: mainColor,
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    );
+                  }),
           )
-        ]),
+        ],
       ),
     );
   }

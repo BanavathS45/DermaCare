@@ -49,6 +49,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     //  controller.setDoctorSlots(widget.doctor.slots);
 
     id = consultationController.consultationId.value;
+    timeslots();
   }
 
   @override
@@ -409,6 +410,4 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ),
     );
   }
-
-
 }

@@ -18,7 +18,7 @@ Widget buildDoctorCard(
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     decoration: BoxDecoration(
-      gradient: appGradient(),
+      gradient: doctor.availablity ? appGradient() : appGradientGrey(),
       borderRadius: BorderRadius.circular(18),
     ),
     child: Padding(
@@ -237,7 +237,14 @@ Widget buildDoctorCard(
                   ),
                   InkWell(
                     onTap: () {
-                      Get.to(() => ScheduleScreen(doctorData: doctorModel));
+                      if (doctor.availablity) {
+                        // showSn
+                        // showSnackbar();
+                      }
+                      doctor.availablity
+                          ? Get.to(
+                              () => ScheduleScreen(doctorData: doctorModel))
+                          : null;
 
                       // Navigator.push(
                       //   context,
@@ -253,11 +260,11 @@ Widget buildDoctorCard(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Text(
-                        "BOOK",
+                      child: Text(
+                        doctor.availablity ? "BOOK" : "Unavailable",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: mainColor,
+                          color: doctor.availablity ? mainColor : Colors.grey,
                         ),
                       ),
                     ),
