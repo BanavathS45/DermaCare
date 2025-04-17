@@ -15,6 +15,7 @@ class Registercontroller extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController dateOfBirthController = TextEditingController();
+  final TextEditingController referralController = TextEditingController();
 
   //API
   final ApiService apiService = ApiService();

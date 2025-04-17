@@ -336,7 +336,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     );
   }
 
-  Widget _getServiceButton(int id) {
+  Widget _getServiceButton(String id) {
     // id = 2; // ✅ Test case 2
     Color color;
     String consultationType;
@@ -379,7 +379,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     );
   }
 
-  Widget _serviceButton(String title, Color backgroundColor, int id, int fee) {
+  Widget _serviceButton(
+      String title, Color backgroundColor, String id, int fee) {
     return GestureDetector(
       onTap: () {},
       child: Padding(
@@ -426,7 +427,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     );
   }
 
-  Widget SlotBookingAndConsltation(String title, int fee, int id) {
+  Widget SlotBookingAndConsltation(String title, int fee, String id) {
     final services = selectedServicesController.selectedServices;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),

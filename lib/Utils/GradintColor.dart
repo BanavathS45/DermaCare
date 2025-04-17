@@ -6,9 +6,11 @@ LinearGradient appGradient() {
   return const LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+    // colors: [secondaryColor, mainColor],
     colors: [secondaryColor, mainColor],
   );
 }
+
 LinearGradient appGradientGrey() {
   return const LinearGradient(
     begin: Alignment.topLeft,

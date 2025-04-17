@@ -37,7 +37,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final registercontroller = Get.put(Registercontroller());
-  int? id;
+  String? id;
   List<DoctorSlot>? slots;
 
   @override
@@ -410,4 +410,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ),
     );
   }
+
+
 }

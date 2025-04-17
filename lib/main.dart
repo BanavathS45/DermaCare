@@ -109,7 +109,7 @@ class MyApp extends StatelessWidget {
         //   index: 0,
         // ),
         home: ConsultationsType(
-          username: 'prashanth',
+          username: 'Banavath prashanth',
           mobileNumber: '7842259803',
         )
         // home: FullscreenLoader(
@@ -121,6 +121,10 @@ class MyApp extends StatelessWidget {
         //   toggleTheme: () {},
         // )
         //  home: HomeScreen()
+        // home: RegisterScreen(
+        //   mobileNumber: '7842259803',
+        //   fullName: 'Banavath prashanth',
+        // )
 
         // home: ConsultationsType(mobileNumber: '7842259803', username: 'prashanth',)
         // home: InvoicePage(bookingDetails: null,)

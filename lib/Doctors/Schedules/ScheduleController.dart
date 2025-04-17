@@ -43,45 +43,7 @@ class ScheduleController extends GetxController {
     // Add more tribal/regional languages as needed
   };
 
-  // DateTime selectedDate = DateTime.now();
-  // var selectedSlotText = "".obs;
-
-  /// Currently selected indices
-  // int selectedSlotIndex = -1;
-
-  /// List of 7 dates from today
-  // List<DateTime> weekDates = [];
-
-  /// Initialize 7-day calendar
-  // void initializeWeekDates() {
-  //   final today = DateTime.now();
-  //   weekDates = List.generate(7, (index) => today.add(Duration(days: index)));
-  //   selectedDate = weekDates[0];
-  // }
-
-  // /// Set time slots from doctor data (like availableSlots)
-  // void setTimeSlots(List<Map<String, dynamic>> slots) {
-  //   timeSlots = slots;
-  // }
-
-  // /// Select a date by index
-  // void selectDate(int index) {
-  //   selectedDayIndex = index;
-  //   selectedDate = weekDates[index];
-  // }
-
-  // /// Select a time slot by index
-  // void selectSlot(int index) {
-  //   selectedSlotIndex = index;
-  // }
-
-  // /// Reset all selections
-  // void reset() {
-  //   selectedDayIndex = 0;
-  //   selectedSlotIndex = -1;
-  //   selectedDate = weekDates.isNotEmpty ? weekDates[0] : DateTime.now();
-  //   timeSlots.clear();
-  // }
+ 
 
   final Rx<DateTime> selectedDate = DateTime.now().obs;
   final RxList<Slot> currentSlots = <Slot>[].obs;
