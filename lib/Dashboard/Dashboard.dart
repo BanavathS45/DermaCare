@@ -44,6 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
@@ -220,6 +221,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
         }
       }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Icon(Icons.arrow_back_ios_new_rounded),
+      ),
     );
   }
 }

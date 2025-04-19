@@ -179,14 +179,14 @@ class ConsultationsTypeState extends State<ConsultationsType> {
       IconData icon, ConsultationModel consultation) {
     return GestureDetector(
       onTap: () {
-        consultationcontroller.setConsultationId(id);
+        consultationcontroller.setConsultation(consultation);
 
         showSnackbar("Selected", "$title [$id]", "success");
         String firstId = _consultations.first.consultationId;
 
         // Check if the 'id' matches the first consultationId in any consultation
         if (firstId == id) {
-          Get.offAll(BottomNavController(
+          Get.to(BottomNavController(
             mobileNumber: widget.mobileNumber,
             username: widget.username,
             index: 0,

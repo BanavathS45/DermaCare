@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -32,10 +33,7 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF456F62),
-              Color(0xFF82D1B8),
-            ],
+            colors: [mainColor, secondaryColor],
           ),
         ),
       ),

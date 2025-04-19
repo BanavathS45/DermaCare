@@ -1,21 +1,74 @@
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../Booings/BooingService.dart';
 import '../BottomNavigation/Appoinments/AppointmentView.dart';
+import '../BottomNavigation/Appoinments/PostBooingModel.dart';
+import '../Doctors/ListOfDoctors/DoctorController.dart';
+import '../Doctors/ListOfDoctors/DoctorService.dart';
 import 'GradintColor.dart';
 
-class AppointmentCard extends StatelessWidget {
-  final HospitalDoctorModel doctorData;
+class AppointmentCard extends StatefulWidget {
+  final PostBookingModel doctorData;
   const AppointmentCard({super.key, required this.doctorData});
 
   @override
+  State<AppointmentCard> createState() => _AppointmentCardState();
+}
+
+class _AppointmentCardState extends State<AppointmentCard> {
+  final DoctorService doctorService = DoctorService();
+  final DoctorController doctorController = Get.put(DoctorController());
+  bool isDoctorFetched = false; // Flag to track if doctor data is fetched
+  bool isLoading = true;
+  HospitalDoctorModel? doctor;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _fetchDoctor(); // Fetch doctor data only once
+  }
+
+  Future<void> _fetchDoctor() async {
+    print("dsfdsfsdfdsfdsfdsf calling");
+
+    final result =
+        await doctorService.getDoctorById(widget.doctorData.booking.doctorId);
+
+    print("dsfdsfsdfdsfdsfdsf ${result}");
+    if (result != null) {
+      setState(() {
+        doctor = result;
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        doctor = null;
+        isLoading = false;
+      });
+      print(
+          "Error: doctor not found for ID ${widget.doctorData.booking.doctorId}");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading || doctor == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    var doctorData = doctor!.doctor;
+    var hospitalData = doctor!.hospital;
     return InkWell(
       onTap: () {
         print("dfhjdsfkhdsjkfhdshfjd");
-        Get.to(AppointmentPreview());
+        Get.to(AppointmentPreview(
+          doctor: doctor!,
+          doctorBookings: widget.doctorData,
+        ));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -36,7 +89,7 @@ class AppointmentCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${doctorData.hospital.name}",
+              "${hospitalData.name}",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.blueGrey[900],
@@ -45,65 +98,86 @@ class AppointmentCard extends StatelessWidget {
               maxLines: 2,
             ),
             Text(
-              doctorData.hospital.city,
+              "${hospitalData.city}",
               style: TextStyle(
                 fontWeight: FontWeight.normal,
                 color: Colors.blueGrey[900],
+                fontSize: 16,
               ),
+              maxLines: 2,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${capitalizeEachWord(widget.doctorData.patient.name)}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey[900],
+                        fontSize: 18,
+                      ),
+                      maxLines: 2,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "${widget.doctorData.patient.age} Yrs /",
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: Colors.blueGrey[900],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      widget.doctorData.patient.gender,
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: Colors.blueGrey[900],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
             SizedBox(
               height: 10,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Profile image
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                    doctorData.doctor.profileImage,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // Info section
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "${doctorData.doctor.name}, ${doctorData.doctor.qualification}",
+                        "Date : ${widget.doctorData.patient.monthYear}",
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.normal,
                           fontSize: 15,
                           color: Colors.black87,
                         ),
                       ),
                       Text(
-                        doctorData.doctor.specialization,
+                        "Time :  ${widget.doctorData.patient.servicetime}",
                         style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.black54,
+                          fontSize: 15,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: Colors.green, size: 18),
-                          const SizedBox(width: 4),
-                          Text(doctorData.doctor.overallRating.toString()),
-                          const SizedBox(width: 12),
-                          Icon(
-                              doctorData.doctor.rated
-                                  ? Icons.favorite_sharp
-                                  : Icons.favorite_border,
-                              size: 18),
-                        ],
-                      ),
                     ],
                   ),
                 ),
+
                 // Right section
               ],
             ),
@@ -124,14 +198,14 @@ class AppointmentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Hair Transplant",
+                      widget.doctorData.booking.servicename,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                           color: Colors.black87),
                       textAlign: TextAlign.center,
                     ),
-                    Text("Service and Treatment",
+                    Text(widget.doctorData.booking.consultationType,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black54,
@@ -143,7 +217,8 @@ class AppointmentCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Row(
-                  children: _buildStatusBadges("pending"),
+                  children: _buildStatusBadges(
+                      widget.doctorData.booking.status.toLowerCase()),
                 )
               ],
             ),

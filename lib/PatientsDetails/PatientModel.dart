@@ -1,46 +1,46 @@
-class Patientmodel {
-  final String patientName;
-  final String patientAge;
+class PatientModel {
+  final String name;
+  final String age;
   final String gender;
   final String bookingFor;
   final String problem;
   final String monthYear;
-  final String dayDate;
-  final String slot;
+  final String serviceDate;
+  final String servicetime;
 
-  Patientmodel(
-      {required this.patientName,
+  PatientModel(
+      {required this.name,
       required this.monthYear,
-      required this.dayDate,
-      required this.slot,
-      required this.patientAge,
+      required this.serviceDate,
+      required this.servicetime,
+      required this.age,
       required this.gender,
       required this.bookingFor,
       required this.problem});
 
-  factory Patientmodel.fromJson(Map<String, dynamic> json) {
-    return Patientmodel(
-      patientName: json['patientName'],
-      patientAge: json['patientAge'],
-      gender: json['gender'],
-      bookingFor: json['bookingFor'],
-      problem: json['problem'],
-      monthYear: json['monthYear'],
-      dayDate: json['dayDate'],
-      slot: json['slot'],
+  factory PatientModel.fromJson(Map<String, dynamic> json) {
+    return PatientModel(
+      name: json['name'] ?? '',
+      age: json['age'] ?? 0,
+      gender: json['gender'] ?? '',
+      bookingFor: json['bookingFor'] ?? '',
+      problem: json['problem'] ?? '',
+      monthYear: json['sele'] ?? json['monthYear'] ?? '',
+      serviceDate: json['serviceDate']?.toString() ?? '',
+      servicetime: json['servicetime']?.toString() ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'patientName': patientName,
-      'patientAge': patientAge,
+      'name': name,
+      'age': age,
       'gender': gender,
       'bookingFor': bookingFor,
       'problem': problem,
       'monthYear': monthYear,
-      'dayDate': dayDate,
-      'slot': slot,
+      'serviceDate': serviceDate,
+      'servicetime': servicetime,
     };
   }
 }

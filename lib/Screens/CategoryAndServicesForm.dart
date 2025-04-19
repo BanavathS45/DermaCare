@@ -101,17 +101,15 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                   )),
 
               SizedBox(height: 16),
-
               Obx(() {
-                final subServiceList =
-                    controller.subServiceList; // ✅ Observable accessed inside
+                final subServiceList = controller.subServiceList;
+                final selectedSubService = controller.selectedSubService.value;
+                final isSubServiceAvailable = subServiceList.isNotEmpty;
 
                 return CustomDropdownField<Service>(
-                  value: subServiceList.isNotEmpty
-                      ? controller.selectedSubService.value
-                      : null,
+                  value: isSubServiceAvailable ? selectedSubService : null,
                   labelText: 'Sub-Service',
-                  items: subServiceList.isNotEmpty
+                  items: isSubServiceAvailable
                       ? subServiceList.map((sub) {
                           return DropdownMenuItem<Service>(
                             value: sub,
@@ -119,13 +117,13 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                           );
                         }).toList()
                       : [
-                          DropdownMenuItem<Service>(
+                          const DropdownMenuItem<Service>(
                             value: null,
                             child: Text("No Sub-Services Available"),
                           ),
                         ],
                   onChanged: (sub) {
-                    if (subServiceList.isNotEmpty) {
+                    if (isSubServiceAvailable && sub != null) {
                       controller.selectedSubService.value = sub;
                     }
                   },
@@ -181,6 +179,11 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                   child: const Text("Submit", style: TextStyle(fontSize: 16)),
                 ),
               ),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Back", style: TextStyle(fontSize: 16))),
 
               Spacer(),
               Copyrights(),

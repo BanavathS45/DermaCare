@@ -45,7 +45,7 @@ void main() async {
   Get.put(Consultationcontroller());
   Get.put(DoctorController());
   Get.put(ScheduleController()); // ✅ FIXED// 👈 This registers it eagerly
-  Get.put(Confirmbookingcontroller()); // ✅ FIXED// 👈 This registers it eagerly
+  // Get.put(Confirmbookingcontroller()); // ✅ FIXED// 👈 This registers it eagerly
   runApp(const MyApp());
 }
 

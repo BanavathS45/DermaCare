@@ -65,6 +65,7 @@ class Doctorscreen extends StatelessWidget {
             Expanded(
               child: doctorController.filteredDoctors.isEmpty
                   ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Center(
                           child: Text("No doctors found"),

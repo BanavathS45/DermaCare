@@ -1,7 +1,9 @@
+import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../APIs/BaseUrl.dart';
+import '../../Booings/BooingService.dart';
 import '../../Doctors/ListOfDoctors/DoctorController.dart';
 import '../../Doctors/ListOfDoctors/DoctorModel.dart';
 import '../../Doctors/ListOfDoctors/DoctorService.dart';
@@ -24,29 +26,47 @@ class _AppointmentPageState extends State<AppointmentPage>
   final DoctorService doctorService = DoctorService();
 
   bool isLoading = true;
-  HospitalDoctorModel? doctor;
 
   String _selectedTab = 'UPCOMING';
 
   @override
   void initState() {
     super.initState();
-    _fetchDoctor();
+    // _fetchDoctor();
+    fetchBookings();
   }
 
-  Future<void> _fetchDoctor() async {
-    final result =
-        await doctorService.getDoctorById(doctorController.doctorId.toString());
+  List<PostBookingModel> doctorBookings = [];
 
-    if (result != null) {
+  void fetchBookings() async {
+    final bookingsJson =
+        await getBookingsByDoctorId(doctorController.doctorId.toString());
+    print("Received bookings JSON: $bookingsJson");
+
+    if (bookingsJson != null && bookingsJson is List) {
+      List<PostBookingModel> parsedBookings = [];
+      for (var item in bookingsJson) {
+        try {
+          final booking = PostBookingModel.fromJson(item);
+          parsedBookings.add(booking);
+        } catch (e, st) {
+          print("❌ Failed to parse booking: $e");
+          print("Stack trace: $st");
+          print("❗ Faulty item: $item");
+        }
+      }
+
       setState(() {
-        doctor = result;
+        doctorBookings = parsedBookings;
         isLoading = false;
       });
+
+      print("✅ Parsed doctor bookings: $doctorBookings");
     } else {
       setState(() {
         isLoading = false;
       });
+      print("❌ Error: bookingsJson is not a list or is null");
     }
   }
 
@@ -57,7 +77,7 @@ class _AppointmentPageState extends State<AppointmentPage>
   }
 
   Future<void> _onRefresh() async {
-    await _fetchDoctor();
+    // await _fetchDoctor();
     print("_onRefresh called for AppointmentPage");
   }
 
@@ -67,7 +87,7 @@ class _AppointmentPageState extends State<AppointmentPage>
     return Scaffold(
       appBar: CommonHeader(
         title: "Appointments",
-        onNotificationPressed: () => _fetchDoctor(),
+        onNotificationPressed: () {},
         onSettingPressed: () async {
           await whatsUpChat();
         },
@@ -102,11 +122,20 @@ class _AppointmentPageState extends State<AppointmentPage>
             ),
             isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : doctor == null
-                    ? const Center(child: Text('Doctor not found'))
-                    : AppointmentCard(
-                        doctorData: doctor!,
-                      ),
+                : doctorBookings.isEmpty
+                    ? const Center(child: Text('No bookings found'))
+                    : Expanded(
+                        child: ListView.builder(
+                          itemCount: doctorBookings.length,
+                          itemBuilder: (context, index) {
+                            final booking = doctorBookings[index];
+                            return AppointmentCard(
+                              doctorData:
+                                  booking, // Assuming your AppointmentCard takes a BookingDetailsModel
+                            );
+                          },
+                        ),
+                      )
           ],
         ),
       ),

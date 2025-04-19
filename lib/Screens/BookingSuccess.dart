@@ -9,7 +9,7 @@ import '../Doctors/ListOfDoctors/DoctorService.dart';
 
 class SuccessScreen extends StatefulWidget {
   final HospitalDoctorModel serviceDetails;
-  final Patientmodel patient;
+  final PatientModel patient;
   final String paymentId;
 
   const SuccessScreen({
@@ -141,7 +141,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
                                   width: 5,
                                 ),
                                 Text(
-                                  "${widget.patient.dayDate}, ${widget.patient.slot}",
+                                  "${widget.patient.serviceDate}, ${widget.patient.servicetime}",
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ],

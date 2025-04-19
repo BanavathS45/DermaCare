@@ -441,7 +441,7 @@
               "availableTimings": "10:00 AM - 05:00 PM",
               "slots": [
                 {
-                  "date": "2025-04-14",
+                  "date": "2025-04-20",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -514,7 +514,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-15",
+                  "date": "2025-04-21",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -571,7 +571,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-16",
+                  "date": "2025-04-22",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -620,7 +620,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-17",
+                  "date": "2025-04-23",
                   "availableSlots": [
                     {
                       "slot": "12:00 PM",
@@ -669,15 +669,15 @@
                   ]
                 },
                 {
-                  "date": "2025-04-07",
+                  "date": "2025-04-24",
                   "availableSlots": []
                 },
                 {
-                  "date": "2025-04-08",
+                  "date": "2025-04-25",
                   "availableSlots": []
                 },
                 {
-                  "date": "2025-04-09",
+                  "date": "2025-04-26",
                   "availableSlots": []
                 }
               ],
@@ -2040,6 +2040,206 @@
         }
       ],
       "id": "dc80"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "77c1",
+      "name": "Dilip",
+      "age": "32",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "Fever and cough",
+      "sele": "April 2025",
+      "serviceDate": "10",
+      "servicetime": "10:30 AM",
+      "servicename": "General Consultation",
+      "serviceId": "SRV12345",
+      "doctorId": "DC_1",
+      "consultationType": "Online",
+      "totalFee": 600,
+      "consultattionFee": 500,
+      "status": "pending"
+    },
+    {
+      "id": "77c2",
+      "name": "Anjali",
+      "age": "28",
+      "gender": "Female",
+      "bookingFor": "Spouse",
+      "problem": "Skin Allergy",
+      "sele": "April 2025",
+      "serviceDate": "11",
+      "servicetime": "11:00 AM",
+      "servicename": "Dermatology Consultation",
+      "serviceId": "SRV54321",
+      "doctorId": "DC_2",
+      "consultationType": "In-clinic",
+      "totalFee": 800,
+      "consultattionFee": 700,
+      "status": "pending"
+    },
+    {
+      "id": "77c3",
+      "name": "Rahul",
+      "age": "45",
+      "gender": "Male",
+      "bookingFor": "Father",
+      "problem": "Back pain",
+      "sele": "April 2025",
+      "serviceDate": "12",
+      "servicetime": "09:15 AM",
+      "servicename": "Orthopedic Checkup",
+      "serviceId": "SRV67890",
+      "doctorId": "DC_2",
+      "consultationType": "Video",
+      "totalFee": 900,
+      "consultattionFee": 750,
+      "status": "pending"
+    },
+    {
+      "id": "77c4",
+      "name": "fggsffrd",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "fggfffvcvffxccffdd",
+      "monthYear": "April 18, 2025",
+      "serviceDate": "Friday",
+      "slot": "02:30 PM",
+      "servicename": "General Consultation",
+      "serviceId": "SRV12345",
+      "doctorId": "DC_3",
+      "consultationType": "Online",
+      "totalFee": 520,
+      "consultattionFee": 500,
+      "status": "pending"
+    },
+    {
+      "id": "77c5",
+      "name": "banavath",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "zhshsbsnnsdndnd",
+      "monthYear": "April 20, 2025",
+      "serviceDate": "Sunday",
+      "slot": "09:00 AM",
+      "servicename": "General Consultation",
+      "serviceId": "SRV12345",
+      "doctorId": "DC_2",
+      "consultationType": "Online",
+      "totalFee": 520,
+      "consultattionFee": 500,
+      "status": "pending"
+    },
+    {
+      "id": "77c6",
+      "name": "Prashath ",
+      "age": "36",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "hdbdbdjdndnndhjd",
+      "monthYear": "April 20, 2025",
+      "serviceDate": "Sunday",
+      "slot": "11:30 AM",
+      "servicename": "General Consultation",
+      "serviceId": "SRV12345",
+      "doctorId": "DC_2",
+      "consultationType": "Online",
+      "totalFee": 520,
+      "consultattionFee": 500,
+      "status": "pending"
+    },
+    {
+      "id": "0675",
+      "name": "Nadhiya ",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "dbdbhdbdnsjsnsnsbd",
+      "monthYear": "April 20, 2025",
+      "serviceDate": "Sunday",
+      "slot": "09:00 AM",
+      "servicename": "PRP for Hair Loss",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_2",
+      "consultationType": "Services & Treatments",
+      "totalFee": 920,
+      "consultattionFee": 900,
+      "status": "completed"
+    },
+    {
+      "id": "5e07",
+      "name": "jvvhvuvuvu",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "hchcucgigibyccycugu",
+      "monthYear": "April 21, 2025",
+      "serviceDate": "Monday",
+      "slot": "09:30 AM",
+      "servicename": "PRP for Hair Loss",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_2",
+      "consultationType": "Services & Treatments",
+      "totalFee": 920,
+      "consultattionFee": 900,
+      "status": "pending"
+    },
+    {
+      "id": "76a6",
+      "name": "jbjggug",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "hcvuguguvuguvhvjbkbjvig hin",
+      "monthYear": "April 20, 2025",
+      "serviceDate": "Sunday",
+      "slot": "09:30 AM",
+      "servicename": "Hair Transplant",
+      "serviceId": "67e131abeaff264f275daa2d",
+      "doctorId": "DC_2",
+      "consultationType": "Services & Treatments",
+      "totalFee": 2720,
+      "consultattionFee": 2700,
+      "status": "completed"
+    },
+    {
+      "id": "23c6",
+      "name": "hvuvvuvu",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "tcyvvyvyggihhugh hi",
+      "monthYear": "April 20, 2025",
+      "serviceDate": "Sunday",
+      "slot": "09:30 AM",
+      "servicename": "PRP for Hair Loss",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_2",
+      "consultationType": "Services & Treatments",
+      "totalFee": 920,
+      "consultattionFee": 900,
+      "status": "pending"
+    },
+    {
+      "id": "9c7d",
+      "name": "amma",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "zhshsbbdjd",
+      "monthYear": "April 21, 2025",
+      "serviceDate": "Monday",
+      "servicetime": "09:00 AM",
+      "servicename": "PRP for Hair Loss",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_2",
+      "consultationType": "In-Clinic Consultation",
+      "totalFee": 1820,
+      "consultattionFee": 1800,
+      "status": "completed"
     }
   ]
 }

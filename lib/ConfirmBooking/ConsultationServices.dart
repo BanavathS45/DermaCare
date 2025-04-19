@@ -38,7 +38,7 @@ class ConsultationModel {
 
   ConsultationModel({
     required this.consultationType,
-    required this.consultationId,
+    required this.consultationId,  
   });
 
   factory ConsultationModel.fromJson(Map<String, dynamic> json) {
