@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 class CustomTextAera extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
-  final String? Function(String?)? validator; // ✅ Added validator
+  final String? Function(String?)? validator;
   final AutovalidateMode? autovalidateMode;
-
+  final void Function(String)? onChanged;
   const CustomTextAera({
     super.key,
     required this.controller,
     required this.labelText,
     this.validator,
     this.autovalidateMode,
+    this.onChanged, // <-- add this
   });
 
   @override
@@ -21,7 +22,8 @@ class CustomTextAera extends StatelessWidget {
       controller: controller,
       maxLines: null,
       keyboardType: TextInputType.multiline,
-      validator: validator, // ✅ Attach validator
+      validator: validator,
+      onChanged: onChanged,
       decoration: InputDecoration(
         labelText: labelText,
         border: OutlineInputBorder(

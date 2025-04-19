@@ -63,34 +63,30 @@ class Doctorscreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: doctorController.filteredDoctors.isEmpty
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: Text("No doctors found"),
-                        ),
-                        doctorController.filteredDoctors.isEmpty
-                            ? FloatingActionButton(
-                                onPressed: () {
-                                  print("I am calling refresh");
-                                  doctorController.refreshDoctors();
-                                },
-                                child: Icon(Icons.refresh),
-                              )
-                            : SizedBox.shrink(),
-                      ],
-                    )
-                  : ListView.builder(
-                      itemCount: doctorController.filteredDoctors.length,
-                      itemBuilder: (context, index) {
-                        return buildDoctorCard(
-                          context,
-                          doctorController.filteredDoctors[index],
-                          doctorController,
-                        );
-                      },
-                    ),
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  doctorController.refreshDoctors();
+                },
+                child: doctorController.filteredDoctors.isEmpty
+                    ? ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(height: 200),
+                          Center(child: Text("No doctors found")),
+                        ],
+                      )
+                    : ListView.builder(
+                        itemCount: doctorController.filteredDoctors.length,
+                        itemBuilder: (context, index) {
+                          return buildDoctorCard(
+                              context,
+                              doctorController.filteredDoctors[index],
+                              doctorController,
+                              mobileNumber
+                              );
+                        },
+                      ),
+              ),
             ),
             SizedBox(
               height: 10,

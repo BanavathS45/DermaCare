@@ -19,8 +19,9 @@ import 'ConsultationController.dart';
 class Confirmbookingdetails extends StatefulWidget {
   final HospitalDoctorModel doctor;
   final PatientModel patient;
+ 
   Confirmbookingdetails(
-      {super.key, required this.doctor, required this.patient});
+      {super.key, required this.doctor, required this.patient });
 
   @override
   State<Confirmbookingdetails> createState() => _ConfirmbookingdetailsState();
@@ -193,7 +194,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               consultationType: consultationController
                   .selectedConsultation.value!.consultationType,
               consultattionFee: consultationFee.toDouble(),
-              totalFee: (totalFee).toDouble(), status: '',
+              totalFee: (totalFee).toDouble(),
+              status: 'pending',
             );
 
             Get.to(RazorpaySubscription(
@@ -205,7 +207,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 serviceDetails: widget.doctor,
                 patient: widget.patient,
                 bookingDetails: PostBookingModel(
-                    patient: widget.patient, booking: bookingDetails)));
+                    patient: widget.patient, booking: bookingDetails), mobileNumber: widget.patient.mobileNumber,));
           },
           child: Text(
             "BOOKING & PAY (₹ ${totalFee})",

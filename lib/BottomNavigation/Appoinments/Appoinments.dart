@@ -1,4 +1,5 @@
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,6 +11,7 @@ import '../../Doctors/ListOfDoctors/DoctorService.dart';
 import '../../Help/Numbers.dart';
 import '../../Utils/AppointmentCard.dart';
 import '../../Utils/Header.dart';
+import 'AppointmentController.dart';
 
 class AppointmentPage extends StatefulWidget {
   final String mobileNumber;
@@ -38,10 +40,10 @@ class _AppointmentPageState extends State<AppointmentPage>
 
   List<PostBookingModel> doctorBookings = [];
 
-  void fetchBookings() async {
-    final bookingsJson =
-        await getBookingsByDoctorId(doctorController.doctorId.toString());
-    print("Received bookings JSON: $bookingsJson");
+  Future<void> fetchBookings() async {
+    final bookingsJson = await getBookingsByMobileNumber(widget.mobileNumber);
+    print("Received bookings JSON: ${bookingsJson}");
+    print("Received bookings JSON: ${widget.mobileNumber}");
 
     if (bookingsJson != null && bookingsJson is List) {
       List<PostBookingModel> parsedBookings = [];
@@ -61,7 +63,7 @@ class _AppointmentPageState extends State<AppointmentPage>
         isLoading = false;
       });
 
-      print("✅ Parsed doctor bookings: $doctorBookings");
+      print("✅ Parsed doctor bookings: ${doctorBookings}");
     } else {
       setState(() {
         isLoading = false;
@@ -77,8 +79,26 @@ class _AppointmentPageState extends State<AppointmentPage>
   }
 
   Future<void> _onRefresh() async {
-    // await _fetchDoctor();
+    await fetchBookings();
     print("_onRefresh called for AppointmentPage");
+  }
+
+  List<PostBookingModel> _filteredBookings() {
+    if (_selectedTab == 'UPCOMING') {
+      return doctorBookings.where((b) {
+        final status = b.booking.status.toLowerCase();
+        final consultationType = b.booking.consultationType.toLowerCase();
+
+        return (status == 'pending' || status == 'confirmed') &&
+            consultationType != 'online consultation';
+      }).toList();
+    } else if (_selectedTab == 'COMPLETED') {
+      return doctorBookings
+          .where((b) => b.booking.status.toLowerCase() == 'completed')
+          .toList();
+    } else {
+      return doctorBookings;
+    }
   }
 
   @override
@@ -103,9 +123,9 @@ class _AppointmentPageState extends State<AppointmentPage>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Expanded(child: _buildTabButton('UPCOMING', Colors.amber)),
+                  Expanded(child: _buildTabButton('UPCOMING', mainColor)),
                   const SizedBox(width: 10.0),
-                  Expanded(child: _buildTabButton('COMPLETED', Colors.green)),
+                  Expanded(child: _buildTabButton('COMPLETED', secondaryColor)),
                 ],
               ),
             ),
@@ -116,22 +136,22 @@ class _AppointmentPageState extends State<AppointmentPage>
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF6B3FA0),
+                  color: mainColor,
                 ),
               ),
             ),
             isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : doctorBookings.isEmpty
-                    ? const Center(child: Text('No bookings found'))
+                : _filteredBookings().isEmpty
+                    ? const Center(
+                        child: Text('No bookings found for this tab'))
                     : Expanded(
                         child: ListView.builder(
-                          itemCount: doctorBookings.length,
+                          itemCount: _filteredBookings().length,
                           itemBuilder: (context, index) {
-                            final booking = doctorBookings[index];
+                            final booking = _filteredBookings()[index];
                             return AppointmentCard(
-                              doctorData:
-                                  booking, // Assuming your AppointmentCard takes a BookingDetailsModel
+                              doctorData: booking,
                             );
                           },
                         ),

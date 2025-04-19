@@ -29,6 +29,7 @@ class ConsultationsType extends StatefulWidget {
 class ConsultationsTypeState extends State<ConsultationsType> {
   final consultationcontroller = Get.find<Consultationcontroller>();
   List<ConsultationModel> _consultations = [];
+  bool loading = true;
 
   @override
   void initState() {
@@ -36,10 +37,17 @@ class ConsultationsTypeState extends State<ConsultationsType> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final consultations = await getConsultationDetails();
-      if (consultations.isNotEmpty) {
-        setState(() {
-          _consultations = consultations;
-        });
+      try {
+        if (consultations.isNotEmpty) {
+          setState(() {
+            _consultations = consultations;
+            loading = false;
+          });
+        } else {
+          loading = false;
+        }
+      } catch (e) {
+        loading = false;
       }
     });
   }
@@ -130,22 +138,33 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                   ),
 
                   // Buttons Section
-                  _consultations.isEmpty
+                  loading
                       ? Center(child: CircularProgressIndicator())
-                      : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                          child: Column(
-                            children: _consultations.map((consultation) {
-                              return _serviceButton(
-                                consultation.consultationType,
-                                Colors.white,
-                                consultation.consultationId,
-                                _getIconForType(consultation.consultationType),
-                                consultation,
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                      : _consultations.isEmpty
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.35,
+                              child: Center(
+                                  child: Text(
+                                "No service available",
+                                style: TextStyle(color: Colors.white),
+                              )),
+                            )
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Column(
+                                children: _consultations.map((consultation) {
+                                  return _serviceButton(
+                                    consultation.consultationType,
+                                    Colors.white,
+                                    consultation.consultationId,
+                                    _getIconForType(
+                                        consultation.consultationType),
+                                    consultation,
+                                  );
+                                }).toList(),
+                              ),
+                            ),
 
                   const SizedBox(height: 40),
                 ],

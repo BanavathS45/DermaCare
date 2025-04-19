@@ -3,6 +3,7 @@ class PatientModel {
   final String age;
   final String gender;
   final String bookingFor;
+  final String mobileNumber;
   final String problem;
   final String monthYear;
   final String serviceDate;
@@ -13,6 +14,7 @@ class PatientModel {
       required this.monthYear,
       required this.serviceDate,
       required this.servicetime,
+      required this.mobileNumber,
       required this.age,
       required this.gender,
       required this.bookingFor,
@@ -21,6 +23,7 @@ class PatientModel {
   factory PatientModel.fromJson(Map<String, dynamic> json) {
     return PatientModel(
       name: json['name'] ?? '',
+      mobileNumber: json['mobileNumber'] ?? '',
       age: json['age'] ?? 0,
       gender: json['gender'] ?? '',
       bookingFor: json['bookingFor'] ?? '',
@@ -34,6 +37,7 @@ class PatientModel {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
+      'mobileNumber': mobileNumber,
       'age': age,
       'gender': gender,
       'bookingFor': bookingFor,

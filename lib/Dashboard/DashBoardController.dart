@@ -35,6 +35,8 @@ class Dashboardcontroller extends GetxController {
 
   String statusMessage = "";
 
+  
+
   void fetchSubServices(String categoryId) async {
     print("categoryId ${categoryId}");
     final result = await ServiceFetcher().fetchServices(categoryId);

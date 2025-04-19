@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 
+import 'BottomNavigation/Appoinments/AppointmentController.dart';
 import 'BottomNavigation/BottomNavigation.dart';
 import 'ConfirmBooking/ConfirmBookingController.dart';
 import 'Controller/CustomerController.dart';
@@ -45,6 +46,8 @@ void main() async {
   Get.put(Consultationcontroller());
   Get.put(DoctorController());
   Get.put(ScheduleController()); // ✅ FIXED// 👈 This registers it eagerly
+  Get.put(Appointmentcontroller()); // ✅ FIXED// 👈 This registers it eagerly
+
   // Get.put(Confirmbookingcontroller()); // ✅ FIXED// 👈 This registers it eagerly
   runApp(const MyApp());
 }
@@ -71,7 +74,6 @@ class MyApp extends StatelessWidget {
           ),
           primaryColor: mainColor, // Explicitly set the primary color
           appBarTheme: const AppBarTheme(
-            backgroundColor: Color(0xFF4C3C7D), //ppBar background color
             titleTextStyle: TextStyle(
               color: Colors.white, // White text for better contrast
               fontSize: 20,

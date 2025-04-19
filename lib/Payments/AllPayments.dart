@@ -13,6 +13,7 @@ class RazorpaySubscription extends StatefulWidget {
   final VoidCallback? onPaymentInitiated;
   final HospitalDoctorModel serviceDetails;
   final String amount;
+  final String mobileNumber;
   final BuildContext context;
   final PatientModel patient;
   final PostBookingModel bookingDetails;
@@ -24,7 +25,7 @@ class RazorpaySubscription extends StatefulWidget {
     required this.amount,
     required this.context,
     required this.patient,
-    required this.bookingDetails,
+    required this.bookingDetails, required this.mobileNumber,
   });
 
   @override
@@ -100,6 +101,7 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
               serviceDetails: widget.serviceDetails,
               paymentId: paymentId.toString(),
               patient: widget.patient,
+              mobileNumber:widget.mobileNumber
             ),
           ),
           (route) => false);

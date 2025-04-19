@@ -7,11 +7,8 @@ import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 import '../Doctors/Schedules/Schedule.dart';
 import '../Utils/GradintColor.dart';
 
-Widget buildDoctorCard(
-  BuildContext context,
-  HospitalDoctorModel doctorModel,
-  DoctorController controller,
-) {
+Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
+    DoctorController controller, String mobileNumber) {
   final doctor = doctorModel.doctor;
   final hospital = doctorModel.hospital;
 
@@ -54,7 +51,7 @@ Widget buildDoctorCard(
               ),
               IconButton(
                 icon: Icon(
-                  Icons.favorite,
+                  Icons.thumb_up,
                   color: doctor.favorites ? Colors.yellow : Colors.white60,
                 ),
                 onPressed: () => controller.toggleFavorite(doctorModel),
@@ -242,8 +239,10 @@ Widget buildDoctorCard(
                         // showSnackbar();
                       }
                       doctor.availablity
-                          ? Get.to(
-                              () => ScheduleScreen(doctorData: doctorModel))
+                          ? Get.to(() => ScheduleScreen(
+                                doctorData: doctorModel,
+                                mobileNumber: mobileNumber,
+                              ))
                           : null;
 
                       // Navigator.push(

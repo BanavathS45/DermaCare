@@ -9,6 +9,7 @@ import '../BottomNavigation/Appoinments/AppointmentView.dart';
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/ListOfDoctors/DoctorService.dart';
+import '../Review/ReviewScreen.dart';
 import 'GradintColor.dart';
 
 class AppointmentCard extends StatefulWidget {
@@ -74,16 +75,17 @@ class _AppointmentCardState extends State<AppointmentCard> {
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: acrdGradient(),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 6,
-              offset: Offset(0, 3),
-            )
-          ],
-        ),
+            borderRadius: BorderRadius.circular(16),
+            // gradient: acrdGradient(),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              )
+            ],
+            border: Border.all(width: 1, color: Colors.grey)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,6 +107,16 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 fontSize: 16,
               ),
               maxLines: 2,
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Divider(
+              height: 1,
+              color: secondaryColor,
+            ),
+            SizedBox(
+              height: 5,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -146,39 +158,25 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 10,
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  flex: 4,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Date : ${widget.doctorData.patient.monthYear}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 15,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Text(
-                        "Time :  ${widget.doctorData.patient.servicetime}",
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.black87,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                    ],
+                Text(
+                  "Date : ${widget.doctorData.patient.monthYear}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 15,
+                    color: Colors.black87,
                   ),
                 ),
-
-                // Right section
+                Text(
+                  "Time :  ${widget.doctorData.patient.servicetime}",
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
               ],
             ),
             SizedBox(
@@ -212,13 +210,72 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           fontStyle: FontStyle.italic,
                         ),
                         textAlign: TextAlign.center),
-                    const SizedBox(height: 8),
                   ],
                 ),
                 const SizedBox(width: 6),
                 Row(
-                  children: _buildStatusBadges(
-                      widget.doctorData.booking.status.toLowerCase()),
+                  children: widget.doctorData.booking.status.toLowerCase() !=
+                          'completed'
+                      ? _buildStatusBadges(
+                          widget.doctorData.booking.status.toLowerCase())
+                      : [], // Return an empty list when status is not 'completed'
+                ),
+                Row(
+                  children: [
+                    // This returns List<Widget>
+                    if (widget.doctorData.booking.status.toLowerCase() ==
+                        'completed') ...[
+                      Container(
+                        height: 40,
+                        decoration: BoxDecoration(
+                          // color: Colors.green, // Set the background color
+                          borderRadius:
+                              BorderRadius.circular(8), // Set the border radius
+                          border: Border.all(
+                              color: mainColor,
+                              width: 1), // Set the border color and width
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            Get.to(
+                              AppointmentPreview(
+                                doctor: doctor!,
+                                doctorBookings: widget.doctorData,
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Details',
+                            style: TextStyle(
+                                color: mainColor), // Set the text color
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Container(
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: Colors.blue, // Set the background color
+                          borderRadius:
+                              BorderRadius.circular(8), // Set the border radius
+                          border: Border.all(
+                              color: Colors.white,
+                              width: 2), // Set the border color and width
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            Get.to(ReviewScreen(doctorData: doctor, doctorBookings: widget.doctorData));
+                          },
+                          child: const Text(
+                            'Review',
+                            style: TextStyle(
+                                color: Colors.white), // Set the text color
+                          ),
+                        ),
+                      ),
+                      // Add some space between the buttons
+                    ],
+                  ],
                 )
               ],
             ),

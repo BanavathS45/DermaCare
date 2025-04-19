@@ -313,7 +313,11 @@
                   ]
                 }
               ],
-              "languagesKnown": ["English", "Hindi", "Telugu"],
+              "languagesKnown": [
+                "English",
+                "Hindi",
+                "Telugu"
+              ],
               "profile": "Specializes in diagnosing and treating hereditary skin disorders and improving personalized skincare treatments.",
               "profileImage": "https://randomuser.me/api/portraits/women/44.jpg",
               "careerPath": [
@@ -410,7 +414,10 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": ["2024-03-25T10:00:00", "2024-03-25T11:00:00"],
+              "bookingSlots": [
+                "2024-03-25T10:00:00",
+                "2024-03-25T11:00:00"
+              ],
               "fee": {
                 "treatmentFee": 1500,
                 "inClinicFee": 1200,
@@ -681,11 +688,21 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": ["English", "Hindi", "Marathi"],
+              "languagesKnown": [
+                "English",
+                "Hindi",
+                "Marathi"
+              ],
               "profile": "Expert in cosmetic skin care, lasers and rejuvenation treatments.",
               "profileImage": "https://randomuser.me/api/portraits/men/55.jpg",
-              "careerPath": ["Apollo Skin Dept.", "DermaGlow Bangalore"],
-              "highlights": ["Korean Laser Training", "Vogue Skincare Feature"],
+              "careerPath": [
+                "Apollo Skin Dept.",
+                "DermaGlow Bangalore"
+              ],
+              "highlights": [
+                "Korean Laser Training",
+                "Vogue Skincare Feature"
+              ],
               "ratings": {
                 "overall": 4.6,
                 "rated": true,
@@ -726,7 +743,10 @@
                 ]
               },
               "favorites": false,
-              "bookingSlots": ["2024-03-26T11:00:00", "2024-03-26T16:00:00"],
+              "bookingSlots": [
+                "2024-03-26T11:00:00",
+                "2024-03-26T16:00:00"
+              ],
               "fee": {
                 "treatmentFee": 2000,
                 "inClinicFee": 1800,
@@ -769,7 +789,11 @@
               "license": "7576gfhgfg",
               "specialization": "Pediatric Dermatology",
               "experienceYears": 7,
-              "focusAreas": ["Eczema", "Infant Rashes", "Birthmark Management"],
+              "focusAreas": [
+                "Eczema",
+                "Infant Rashes",
+                "Birthmark Management"
+              ],
               "availableDays": "Mon - Sat",
               "availableTimings": "11:00 AM - 05:00 PM",
               "slots": [
@@ -1014,11 +1038,21 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": ["English", "Hindi", "Urdu"],
+              "languagesKnown": [
+                "English",
+                "Hindi",
+                "Urdu"
+              ],
               "profile": "Provides gentle, expert care for skin conditions in children and infants.",
               "profileImage": "https://randomuser.me/api/portraits/women/65.jpg",
-              "careerPath": ["Rainbow Hospitals", "SkinCare Chennai"],
-              "highlights": ["12 pediatric papers", "NeoDerm Speaker"],
+              "careerPath": [
+                "Rainbow Hospitals",
+                "SkinCare Chennai"
+              ],
+              "highlights": [
+                "12 pediatric papers",
+                "NeoDerm Speaker"
+              ],
               "ratings": {
                 "overall": 4.9,
                 "rated": true,
@@ -1059,7 +1093,10 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": ["2024-03-27T09:00:00", "2024-03-27T10:30:00"],
+              "bookingSlots": [
+                "2024-03-27T09:00:00",
+                "2024-03-27T10:30:00"
+              ],
               "fee": {
                 "treatmentFee": 1200,
                 "inClinicFee": 1000,
@@ -1081,7 +1118,11 @@
               "license": "7576gfhgfg",
               "specialization": "Trichology",
               "experienceYears": 10,
-              "focusAreas": ["Hair Transplant", "Hair Fall", "Dandruff"],
+              "focusAreas": [
+                "Hair Transplant",
+                "Hair Fall",
+                "Dandruff"
+              ],
               "availableDays": "Tue - Sat",
               "availableTimings": "09:00 AM - 05:00 PM",
               "slots": [
@@ -1326,11 +1367,21 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": ["English", "Hindi", "Kannada"],
+              "languagesKnown": [
+                "English",
+                "Hindi",
+                "Kannada"
+              ],
               "profile": "Leading hair specialist with expertise in transplant and scalp care.",
               "profileImage": "https://randomuser.me/api/portraits/men/45.jpg",
-              "careerPath": ["Kaya Skin Clinic", "HairCraft Founder"],
-              "highlights": ["1000+ transplants", "Spain-trained surgeon"],
+              "careerPath": [
+                "Kaya Skin Clinic",
+                "HairCraft Founder"
+              ],
+              "highlights": [
+                "1000+ transplants",
+                "Spain-trained surgeon"
+              ],
               "ratings": {
                 "overall": 4.7,
                 "rated": true,
@@ -1371,7 +1422,10 @@
                 ]
               },
               "favorites": false,
-              "bookingSlots": ["2024-03-28T14:00:00", "2024-03-28T15:30:00"],
+              "bookingSlots": [
+                "2024-03-28T14:00:00",
+                "2024-03-28T15:30:00"
+              ],
               "fee": {
                 "treatmentFee": 2500,
                 "inClinicFee": 2000,
@@ -1422,12 +1476,16 @@
               "license": "7576gfhgfg",
               "specialization": "Clinical Dermatology",
               "experienceYears": 8,
-              "focusAreas": ["Psoriasis", "Vitiligo", "Chronic Eczema"],
+              "focusAreas": [
+                "Psoriasis",
+                "Vitiligo",
+                "Chronic Eczema"
+              ],
               "availableDays": "Tue - Sat",
               "availableTimings": "10:00 AM - 05:00 PM",
               "slots": [
                 {
-                  "date": "2025-04-03",
+                  "date": "2025-04-19",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -1500,7 +1558,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-04",
+                  "date": "2025-04-20",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -1557,7 +1615,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-05",
+                  "date": "2025-04-21",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -1606,7 +1664,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-06",
+                  "date": "2025-04-22",
                   "availableSlots": [
                     {
                       "slot": "12:00 PM",
@@ -1667,11 +1725,21 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": ["English", "Telugu", "Gujarati"],
+              "languagesKnown": [
+                "English",
+                "Telugu",
+                "Gujarati"
+              ],
               "profile": "Experienced in managing long-term dermatological diseases using medical therapies.",
               "profileImage": "https://randomuser.me/api/portraits/women/32.jpg",
-              "careerPath": ["NIMS Fellow", "Lead at DermaPlus"],
-              "highlights": ["Vitiligo Campaigner", "Case Study Winner"],
+              "careerPath": [
+                "NIMS Fellow",
+                "Lead at DermaPlus"
+              ],
+              "highlights": [
+                "Vitiligo Campaigner",
+                "Case Study Winner"
+              ],
               "ratings": {
                 "overall": 4.5,
                 "rated": true,
@@ -1703,13 +1771,16 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": ["2024-03-29T10:00:00", "2024-03-29T11:30:00"],
+              "bookingSlots": [
+                "2024-03-29T10:00:00",
+                "2024-03-29T11:30:00"
+              ],
               "fee": {
                 "treatmentFee": 1400,
                 "inClinicFee": 1300,
                 "videoConsultationFee": 1000
               },
-              "availablity": false,
+              "availablity": true,
               "status": {
                 "status": "pending",
                 "rejectionReason": null
@@ -1726,31 +1797,36 @@
       "Id": "1",
       "doctorId": "DC_1",
       "username": "doctor_1",
-      "password": "doctor@123A"
+      "password": "doctor@123A",
+      "id": "f7e5"
     },
     {
       "Id": "2",
       "doctorId": "DC_2",
       "username": "doctor_2",
-      "password": "doctor@2"
+      "password": "doctor@2",
+      "id": "b3cd"
     },
     {
       "Id": "3",
       "doctorId": "DC_3",
       "username": "doctor_3",
-      "password": "doctor@3"
+      "password": "doctor@3",
+      "id": "5a84"
     },
     {
       "Id": "4",
       "doctorId": "DC_4",
       "username": "doctor_4",
-      "password": "doctor@4"
+      "password": "doctor@4",
+      "id": "a389"
     },
     {
       "Id": "5",
       "doctorId": "DC_5",
       "username": "doctor_5",
-      "password": "doctor@5"
+      "password": "doctor@5",
+      "id": "425d"
     }
   ],
   "notifications": [
@@ -2048,6 +2124,7 @@
       "name": "Dilip",
       "age": "32",
       "gender": "Male",
+      "mobileNumber": "7842259803",
       "bookingFor": "Self",
       "problem": "Fever and cough",
       "sele": "April 2025",
@@ -2066,6 +2143,7 @@
       "name": "Anjali",
       "age": "28",
       "gender": "Female",
+      "mobileNumber": "7842259803",
       "bookingFor": "Spouse",
       "problem": "Skin Allergy",
       "sele": "April 2025",
@@ -2084,6 +2162,7 @@
       "name": "Rahul",
       "age": "45",
       "gender": "Male",
+      "mobileNumber": "7842259803",
       "bookingFor": "Father",
       "problem": "Back pain",
       "sele": "April 2025",
@@ -2102,6 +2181,7 @@
       "name": "fggsffrd",
       "age": "25",
       "gender": "Male",
+      "mobileNumber": "7842259803",
       "bookingFor": "Self",
       "problem": "fggfffvcvffxccffdd",
       "monthYear": "April 18, 2025",
@@ -2121,6 +2201,7 @@
       "age": "25",
       "gender": "Male",
       "bookingFor": "Self",
+      "mobileNumber": "7842259803",
       "problem": "zhshsbsnnsdndnd",
       "monthYear": "April 20, 2025",
       "serviceDate": "Sunday",
@@ -2138,6 +2219,7 @@
       "name": "Prashath ",
       "age": "36",
       "gender": "Male",
+      "mobileNumber": "7842259803",
       "bookingFor": "Self",
       "problem": "hdbdbdjdndnndhjd",
       "monthYear": "April 20, 2025",
@@ -2157,6 +2239,7 @@
       "age": "25",
       "gender": "Male",
       "bookingFor": "Self",
+      "mobileNumber": "7842259803",
       "problem": "dbdbhdbdnsjsnsnsbd",
       "monthYear": "April 20, 2025",
       "serviceDate": "Sunday",
@@ -2175,6 +2258,7 @@
       "age": "25",
       "gender": "Male",
       "bookingFor": "Self",
+      "mobileNumber": "7842259803",
       "problem": "hchcucgigibyccycugu",
       "monthYear": "April 21, 2025",
       "serviceDate": "Monday",
@@ -2193,6 +2277,7 @@
       "age": "25",
       "gender": "Male",
       "bookingFor": "Self",
+      "mobileNumber": "7842259803",
       "problem": "hcvuguguvuguvhvjbkbjvig hin",
       "monthYear": "April 20, 2025",
       "serviceDate": "Sunday",
@@ -2211,6 +2296,7 @@
       "age": "25",
       "gender": "Male",
       "bookingFor": "Self",
+      "mobileNumber": "7842259803",
       "problem": "tcyvvyvyggihhugh hi",
       "monthYear": "April 20, 2025",
       "serviceDate": "Sunday",
@@ -2230,6 +2316,7 @@
       "gender": "Male",
       "bookingFor": "Self",
       "problem": "zhshsbbdjd",
+      "mobileNumber": "7842259802",
       "monthYear": "April 21, 2025",
       "serviceDate": "Monday",
       "servicetime": "09:00 AM",
@@ -2240,6 +2327,120 @@
       "totalFee": 1820,
       "consultattionFee": 1800,
       "status": "completed"
+    },
+    {
+      "id": "8c47",
+      "name": "vaishnavi ",
+      "age": "25",
+      "gender": "Female",
+      "bookingFor": "Self",
+      "mobileNumber": "7842259802",
+      "problem": "ghhhghhdfhgddvv",
+      "monthYear": "April 20, 2025",
+      "serviceDate": "Sunday",
+      "servicetime": "09:30 AM",
+      "servicename": "PRP for Hair Loss",
+      "status": "pending",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_2",
+      "consultationType": "Online Consultation",
+      "totalFee": 1520,
+      "consultattionFee": 1500
+    },
+    {
+      "id": "98a9",
+      "name": "Anil Kumar",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "mobileNumber": "7842259803",
+      "problem": "bsbdhdndnsndnsnnsns",
+      "monthYear": "April 19, 2025",
+      "serviceDate": "Saturday",
+      "servicetime": "09:30 AM",
+      "servicename": "PRP for Hair Loss",
+      "status": "pending",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_5",
+      "consultationType": "Online Consultation",
+      "totalFee": 1020,
+      "consultattionFee": 1000
+    },
+    {
+      "id": "98a9",
+      "name": "spandana",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "mobileNumber": "7842259803",
+      "problem": "bsbdhdndnsndnsnnsns",
+      "monthYear": "April 19, 2025",
+      "serviceDate": "Saturday",
+      "servicetime": "09:30 AM",
+      "servicename": "PRP for Hair Loss",
+      "status": "completed",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_5",
+      "consultationType": "Online Consultation",
+      "totalFee": 1020,
+      "consultattionFee": 1000
+    },
+    {
+      "id": "c5c6",
+      "name": "sowjanya ",
+      "mobileNumber": "7842259803",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "cycybuvub sc s\n",
+      "monthYear": "April 21, 2025",
+      "serviceDate": "Monday",
+      "servicetime": "09:30 AM",
+      "servicename": "PRP for Hair Loss",
+      "status": "pending",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_2",
+      "consultationType": "In-Clinic Consultation",
+      "totalFee": 1820,
+      "consultattionFee": 1800
+    },
+    {
+      "id": "e723",
+      "name": "Rakesh",
+      "mobileNumber": "7842259803",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "gcyccyfgygyggyyvgyg",
+      "monthYear": "April 21, 2025",
+      "serviceDate": "Monday",
+      "servicetime": "09:30 AM",
+      "servicename": "Hair Transplant",
+      "status": "pending",
+      "serviceId": "67e131abeaff264f275daa2d",
+      "doctorId": "DC_2",
+      "consultationType": "Online Consultation",
+      "totalFee": 1520,
+      "consultattionFee": 1500
+    },
+    {
+      "id": "2ce8",
+      "name": "jvhvvu",
+      "mobileNumber": "7842259803",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "hcycgygydyfubh",
+      "monthYear": "April 21, 2025",
+      "serviceDate": "Monday",
+      "servicetime": "09:30 AM",
+      "servicename": "PRP for Hair Loss",
+      "status": "pending",
+      "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_2",
+      "consultationType": "In-Clinic Consultation",
+      "totalFee": 1820,
+      "consultattionFee": 1800
     }
   ]
 }

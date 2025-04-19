@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../APIs/BaseUrl.dart';
+import '../BottomNavigation/Appoinments/AppointmentController.dart';
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 
 Future<Map<String, dynamic>?> postBookings(
@@ -29,16 +30,19 @@ Future<Map<String, dynamic>?> postBookings(
   }
 }
 
-Future<List<Map<String, dynamic>>> getBookingsByDoctorId(
-    String doctorId) async {
+Future<List<Map<String, dynamic>>> getBookingsByMobileNumber(
+    String mobileNumber) async {
+  print("dshffdfjsd ${mobileNumber}");
+  // final String mobileNumber = "7842259802";
   final url = Uri.parse(
-      'http://$wifiUrl:3000/bookings?doctorId=$doctorId'); // Adjust param name as per your API
+      'http://$wifiUrl:3000/bookings?mobileNumber=$mobileNumber'); // Adjust param name as per your API
 
   try {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print("expected response format: $data");
 
       if (data is List) {
         return List<Map<String, dynamic>>.from(data);
@@ -56,21 +60,21 @@ Future<List<Map<String, dynamic>>> getBookingsByDoctorId(
   }
 }
 
-Future<List<BookingDetailsModel>> getDetailByDoctorId(String doctorId) async {
-  final url = Uri.parse('http://$wifiUrl:3000/bookings?doctorId=$doctorId');
+// Future<List<BookingDetailsModel>> getDetailByDoctorId(String doctorId) async {
+//   final url = Uri.parse('http://$wifiUrl:3000/bookings?doctorId=$doctorId');
 
-  try {
-    final response = await http.get(url);
+//   try {
+//     final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => BookingDetailsModel.fromJson(json)).toList();
-    } else {
-      print("❌ Error: ${response.statusCode}");
-      return [];
-    }
-  } catch (e) {
-    print("❌ Exception: $e");
-    return [];
-  }
-}
+//     if (response.statusCode == 200) {
+//       final List<dynamic> data = jsonDecode(response.body);
+//       return data.map((json) => BookingDetailsModel.fromJson(json)).toList();
+//     } else {
+//       print("❌ Error: ${response.statusCode}");
+//       return [];
+//     }
+//   } catch (e) {
+//     print("❌ Exception: $e");
+//     return [];
+//   }
+// }

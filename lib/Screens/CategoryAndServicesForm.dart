@@ -45,150 +45,164 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        iconTheme:
+            IconThemeData(color: Colors.black), // 👈 Make back arrow black
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              Spacer(),
-              Image.asset("assets/DermaText.png", height: 100),
-              SizedBox(height: 20),
-              GradientText(
-                "Service Details", // Required text
-                gradient: appGradient(), // Now it's a LinearGradient
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+        child: Column(
+          children: [
+            Spacer(),
+            Image.asset("assets/DermaText.png", height: 100),
+            SizedBox(height: 20),
+            GradientText(
+              "Service Details", // Required text
+              gradient: appGradient(), // Now it's a LinearGradient
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
               ),
+            ),
 
-              SizedBox(height: 5),
-              Text(
-                widget.consulationType,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                  color: secondaryColor,
-                ),
+            SizedBox(height: 5),
+            Text(
+              widget.consulationType,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.normal,
+                color: secondaryColor,
               ),
-              SizedBox(height: 40),
+            ),
+            SizedBox(height: 20),
 
-              // Service Category Image - Wrap in Obx ONLY this part
-              Obx(() => controller.selectedService.value != null
-                  ? Image.memory(
+            // Service Category Image - Wrap in Obx ONLY this part
+            Obx(() => controller.selectedService.value != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.memory(
                       controller.selectedService.value!.categoryImage,
                       height: 100,
-                    )
-                  : SizedBox.shrink()),
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : SizedBox.shrink()),
 
-              SizedBox(height: 20),
+            SizedBox(height: 30),
 
-              // Dropdowns inside Obx because they use observables
-              Obx(() => CustomDropdownField<Serviceb>(
-                    value: controller.selectedService.value,
-                    labelText: 'Service Category',
-                    items: controller.services.map((service) {
-                      return DropdownMenuItem<Serviceb>(
-                        value: service,
-                        child: Text(service.categoryName),
-                      );
-                    }).toList(),
-                    onChanged: (service) {
-                      controller.selectedService.value = service;
-                      controller.selectedSubService.value = null;
-                      controller.fetchSubServices(service!.categoryId);
-                    },
-                  )),
-
-              SizedBox(height: 16),
-              Obx(() {
-                final subServiceList = controller.subServiceList;
-                final selectedSubService = controller.selectedSubService.value;
-                final isSubServiceAvailable = subServiceList.isNotEmpty;
-
-                return CustomDropdownField<Service>(
-                  value: isSubServiceAvailable ? selectedSubService : null,
-                  labelText: 'Sub-Service',
-                  items: isSubServiceAvailable
-                      ? subServiceList.map((sub) {
-                          return DropdownMenuItem<Service>(
-                            value: sub,
-                            child: Text(sub.serviceName),
+            // Dropdowns inside Obx because they use observables
+            Obx(() => CustomDropdownField<Serviceb>(
+                  value: controller.selectedService.value,
+                  labelText: 'Service Category',
+                  items: controller.services.isNotEmpty
+                      ? controller.services.map((service) {
+                          return DropdownMenuItem<Serviceb>(
+                            value: service,
+                            child: Text(service.categoryName),
                           );
                         }).toList()
                       : [
-                          const DropdownMenuItem<Service>(
+                          const DropdownMenuItem<Serviceb>(
                             value: null,
-                            child: Text("No Sub-Services Available"),
-                          ),
+                            child: Text("No Services Available"),
+                          )
                         ],
-                  onChanged: (sub) {
-                    if (isSubServiceAvailable && sub != null) {
-                      controller.selectedSubService.value = sub;
-                    }
+                  onChanged: (service) {
+                    controller.selectedService.value = service;
+                    controller.selectedSubService.value = null;
+                    controller.fetchSubServices(service!.categoryId);
                   },
-                );
-              }),
+                )),
 
-              SizedBox(height: 40),
+            SizedBox(height: 16),
+            Obx(() {
+              final subServiceList = controller.subServiceList;
+              final selectedSubService = controller.selectedSubService.value;
+              final isSubServiceAvailable = subServiceList.isNotEmpty;
 
-              Container(
-                decoration: BoxDecoration(
-                  gradient: appGradient(),
-                  borderRadius: BorderRadius.circular(10), // optional
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    final selectedMain = controller.selectedService.value;
-                    final selectedSub = controller.selectedSubService.value;
+              return CustomDropdownField<Service>(
+                value: isSubServiceAvailable ? selectedSubService : null,
+                labelText: 'Sub-Service',
+                items: isSubServiceAvailable
+                    ? subServiceList.map((sub) {
+                        return DropdownMenuItem<Service>(
+                          value: sub,
+                          child: Text(sub.serviceName),
+                        );
+                      }).toList()
+                    : [
+                        const DropdownMenuItem<Service>(
+                          value: null,
+                          child: Text("No Sub-Services Available"),
+                        ),
+                      ],
+                onChanged: (sub) {
+                  if (isSubServiceAvailable && sub != null) {
+                    controller.selectedSubService.value = sub;
+                  }
+                },
+              );
+            }),
 
-                    print(
-                        "Selected Service Category: ${selectedMain?.categoryName}");
-                    print("Selected Sub-Service: ${selectedSub?.serviceName}");
+            SizedBox(height: 40),
 
-                    final selectedService = selectedSub;
-                    final selectedServicesController =
-                        Get.find<SelectedServicesController>();
-
-                    if (selectedService != null && selectedMain != null) {
-                      selectedServicesController
-                          .updateSelectedServices([selectedService]);
-                      selectedServicesController.categoryId.value =
-                          selectedMain.categoryId;
-                      selectedServicesController.categoryName.value =
-                          selectedMain.categoryName;
-
-                      Get.to(() => Doctorscreen(
-                            mobileNumber: widget.mobileNumber,
-                            username: widget.username,
-                          ));
-                    } else {
-                      Get.snackbar(
-                          "Error", "Please select a service and sub-service");
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 80, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text("Submit", style: TextStyle(fontSize: 16)),
-                ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: appGradient(),
+                borderRadius: BorderRadius.circular(10), // optional
               ),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("Back", style: TextStyle(fontSize: 16))),
+              child: ElevatedButton(
+                onPressed: () {
+                  final selectedMain = controller.selectedService.value;
+                  final selectedSub = controller.selectedSubService.value;
 
-              Spacer(),
-              Copyrights(),
-            ],
-          ),
+                  if (selectedMain == null) {
+                    Get.snackbar(
+                        "Validation", "Please select a service category");
+                    return;
+                  }
+
+                  if (selectedSub == null) {
+                    Get.snackbar("Validation", "Please select a sub-service");
+                    return;
+                  }
+
+                  final selectedServicesController =
+                      Get.find<SelectedServicesController>();
+                  selectedServicesController
+                      .updateSelectedServices([selectedSub]);
+                  selectedServicesController.categoryId.value =
+                      selectedMain.categoryId;
+                  selectedServicesController.categoryName.value =
+                      selectedMain.categoryName;
+
+                  Get.to(() => Doctorscreen(
+                        mobileNumber: widget.mobileNumber,
+                        username: widget.username,
+                      ));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 80, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text("Submit", style: TextStyle(fontSize: 16)),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Back", style: TextStyle(fontSize: 16))),
+
+            Spacer(),
+            Copyrights(),
+          ],
         ),
       ),
     );

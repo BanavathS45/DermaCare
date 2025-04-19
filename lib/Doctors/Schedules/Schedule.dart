@@ -18,8 +18,9 @@ import 'package:intl/intl.dart';
 
 class ScheduleScreen extends StatefulWidget {
   final HospitalDoctorModel doctorData;
-
-  const ScheduleScreen({super.key, required this.doctorData});
+  final String mobileNumber;
+  const ScheduleScreen(
+      {super.key, required this.doctorData, required this.mobileNumber});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -119,10 +120,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     showSnackbar("Success", "Form Validated", "success");
 
                     PatientModel patientmodel = PatientModel(
-                        name:
-                            patientdetailsformcontroller.nameController.text,
-                        age:
-                            patientdetailsformcontroller.ageController.text,
+                        name: patientdetailsformcontroller.nameController.text,
+                        age: patientdetailsformcontroller.ageController.text,
                         gender: registercontroller.selectedGender,
                         bookingFor: patientdetailsformcontroller.selectedFor,
                         problem:
@@ -131,7 +130,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             .format(scheduleController.selectedDate.value),
                         serviceDate: DateFormat('EEEE')
                             .format(scheduleController.selectedDate.value),
-                        servicetime: scheduleController.selectedSlotText.value);
+                        servicetime: scheduleController.selectedSlotText.value,
+                        mobileNumber: widget.mobileNumber);
 
                     print("patientmodel ${patientmodel.toJson()}");
                     Get.to(Confirmbookingdetails(

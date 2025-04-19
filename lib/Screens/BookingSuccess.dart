@@ -11,12 +11,13 @@ class SuccessScreen extends StatefulWidget {
   final HospitalDoctorModel serviceDetails;
   final PatientModel patient;
   final String paymentId;
-
+  final String mobileNumber;
   const SuccessScreen({
     super.key,
     required this.serviceDetails,
     required this.paymentId,
     required this.patient,
+    required this.mobileNumber,
   });
 
   @override
@@ -167,7 +168,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
           onPressed: () {
             Get.offAll(
               BottomNavController(
-                mobileNumber: widget.serviceDetails.hospital.contactNumber,
+                mobileNumber: widget.mobileNumber,
                 username: widget.serviceDetails.doctor.name,
                 index: 1,
               ),

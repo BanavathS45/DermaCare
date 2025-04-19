@@ -4,6 +4,7 @@ import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../Dashboard/DashBoardController.dart';
 import '../Loading/SkeletonLoder.dart';
 import '../Modals/ServiceModal.dart';
 import 'ServiceSelectionController.dart';
@@ -32,7 +33,8 @@ class _SelectServicesPageState extends State<SelectServicesPage>
     with SingleTickerProviderStateMixin {
   final Serviceselectioncontroller serviceselectioncontroller =
       Get.put(Serviceselectioncontroller());
-
+  final Dashboardcontroller dashboardcontroller =
+      Get.put(Dashboardcontroller());
   @override
   void initState() {
     super.initState();
@@ -75,7 +77,7 @@ class _SelectServicesPageState extends State<SelectServicesPage>
             children: [
               const SizedBox(height: 20),
               CommonCarouselAds(
-                media: serviceselectioncontroller.carouselImages,
+                media: dashboardcontroller.carouselImages,
               ),
               Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -309,7 +311,7 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                                                                 categoryId: widget
                                                                     .categoryId,
                                                                 servicePrice: service
-                                                                    .finalCost
+                                                                    .discountedCost
                                                                     .toStringAsFixed(
                                                                         0)
                                                                     .toString(),
