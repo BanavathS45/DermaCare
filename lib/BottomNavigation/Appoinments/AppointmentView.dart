@@ -1,7 +1,10 @@
+import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:cutomer_app/Utils/MapOnGoogle.dart';
 import 'package:flutter/material.dart';
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:get/get.dart';
+import '../../Doctors/DoctorDetails/DoctorDetailsController.dart';
 import '../../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 import '../../Doctors/ListOfDoctors/DoctorModel.dart';
 
@@ -21,6 +24,7 @@ class AppointmentPreview extends StatefulWidget {
 
 class _AppointmentPreviewState extends State<AppointmentPreview>
     with AutomaticKeepAliveClientMixin {
+  Doctordetailscontroller doctordetailscontroller = Doctordetailscontroller();
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -38,21 +42,83 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
           children: [
             _sectionCard(
               icon: Icons.local_hospital_outlined,
-              title: "Hospital Details",
               children: [
                 _infoRow("Hospital", doctor.hospital.name),
                 _infoRow("Location", doctor.hospital.address),
-                _infoRow("Contact", doctor.hospital.contactNumber),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                        child:
+                            _infoRow("Contact", doctor.hospital.contactNumber)),
+                    IconButton(
+                      onPressed: () {
+                        String address =
+                            "${doctor.hospital.name}, ${doctor.hospital.address}";
+                        MapUtils.openMapByAddress(address);
+                      },
+                      icon: CircleAvatar(
+                        child: Icon(
+                          Icons.navigation,
+                          color: mainColor,
+                        ),
+                      ), // Correct here
+                    ),
+                  ],
+                ),
               ],
+              title: 'Hospital Details',
             ),
             _sectionCard(
               icon: Icons.person_outline,
-              title: "Doctor Details",
               children: [
-                _infoRow("Name", doctor.doctor.name),
-                _infoRow("Specialization", doctor.doctor.specialization),
-                _infoRow(
-                    "Experience", "${doctor.doctor.experienceYears} years"),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Doctor Image
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: doctor.doctor.profileImage.isNotEmpty
+                          ? NetworkImage(doctor.doctor.profileImage)
+                          : const AssetImage('assets/placeholder.png')
+                              as ImageProvider,
+                    ),
+                    const SizedBox(
+                        width: 16), // spacing between image and details
+                    // Doctor Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            doctor.doctor.name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            doctor.doctor.specialization,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "${doctor.doctor.experienceYears} years Experience",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12), // spacing before the button
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton.icon(
@@ -62,8 +128,9 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                     icon: const Icon(Icons.info_outline),
                     label: const Text("About Doctor"),
                   ),
-                )
+                ),
               ],
+              title: "Doctor Details",
             ),
             _sectionCard(
               icon: Icons.account_circle_outlined,

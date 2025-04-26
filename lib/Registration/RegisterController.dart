@@ -88,10 +88,9 @@ class Registercontroller extends GetxController {
         fullName: fullName,
         mobileNumber: mobileNumber,
         emailId: emailController.text,
-        // age: dateOfBirthController.text as int, // Handle parsing error
-        age: 20,
+        referCode: referralController.text,
         gender: selectedGender,
-        bloodGroup: bloodGroup,
+        dateOfBirth: dateOfBirthController.text,
       );
 
       try {
@@ -99,6 +98,7 @@ class Registercontroller extends GetxController {
         // print("Iam calling from Basic Details....${response.bod}");
 
         if (response['status'] == 200) {
+          
           context.loaderOverlay.hide(); // Hide loading overlay
           showSnackbar("Success", "${response['message']}", "success");
           Get.offAll(ConsultationsType(

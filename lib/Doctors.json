@@ -313,11 +313,7 @@
                   ]
                 }
               ],
-              "languagesKnown": [
-                "English",
-                "Hindi",
-                "Telugu"
-              ],
+              "languagesKnown": ["English", "Hindi", "Telugu"],
               "profile": "Specializes in diagnosing and treating hereditary skin disorders and improving personalized skincare treatments.",
               "profileImage": "https://randomuser.me/api/portraits/women/44.jpg",
               "careerPath": [
@@ -414,10 +410,7 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": [
-                "2024-03-25T10:00:00",
-                "2024-03-25T11:00:00"
-              ],
+              "bookingSlots": ["2024-03-25T10:00:00", "2024-03-25T11:00:00"],
               "fee": {
                 "treatmentFee": 1500,
                 "inClinicFee": 1200,
@@ -688,21 +681,11 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": [
-                "English",
-                "Hindi",
-                "Marathi"
-              ],
+              "languagesKnown": ["English", "Hindi", "Marathi"],
               "profile": "Expert in cosmetic skin care, lasers and rejuvenation treatments.",
               "profileImage": "https://randomuser.me/api/portraits/men/55.jpg",
-              "careerPath": [
-                "Apollo Skin Dept.",
-                "DermaGlow Bangalore"
-              ],
-              "highlights": [
-                "Korean Laser Training",
-                "Vogue Skincare Feature"
-              ],
+              "careerPath": ["Apollo Skin Dept.", "DermaGlow Bangalore"],
+              "highlights": ["Korean Laser Training", "Vogue Skincare Feature"],
               "ratings": {
                 "overall": 4.6,
                 "rated": true,
@@ -743,10 +726,7 @@
                 ]
               },
               "favorites": false,
-              "bookingSlots": [
-                "2024-03-26T11:00:00",
-                "2024-03-26T16:00:00"
-              ],
+              "bookingSlots": ["2024-03-26T11:00:00", "2024-03-26T16:00:00"],
               "fee": {
                 "treatmentFee": 2000,
                 "inClinicFee": 1800,
@@ -782,18 +762,14 @@
             {
               "doctorId": "DC_3",
               "doctorServices": [],
-              "name": "Dr. Fatima Shaikh",
+              "name": "Dr. Nadhiya Begum",
               "gender": "Female",
               "qualification": "MBBS, DDVL",
               "doctorMobileNumber": "7842259801",
               "license": "7576gfhgfg",
               "specialization": "Pediatric Dermatology",
               "experienceYears": 7,
-              "focusAreas": [
-                "Eczema",
-                "Infant Rashes",
-                "Birthmark Management"
-              ],
+              "focusAreas": ["Eczema", "Infant Rashes", "Birthmark Management"],
               "availableDays": "Mon - Sat",
               "availableTimings": "11:00 AM - 05:00 PM",
               "slots": [
@@ -1038,21 +1014,11 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": [
-                "English",
-                "Hindi",
-                "Urdu"
-              ],
+              "languagesKnown": ["English", "Hindi", "Urdu"],
               "profile": "Provides gentle, expert care for skin conditions in children and infants.",
-              "profileImage": "https://randomuser.me/api/portraits/women/65.jpg",
-              "careerPath": [
-                "Rainbow Hospitals",
-                "SkinCare Chennai"
-              ],
-              "highlights": [
-                "12 pediatric papers",
-                "NeoDerm Speaker"
-              ],
+              "profileImage": "https://t4.ftcdn.net/jpg/03/20/74/45/360_F_320744517_TaGkT7aRlqqWdfGUuzRKDABtFEoN5CiO.jpg",
+              "careerPath": ["Rainbow Hospitals", "SkinCare Chennai"],
+              "highlights": ["12 pediatric papers", "NeoDerm Speaker"],
               "ratings": {
                 "overall": 4.9,
                 "rated": true,
@@ -1093,10 +1059,7 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": [
-                "2024-03-27T09:00:00",
-                "2024-03-27T10:30:00"
-              ],
+              "bookingSlots": ["2024-03-27T09:00:00", "2024-03-27T10:30:00"],
               "fee": {
                 "treatmentFee": 1200,
                 "inClinicFee": 1000,
@@ -1118,11 +1081,7 @@
               "license": "7576gfhgfg",
               "specialization": "Trichology",
               "experienceYears": 10,
-              "focusAreas": [
-                "Hair Transplant",
-                "Hair Fall",
-                "Dandruff"
-              ],
+              "focusAreas": ["Hair Transplant", "Hair Fall", "Dandruff"],
               "availableDays": "Tue - Sat",
               "availableTimings": "09:00 AM - 05:00 PM",
               "slots": [
@@ -1367,21 +1326,11 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": [
-                "English",
-                "Hindi",
-                "Kannada"
-              ],
+              "languagesKnown": ["English", "Hindi", "Kannada"],
               "profile": "Leading hair specialist with expertise in transplant and scalp care.",
               "profileImage": "https://randomuser.me/api/portraits/men/45.jpg",
-              "careerPath": [
-                "Kaya Skin Clinic",
-                "HairCraft Founder"
-              ],
-              "highlights": [
-                "1000+ transplants",
-                "Spain-trained surgeon"
-              ],
+              "careerPath": ["Kaya Skin Clinic", "HairCraft Founder"],
+              "highlights": ["1000+ transplants", "Spain-trained surgeon"],
               "ratings": {
                 "overall": 4.7,
                 "rated": true,
@@ -1422,10 +1371,7 @@
                 ]
               },
               "favorites": false,
-              "bookingSlots": [
-                "2024-03-28T14:00:00",
-                "2024-03-28T15:30:00"
-              ],
+              "bookingSlots": ["2024-03-28T14:00:00", "2024-03-28T15:30:00"],
               "fee": {
                 "treatmentFee": 2500,
                 "inClinicFee": 2000,
@@ -1469,18 +1415,14 @@
             {
               "doctorId": "DC_5",
               "doctorServices": [],
-              "name": "Dr. Sneha Reddy",
+              "name": "Dr. Uma Rani",
               "gender": "Female",
               "qualification": "MBBS",
               "doctorMobileNumber": "7842259813",
               "license": "7576gfhgfg",
               "specialization": "Clinical Dermatology",
               "experienceYears": 8,
-              "focusAreas": [
-                "Psoriasis",
-                "Vitiligo",
-                "Chronic Eczema"
-              ],
+              "focusAreas": ["Psoriasis", "Vitiligo", "Chronic Eczema"],
               "availableDays": "Tue - Sat",
               "availableTimings": "10:00 AM - 05:00 PM",
               "slots": [
@@ -1725,21 +1667,11 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": [
-                "English",
-                "Telugu",
-                "Gujarati"
-              ],
+              "languagesKnown": ["English", "Telugu", "Gujarati"],
               "profile": "Experienced in managing long-term dermatological diseases using medical therapies.",
-              "profileImage": "https://randomuser.me/api/portraits/women/32.jpg",
-              "careerPath": [
-                "NIMS Fellow",
-                "Lead at DermaPlus"
-              ],
-              "highlights": [
-                "Vitiligo Campaigner",
-                "Case Study Winner"
-              ],
+              "profileImage": "https://thumbs.dreamstime.com/b/doctor-indian-38175791.jpg",
+              "careerPath": ["NIMS Fellow", "Lead at DermaPlus"],
+              "highlights": ["Vitiligo Campaigner", "Case Study Winner"],
               "ratings": {
                 "overall": 4.5,
                 "rated": true,
@@ -1771,10 +1703,7 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": [
-                "2024-03-29T10:00:00",
-                "2024-03-29T11:30:00"
-              ],
+              "bookingSlots": ["2024-03-29T10:00:00", "2024-03-29T11:30:00"],
               "fee": {
                 "treatmentFee": 1400,
                 "inClinicFee": 1300,

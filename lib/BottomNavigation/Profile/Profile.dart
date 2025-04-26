@@ -1,6 +1,7 @@
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -34,17 +35,10 @@ class _ProfilePageState extends State<ProfilePage> {
     // Get the shared preferences instance
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Remove the user data (you can clear specific keys or all preferences)
-    await prefs.remove('isLoggedIn');
-    await prefs.remove('mobileNumber');
-    await prefs.remove('username');
+ 
 
-    // Optionally, clear all preferences
-    // await prefs.clear(); // This clears everything in SharedPreferences
-
-    // Navigate to the login screen (or any other screen)
-    // Replace '/login' with the actual login screen route name
-    Navigator.pushReplacementNamed(context, '/login');
+    await prefs.clear(); // clear session
+    Get.offAllNamed('/login');
 
     print("User logged out successfully.");
   }

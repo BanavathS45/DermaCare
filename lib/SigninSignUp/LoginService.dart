@@ -24,7 +24,8 @@ class LoginApiService {
       if (response.statusCode == 200) {
         print("response for login $decoded");
 
-        showSnackbar("Success", "${decoded['message']}", "success");
+        // showSnackbar("Success", "${decoded['message']}", "success");
+        showSnackbar("Success", "Login Successfully...!", "success");
 
         return decoded;
       } else {
