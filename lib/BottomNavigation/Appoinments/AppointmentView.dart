@@ -1,5 +1,6 @@
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/MapOnGoogle.dart';
+import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:cutomer_app/Utils/Header.dart';
@@ -7,6 +8,8 @@ import 'package:get/get.dart';
 import '../../Doctors/DoctorDetails/DoctorDetailsController.dart';
 import '../../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 import '../../Doctors/ListOfDoctors/DoctorModel.dart';
+import '../../Reports/ReportsDownload.dart';
+import '../../Utils/GradintColor.dart';
 
 class AppointmentPreview extends StatefulWidget {
   final HospitalDoctorModel doctor;
@@ -32,6 +35,8 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
     final booking = widget.doctorBookings.booking;
     final doctor = widget.doctor;
 
+    final isCompletedStatus = booking.status.toLowerCase() == 'completed';
+    final hasReports = patient.reports != null && patient.reports!.isNotEmpty;
     return Scaffold(
       appBar: CommonHeader(
         title: "Booking ID: #${booking.serviceId}",
@@ -143,6 +148,11 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                 _infoRow("Problem", patient.problem),
                 _infoRow("Date", patient.monthYear),
                 _infoRow("Time", patient.servicetime),
+                _infoRow(
+                    "Patient Notes",
+                    (patient.notes!.isNotEmpty
+                        ? patient.notes!
+                        : "No Patient Notes Provide")),
               ],
             ),
             _sectionCard(
@@ -156,6 +166,38 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               ],
             ),
             const SizedBox(height: 10),
+            isCompletedStatus && hasReports
+                ? Container(
+                    width: 200,
+                    decoration: BoxDecoration(
+                      gradient: appGradient(),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final reports = widget.doctorBookings.patient.reports;
+                        print("dshfjkshdfhkd${reports}");
+                        if (reports != null && reports.isNotEmpty) {
+                          showReportDownloadSheet(context, reports);
+                        } else {
+                          showSnackbar("Error", "No report found.", "error");
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        "Download Reports",
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ],
         ),
       ),

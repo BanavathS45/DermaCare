@@ -441,7 +441,7 @@
               "availableTimings": "10:00 AM - 05:00 PM",
               "slots": [
                 {
-                  "date": "2025-04-20",
+                  "date": "2025-04-26",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -514,7 +514,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-21",
+                  "date": "2025-04-27",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -571,7 +571,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-22",
+                  "date": "2025-04-28",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -620,7 +620,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-23",
+                  "date": "2025-04-29",
                   "availableSlots": [
                     {
                       "slot": "12:00 PM",
@@ -1966,7 +1966,7 @@
             "gender": "Female",
             "problems": "problem_3",
             "bookingfor": "self",
-            "notes": "",
+            "notes": "Simulate download URLs for Flutter testing",
             "reports": [
               {
                 "reportId": "R001",
@@ -2312,7 +2312,26 @@
       "doctorId": "DC_5",
       "consultationType": "Online Consultation",
       "totalFee": 1020,
-      "consultattionFee": 1000
+      "consultattionFee": 1000,
+      "notes": "Simulate download URLs for Flutter testing",
+      "reports": [
+        {
+          "reportId": "R001",
+          "reportName": "Report 01234",
+          "reportDate": "2025-04-08",
+          "reportStatus": "completed",
+          "reportType": "Lab Test",
+          "reportFile": "https://www.pixelstalk.net/wp-content/uploads/2016/07/Background-Beautiful-Nature-Images-HD.jpg"
+        },
+        {
+          "reportId": "R002",
+          "reportName": "Report 07872",
+          "reportDate": "2025-04-08",
+          "reportStatus": "completed",
+          "reportType": "Lab Test",
+          "reportFile": "https://th.bing.com/th/id/OIP.JlYNhV7cKk6hbEd9rRQg2gHaEc?rs=1&pid=ImgDetMain"
+        }
+      ]
     },
     {
       "id": "c5c6",
@@ -2366,6 +2385,25 @@
       "servicename": "PRP for Hair Loss",
       "status": "pending",
       "serviceId": "67e1112ceaff264f275daa2c",
+      "doctorId": "DC_2",
+      "consultationType": "In-Clinic Consultation",
+      "totalFee": 1820,
+      "consultattionFee": 1800
+    },
+    {
+      "id": "44c8",
+      "name": "prashath ",
+      "mobileNumber": "7842259803",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "nsjshsnsjzjsnshzjdjsnshzjz",
+      "monthYear": "April 26, 2025",
+      "serviceDate": "Saturday",
+      "servicetime": "03:00 PM",
+      "servicename": "Hair Fall Treatment",
+      "status": "pending",
+      "serviceId": "680c7a68892cc924bf802f58",
       "doctorId": "DC_2",
       "consultationType": "In-Clinic Consultation",
       "totalFee": 1820,

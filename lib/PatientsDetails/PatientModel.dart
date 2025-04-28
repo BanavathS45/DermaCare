@@ -8,6 +8,8 @@ class PatientModel {
   final String monthYear;
   final String serviceDate;
   final String servicetime;
+  final String? notes;
+  final List<Report>? reports;
 
   PatientModel(
       {required this.name,
@@ -18,6 +20,8 @@ class PatientModel {
       required this.age,
       required this.gender,
       required this.bookingFor,
+      this.notes,
+      this.reports,
       required this.problem});
 
   factory PatientModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +35,12 @@ class PatientModel {
       monthYear: json['sele'] ?? json['monthYear'] ?? '',
       serviceDate: json['serviceDate']?.toString() ?? '',
       servicetime: json['servicetime']?.toString() ?? '',
+      notes: json['notes'] ?? "",
+      reports: json['reports'] != null
+          ? List<Report>.from(
+              json['reports'].map((x) => Report.fromJson(x)),
+            )
+          : null,
     );
   }
 
@@ -46,5 +56,34 @@ class PatientModel {
       'serviceDate': serviceDate,
       'servicetime': servicetime,
     };
+  }
+}
+
+class Report {
+  final String reportId;
+  final String reportName;
+  final String reportDate;
+  final String reportStatus;
+  final String reportType;
+  final String reportFile;
+
+  Report({
+    required this.reportId,
+    required this.reportName,
+    required this.reportDate,
+    required this.reportStatus,
+    required this.reportType,
+    required this.reportFile,
+  });
+
+  factory Report.fromJson(Map<String, dynamic> json) {
+    return Report(
+      reportId: json['reportId'],
+      reportName: json['reportName'],
+      reportDate: json['reportDate'],
+      reportStatus: json['reportStatus'],
+      reportType: json['reportType'],
+      reportFile: json['reportFile'],
+    );
   }
 }

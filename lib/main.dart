@@ -1,3 +1,4 @@
+import 'package:cutomer_app/DummyFloder/Loginnn.dart';
 import 'package:cutomer_app/Routes/Navigation.dart';
 
 import 'package:flutter/material.dart';
@@ -97,8 +98,7 @@ class MyApp extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                Color(0xFF6A5B94), // Set ElevatedButton background color
+            backgroundColor: mainColor, // Set ElevatedButton background color
             foregroundColor: Colors.white, // Set text color to white
             shape: RoundedRectangleBorder(
               borderRadius:
@@ -134,7 +134,7 @@ class MyApp extends StatelessWidget {
       // )
 
       // home: ConsultationsType(mobileNumber: '7842259803', username: 'prashanth',)
-      // home: InvoicePage(bookingDetails: null,)
+      // home: LoginApp(),
       // home: StateAndCity(
       //   title: "State and City",
       // ) // TODO:Tempary

@@ -17,20 +17,23 @@ class ServiceDetailsPage extends StatefulWidget {
   final String mobileNumber;
   final String username;
 
-  const ServiceDetailsPage(
-      {super.key,
-      required this.categoryName,
-      required this.categoryId,
-      required this.serviceId,
-      required this.serviceName,
-      required this.servicePrice,
-      required this.mobileNumber,
-      required this.username});
+  const ServiceDetailsPage({
+    super.key,
+    required this.categoryName,
+    required this.categoryId,
+    required this.serviceId,
+    required this.serviceName,
+    required this.servicePrice,
+    required this.mobileNumber,
+    required this.username,
+    required this.selectedOption,
+  });
   final String categoryName;
   final String categoryId;
   final String serviceId;
   final String serviceName;
   final String servicePrice;
+  final String selectedOption;
 
   @override
   _ServiceDetailsPageState createState() => _ServiceDetailsPageState();
@@ -198,6 +201,18 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                           ),
                           Text(
                             widget.serviceName,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Sub Service Name:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            widget.selectedOption,
                             style: const TextStyle(fontSize: 16),
                           ),
                           const SizedBox(height: 16),

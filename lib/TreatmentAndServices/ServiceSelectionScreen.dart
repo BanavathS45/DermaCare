@@ -318,7 +318,7 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                                                                 mobileNumber: widget
                                                                     .mobileNumber,
                                                                 username: widget
-                                                                    .username,
+                                                                    .username, selectedOption: '', //TODO check here selected option
                                                               ),
                                                             ),
                                                           );
