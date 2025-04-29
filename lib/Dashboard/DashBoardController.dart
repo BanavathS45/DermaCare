@@ -34,8 +34,11 @@ class Dashboardcontroller extends GetxController {
   var subServiceList = <Service>[].obs;
 
   String statusMessage = "";
-
   
+  RxString mobileNumber = ''.obs;
+  void setMobileNumber(String number) {
+    mobileNumber.value = number;
+  }
 
   void fetchSubServices(String categoryId) async {
     print("categoryId ${categoryId}");

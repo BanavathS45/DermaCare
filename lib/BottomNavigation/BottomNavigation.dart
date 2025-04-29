@@ -1,3 +1,4 @@
+import 'package:cutomer_app/BottomNavigation/Profile/Profile.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,7 +6,7 @@ import '../Dashboard/Dashboard.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import 'Appoinments/Appoinments.dart';
 import 'Appoinments/AppointmentController.dart';
-import 'Profile/Profile.dart';
+import 'Profile/Profiles.dart';
 import 'OnlineCounsultation/OnlineCounsultation.dart';
 
 class BottomNavController extends StatefulWidget {
@@ -27,7 +28,9 @@ class BottomNavController extends StatefulWidget {
 class _BottomNavControllerState extends State<BottomNavController> {
   late int _selectedIndex;
   final doctorController = Get.find<DoctorController>();
-  final appointmentcontroller = Appointmentcontroller();
+
+  final appointmentcontroller = Get.find<AppointmentController>();
+
   late List<Widget> _pages;
 
   @override
@@ -47,13 +50,10 @@ class _BottomNavControllerState extends State<BottomNavController> {
       AppointmentPage(
         mobileNumber: widget.mobileNumber,
       ),
-      ProfilePage(
-        customerLatitude: 17.368784,
-        customerLongitude: 78.524673,
-      ),
       OnlineCounsultation(
         mobileNumber: widget.mobileNumber,
       ),
+      CustomerProfilePage(),
     ];
   }
 
@@ -66,104 +66,104 @@ class _BottomNavControllerState extends State<BottomNavController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: _pages[_selectedIndex],
-        bottomNavigationBar: Obx(() => Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    mainColor,
-                    secondaryColor,
-                  ],
-                ),
-              ),
-              child: BottomNavigationBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                type: BottomNavigationBarType.fixed,
-                currentIndex: _selectedIndex,
-                onTap: _onItemTapped,
-                selectedItemColor: const Color.fromARGB(255, 1, 17, 61),
-                unselectedItemColor: Colors.white,
-                items: <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home_outlined),
-                    label: 'Services',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Obx(() => Stack(
-                          children: [
-                            const Icon(Icons.calendar_month),
-                            if (appointmentcontroller.bookingLength.value > 0)
-                              Positioned(
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 16,
-                                    minHeight: 16,
-                                  ),
-                                  child: Text(
-                                    appointmentcontroller.bookingLength.value >
-                                            10
-                                        ? '10+'
-                                        : '${appointmentcontroller.bookingLength.value}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [mainColor, secondaryColor],
+          ),
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: const Color.fromARGB(255, 1, 17, 61),
+          unselectedItemColor: Colors.white,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home_outlined),
+              label: 'Services',
+            ),
+            BottomNavigationBarItem(
+              icon: Obx(() => Stack(
+                    children: [
+                      const Icon(Icons.calendar_month),
+                      if (appointmentcontroller.upcomingCountRx.value > 0)
+                        Positioned(
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              appointmentcontroller.upcomingCountRx.value > 10
+                                  ? '10+'
+                                  : '${appointmentcontroller.upcomingCountRx.value}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
                               ),
-                          ],
-                        )),
-                    label: 'Appointment',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person_2_outlined),
-                    label: 'Profile',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Stack(
-                      children: [
-                        const Icon(Icons.video_call),
-                        if (doctorController.appointmentCount.value > 0)
-                          Positioned(
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 16,
-                                minHeight: 16,
-                              ),
-                              child: Text(
-                                doctorController.appointmentCount.value > 10
-                                    ? '10+'
-                                    : '${doctorController.appointmentCount.value}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                      ],
-                    ),
-                    label: 'Online Consultation',
-                  ),
-                ],
-              ),
-            )));
+                        ),
+                    ],
+                  )),
+              label: 'Appointment',
+            ),
+            BottomNavigationBarItem(
+              icon: Obx(() => Stack(
+                    children: [
+                      const Icon(Icons.video_call),
+                      if (appointmentcontroller.videoConsultationCountRx.value >
+                          0)
+                        Positioned(
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              appointmentcontroller
+                                          .videoConsultationCountRx.value >
+                                      10
+                                  ? '10+'
+                                  : '${appointmentcontroller.videoConsultationCountRx.value}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  )),
+              label: 'Online Consultation',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_2_outlined),
+              label: 'Profile',
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

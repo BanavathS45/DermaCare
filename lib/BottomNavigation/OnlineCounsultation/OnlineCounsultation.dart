@@ -76,8 +76,8 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
 
   List<PostBookingModel> _filteredBookings() {
     return doctorBookings.where((b) {
-      final type = b.booking.consultationType?.trim().toLowerCase() ?? '';
-      final status = b.booking.status?.trim().toLowerCase() ?? '';
+      final type = b.booking.consultationType.trim().toLowerCase();
+      final status = b.booking.status.trim().toLowerCase();
       return type == 'online consultation' && status == 'pending';
     }).toList();
   }
@@ -85,7 +85,10 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonHeader(title: 'Online Consultation'),
+      appBar: CommonHeader(
+        title: 'Online Consultation',
+        automaticallyImplyLeading: false,
+      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : RefreshIndicator(

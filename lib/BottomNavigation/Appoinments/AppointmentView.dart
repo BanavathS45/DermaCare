@@ -45,6 +45,31 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            booking.status.toLowerCase() == "rejected"
+                ? Card(
+                    color: Colors.red,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Resone For Reject",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "${booking.resoan!} ",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : SizedBox.shrink(),
+            SizedBox(
+              height: 20,
+            ),
             _sectionCard(
               icon: Icons.local_hospital_outlined,
               children: [

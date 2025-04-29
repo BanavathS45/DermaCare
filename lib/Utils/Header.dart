@@ -11,6 +11,7 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onNotificationPressed; // Nullable callback
   final VoidCallback? onSettingPressed; // Nullable callback
   final VoidCallback? onHelpPressed; // Nullable callback
+  final bool automaticallyImplyLeading; // 👈 Add this
 
   const CommonHeader(
       {Key? key,
@@ -20,6 +21,7 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
       this.subLocality,
       this.onNotificationPressed,
       this.onSettingPressed,
+      this.automaticallyImplyLeading = true,
       this.onHelpPressed})
       : super(key: key);
 
@@ -28,6 +30,7 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
+       automaticallyImplyLeading: automaticallyImplyLeading, 
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import '../BottomNavigation/Appoinments/AppointmentController.dart';
 import '../BottomNavigation/BottomNavigation.dart';
 import '../Help/Numbers.dart';
 import '../Modals/ServiceCard.dart';
@@ -29,6 +30,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final Dashboardcontroller dashboardcontroller =
       Get.put(Dashboardcontroller());
+  final controller = Get.put(AppointmentController());
 
   bool showLabel = false;
   bool isFabVisible = true;
@@ -56,7 +58,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     dashboardcontroller.fetchUserServices();
     dashboardcontroller.fetchAppointments(widget.mobileNumber);
     dashboardcontroller.fetchImages();
+    controller.fetchBookings();
     dashboardcontroller.storeUserData(widget.mobileNumber, widget.username);
+    // dashboardcontroller.setMobileNumber(widget.mobileNumber);
 
     _scrollController = ScrollController()
       ..addListener(() {
@@ -189,36 +193,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       height: 170,
                     ),
                     const SizedBox(height: 20),
-                    if (dashboardcontroller.allAppointments.isNotEmpty) ...[
-                      const Padding(
+                    if (controller.inProgressBookings.isNotEmpty) ...[
+                      Padding(
                         padding: EdgeInsets.all(16.0),
-                        child: Text(
-                          "Active Appointments",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
                         child: Row(
-                          children: List.generate(
-                            min(3, dashboardcontroller.allAppointments.length),
-                            (index) {
-                              final appointment =
-                                  dashboardcontroller.allAppointments[index];
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.95,
-                                  // child: AppointmentCard(),
-                                ),
-                              );
-                            },
-                          ),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Active Appointments",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Text("${controller.inProgressBookings.length}")
+                          ],
                         ),
                       ),
+                      Obx(() {
+                        print(
+                            'In-progress bookings count: ${controller.inProgressBookings.length}');
+
+                        if (controller.inProgressBookings.isEmpty) {
+                          // 👈 Fix here
+                          return const Center(
+                              child: Text('No in-progress appointments'));
+                        }
+
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: List.generate(
+                              min(3, controller.inProgressBookings.length),
+                              (index) {
+                                final appointment =
+                                    controller.inProgressBookings[index];
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.95,
+                                    child: AppointmentCard(
+                                        doctorData: appointment),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      }),
                     ],
                     const SizedBox(height: 10),
                     Center(

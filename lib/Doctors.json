@@ -2049,44 +2049,6 @@
   ],
   "bookings": [
     {
-      "id": "77c1",
-      "name": "Dilip",
-      "age": "32",
-      "gender": "Male",
-      "mobileNumber": "7842259803",
-      "bookingFor": "Self",
-      "problem": "Fever and cough",
-      "sele": "April 2025",
-      "serviceDate": "10",
-      "servicetime": "10:30 AM",
-      "servicename": "General Consultation",
-      "serviceId": "SRV12345",
-      "doctorId": "DC_1",
-      "consultationType": "Online",
-      "totalFee": 600,
-      "consultattionFee": 500,
-      "status": "pending"
-    },
-    {
-      "id": "77c2",
-      "name": "Anjali",
-      "age": "28",
-      "gender": "Female",
-      "mobileNumber": "7842259803",
-      "bookingFor": "Spouse",
-      "problem": "Skin Allergy",
-      "sele": "April 2025",
-      "serviceDate": "11",
-      "servicetime": "11:00 AM",
-      "servicename": "Dermatology Consultation",
-      "serviceId": "SRV54321",
-      "doctorId": "DC_2",
-      "consultationType": "In-clinic",
-      "totalFee": 800,
-      "consultattionFee": 700,
-      "status": "pending"
-    },
-    {
       "id": "77c3",
       "name": "Rahul",
       "age": "45",
@@ -2103,7 +2065,7 @@
       "consultationType": "Video",
       "totalFee": 900,
       "consultattionFee": 750,
-      "status": "pending"
+      "status": "confirmed"
     },
     {
       "id": "77c4",
@@ -2122,7 +2084,8 @@
       "consultationType": "Online",
       "totalFee": 520,
       "consultattionFee": 500,
-      "status": "pending"
+      "status": "rejected",
+      "resoan": "Schedule Conflict - Overlapping appointments or unexpected meetings."
     },
     {
       "id": "77c5",
@@ -2141,7 +2104,7 @@
       "consultationType": "Online",
       "totalFee": 520,
       "consultattionFee": 500,
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": "77c6",

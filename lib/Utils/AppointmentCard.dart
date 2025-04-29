@@ -264,7 +264,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         ),
                         child: TextButton(
                           onPressed: () {
-                            Get.to(ReviewScreen(doctorData: doctor, doctorBookings: widget.doctorData));
+                            Get.to(ReviewScreen(
+                                doctorData: doctor,
+                                doctorBookings: widget.doctorData));
                           },
                           child: const Text(
                             'Review',
@@ -304,8 +306,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
     switch (status.toLowerCase()) {
       case 'pending':
         return [_statusBadge("Pending", Colors.amber)];
-      case 'accepted':
-        return [_statusBadge("Accepted", Colors.green)];
+      case 'confirmed':
+        return [_statusBadge("confirmed", Colors.green)];
       case 'in_progress':
         return [_statusBadge("In Progress", Colors.blue)];
       case 'rejected':

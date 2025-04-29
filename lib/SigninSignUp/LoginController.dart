@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../ConfirmBooking/Consultations.dart';
 import '../OTP/OtpScreen.dart';
 import '../Registration/RegisterScreen.dart';
 import 'LoginService.dart';
@@ -95,12 +96,20 @@ class SiginSignUpController extends GetxController {
           await prefs.setString('username', fullname);
           await prefs.setString('mobileNumber', mobileNumber);
 
+          final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
 
-          Get.to(
-            RegisterScreen(
-            fullName: fullname,
-            mobileNumber: mobileNumber,
-          ));
+          if (isAuthenticated) {
+            Get.offAll(() => ConsultationsType(
+                  mobileNumber: mobileNumber,
+                  username: fullname,
+                ));
+          } else {
+            Get.to(RegisterScreen(
+              fullName: fullname,
+              mobileNumber: mobileNumber,
+            ));
+          }
+
           // Navigator.push(
           //   context,
           //   MaterialPageRoute(

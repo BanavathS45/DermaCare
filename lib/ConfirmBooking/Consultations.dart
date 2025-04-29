@@ -1,4 +1,5 @@
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
+import 'package:cutomer_app/Dashboard/DashBoardController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/CopyRigths.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -30,10 +31,12 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   final consultationcontroller = Get.find<Consultationcontroller>();
   List<ConsultationModel> _consultations = [];
   bool loading = true;
-
+  final  dashboardcontroller =
+      Get.put(Dashboardcontroller());
   @override
   void initState() {
     super.initState();
+dashboardcontroller.setMobileNumber(widget.mobileNumber);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final consultations = await getConsultationDetails();

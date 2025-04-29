@@ -1,4 +1,3 @@
- 
 import '../../PatientsDetails/PatientModel.dart';
 
 class BookingDetailsModel {
@@ -9,8 +8,9 @@ class BookingDetailsModel {
   final double totalFee;
   final double consultattionFee; // kept as-is based on your earlier message
   final String status;
+  final String? resoan;
 
-  BookingDetailsModel( {
+  BookingDetailsModel({
     required this.servicename,
     required this.serviceId,
     required this.doctorId,
@@ -18,6 +18,7 @@ class BookingDetailsModel {
     required this.totalFee,
     required this.consultattionFee,
     required this.status,
+    this.resoan,
   });
 
   factory BookingDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -27,6 +28,7 @@ class BookingDetailsModel {
       serviceId: json['serviceId'],
       doctorId: json['doctorId'],
       consultationType: json['consultationType'],
+      resoan: json['resoan'],
       totalFee: (json['totalFee'] ?? 0).toDouble(),
       consultattionFee: (json['consultattionFee'] ?? 0).toDouble(),
     );
@@ -35,6 +37,7 @@ class BookingDetailsModel {
   Map<String, dynamic> toJson() {
     return {
       'servicename': servicename,
+      'resoan': resoan,
       'status': status,
       'serviceId': serviceId,
       'doctorId': doctorId,
@@ -44,6 +47,7 @@ class BookingDetailsModel {
     };
   }
 }
+
 class PostBookingModel {
   final PatientModel patient;
   final BookingDetailsModel booking;
@@ -66,5 +70,3 @@ class PostBookingModel {
     };
   }
 }
-
-

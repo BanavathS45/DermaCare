@@ -48,10 +48,10 @@ void main() async {
   Get.put(Serviceselectioncontroller());
   Get.put(Consultationcontroller());
   Get.put(DoctorController());
-  Get.put(ScheduleController()); // ✅ FIXED// 👈 This registers it eagerly
-  Get.put(Appointmentcontroller()); // ✅ FIXED// 👈 This registers it eagerly
+  Get.put(ScheduleController()); 
+  Get.put(AppointmentController()); 
 
-  // Get.put(Confirmbookingcontroller()); // ✅ FIXED// 👈 This registers it eagerly
+  // Get.put(Confirmbookingcontroller()); 
   final prefs = await SharedPreferences.getInstance();
   final isFirstLoginDone = prefs.getBool('isFirstLoginDone') ?? false;
 
@@ -65,11 +65,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // Get.put(SelectedServicesController());
-    // Get.put(Dashboardcontroller());
-    // Get.put(Serviceselectioncontroller());
-    // Get.put(Consultationcontroller());
-    // Get.put(DoctorController());
+  
 
     return GetMaterialApp(
       title: 'Derma Care',
