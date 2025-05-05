@@ -7,12 +7,11 @@ import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 
 Future<Map<String, dynamic>?> postBookings(
     PostBookingModel bookingDetails) async {
-  final url =
-      Uri.parse('http://$wifiUrl:3000/bookings'); // Replace with your endpoint
+  final Url = Uri.parse(BookingUrl); // Replace with your endpoint
 
   try {
     final response = await http.post(
-      url,
+      Url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(bookingDetails.toJson()),
     );
@@ -34,8 +33,7 @@ Future<List<Map<String, dynamic>>> getBookingsByMobileNumber(
     String mobileNumber) async {
   print("dshffdfjsd ${mobileNumber}");
   // final String mobileNumber = "7842259802";
-  final url = Uri.parse(
-      'http://$wifiUrl:3000/bookings?mobileNumber=$mobileNumber'); // Adjust param name as per your API
+  final url = Uri.parse('$GetBookings=$mobileNumber'); // Adjust param name as per your API
 
   try {
     final response = await http.get(url);

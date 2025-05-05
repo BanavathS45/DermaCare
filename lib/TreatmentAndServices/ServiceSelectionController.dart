@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 import '../APIs/FetchServices.dart';
 import '../Controller/CustomerController.dart';
-import '../Doctors/ListOfDoctors/DoctorScreen.dart';
+
 import '../Modals/ServiceModal.dart';
 import '../Services/CarouselSliderService.dart';
 
@@ -57,6 +57,9 @@ class Serviceselectioncontroller extends GetxController {
   Future<void> fetchServices(String categoryId) async {
     final fetchedServices = await serviceFetcher.fetchServices(categoryId);
 
+    print("fetchedServices ${categoryId}");
+    print("fetchedServices fetchedServices ${fetchedServices}");
+
     services.assignAll(fetchedServices); // ✅ Fix
     filteredServices.assignAll(fetchedServices); // ✅ Fix
 
@@ -73,28 +76,9 @@ class Serviceselectioncontroller extends GetxController {
     filteredServices.assignAll(results); // Assuming you're using RxList
   }
 
-  RxInt totalItems = 0.obs;
-  RxDouble totalPrice = 0.0.obs;
-
-  void updateTotal() {
-    totalItems.value = services.where((s) => s.quantity > 0).length;
-    totalPrice.value = services.fold(
-      0.0,
-      (sum, s) => sum + s.discountedCost * s.quantity,
-    );
-  }
-
   void navigateToConfirmation(
       {String? categoryId, String? categoryName, String? serviceId}) async {
     try {
-      // Fetch the first address
-      // AddressModel? firstAddress =
-      //     await fetchFirstAddress.fetchFirstAddress(mobileNumber!);
-
-      // Use the instance of the SelectedServicesController to update selected services
-      // Replace with your actual serviceId
-
-// Find the service with that ID
       Service? selectedService = services.firstWhere(
         (service) => service.serviceId == serviceId,
       );
@@ -116,133 +100,6 @@ class Serviceselectioncontroller extends GetxController {
     }
   }
 
-  void showAddedItemsAlert(BuildContext context) {
-    List<Service> selectedServices =
-        services.where((service) => service.quantity > 0).toList();
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-      ),
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState) {
-            return Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Selected Services',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF6B3FA0),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.black,
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          padding: EdgeInsets.zero,
-                        ),
-                        child: const Icon(Icons.close, size: 20),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  selectedServices.isEmpty
-                      ? const Center(
-                          child: Text(
-                            "No services selected yet",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        )
-                      : Expanded(
-                          child: ListView.builder(
-                            itemCount: selectedServices.length,
-                            itemBuilder: (context, index) {
-                              final service = selectedServices[index];
-                              return ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
-                                leading: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.20,
-                                  child: service.serviceImage != null
-                                      ? Image.memory(
-                                          service.serviceImage as Uint8List,
-                                          fit: BoxFit.cover,
-                                          height: double.infinity,
-                                        )
-                                      : Container(
-                                          color: Colors.grey,
-                                          child: const Center(
-                                              child:
-                                                  Text('Image not available')),
-                                        ),
-                                ),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      service.serviceName,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "₹ ${service.discountedCost.toStringAsFixed(0)}",
-                                      style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color.fromARGB(
-                                              255, 146, 150, 147)),
-                                    ),
-                                  ],
-                                ),
-                                trailing: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.15,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      setModalState(() {
-                                        service.quantity = 0; // Reset quantity
-                                        selectedServices
-                                            .removeAt(index); // Remove item
-                                      });
-
-                                      updateTotal(); // Recalculate total
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   void clearSearch() {
     searchController.clear(); // Clear the search text field
     filteredServices.assignAll(services); // ✅ Fix
@@ -261,6 +118,5 @@ class Serviceselectioncontroller extends GetxController {
 
   onRefresh(String categoryId) async {
     await fetchServices(categoryId);
-    updateTotal();
   }
 }

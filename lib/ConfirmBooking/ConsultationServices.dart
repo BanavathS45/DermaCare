@@ -15,12 +15,20 @@ Future<List<ConsultationModel>> getConsultationDetails() async {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
+      final Map<String, dynamic> responseBody = jsonDecode(response.body);
 
-      final List<ConsultationModel> consultations =
-          data.map((jsonItem) => ConsultationModel.fromJson(jsonItem)).toList();
+      if (responseBody['success'] == true && responseBody['data'] != null) {
+        final List<dynamic> dataList = responseBody['data'];
 
-      return consultations;
+        final List<ConsultationModel> consultations = dataList
+            .map((jsonItem) => ConsultationModel.fromJson(jsonItem))
+            .toList();
+
+        return consultations;
+      } else {
+        showSnackbar("Error", "No consultation data found", "error");
+        return [];
+      }
     } else {
       showSnackbar("Error", "API Failed: ${response.statusCode}", "error");
       return [];
@@ -38,7 +46,7 @@ class ConsultationModel {
 
   ConsultationModel({
     required this.consultationType,
-    required this.consultationId,  
+    required this.consultationId,
   });
 
   factory ConsultationModel.fromJson(Map<String, dynamic> json) {

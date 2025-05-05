@@ -40,22 +40,23 @@ class ServiceHospitalModel {
   final String closingTime;
   final String hospitalLogo;
   final List<dynamic> hospitalDoucuments;
+  final bool recommended;
   final List<HospitalDoctorModel> doctors;
 
-  ServiceHospitalModel({
-    required this.hospitalId,
-    required this.name,
-    required this.address,
-    required this.city,
-    required this.contactNumber,
-    required this.hospitalOveralRating,
-    required this.hospitalRegistrations,
-    required this.openingTime,
-    required this.closingTime,
-    required this.hospitalLogo,
-    required this.hospitalDoucuments,
-    required this.doctors,
-  });
+  ServiceHospitalModel(
+      {required this.hospitalId,
+      required this.name,
+      required this.address,
+      required this.city,
+      required this.contactNumber,
+      required this.hospitalOveralRating,
+      required this.hospitalRegistrations,
+      required this.openingTime,
+      required this.closingTime,
+      required this.hospitalLogo,
+      required this.hospitalDoucuments,
+      required this.doctors,
+      required this.recommended});
 
   factory ServiceHospitalModel.fromJson(Map<String, dynamic> json) {
     final hospitalInfo = Hospital(
@@ -66,6 +67,7 @@ class ServiceHospitalModel {
       hospitalId: json['hospitalId'],
       hospitalOveralRating: json['hospitalOveralRating'] ?? 0,
       hospitalRegistrations: json['hospitalRegistrations'] ?? '',
+      recommended: json['recommended'] ?? '',
       openingTime: json['openingTime'] ?? '',
       closingTime: json['closingTime'] ?? '',
       hospitalLogo: json['hospitalLogo'] ?? '',
@@ -84,6 +86,7 @@ class ServiceHospitalModel {
       closingTime: json['closingTime'] ?? '',
       hospitalLogo: json['hospitalLogo'] ?? '',
       hospitalDoucuments: json['hospitalDoucuments'] ?? [],
+      recommended: json['recommended'] ?? false,
       doctors: (json['doctors'] as List)
           .map((docJson) => HospitalDoctorModel(
                 id: docJson['doctorId'] ?? '',
@@ -142,21 +145,22 @@ class Hospital {
   final String openingTime;
   final String closingTime;
   final String hospitalLogo;
+  final bool recommended;
   final List<dynamic> hospitalDoucuments;
 
-  Hospital({
-    required this.hospitalId,
-    required this.name,
-    required this.address,
-    required this.city,
-    required this.contactNumber,
-    required this.hospitalOveralRating,
-    required this.hospitalRegistrations,
-    required this.openingTime,
-    required this.closingTime,
-    required this.hospitalLogo,
-    required this.hospitalDoucuments,
-  });
+  Hospital(
+      {required this.hospitalId,
+      required this.name,
+      required this.address,
+      required this.city,
+      required this.contactNumber,
+      required this.hospitalOveralRating,
+      required this.hospitalRegistrations,
+      required this.openingTime,
+      required this.closingTime,
+      required this.hospitalLogo,
+      required this.hospitalDoucuments,
+      required this.recommended});
 
   factory Hospital.fromJson(Map<String, dynamic> json) => Hospital(
         hospitalId: json['hospitalId'],
@@ -170,6 +174,7 @@ class Hospital {
         closingTime: json['closingTime'] ?? '',
         hospitalLogo: json['hospitalLogo'] ?? '',
         hospitalDoucuments: json['hospitalDoucuments'] ?? [],
+        recommended: json['recommended'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -184,6 +189,7 @@ class Hospital {
         'closingTime': closingTime,
         'hospitalLogo': hospitalLogo,
         'hospitalDoucuments': hospitalDoucuments,
+        'recommended': recommended,
       };
 }
 

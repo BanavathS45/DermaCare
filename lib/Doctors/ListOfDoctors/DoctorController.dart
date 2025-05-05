@@ -12,6 +12,8 @@ class DoctorController extends GetxController {
 
   RxString selectedGender = 'All'.obs;
   RxString selectedCity = 'All'.obs;
+  RxBool selectedRecommended = false.obs; // ✅ RxBool
+
   RxBool showFavoritesOnly = false.obs;
   RxBool sortByAZ = false.obs;
   RxDouble selectedRating = 0.0.obs;
@@ -89,6 +91,9 @@ class DoctorController extends GetxController {
     if (selectedCity.value != 'All') {
       filtered =
           filtered.where((d) => d.hospital.city == selectedCity.value).toList();
+    }
+    if (selectedRecommended.value) {
+      filtered = filtered.where((d) => d.hospital.recommended == true).toList();
     }
 
     if (showFavoritesOnly.value) {

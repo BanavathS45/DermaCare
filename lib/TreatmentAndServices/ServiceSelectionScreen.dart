@@ -46,7 +46,6 @@ class _SelectServicesPageState extends State<SelectServicesPage>
       );
     });
 
-    serviceselectioncontroller.updateTotal();
     serviceselectioncontroller.searchController
         .addListener(serviceselectioncontroller.updateSuggestions);
 
@@ -199,11 +198,12 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                                               ),
                                             ),
                                             const SizedBox(height: 5),
-                                            if (service.discount > 0) ...[
+                                            if (service.discountPercentage >
+                                                0) ...[
                                               Row(
                                                 children: [
                                                   Text(
-                                                    "${service.discount.toStringAsFixed(0)}% OFF",
+                                                    "${service.discountPercentage.toStringAsFixed(0)}% OFF",
                                                     style: const TextStyle(
                                                       color: Colors.red,
                                                       fontWeight:
@@ -212,7 +212,7 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                                                   ),
                                                   const SizedBox(width: 30),
                                                   Text(
-                                                    "₹${service.pricing.toStringAsFixed(0)}",
+                                                    "₹${service.price.toStringAsFixed(0)}",
                                                     style: const TextStyle(
                                                       decoration: TextDecoration
                                                           .lineThrough,
@@ -232,126 +232,74 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                                               ),
                                             ),
                                             const SizedBox(height: 6),
-                                            service.quantity > 0
-                                                ? ElevatedButton.icon(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        service.quantity = 0;
-                                                        serviceselectioncontroller
-                                                            .updateTotal();
-                                                      });
-                                                    },
-                                                    label: const Text("Remove"),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          Colors.red.shade400,
-                                                      foregroundColor:
-                                                          Colors.white,
-                                                    ),
-                                                  )
-                                                : Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      // ElevatedButton(
-                                                      //   onPressed: () {
-                                                      //     setState(() {
-                                                      //       service.quantity++;
-                                                      //       serviceselectioncontroller
-                                                      //           .updateTotal();
-                                                      //     });
-                                                      //   },
-                                                      //   style: ElevatedButton
-                                                      //       .styleFrom(
-                                                      //     backgroundColor:
-                                                      //         mainColor,
-                                                      //     foregroundColor:
-                                                      //         Colors.white,
-                                                      //     padding:
-                                                      //         const EdgeInsets
-                                                      //             .symmetric(
-                                                      //             horizontal:
-                                                      //                 16,
-                                                      //             vertical: 8),
-                                                      //     textStyle:
-                                                      //         const TextStyle(
-                                                      //             fontSize: 14),
-                                                      //   ),
-                                                      //   child: const Text(
-                                                      //       "Select"),
-                                                      // ),
-
-                                                      OutlinedButton(
-                                                        onPressed: () {
-                                                          serviceselectioncontroller
-                                                              .navigateToConfirmation(
-                                                            categoryId: widget
-                                                                .categoryId,
-                                                            categoryName: widget
-                                                                .categoryName,
-                                                            serviceId: service
-                                                                .serviceId,
-                                                          );
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  ServiceDetailsPage(
-                                                                categoryName:
-                                                                    service
-                                                                        .categoryName,
-                                                                serviceId: service
-                                                                    .serviceId,
-                                                                serviceName: service
-                                                                    .serviceName,
-                                                                categoryId: widget
-                                                                    .categoryId,
-                                                                servicePrice: service
-                                                                    .discountedCost
-                                                                    .toStringAsFixed(
-                                                                        0)
-                                                                    .toString(),
-                                                                mobileNumber: widget
-                                                                    .mobileNumber,
-                                                                username: widget
-                                                                    .username, selectedOption: '', //TODO check here selected option
-                                                              ),
-                                                            ),
-                                                          );
-                                                        },
-                                                        style: OutlinedButton
-                                                            .styleFrom(
-                                                          side: BorderSide(
-                                                              color:
-                                                                  secondaryColor),
-                                                          foregroundColor:
-                                                              secondaryColor,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      16,
-                                                                  vertical: 8),
-                                                          textStyle:
-                                                              const TextStyle(
-                                                                  fontSize: 14),
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                          ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                OutlinedButton(
+                                                  onPressed: () {
+                                                    serviceselectioncontroller
+                                                        .navigateToConfirmation(
+                                                      categoryId:
+                                                          widget.categoryId,
+                                                      categoryName:
+                                                          widget.categoryName,
+                                                      serviceId:
+                                                          service.serviceId,
+                                                    );
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ServiceDetailsPage(
+                                                          categoryName: service
+                                                              .categoryName,
+                                                          serviceId:
+                                                              service.serviceId,
+                                                          serviceName: service
+                                                              .serviceName,
+                                                          categoryId:
+                                                              widget.categoryId,
+                                                          servicePrice: service
+                                                              .discountedCost
+                                                              .toStringAsFixed(
+                                                                  0)
+                                                              .toString(),
+                                                          mobileNumber: widget
+                                                              .mobileNumber,
+                                                          username:
+                                                              widget.username,
+                                                          selectedOption:
+                                                              '', services: service, //TODO check here selected option
                                                         ),
-                                                        child: const Text(
-                                                            "Select"),
                                                       ),
-                                                    ],
-                                                  )
+                                                    );
+                                                  },
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                    side: BorderSide(
+                                                        color: secondaryColor),
+                                                    foregroundColor:
+                                                        secondaryColor,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 16,
+                                                        vertical: 8),
+                                                    textStyle: const TextStyle(
+                                                        fontSize: 14),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                  ),
+                                                  child: const Text("Select"),
+                                                ),
+                                              ],
+                                            )
                                           ],
                                         ),
                                       ),

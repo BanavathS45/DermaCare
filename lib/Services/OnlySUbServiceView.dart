@@ -39,12 +39,18 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
 
   final items = [
     "Blood sample collection",
-    "Plasma extraction and scalp injection",
-    "Follow-up sessions"
+    "Plasma extraction and scalp injection Follow-up sessions",
+    "Follow-up sessions_1",
+    "Follow-up sessions_2",
+    "Follow-up sessions_3",
+    "Follow-up sessions_4",
   ];
   @override
   void initState() {
     super.initState();
+
+    print("Blood sample collection categoryName${widget.categoryName}");
+    print("Blood sample collection categoryId${widget.categoryId}");
 
     serviceselectioncontroller.fetchImages();
     serviceselectioncontroller.fetchServices(widget.categoryId).then((_) {
@@ -53,7 +59,6 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
       );
     });
 
-    serviceselectioncontroller.updateTotal();
     serviceselectioncontroller.searchController
         .addListener(serviceselectioncontroller.updateSuggestions);
 
@@ -121,7 +126,8 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                 Container(
                   child: Obx(() {
                     List<Service> services =
-                        serviceselectioncontroller.filteredServices.value;
+                        serviceselectioncontroller.filteredServices;
+                    print("selected services ${services}");
 
                     return ListView.builder(
                       shrinkWrap: true, // Needed inside Column/Scroll
@@ -176,6 +182,9 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2, // Two columns
+
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
                             ),
                             itemCount: serviceselectioncontroller
                                 .filteredServices.length,
@@ -184,78 +193,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                                   .filteredServices[index];
                               return InkWell(
                                 onTap: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(16)),
-                                    ),
-                                    builder: (context) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Select an option for \n${service.serviceName}",
-                                                  style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(Icons.close,
-                                                      color: Colors.red),
-                                                  onPressed: () =>
-                                                      Navigator.pop(context),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 12),
-                                            // List of direct options (Replace 'items' with your actual options)
-                                            ...items.map((option) => ListTile(
-                                                  title: Text(option),
-                                                  onTap: () {
-                                                    Navigator.pop(
-                                                        context); // Close bottom sheet
-                                                    // Navigate to next page
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ServiceDetailsPage(
-                                                          categoryName: service
-                                                              .categoryName,
-                                                          serviceId:
-                                                              service.serviceId,
-                                                          serviceName: service
-                                                              .serviceName,
-                                                          categoryId:
-                                                              widget.categoryId,
-                                                          servicePrice: service
-                                                              .discountedCost
-                                                              .toStringAsFixed(
-                                                                  0),
-                                                          mobileNumber: widget
-                                                              .mobileNumber,
-                                                          username:
-                                                              widget.username,
-                                                              selectedOption:option
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                )),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  );
+                                  _showOptionBottomSheet(context, service);
                                 },
                                 borderRadius: BorderRadius.circular(12),
                                 child: Container(
@@ -297,17 +235,20 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                                                   ),
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            service.serviceName,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: mainColor),
-                                            textAlign: TextAlign.center,
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 6.0, horizontal: 8),
+                                            child: Text(
+                                              service.serviceName,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: mainColor),
+                                              textAlign: TextAlign.center,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -322,6 +263,146 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
           ),
         ),
       ),
+    );
+  }
+
+  void _showOptionBottomSheet(BuildContext context, Service service) {
+    String? selectedOption;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "Select an option for \n${service.serviceName}",
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.red),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ...items.map((option) {
+                    final isSelected = selectedOption == option;
+                    return GestureDetector(
+                      onTap: () => setState(() => selectedOption = option),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 14, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Theme.of(context).primaryColor.withOpacity(0.1)
+                              : Colors.white,
+                          border: Border.all(
+                            color: isSelected
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              isSelected
+                                  ? Icons.radio_button_checked
+                                  : Icons.radio_button_off,
+                              color: isSelected
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                option,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: isSelected
+                                      ? Colors.black
+                                      : Colors.grey[800],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 14, horizontal: 32),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: selectedOption == null
+                          ? null
+                          : () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ServiceDetailsPage(
+                                    categoryName: service.categoryName,
+                                    serviceId: service.serviceId,
+                                    serviceName: service.serviceName,
+                                    categoryId: widget.categoryId,
+                                    servicePrice: service.discountedCost
+                                        .toStringAsFixed(0),
+                                    mobileNumber: widget.mobileNumber,
+                                    username: widget.username,
+                                    services: service,
+                                    selectedOption: selectedOption!,
+                                  ),
+                                ),
+                              );
+                            },
+                      child: const Text("Continue",
+                          style: TextStyle(fontSize: 16)),
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

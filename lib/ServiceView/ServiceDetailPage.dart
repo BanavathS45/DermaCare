@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:cutomer_app/ServiceView/FetchViewService.dart';
 import 'package:flutter/material.dart';
 import '../APIs/BaseUrl.dart';
+import '../APIs/FetchServices.dart';
 import '../Doctors/ListOfDoctors/DoctorScreen.dart';
 import '../Loading/SkeletonLoder.dart';
 import '../TreatmentAndServices/ServiceSelectionController.dart';
@@ -27,6 +29,7 @@ class ServiceDetailsPage extends StatefulWidget {
     required this.mobileNumber,
     required this.username,
     required this.selectedOption,
+    required this.services,
   });
   final String categoryName;
   final String categoryId;
@@ -34,6 +37,7 @@ class ServiceDetailsPage extends StatefulWidget {
   final String serviceName;
   final String servicePrice;
   final String selectedOption;
+  final Service services;
 
   @override
   _ServiceDetailsPageState createState() => _ServiceDetailsPageState();
@@ -42,21 +46,23 @@ class ServiceDetailsPage extends StatefulWidget {
 class _ServiceDetailsPageState extends State<ServiceDetailsPage>
     with SingleTickerProviderStateMixin {
   late ApiService apiService;
-  bool isLoading = true;
-  List<ServiceDetails> services = [];
+  bool isLoading = false;
 
   late AnimationController _animationController;
   late Animation<Color?> _skeletonColorAnimation;
   final Serviceselectioncontroller serviceselectioncontroller =
       Get.put(Serviceselectioncontroller());
-
+  final ServiceFetcher serviceFetcher = ServiceFetcher();
   // Replace with your data model.
 
   @override
   void initState() {
     super.initState();
     apiService = ApiService();
-    fetchServices();
+
+    // fetchServices();
+    print("widget.serviceId ${widget.serviceName}");
+    print("widget.serviceId ${widget.services.clinicPay} ");
 
     // Initialize animation for skeleton loading
     _animationController = AnimationController(
@@ -76,201 +82,132 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
     super.dispose();
   }
 
-// /67498187abae773a58922196
-  Future<void> fetchServices() async {
-    print(
-        "Fetching services for category serviceView Page: ${widget.serviceId}");
-
-    final url = '${getAllServiceUrl}/${widget.categoryId}';
-
-    try {
-      print("Sending request to URL: $url");
-      final response = await http.get(Uri.parse(url));
-      print("API response status code: ${response.statusCode}");
-      print("API response body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        final decodedResponse = json.decode(response.body);
-
-        // Access the 'data' list
-        if (decodedResponse['data'] is List) {
-          final List<dynamic> data = decodedResponse['data'];
-          print("Decoded data: $data");
-
-          // Find the service with the matching ID
-          final serviceId =
-              widget.serviceId; // Pass the service ID to this widget
-          final serviceJson = data.firstWhere(
-            (item) => item['serviceId'] == serviceId,
-            orElse: () => null, // Fallback if no match is found
-          );
-
-          if (serviceJson != null) {
-            print("Service JSON: $serviceJson");
-
-            // Decode the image
-            Uint8List decodedImage;
-            try {
-              decodedImage = base64Decode(serviceJson['viewImage']);
-            } catch (e) {
-              print("Error decoding image: $e");
-              decodedImage = Uint8List(0); // Fallback if image decoding fails
-            }
-
-            // Map the service to the ServiceDetails model
-            setState(() {
-              services = [
-                ServiceDetails(
-                  viewDescription: serviceJson['viewDescription'] as String,
-                  viewImage: decodedImage,
-                  includes: serviceJson['includes'] as String,
-                  readyPeriod: serviceJson['readyPeriod'] as String,
-                  preparation: serviceJson['preparation'] as String? ?? '',
-                  minTime: serviceJson['minTime'] as String? ?? '',
-                )
-              ];
-              isLoading = false;
-              print("Services: $services");
-            });
-          } else {
-            print('Error: Service with ID $serviceId not found');
-            setState(() => isLoading = false);
-          }
-        } else {
-          print('Error: "data" is not a list');
-          setState(() => isLoading = false);
-        }
-      } else {
-        print('Error: ${response.reasonPhrase}');
-        setState(() => isLoading = false);
-      }
-    } catch (e) {
-      print('Failed to fetch services: $e');
-      setState(() => isLoading = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final service = widget.services;
     return Scaffold(
       appBar: CommonHeader(
         title: "Service & Treatment Details",
         onNotificationPressed: () {},
         onSettingPressed: () {},
       ),
-      body: isLoading
-          ? SkeletonLoaderView(animation: _skeletonColorAnimation)
-          : services.isEmpty
-              ? Center(child: Text('Service details not available '))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(10.0),
-                  itemCount: services.length,
-                  itemBuilder: (context, index) {
-                    final service = services[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          service.viewImage.isNotEmpty
-                              ? Image.memory(
-                                  service.viewImage,
-                                  height: 150, // 👈 set fixed height
-                                  width:
-                                      double.infinity, // Optional: full width
-                                  fit: BoxFit
-                                      .fill, // Optional: scale image to fit
-                                )
-                              : Container(
-                                  height: 150, // 👈 match fallback height
-                                  color: Colors.grey.shade200,
-                                  child: const Center(child: Text("No Image")),
-                                ),
-                          const SizedBox(height: 16),
-                          Text(
-                            service.viewDescription,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Service Name:',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            widget.serviceName,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Sub Service Name:',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            widget.selectedOption,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Service Duration:',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            formatTime(int.parse(service.minTime)),
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'What is PRP Therapy:',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            service.includes,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'PRP contains growth factors that :',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            service.readyPeriod,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Procedure Steps :',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            service.preparation,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    );
-                  },
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              service.viewImage.isNotEmpty
+                  ? Image.memory(
+                      service.viewImage,
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.fill,
+                    )
+                  : Container(
+                      height: 150,
+                      color: Colors.grey.shade200,
+                      child: const Center(child: Text("No Image")),
+                    ),
+              const SizedBox(height: 16),
+
+              Text(
+                service.viewDescription,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Category Name:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
+              ),
+              Text(
+                widget.categoryName,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Service Name:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                widget.serviceName,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+
+              const Text(
+                'Sub Service Name:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                widget.selectedOption,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+
+              const Text(
+                'Service Duration:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                service.minTime,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+
+              // Description Q&A
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ...service.descriptionQA.expand((descQA) {
+                    return descQA.qa.entries.map((entry) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.key, // Question
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ...entry.value.map((answer) => Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, bottom: 4.0),
+                                  child: Text(
+                                    "• $answer", // Answer
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                )),
+                          ],
+                        ),
+                      );
+                    });
+                  }),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
       bottomNavigationBar: Container(
-        height: 60,
+        height: 70,
         decoration: BoxDecoration(
           gradient: appGradient(),
         ),
@@ -279,7 +216,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
           children: [
             GestureDetector(
               onTap: () {
-                serviceselectioncontroller.showAddedItemsAlert(context);
+                // serviceselectioncontroller.showAddedItemsAlert(context);
               },
               child: Padding(
                 padding: const EdgeInsets.only(left: 20.0),
@@ -295,6 +232,11 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                         color: Colors.white,
                       ),
                     ),
+                    Text(
+                      "(include all taxes\n& discount (if any))",
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                      textAlign: TextAlign.center,
+                    )
                   ],
                 ),
               ),

@@ -22,6 +22,7 @@
           "hospitalDoucuments": [],
           "hospitalcategory": [],
           "hospitalServices": [],
+          "recommended": true,
           "doctors": [
             {
               "doctorId": "DC_1",
@@ -758,6 +759,7 @@
           "hospitalDoucuments": [],
           "hospitalcategory": [],
           "hospitalServices": [],
+          "recommended": false,
           "doctors": [
             {
               "doctorId": "DC_3",
@@ -1411,6 +1413,7 @@
           "hospitalDoucuments": [],
           "hospitalcategory": [],
           "hospitalServices": [],
+          "recommended": false,
           "doctors": [
             {
               "doctorId": "DC_5",
