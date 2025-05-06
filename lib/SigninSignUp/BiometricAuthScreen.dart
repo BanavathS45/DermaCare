@@ -1,4 +1,5 @@
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorService.dart';
+import 'package:cutomer_app/Firebase/RequestNotificationPermissions.dart';
 import 'package:cutomer_app/SigninSignUp/LoginController.dart';
 import 'package:cutomer_app/SigninSignUp/LoginService.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,8 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
   void initState() {
     super.initState();
     _checkBiometrics();
+    requestFCMPermission();
+    getFCMToken();
   }
 
   Future<void> _checkBiometrics() async {
@@ -70,7 +73,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
 
         // Call login/sign-up API
         final loginData =
-            await _loginApiService.signInOrSignUp(username, mobileNumber);
+            await _loginApiService.sendUserDataWithFCMToken(username, mobileNumber);
         print("📥 Login API Response: $loginData");
 
         // Check login API response and navigate accordingly

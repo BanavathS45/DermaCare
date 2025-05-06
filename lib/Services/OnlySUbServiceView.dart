@@ -37,14 +37,20 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
   final Dashboardcontroller dashboardcontroller =
       Get.put(Dashboardcontroller());
 
-  final items = [
-    "Blood sample collection",
-    "Plasma extraction and scalp injection Follow-up sessions",
-    "Follow-up sessions_1",
-    "Follow-up sessions_2",
-    "Follow-up sessions_3",
-    "Follow-up sessions_4",
+  final List<String> hairRemovalSubServices = [
+    "Laser Hair Removal - Face",
+    "Laser Hair Removal - Underarms",
+    "Laser Hair Removal - Full Arms",
+    "Laser Hair Removal - Full Legs",
+    "Laser Hair Removal - Bikini Line",
+    "Laser Hair Removal - Chest & Back",
+    "Threading - Eyebrows",
+    "Threading - Upper Lip",
+    "Waxing - Arms",
+    "Waxing - Legs",
+    "Waxing - Full Body"
   ];
+
   @override
   void initState() {
     super.initState();
@@ -285,119 +291,123 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                 top: 16,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 16,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Select an option for \n${service.serviceName}",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  ...items.map((option) {
-                    final isSelected = selectedOption == option;
-                    return GestureDetector(
-                      onTap: () => setState(() => selectedOption = option),
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 14, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Theme.of(context).primaryColor.withOpacity(0.1)
-                              : Colors.white,
-                          border: Border.all(
-                            color: isSelected
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey.shade300,
-                            width: 1.5,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Select an option for \n${service.serviceName}",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
+                          ),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              isSelected
-                                  ? Icons.radio_button_checked
-                                  : Icons.radio_button_off,
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.red),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ...hairRemovalSubServices.map((option) {
+                      final isSelected = selectedOption == option;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedOption = option),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 14, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(0.1)
+                                : Colors.white,
+                            border: Border.all(
                               color: isSelected
                                   ? Theme.of(context).primaryColor
-                                  : Colors.grey,
+                                  : Colors.grey.shade300,
+                              width: 1.5,
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                option,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: isSelected
-                                      ? Colors.black
-                                      : Colors.grey[800],
-                                ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 14, horizontal: 32),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      onPressed: selectedOption == null
-                          ? null
-                          : () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ServiceDetailsPage(
-                                    categoryName: service.categoryName,
-                                    serviceId: service.serviceId,
-                                    serviceName: service.serviceName,
-                                    categoryId: widget.categoryId,
-                                    servicePrice: service.discountedCost
-                                        .toStringAsFixed(0),
-                                    mobileNumber: widget.mobileNumber,
-                                    username: widget.username,
-                                    services: service,
-                                    selectedOption: selectedOption!,
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                isSelected
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_off,
+                                color: isSelected
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.grey,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  option,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: isSelected
+                                        ? Colors.black
+                                        : Colors.grey[800],
                                   ),
                                 ),
-                              );
-                            },
-                      child: const Text("Continue",
-                          style: TextStyle(fontSize: 16)),
-                    ),
-                  )
-                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 14, horizontal: 32),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: selectedOption == null
+                            ? null
+                            : () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ServiceDetailsPage(
+                                      categoryName: service.categoryName,
+                                      serviceId: service.serviceId,
+                                      serviceName: service.serviceName,
+                                      categoryId: widget.categoryId,
+                                      servicePrice: service.discountedCost
+                                          .toStringAsFixed(0),
+                                      mobileNumber: widget.mobileNumber,
+                                      username: widget.username,
+                                      services: service,
+                                      selectedOption: selectedOption!,
+                                    ),
+                                  ),
+                                );
+                              },
+                        child: const Text("Continue",
+                            style: TextStyle(fontSize: 16)),
+                      ),
+                    )
+                  ],
+                ),
               ),
             );
           },

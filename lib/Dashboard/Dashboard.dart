@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -124,11 +125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             IconButton(
               icon: const Icon(Icons.notifications, color: Colors.white),
               onPressed: () {
-                Get.offAll(() => BottomNavController(
-                      mobileNumber: widget.mobileNumber,
-                      username: widget.username,
-                      index: 0,
-                    ));
+                Get.to(() => NotificationScreen());
               },
             ),
             IconButton(

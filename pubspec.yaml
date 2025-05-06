@@ -83,6 +83,10 @@ dependencies:
   local_auth: ^2.1.6
   photo_view: ^0.15.0
   flutter_vector_icons: ^2.0.0
+  firebase_core: ^3.13.0
+  firebase_messaging: ^15.2.5
+  # flutter_local_notifications: ^16.1.0
+
   # ext_storage: ^1.0.3
   # storage_path: ^0.2.0
 

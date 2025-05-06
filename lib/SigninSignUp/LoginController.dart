@@ -82,9 +82,10 @@ class SiginSignUpController extends GetxController {
 
       final fullname = nameController.text.trim();
       final mobileNumber = mobileController.text.trim();
+
       try {
         final response =
-            await _loginapiService.signInOrSignUp(fullname, mobileNumber);
+            await _loginapiService.sendUserDataWithFCMToken(fullname, mobileNumber);
         if (response['status'] == 200) {
           getOTPButton.value =
               "SIGN IN"; //TODO: replace with SIGN IN eith GET OTP
