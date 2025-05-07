@@ -11,6 +11,9 @@ class LoginApiService {
 
   Future<Map<String, dynamic>> sendUserDataWithFCMToken(
       String fullname, String mobileNumber) async {
+    print("response for fullname ${fullname}");
+    print("response for mobileNumber ${mobileNumber}");
+
     try {
       // Get the FCM token
       String? token = await FirebaseMessaging.instance.getToken();
@@ -38,6 +41,7 @@ class LoginApiService {
           // 'fcmToken': token,
         }),
       );
+      print("response for statusCode ${response.statusCode}");
 
       final decoded = jsonDecode(response.body);
       if (response.statusCode == 200) {

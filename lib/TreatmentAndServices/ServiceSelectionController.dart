@@ -23,8 +23,8 @@ class Serviceselectioncontroller extends GetxController {
   final ServiceFetcher serviceFetcher = ServiceFetcher();
   TextEditingController searchController = TextEditingController();
 
-  final RxList<Service> services = <Service>[].obs;
-  final RxList<Service> filteredServices = <Service>[].obs;
+  final RxList<SubService> services = <SubService>[].obs;
+  final RxList<SubService> filteredServices = <SubService>[].obs;
 
   final RxBool isLoading = true.obs;
 
@@ -56,6 +56,7 @@ class Serviceselectioncontroller extends GetxController {
 
   Future<void> fetchServices(String categoryId) async {
     final fetchedServices = await serviceFetcher.fetchServices(categoryId);
+    final fetchedSubServices = await serviceFetcher.fetchsubServices(categoryId);
 
     print("fetchedServices ${categoryId}");
     print("fetchedServices fetchedServices ${fetchedServices}");
@@ -79,7 +80,7 @@ class Serviceselectioncontroller extends GetxController {
   void navigateToConfirmation(
       {String? categoryId, String? categoryName, String? serviceId}) async {
     try {
-      Service? selectedService = services.firstWhere(
+      SubService? selectedService = services.firstWhere(
         (service) => service.serviceId == serviceId,
       );
 

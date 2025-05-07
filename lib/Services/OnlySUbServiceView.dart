@@ -131,7 +131,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                   serviceselectioncontroller.filteredServices.isNotEmpty)
                 Container(
                   child: Obx(() {
-                    List<Service> services =
+                    List<SubService> services =
                         serviceselectioncontroller.filteredServices;
                     print("selected services ${services}");
 
@@ -272,7 +272,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
     );
   }
 
-  void _showOptionBottomSheet(BuildContext context, Service service) {
+  void _showOptionBottomSheet(BuildContext context, SubService service) {
     String? selectedOption;
 
     showModalBottomSheet(

@@ -37,7 +37,7 @@ class ServiceDetailsPage extends StatefulWidget {
   final String serviceName;
   final String servicePrice;
   final String selectedOption;
-  final Service services;
+  final SubService services;
 
   @override
   _ServiceDetailsPageState createState() => _ServiceDetailsPageState();

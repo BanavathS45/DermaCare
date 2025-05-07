@@ -28,10 +28,10 @@ class Dashboardcontroller extends GetxController {
   final RxList<String> carouselImages = <String>[].obs;
   final selectedService = Rxn<Serviceb>();
 
-  var selectedSubService = Rxn<Service>();
+  var selectedSubService = Rxn<SubService>();
   var serviceList = <Serviceb>[];
 
-  var subServiceList = <Service>[].obs;
+  var subServiceList = <SubService>[].obs;
 
   String statusMessage = "";
   

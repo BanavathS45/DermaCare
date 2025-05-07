@@ -120,18 +120,18 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
               final selectedSubService = controller.selectedSubService.value;
               final isSubServiceAvailable = subServiceList.isNotEmpty;
 
-              return CustomDropdownField<Service>(
+              return CustomDropdownField<SubService>(
                 value: isSubServiceAvailable ? selectedSubService : null,
                 labelText: 'Sub-Service',
                 items: isSubServiceAvailable
                     ? subServiceList.map((sub) {
-                        return DropdownMenuItem<Service>(
+                        return DropdownMenuItem<SubService>(
                           value: sub,
                           child: Text(sub.serviceName),
                         );
                       }).toList()
                     : [
-                        const DropdownMenuItem<Service>(
+                        const DropdownMenuItem<SubService>(
                           value: null,
                           child: Text("No Sub-Services Available"),
                         ),

@@ -112,7 +112,7 @@ class _SelectServicesPageState extends State<SelectServicesPage>
                   serviceselectioncontroller.filteredServices.isNotEmpty)
                 Container(
                   child: Obx(() {
-                    List<Service> services =
+                    List<SubService> services =
                         serviceselectioncontroller.filteredServices.value;
 
                     return ListView.builder(

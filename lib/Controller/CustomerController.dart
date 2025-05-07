@@ -8,12 +8,12 @@ import '../TreatmentAndServices/ServiceSelectionScreen.dart'; // Adjust the impo
 
 class SelectedServicesController extends GetxController {
   // Observable list of selected services
-  var selectedServices = <Service>[].obs;
+  var selectedServices = <SubService>[].obs;
   RxString categoryId = "".obs;
   RxString categoryName = "".obs;
 
   // Method to update the selected services
-  void updateSelectedServices(List<Service> services) {
+  void updateSelectedServices(List<SubService> services) {
     selectedServices.assignAll(services);
   }
 

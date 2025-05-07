@@ -26,9 +26,9 @@ void main() async {
   await Firebase.initializeApp();
 
   // Handle terminated state tap
-  RemoteMessage? initialMessage =
+ 
+ RemoteMessage? initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();
-
   // Init PhonePe SDK
   await PhonePePaymentSdk.init("SANDBOX", null, "PGTESTPAYUAT", true);
 

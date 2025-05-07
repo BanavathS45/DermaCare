@@ -94,7 +94,7 @@ import 'dart:typed_data';
 //   }
 // ]
 
-class Service {
+class SubService {
   final String serviceId;
   final String serviceName;
   final String categoryName;
@@ -117,7 +117,7 @@ class Service {
   final double clinicPay;
   final double finalCost;
 
-  Service({
+  SubService({
     required this.serviceId,
     required this.serviceName,
     required this.categoryName,
@@ -141,8 +141,8 @@ class Service {
     required this.finalCost,
   });
 
-  factory Service.fromJson(Map<String, dynamic> json) {
-    return Service(
+  factory SubService.fromJson(Map<String, dynamic> json) {
+    return SubService(
       serviceId: json['serviceId'] ?? '',
       serviceName: json['serviceName'] ?? '',
       categoryName: json['categoryName'] ?? '',
