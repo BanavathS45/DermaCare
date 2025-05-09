@@ -10,9 +10,7 @@ import '../Modals/ServiceModal.dart';
 import '../Services/CarouselSliderService.dart';
 
 class Serviceselectioncontroller extends GetxController {
-  // RxInt totalItems = 0.obs;
-
-  // RxDouble totalPrice = 0.0.obs;
+ 
 
   late AnimationController animationController;
   late Animation<Color?> skeletonColorAnimation;
@@ -23,8 +21,9 @@ class Serviceselectioncontroller extends GetxController {
   final ServiceFetcher serviceFetcher = ServiceFetcher();
   TextEditingController searchController = TextEditingController();
 
-  final RxList<SubService> services = <SubService>[].obs;
-  final RxList<SubService> filteredServices = <SubService>[].obs;
+  final RxList<Service> services = <Service>[].obs;
+  final RxList<SubService> subservices = <SubService>[].obs;
+  final RxList<Service> filteredServices = <Service>[].obs;
 
   final RxBool isLoading = true.obs;
 
@@ -57,11 +56,13 @@ class Serviceselectioncontroller extends GetxController {
   Future<void> fetchServices(String categoryId) async {
     final fetchedServices = await serviceFetcher.fetchServices(categoryId);
     final fetchedSubServices = await serviceFetcher.fetchsubServices(categoryId);
+    
 
     print("fetchedServices ${categoryId}");
     print("fetchedServices fetchedServices ${fetchedServices}");
 
     services.assignAll(fetchedServices); // ✅ Fix
+    subservices.assignAll(fetchedSubServices); // ✅ Fix
     filteredServices.assignAll(fetchedServices); // ✅ Fix
 
     isLoading.value = false;
@@ -76,30 +77,38 @@ class Serviceselectioncontroller extends GetxController {
 
     filteredServices.assignAll(results); // Assuming you're using RxList
   }
+    
 
-  void navigateToConfirmation(
-      {String? categoryId, String? categoryName, String? serviceId}) async {
-    try {
-      SubService? selectedService = services.firstWhere(
-        (service) => service.serviceId == serviceId,
-      );
+//   void navigateToConfirmation(
+//       {String? categoryId, String? categoryName, String? serviceId, String? subserviceId }) async {
+//     await serviceFetcher.fetchsubServices(serviceId!);
 
-// Only proceed if found
-      if (selectedService != null) {
-        final selectedServicesController =
-            Get.find<SelectedServicesController>();
-        selectedServicesController
-            .updateSelectedServices([selectedService]); // Pass as a list
-        selectedServicesController.categoryId.value = categoryId!;
-        selectedServicesController.categoryName.value = categoryName!;
-      } else {
-        print("Service with ID $serviceId not found.");
-      }
-    } catch (e) {
-      print('Error fetching address: $e');
-      // Handle error
-    }
-  }
+//     try {
+//       Service? selectedService = services.firstWhere(
+//         (service) => service.serviceId == serviceId,
+//       );
+//         SubService? selectedSubService = subservices.firstWhere(
+//         (service) => service.subServiceId == subserviceId,
+//       );
+
+// // Only proceed if found
+//       if (selectedService != null) {
+//         final selectedServicesController =
+//             Get.find<SelectedServicesController>();
+//         selectedServicesController.updateSelectedServices([selectedService]); 
+//          selectedServicesController
+//                       .updateSelectedSubServices([selectedSubService!]);
+//         // Pass as a list
+//         selectedServicesController.categoryId.value = categoryId!;
+//         selectedServicesController.categoryName.value = categoryName!;
+//       } else {
+//         print("Service with ID $serviceId not found.");
+//       }
+//     } catch (e) {
+//       print('Error fetching address: $e');
+//       // Handle error
+//     }
+//   }
 
   void clearSearch() {
     searchController.clear(); // Clear the search text field

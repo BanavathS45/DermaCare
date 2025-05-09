@@ -95,37 +95,41 @@ import 'dart:typed_data';
 // ]
 
 class SubService {
-  final String serviceId;
+  final String subServiceId;
+  final String subServiceName;
+  final String serviceID;
   final String serviceName;
   final String categoryName;
   final String categoryId;
   final String description;
   final String viewDescription;
   final String status;
-  final Uint8List serviceImage;
-  final Uint8List viewImage;
+  final Uint8List subServiceImage;
+  final Uint8List viewImage;// Removed this line
   final String minTime;
   final List<DescriptionQA> descriptionQA;
   final double price;
   final double discountPercentage;
   final double taxPercentage;
   final double platformFeePercentage;
-  final double discountAmount;
-  final double taxAmount;
-  final double platformFee;
-  final double discountedCost;
-  final double clinicPay;
-  final double finalCost;
+  final double discountAmount; // Removed this line
+  final double taxAmount;// Removed this line
+  final double platformFee;// Removed this line
+  final double discountedCost;// Removed this line
+  final double clinicPay;// Removed this line
+  final double finalCost;// Removed this line
 
   SubService({
-    required this.serviceId,
+    required this.subServiceId,
+    required this.serviceID,
     required this.serviceName,
+    required this.subServiceName,
     required this.categoryName,
     required this.categoryId,
     required this.description,
     required this.viewDescription,
     required this.status,
-    required this.serviceImage,
+    required this.subServiceImage,
     required this.viewImage,
     required this.minTime,
     required this.descriptionQA,
@@ -143,16 +147,18 @@ class SubService {
 
   factory SubService.fromJson(Map<String, dynamic> json) {
     return SubService(
-      serviceId: json['serviceId'] ?? '',
+      subServiceId: json['subServiceId'] ?? '',
+      serviceID: json['serviceID'] ?? '',
       serviceName: json['serviceName'] ?? '',
+      subServiceName: json['subServiceName'] ?? '',
       categoryName: json['categoryName'] ?? '',
       categoryId: json['categoryId'] ?? '',
       description: json['description'] ?? '',
       viewDescription: json['viewDescription'] ?? '',
       status: json['status'] ?? '',
-      serviceImage:
-          (json['serviceImage'] != null && json['serviceImage'].isNotEmpty)
-              ? base64Decode(json['serviceImage'])
+      subServiceImage:
+          (json['subServiceImage'] != null && json['subServiceImage'].isNotEmpty)
+              ? base64Decode(json['subServiceImage'])
               : Uint8List(0),
       viewImage: (json['viewImage'] != null && json['viewImage'].isNotEmpty)
           ? base64Decode(json['viewImage'])
@@ -177,14 +183,16 @@ class SubService {
 
   Map<String, dynamic> toJson() {
     return {
-      'serviceId': serviceId,
-      'serviceName': serviceName,
+      'subServiceId': subServiceId,
+      'serviceID': serviceID,
+      'serviceName': subServiceId,
+      'subServiceName': subServiceName,
       'categoryName': categoryName,
       'categoryId': categoryId,
       'description': description,
       'viewDescription': viewDescription,
       'status': status,
-      'serviceImage': serviceImage,
+      'subServiceImage': subServiceImage,
       'viewImage': viewImage,
       'minTime': minTime,
       'descriptionQA': descriptionQA.map((e) => e.toJson()).toList(),
@@ -218,3 +226,46 @@ class DescriptionQA {
     return qa;
   }
 }
+ 
+
+class Service {
+  final String serviceId;
+  final String serviceName;
+  final String categoryName;
+  final String categoryId;
+  final String description;
+  final Uint8List serviceImage;
+
+  Service({
+    required this.serviceId,
+    required this.serviceName,
+    required this.categoryName,
+    required this.categoryId,
+    required this.description,
+    required this.serviceImage,
+  });
+
+  factory Service.fromJson(Map<String, dynamic> json) {
+    return Service(
+      serviceId: json['serviceId'] ?? '',
+      serviceName: json['serviceName'] ?? '',
+      categoryName: json['categoryName'] ?? '',
+      categoryId: json['categoryId'] ?? '',
+      description: json['description'] ?? '',
+      serviceImage: base64Decode(json['serviceImage'] ?? ''),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'serviceId': serviceId,
+      'serviceName': serviceName,
+      'categoryName': categoryName,
+      'categoryId': categoryId,
+      'description': description,
+      'serviceImage': base64Encode(serviceImage),
+    };
+  }
+}
+
+

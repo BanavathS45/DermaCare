@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import '../Modals/ServiceModal.dart';
 import 'BaseUrl.dart';
 import 'package:http/http.dart' as http;
 
 class ServiceFetcher {
-  Future<List<SubService>> fetchServices(String categoryId) async {
+  Future<List<Service>> fetchServices(String categoryId) async {
     final url = '$getServiceByCategoriesID/$categoryId';
 
     try {
@@ -20,12 +21,19 @@ class ServiceFetcher {
           final List<dynamic> data = decodedResponse['data'];
           print("✅ Data length: ${data.length}");
 
-          return data.expand<SubService>((json) {
+          return data.map<Service>((json) {
             try {
-              return [SubService.fromJson(json)];
+              return Service.fromJson(json);
             } catch (e) {
               print("❌ Error parsing service: $e");
-              return [];
+              return Service(
+                serviceId: '',
+                serviceName: '',
+                categoryName: '',
+                categoryId: '',
+                description: '',
+                serviceImage: Uint8List(0),
+              );
             }
           }).toList();
         } else {
@@ -41,11 +49,12 @@ class ServiceFetcher {
       return [];
     }
   }
+
   Future<List<SubService>> fetchsubServices(String serviceId) async {
-    final url = '$getServiceByCategoriesID/$serviceId';
+    final url = '$getSubServiceByServiceID/$serviceId';
 
     try {
-      print("🔄 Sending request to URL: $url");
+      print("🔄 Sending request to URL serviceId: $url");
       final response = await http.get(Uri.parse(url));
       print("📦 API response status: ${response.statusCode}");
 

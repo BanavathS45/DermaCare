@@ -88,7 +88,7 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                   )
                 : SizedBox.shrink()),
 
-            SizedBox(height: 30),
+            SizedBox(height: 10),
 
             // Dropdowns inside Obx because they use observables
             Obx(() => CustomDropdownField<Serviceb>(
@@ -114,20 +114,52 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                   },
                 )),
 
-            SizedBox(height: 16),
+            SizedBox(height: 5),
             Obx(() {
-              final subServiceList = controller.subServiceList;
+              final ServiceList = controller.subServiceList;
               final selectedSubService = controller.selectedSubService.value;
-              final isSubServiceAvailable = subServiceList.isNotEmpty;
+              final isSubServiceAvailable = ServiceList.isNotEmpty;
 
-              return CustomDropdownField<SubService>(
+              return CustomDropdownField<Service>(
                 value: isSubServiceAvailable ? selectedSubService : null,
                 labelText: 'Sub-Service',
                 items: isSubServiceAvailable
-                    ? subServiceList.map((sub) {
+                    ? ServiceList.map((service) {
+                        return DropdownMenuItem<Service>(
+                          value: service,
+                          child: Text(service.serviceName),
+                        );
+                      }).toList()
+                    : [
+                        const DropdownMenuItem<Service>(
+                          value: null,
+                          child: Text("No Sub-Services Available"),
+                        ),
+                      ],
+                onChanged: (sub) {
+                  if (isSubServiceAvailable && sub != null) {
+                    controller.selectedSubService.value = sub;
+                  }
+                  controller.fetchSubSubServices(sub!.serviceId);
+                },
+              );
+            }),
+            SizedBox(height: 5),
+
+            Obx(() {
+              final subServiceArray = controller.subServiceArray;
+              final selectedSubSubService =
+                  controller.selectedSubSubService.value;
+              final isSubServiceAvailable = subServiceArray.isNotEmpty;
+
+              return CustomDropdownField<SubService>(
+                value: isSubServiceAvailable ? selectedSubSubService : null,
+                labelText: 'Sub-Service',
+                items: isSubServiceAvailable
+                    ? subServiceArray.map((service) {
                         return DropdownMenuItem<SubService>(
-                          value: sub,
-                          child: Text(sub.serviceName),
+                          value: service,
+                          child: Text(service.subServiceName),
                         );
                       }).toList()
                     : [
@@ -138,13 +170,11 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                       ],
                 onChanged: (sub) {
                   if (isSubServiceAvailable && sub != null) {
-                    controller.selectedSubService.value = sub;
+                    controller.selectedSubSubService.value = sub;
                   }
                 },
               );
             }),
-
-            SizedBox(height: 40),
 
             Container(
               decoration: BoxDecoration(
@@ -155,6 +185,8 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                 onPressed: () {
                   final selectedMain = controller.selectedService.value;
                   final selectedSub = controller.selectedSubService.value;
+                  final selectedSubService =
+                      controller.selectedSubSubService.value;
 
                   if (selectedMain == null) {
                     Get.snackbar(
@@ -171,6 +203,8 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                       Get.find<SelectedServicesController>();
                   selectedServicesController
                       .updateSelectedServices([selectedSub]);
+                  selectedServicesController
+                      .updateSelectedSubServices([selectedSubService!]);
                   selectedServicesController.categoryId.value =
                       selectedMain.categoryId;
                   selectedServicesController.categoryName.value =
@@ -193,7 +227,7 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                 child: const Text("Submit", style: TextStyle(fontSize: 16)),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
             TextButton(
                 onPressed: () {
                   Navigator.pop(context);

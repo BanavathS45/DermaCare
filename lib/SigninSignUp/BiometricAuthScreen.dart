@@ -2,6 +2,7 @@ import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorService.dart';
 import 'package:cutomer_app/Firebase/RequestNotificationPermissions.dart';
 import 'package:cutomer_app/SigninSignUp/LoginController.dart';
 import 'package:cutomer_app/SigninSignUp/LoginService.dart';
+import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
@@ -72,8 +73,8 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
         print("🎯 Authentication and session valid. Proceeding to login API.");
 
         // Call login/sign-up API
-        final loginData =
-            await _loginApiService.sendUserDataWithFCMToken(username, mobileNumber);
+        final loginData = await _loginApiService.sendUserDataWithFCMToken(
+            username, mobileNumber);
         print("📥 Login API Response: $loginData");
 
         // Check login API response and navigate accordingly
@@ -83,6 +84,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
                 mobileNumber: mobileNumber,
                 username: username,
               ));
+        
         } else {
           print("⚠️ Incomplete session data. Redirecting to LoginScreen.");
           Get.offAll(() => Loginscreen());

@@ -4,6 +4,7 @@ import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../APIs/FetchServices.dart';
 import '../Dashboard/DashBoardController.dart';
 import '../Loading/SkeletonLoder.dart';
 import '../Modals/ServiceModal.dart';
@@ -36,6 +37,10 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
       Get.put(Serviceselectioncontroller());
   final Dashboardcontroller dashboardcontroller =
       Get.put(Dashboardcontroller());
+  final serviceFetcher = Get.put(ServiceFetcher());
+  List<SubService> dynamicSubServices = [];
+  bool isSubServiceLoading = false;
+  SubService? selectedSubService;
 
   final List<String> hairRemovalSubServices = [
     "Laser Hair Removal - Face",
@@ -50,7 +55,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
     "Waxing - Legs",
     "Waxing - Full Body"
   ];
-
+  var suggestion;
   @override
   void initState() {
     super.initState();
@@ -131,7 +136,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                   serviceselectioncontroller.filteredServices.isNotEmpty)
                 Container(
                   child: Obx(() {
-                    List<SubService> services =
+                    List<Service> services =
                         serviceselectioncontroller.filteredServices;
                     print("selected services ${services}");
 
@@ -139,7 +144,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                       shrinkWrap: true, // Needed inside Column/Scroll
                       itemCount: services.length,
                       itemBuilder: (context, index) {
-                        final suggestion = services[index];
+                        suggestion = services[index];
 
                         return ListTile(
                           title: Text(suggestion.serviceName),
@@ -272,7 +277,163 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
     );
   }
 
-  void _showOptionBottomSheet(BuildContext context, SubService service) {
+  // void _showOptionBottomSheet(BuildContext context, Service service) {
+  //   String? selectedOption;
+
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //     ),
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return Padding(
+  //             padding: EdgeInsets.only(
+  //               left: 16,
+  //               right: 16,
+  //               top: 16,
+  //               bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+  //             ),
+  //             child: SingleChildScrollView(
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   Row(
+  //                     children: [
+  //                       Expanded(
+  //                         child: Text(
+  //                           "Select an option for \n${service.serviceName}",
+  //                           style: const TextStyle(
+  //                             fontSize: 20,
+  //                             fontWeight: FontWeight.bold,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       IconButton(
+  //                         icon: const Icon(Icons.close, color: Colors.red),
+  //                         onPressed: () => Navigator.pop(context),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 12),
+  //                   ...hairRemovalSubServices.map((option) {
+  //                     final isSelected = selectedOption == option;
+  //                     return GestureDetector(
+  //                       onTap: () => setState(() => selectedOption = option),
+  //                       child: Container(
+  //                         margin: const EdgeInsets.only(bottom: 12),
+  //                         padding: const EdgeInsets.symmetric(
+  //                             vertical: 14, horizontal: 16),
+  //                         decoration: BoxDecoration(
+  //                           color: isSelected
+  //                               ? Theme.of(context)
+  //                                   .primaryColor
+  //                                   .withOpacity(0.1)
+  //                               : Colors.white,
+  //                           border: Border.all(
+  //                             color: isSelected
+  //                                 ? Theme.of(context).primaryColor
+  //                                 : Colors.grey.shade300,
+  //                             width: 1.5,
+  //                           ),
+  //                           borderRadius: BorderRadius.circular(12),
+  //                           boxShadow: [
+  //                             BoxShadow(
+  //                               color: Colors.black.withOpacity(0.05),
+  //                               blurRadius: 6,
+  //                               offset: Offset(0, 2),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                         child: Row(
+  //                           children: [
+  //                             Icon(
+  //                               isSelected
+  //                                   ? Icons.radio_button_checked
+  //                                   : Icons.radio_button_off,
+  //                               color: isSelected
+  //                                   ? Theme.of(context).primaryColor
+  //                                   : Colors.grey,
+  //                             ),
+  //                             const SizedBox(width: 10),
+  //                             Expanded(
+  //                               child: Text(
+  //                                 option,
+  //                                 style: TextStyle(
+  //                                   fontSize: 16,
+  //                                   fontWeight: FontWeight.w500,
+  //                                   color: isSelected
+  //                                       ? Colors.black
+  //                                       : Colors.grey[800],
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     );
+  //                   }).toList(),
+  //                   const SizedBox(height: 20),
+  //                   SizedBox(
+  //                     width: double.infinity,
+  //                     child: ElevatedButton(
+  //                       style: ElevatedButton.styleFrom(
+  //                         padding: const EdgeInsets.symmetric(
+  //                             vertical: 14, horizontal: 32),
+  //                         shape: RoundedRectangleBorder(
+  //                             borderRadius: BorderRadius.circular(12)),
+  //                       ),
+  //                       onPressed: selectedOption == null
+  //                           ? null
+  //                           : () {
+  //                               Navigator.pop(context);
+  //                               Navigator.push(
+  //                                 context,
+  //                                 MaterialPageRoute(
+  //                                   builder: (context) => ServiceDetailsPage(
+  //                                     categoryName: service.categoryName,
+  //                                     serviceId: service.serviceId,
+  //                                     serviceName: service.serviceName,
+  //                                     categoryId: widget.categoryId,
+
+  //                                     mobileNumber: widget.mobileNumber,
+  //                                     username: widget.username,
+  //                                     services: service,
+  //                                     selectedOption: selectedOption!,
+  //                                   ),
+  //                                 ),
+  //                               );
+  //                             },
+  //                       child: const Text("Continue",
+  //                           style: TextStyle(fontSize: 16)),
+  //                     ),
+  //                   )
+  //                 ],
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+  void _showOptionBottomSheet(BuildContext context, Service service) async {
+    setState(() {
+      isSubServiceLoading = true;
+    });
+
+    // Fetch subservices using the serviceId
+    final subservices =
+        await serviceFetcher.fetchsubServices(service.serviceId);
+
+    setState(() {
+      dynamicSubServices = subservices;
+      isSubServiceLoading = false;
+    });
+
     String? selectedOption;
 
     showModalBottomSheet(
@@ -299,7 +460,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                       children: [
                         Expanded(
                           child: Text(
-                            "Select an option for \n${service.serviceName}",
+                            "Select Sub-Service for\n${service.serviceName}",
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -313,63 +474,71 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                       ],
                     ),
                     const SizedBox(height: 12),
-                    ...hairRemovalSubServices.map((option) {
-                      final isSelected = selectedOption == option;
-                      return GestureDetector(
-                        onTap: () => setState(() => selectedOption = option),
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14, horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Theme.of(context)
-                                    .primaryColor
-                                    .withOpacity(0.1)
-                                : Colors.white,
-                            border: Border.all(
+                    if (isSubServiceLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else if (dynamicSubServices.isEmpty)
+                      const Text("No Sub-Services Available")
+                    else
+                      ...dynamicSubServices.map((sub) {
+                        final isSelected = selectedSubService?.subServiceId ==
+                            sub.subServiceId;
+                        return GestureDetector(
+                          onTap: () => setState(() => selectedSubService = sub),
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 14, horizontal: 16),
+                            decoration: BoxDecoration(
                               color: isSelected
-                                  ? Theme.of(context).primaryColor
-                                  : Colors.grey.shade300,
-                              width: 1.5,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                isSelected
-                                    ? Icons.radio_button_checked
-                                    : Icons.radio_button_off,
+                                  ? Theme.of(context)
+                                      .primaryColor
+                                      .withOpacity(0.1)
+                                  : Colors.white,
+                              border: Border.all(
                                 color: isSelected
                                     ? Theme.of(context).primaryColor
-                                    : Colors.grey,
+                                    : Colors.grey.shade300,
+                                width: 1.5,
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  option,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: isSelected
-                                        ? Colors.black
-                                        : Colors.grey[800],
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  isSelected
+                                      ? Icons.radio_button_checked
+                                      : Icons.radio_button_off,
+                                  color: isSelected
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.grey,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    sub.subServiceName.isNotEmpty
+                                        ? sub.subServiceName
+                                        : sub.serviceName,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: isSelected
+                                          ? Colors.black
+                                          : Colors.grey[800],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }),
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
@@ -380,7 +549,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
-                        onPressed: selectedOption == null
+                        onPressed: selectedSubService == null
                             ? null
                             : () {
                                 Navigator.pop(context);
@@ -392,12 +561,10 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                                       serviceId: service.serviceId,
                                       serviceName: service.serviceName,
                                       categoryId: widget.categoryId,
-                                      servicePrice: service.discountedCost
-                                          .toStringAsFixed(0),
                                       mobileNumber: widget.mobileNumber,
                                       username: widget.username,
                                       services: service,
-                                      selectedOption: selectedOption!,
+                                      selectedService: selectedSubService!,
                                     ),
                                   ),
                                 );

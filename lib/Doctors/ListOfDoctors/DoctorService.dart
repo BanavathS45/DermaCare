@@ -86,22 +86,39 @@ class DoctorService {
 
   /// Fetches all services → hospitals → doctors from API
   Future<List<ServiceModel>> fetchServices() async {
-    print("Calling fetchServices...");
+    print("📡 Calling fetchServices...");
 
     try {
       final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        print("✅ Services retrieved successfully.");
-        List<dynamic> jsonData = jsonDecode(response.body);
+      print("🔁 Response status: ${response.statusCode}");
+      print("📦 Raw body: ${response.body}");
 
-        return jsonData.map((e) => ServiceModel.fromJson(e)).toList();
+      if (response.statusCode == 200) {
+        try {
+          final jsonData = jsonDecode(response.body);
+          print("✅ Decoded JSON: $jsonData");
+
+          if (jsonData is List) {
+            final services =
+                jsonData.map((e) => ServiceModel.fromJson(e)).toList();
+            print("📊 Parsed ${services.length} services.");
+            return services;
+          } else {
+            throw FormatException(
+                "Expected a list but got: ${jsonData.runtimeType}");
+          }
+        } catch (e) {
+          print("❌ JSON decoding error: $e");
+          return Future.error("JSON decoding failed: $e");
+        }
       } else {
-        throw Exception('❌ Error: ${response.statusCode}');
+        print("❌ Server returned status: ${response.statusCode}");
+        return Future.error('Error: ${response.statusCode}');
       }
     } catch (e, s) {
-      print('❌ Exception: $e');
+      print('❌ Outer catch Exception: $e');
       print('🪵 StackTrace: $s');
-      return Future.error('Failed to fetch data: $e');
+      return Future.error('Fetch failed: $e');
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cutomer_app/APIs/BaseUrl.dart';
+import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import '../Utils/ShowSnackBar.dart';
@@ -22,6 +23,17 @@ class LoginApiService {
         print("FCM Token is null. Cannot send data.");
         return {'error': 'FCM Token is null. Cannot send data.'};
       }
+
+      //   FirebaseInstallations.getInstance().getId()
+      // .addOnCompleteListener(task -> {
+      //     if (task.isSuccessful()) {
+      //         String installationId = task.getResult();
+      //         Log.d("InstallationID", installationId);
+      //     }
+      // });
+
+      final id = await FirebaseInstallations.instance.getId();
+      print('Installation ID: $id');
 
       print("FCM Token: $token");
 

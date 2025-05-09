@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -25,19 +26,18 @@ class ServiceDetailsPage extends StatefulWidget {
     required this.categoryId,
     required this.serviceId,
     required this.serviceName,
-    required this.servicePrice,
     required this.mobileNumber,
     required this.username,
-    required this.selectedOption,
+    required this.selectedService,
     required this.services,
   });
   final String categoryName;
   final String categoryId;
   final String serviceId;
   final String serviceName;
-  final String servicePrice;
-  final String selectedOption;
-  final SubService services;
+
+  final SubService selectedService;
+  final Service services;
 
   @override
   _ServiceDetailsPageState createState() => _ServiceDetailsPageState();
@@ -52,17 +52,13 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
   late Animation<Color?> _skeletonColorAnimation;
   final Serviceselectioncontroller serviceselectioncontroller =
       Get.put(Serviceselectioncontroller());
-  final ServiceFetcher serviceFetcher = ServiceFetcher();
+  final serviceFetcher = Get.put(ServiceFetcher());
   // Replace with your data model.
 
   @override
   void initState() {
     super.initState();
     apiService = ApiService();
-
-    // fetchServices();
-    print("widget.serviceId ${widget.serviceName}");
-    print("widget.serviceId ${widget.services.clinicPay} ");
 
     // Initialize animation for skeleton loading
     _animationController = AnimationController(
@@ -97,9 +93,9 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              service.viewImage.isNotEmpty
+              widget.selectedService.subServiceImage.isNotEmpty
                   ? Image.memory(
-                      service.viewImage,
+                      widget.selectedService.subServiceImage,
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.fill,
@@ -112,7 +108,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               const SizedBox(height: 16),
 
               Text(
-                service.viewDescription,
+                widget.selectedService.viewDescription,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -149,7 +145,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 ),
               ),
               Text(
-                widget.selectedOption,
+                widget.selectedService.subServiceName,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -162,7 +158,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 ),
               ),
               Text(
-                service.minTime,
+                widget.selectedService.minTime,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -171,7 +167,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ...service.descriptionQA.expand((descQA) {
+                  ...widget.selectedService.descriptionQA.expand((descQA) {
                     return descQA.qa.entries.map((entry) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
@@ -225,7 +221,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "₹ ${widget.servicePrice}",
+                      "₹ ${widget.selectedService.price}",
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -253,6 +249,11 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                       mobileNumber: widget.mobileNumber,
                       username: widget.username,
                     ));
+
+                final selectedServicesController =
+                    Get.find<SelectedServicesController>();
+                selectedServicesController
+                    .updateSelectedSubServices([widget.selectedService]);
               },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,

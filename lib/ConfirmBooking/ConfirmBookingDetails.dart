@@ -19,9 +19,9 @@ import 'ConsultationController.dart';
 class Confirmbookingdetails extends StatefulWidget {
   final HospitalDoctorModel doctor;
   final PatientModel patient;
- 
+
   Confirmbookingdetails(
-      {super.key, required this.doctor, required this.patient });
+      {super.key, required this.doctor, required this.patient});
 
   @override
   State<Confirmbookingdetails> createState() => _ConfirmbookingdetailsState();
@@ -56,8 +56,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         // Now execute based on matched ID
         if (selectedId == consultations[0].consultationId) {
           setState(() {
-            consultationFee = (selectedServicesController
-                    .selectedServices.first.discountedCost)
+            consultationFee = selectedServicesController
+                .selectedSubServices.first.finalCost
                 .toInt();
           });
         } else if (selectedId == consultations[1].consultationId) {
@@ -186,10 +186,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
           onPressed: () {
             print("PayAmount to be confirmbookingcontroller ${totalFee}");
             final bookingDetails = BookingDetailsModel(
-              servicename:
-                  selectedServicesController.selectedServices.first.serviceName,
-              serviceId:
-                  selectedServicesController.selectedServices.first.serviceId,
+              servicename: selectedServicesController
+                  .selectedSubServices.first.serviceName,
+              serviceId: selectedServicesController
+                  .selectedSubServices.first.subServiceId,
               doctorId: widget.doctor.doctor.doctorId,
               consultationType: consultationController
                   .selectedConsultation.value!.consultationType,
@@ -199,15 +199,17 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             );
 
             Get.to(RazorpaySubscription(
-                context: context,
-                amount: totalFee.toString(),
-                onPaymentInitiated: () {
-                  showSnackbar("Warning", "Paytments Initiated", "warning");
-                },
-                serviceDetails: widget.doctor,
-                patient: widget.patient,
-                bookingDetails: PostBookingModel(
-                    patient: widget.patient, booking: bookingDetails), mobileNumber: widget.patient.mobileNumber,));
+              context: context,
+              amount: totalFee.toString(),
+              onPaymentInitiated: () {
+                showSnackbar("Warning", "Paytments Initiated", "warning");
+              },
+              serviceDetails: widget.doctor,
+              patient: widget.patient,
+              bookingDetails: PostBookingModel(
+                  patient: widget.patient, booking: bookingDetails),
+              mobileNumber: widget.patient.mobileNumber,
+            ));
           },
           child: Text(
             "BOOKING & PAY (₹ ${totalFee})",
@@ -387,10 +389,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     // Dynamically set the fee based on the consultation type
     if (consultations[0].consultationId == id) {
       color = Colors.white;
-      consultationFee = selectedServicesController.selectedServices.isNotEmpty
-          ? (selectedServicesController.selectedServices.first.discountedCost)
-              .toInt()
-          : 0;
+      consultationFee = selectedServicesController
+          .selectedSubServices.first.finalCost
+          .toInt();
+      ;
 
       consultationType = consultations[0].consultationType;
     } else if (consultations[1].consultationId == id) {
@@ -467,7 +469,13 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   }
 
   Widget SlotBookingAndConsltation(String title, int fee, String id) {
-    final services = selectedServicesController.selectedServices;
+    print("title __ ${title}");
+    print("fee __ ${fee}");
+    print("id __ ${id}");
+    final services = selectedServicesController.selectedSubServices;
+    print(
+        "selectedServicesControllersdds __ ${selectedServicesController.selectedSubServices.first.finalCost}");
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
       child: Row(
@@ -518,7 +526,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        service.serviceName,
+                        selectedServicesController
+                            .selectedSubServices.first.subServiceName,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

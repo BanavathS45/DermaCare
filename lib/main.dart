@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'APIs/FetchServices.dart';
 import 'BottomNavigation/Appoinments/AppointmentController.dart';
 import 'Controller/CustomerController.dart';
 import 'Dashboard/DashBoardController.dart';
@@ -44,6 +45,7 @@ void main() async {
   Get.put(ScheduleController());
   Get.put(AppointmentController());
   Get.put(NotificationController());
+  Get.put(ServiceFetcher());
 
   // SharedPreferences
   final prefs = await SharedPreferences.getInstance();

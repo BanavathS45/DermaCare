@@ -99,7 +99,7 @@ class SiginSignUpController extends GetxController {
 
           final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
 
-          if (isAuthenticated) {
+          if (!isAuthenticated) {
             Get.offAll(() => ConsultationsType(
                   mobileNumber: mobileNumber,
                   username: fullname,

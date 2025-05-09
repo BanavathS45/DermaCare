@@ -314,7 +314,11 @@
                   ]
                 }
               ],
-              "languagesKnown": ["English", "Hindi", "Telugu"],
+              "languagesKnown": [
+                "English",
+                "Hindi",
+                "Telugu"
+              ],
               "profile": "Specializes in diagnosing and treating hereditary skin disorders and improving personalized skincare treatments.",
               "profileImage": "https://randomuser.me/api/portraits/women/44.jpg",
               "careerPath": [
@@ -411,7 +415,10 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": ["2024-03-25T10:00:00", "2024-03-25T11:00:00"],
+              "bookingSlots": [
+                "2024-03-25T10:00:00",
+                "2024-03-25T11:00:00"
+              ],
               "fee": {
                 "treatmentFee": 1500,
                 "inClinicFee": 1200,
@@ -682,11 +689,21 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": ["English", "Hindi", "Marathi"],
+              "languagesKnown": [
+                "English",
+                "Hindi",
+                "Marathi"
+              ],
               "profile": "Expert in cosmetic skin care, lasers and rejuvenation treatments.",
               "profileImage": "https://randomuser.me/api/portraits/men/55.jpg",
-              "careerPath": ["Apollo Skin Dept.", "DermaGlow Bangalore"],
-              "highlights": ["Korean Laser Training", "Vogue Skincare Feature"],
+              "careerPath": [
+                "Apollo Skin Dept.",
+                "DermaGlow Bangalore"
+              ],
+              "highlights": [
+                "Korean Laser Training",
+                "Vogue Skincare Feature"
+              ],
               "ratings": {
                 "overall": 4.6,
                 "rated": true,
@@ -727,7 +744,10 @@
                 ]
               },
               "favorites": false,
-              "bookingSlots": ["2024-03-26T11:00:00", "2024-03-26T16:00:00"],
+              "bookingSlots": [
+                "2024-03-26T11:00:00",
+                "2024-03-26T16:00:00"
+              ],
               "fee": {
                 "treatmentFee": 2000,
                 "inClinicFee": 1800,
@@ -771,12 +791,16 @@
               "license": "7576gfhgfg",
               "specialization": "Pediatric Dermatology",
               "experienceYears": 7,
-              "focusAreas": ["Eczema", "Infant Rashes", "Birthmark Management"],
+              "focusAreas": [
+                "Eczema",
+                "Infant Rashes",
+                "Birthmark Management"
+              ],
               "availableDays": "Mon - Sat",
               "availableTimings": "11:00 AM - 05:00 PM",
               "slots": [
                 {
-                  "date": "2025-04-03",
+                  "date": "2025-05-08",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -1016,11 +1040,21 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": ["English", "Hindi", "Urdu"],
+              "languagesKnown": [
+                "English",
+                "Hindi",
+                "Urdu"
+              ],
               "profile": "Provides gentle, expert care for skin conditions in children and infants.",
               "profileImage": "https://t4.ftcdn.net/jpg/03/20/74/45/360_F_320744517_TaGkT7aRlqqWdfGUuzRKDABtFEoN5CiO.jpg",
-              "careerPath": ["Rainbow Hospitals", "SkinCare Chennai"],
-              "highlights": ["12 pediatric papers", "NeoDerm Speaker"],
+              "careerPath": [
+                "Rainbow Hospitals",
+                "SkinCare Chennai"
+              ],
+              "highlights": [
+                "12 pediatric papers",
+                "NeoDerm Speaker"
+              ],
               "ratings": {
                 "overall": 4.9,
                 "rated": true,
@@ -1061,7 +1095,10 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": ["2024-03-27T09:00:00", "2024-03-27T10:30:00"],
+              "bookingSlots": [
+                "2024-03-27T09:00:00",
+                "2024-03-27T10:30:00"
+              ],
               "fee": {
                 "treatmentFee": 1200,
                 "inClinicFee": 1000,
@@ -1083,7 +1120,11 @@
               "license": "7576gfhgfg",
               "specialization": "Trichology",
               "experienceYears": 10,
-              "focusAreas": ["Hair Transplant", "Hair Fall", "Dandruff"],
+              "focusAreas": [
+                "Hair Transplant",
+                "Hair Fall",
+                "Dandruff"
+              ],
               "availableDays": "Tue - Sat",
               "availableTimings": "09:00 AM - 05:00 PM",
               "slots": [
@@ -1328,11 +1369,21 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": ["English", "Hindi", "Kannada"],
+              "languagesKnown": [
+                "English",
+                "Hindi",
+                "Kannada"
+              ],
               "profile": "Leading hair specialist with expertise in transplant and scalp care.",
               "profileImage": "https://randomuser.me/api/portraits/men/45.jpg",
-              "careerPath": ["Kaya Skin Clinic", "HairCraft Founder"],
-              "highlights": ["1000+ transplants", "Spain-trained surgeon"],
+              "careerPath": [
+                "Kaya Skin Clinic",
+                "HairCraft Founder"
+              ],
+              "highlights": [
+                "1000+ transplants",
+                "Spain-trained surgeon"
+              ],
               "ratings": {
                 "overall": 4.7,
                 "rated": true,
@@ -1373,7 +1424,10 @@
                 ]
               },
               "favorites": false,
-              "bookingSlots": ["2024-03-28T14:00:00", "2024-03-28T15:30:00"],
+              "bookingSlots": [
+                "2024-03-28T14:00:00",
+                "2024-03-28T15:30:00"
+              ],
               "fee": {
                 "treatmentFee": 2500,
                 "inClinicFee": 2000,
@@ -1425,7 +1479,11 @@
               "license": "7576gfhgfg",
               "specialization": "Clinical Dermatology",
               "experienceYears": 8,
-              "focusAreas": ["Psoriasis", "Vitiligo", "Chronic Eczema"],
+              "focusAreas": [
+                "Psoriasis",
+                "Vitiligo",
+                "Chronic Eczema"
+              ],
               "availableDays": "Tue - Sat",
               "availableTimings": "10:00 AM - 05:00 PM",
               "slots": [
@@ -1670,11 +1728,21 @@
                   "availableSlots": []
                 }
               ],
-              "languagesKnown": ["English", "Telugu", "Gujarati"],
+              "languagesKnown": [
+                "English",
+                "Telugu",
+                "Gujarati"
+              ],
               "profile": "Experienced in managing long-term dermatological diseases using medical therapies.",
               "profileImage": "https://thumbs.dreamstime.com/b/doctor-indian-38175791.jpg",
-              "careerPath": ["NIMS Fellow", "Lead at DermaPlus"],
-              "highlights": ["Vitiligo Campaigner", "Case Study Winner"],
+              "careerPath": [
+                "NIMS Fellow",
+                "Lead at DermaPlus"
+              ],
+              "highlights": [
+                "Vitiligo Campaigner",
+                "Case Study Winner"
+              ],
               "ratings": {
                 "overall": 4.5,
                 "rated": true,
@@ -1706,7 +1774,10 @@
                 ]
               },
               "favorites": true,
-              "bookingSlots": ["2024-03-29T10:00:00", "2024-03-29T11:30:00"],
+              "bookingSlots": [
+                "2024-03-29T10:00:00",
+                "2024-03-29T11:30:00"
+              ],
               "fee": {
                 "treatmentFee": 1400,
                 "inClinicFee": 1300,
@@ -2374,6 +2445,66 @@
       "consultationType": "In-Clinic Consultation",
       "totalFee": 1820,
       "consultattionFee": 1800
+    },
+    {
+      "id": "2792",
+      "name": "hvuvvu",
+      "mobileNumber": "7842259803",
+      "age": "58",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "uvugvuvibuhihihihih",
+      "monthYear": "May 08, 2025",
+      "serviceDate": "Thursday",
+      "servicetime": "12:30 PM",
+      "servicename": "Skin Rejuvenation",
+      "resoan": null,
+      "status": "pending",
+      "serviceId": "681c426d538f0512760ecf43",
+      "doctorId": "DC_3",
+      "consultationType": "In-Clinic Consultation",
+      "totalFee": 1020,
+      "consultattionFee": 1000
+    },
+    {
+      "id": "1fb5",
+      "name": "hchc",
+      "mobileNumber": "7842259803",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "hchcvjvjbjvjgiguvigugug",
+      "monthYear": "May 08, 2025",
+      "serviceDate": "Thursday",
+      "servicetime": "01:30 PM",
+      "servicename": "Derma Care",
+      "resoan": null,
+      "status": "pending",
+      "serviceId": "681c4151538f0512760ecf42",
+      "doctorId": "DC_3",
+      "consultationType": "Services & Treatments",
+      "totalFee": 570,
+      "consultattionFee": 550
+    },
+    {
+      "id": "9875",
+      "name": "bdbd",
+      "mobileNumber": "7842259803",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "bsbdhdjdndjdnd",
+      "monthYear": "May 08, 2025",
+      "serviceDate": "Thursday",
+      "servicetime": "02:30 PM",
+      "servicename": "Skin Rejuvenation",
+      "resoan": null,
+      "status": "pending",
+      "serviceId": "681b5fcd0c284a28df94c3d9",
+      "doctorId": "DC_3",
+      "consultationType": "Services & Treatments",
+      "totalFee": 364,
+      "consultattionFee": 344
     }
   ]
 }

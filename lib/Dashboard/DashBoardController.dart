@@ -28,10 +28,12 @@ class Dashboardcontroller extends GetxController {
   final RxList<String> carouselImages = <String>[].obs;
   final selectedService = Rxn<Serviceb>();
 
-  var selectedSubService = Rxn<SubService>();
+  var selectedSubService = Rxn<Service>();
+  var selectedSubSubService = Rxn<SubService>();
   var serviceList = <Serviceb>[];
 
-  var subServiceList = <SubService>[].obs;
+  var subServiceList = <Service>[].obs;
+  var subServiceArray = <SubService>[].obs;
 
   String statusMessage = "";
   
@@ -45,6 +47,12 @@ class Dashboardcontroller extends GetxController {
     final result = await ServiceFetcher().fetchServices(categoryId);
     subServiceList.assignAll(result);
     print("subServiceList ${subServiceList}");
+  }
+   void fetchSubSubServices(String serviceId) async {
+    print("categoryId ${serviceId}");
+    final result = await ServiceFetcher().fetchsubServices(serviceId);
+    subServiceArray.assignAll(result);
+    print("subServiceArray ${subServiceArray}");
   }
 
   /// Store user session data
