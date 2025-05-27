@@ -7,18 +7,15 @@ import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 import '../Doctors/Schedules/Schedule.dart';
 import '../Utils/GradintColor.dart';
 
-Widget buildDoctorCard(
-  BuildContext context,
-  HospitalDoctorModel doctorModel,
-  DoctorController controller,
-) {
+Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
+    DoctorController controller, String mobileNumber) {
   final doctor = doctorModel.doctor;
   final hospital = doctorModel.hospital;
 
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     decoration: BoxDecoration(
-      gradient: appGradient(),
+      gradient: doctor.availablity ? appGradient() : appGradientGrey(),
       borderRadius: BorderRadius.circular(18),
     ),
     child: Padding(
@@ -54,7 +51,7 @@ Widget buildDoctorCard(
               ),
               IconButton(
                 icon: Icon(
-                  Icons.favorite,
+                  Icons.thumb_up,
                   color: doctor.favorites ? Colors.yellow : Colors.white60,
                 ),
                 onPressed: () => controller.toggleFavorite(doctorModel),
@@ -237,7 +234,16 @@ Widget buildDoctorCard(
                   ),
                   InkWell(
                     onTap: () {
-                      Get.to(() => ScheduleScreen(doctorData: doctorModel));
+                      if (doctor.availablity) {
+                        // showSn
+                        // showSnackbar();
+                      }
+                      doctor.availablity
+                          ? Get.to(() => ScheduleScreen(
+                                doctorData: doctorModel,
+                                mobileNumber: mobileNumber,
+                              ))
+                          : null;
 
                       // Navigator.push(
                       //   context,
@@ -253,11 +259,11 @@ Widget buildDoctorCard(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Text(
-                        "BOOK",
+                      child: Text(
+                        doctor.availablity ? "BOOK" : "Unavailable",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: mainColor,
+                          color: doctor.availablity ? mainColor : Colors.grey,
                         ),
                       ),
                     ),
@@ -364,35 +370,66 @@ Widget buildFilters(DoctorController controller) {
                 controller.applyFilters();
               },
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: controller.selectedCity.value,
-                  onChanged: (value) {
-                    controller.selectedCity.value = value!;
-                    controller.applyFilters();
-                  },
-                  items: controller.cityList
-                      .map(
-                        (city) => DropdownMenuItem<String>(
-                          value: city,
-                          child: Text(
-                            // city.isEmpty ? city : "No city available",
-                            city,
-                            style: TextStyle(color: mainColor),
-                          ),
-                        ),
-                      )
-                      .toList(),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: controller.selectedCity.value,
+                        onChanged: (value) {
+                          controller.selectedCity.value = value!;
+                          controller.applyFilters();
+                        },
+                        items: controller.cityList
+                            .map(
+                              (city) => DropdownMenuItem<String>(
+                                value: city,
+                                child: Text(
+                                  // city.isEmpty ? city : "No city available",
+                                  city,
+                                  style: TextStyle(color: mainColor),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(
+                  width: 10,
+                ),
+                // FilterChip(
+                //   label: Padding(
+                //     padding: const EdgeInsets.symmetric(vertical: 6.0),
+                //     child: Text(
+                //       "Our Recommended",
+                //       style: TextStyle(
+                //         color: controller.selectedRecommended.value
+                //             ? Colors.white
+                //             : mainColor,
+                //       ),
+                //     ),
+                //   ),
+                //   selectedColor: mainColor,
+                //   showCheckmark: false,
+                //   selected:
+                //       controller.selectedRecommended.value, // expects a bool
+
+                //   onSelected: (val) {
+                //     controller.selectedRecommended.value = val;
+                //     controller.applyFilters();
+                //   },
+                // ),
+              ],
             ),
           ],
         ),

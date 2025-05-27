@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../ConfirmBooking/Consultations.dart';
 import '../OTP/OtpScreen.dart';
+import '../Registration/RegisterScreen.dart';
 import 'LoginService.dart';
 
 class SiginSignUpController extends GetxController {
-  var getOTPButton = "GET OTP".obs;
+  var getOTPButton = "SIGN IN".obs;
   var isLoading = false.obs;
   var errorMessage = ''.obs;
   final formKey = GlobalKey<FormState>();
@@ -32,27 +35,27 @@ class SiginSignUpController extends GetxController {
     }
     return null; // ✅ Valid input
   }
+
   String? validateAge(String? value) {
-  if (value == null || value.isEmpty) {
-    return "Please enter your age";
-  }
+    if (value == null || value.isEmpty) {
+      return "Please enter your age";
+    }
 
-  final numericRegex = RegExp(r'^\d+$'); // Only digits
-  if (!numericRegex.hasMatch(value)) {
-    return "Age must be a number";
-  }
+    final numericRegex = RegExp(r'^\d+$'); // Only digits
+    if (!numericRegex.hasMatch(value)) {
+      return "Age must be a number";
+    }
 
-  final age = int.tryParse(value);
-  if (age == null || age <= 0) {
-    return "Enter a valid age";
-  }
-  if (age > 120) {
-    return "Age must be less than or equal to 120";
-  }
+    final age = int.tryParse(value);
+    if (age == null || age <= 0) {
+      return "Enter a valid age";
+    }
+    if (age > 120) {
+      return "Age must be less than or equal to 120";
+    }
 
-  return null; // ✅ Valid
-}
-
+    return null; // ✅ Valid
+  }
 
   String? validateMobileNumber(String? value) {
     value = value?.trim();
@@ -70,34 +73,60 @@ class SiginSignUpController extends GetxController {
 
   void submitForm(BuildContext context) async {
     if (formKey.currentState!.validate() && agreeToTerms) {
-      getOTPButton.value = "Sending OTP...";
+      getOTPButton.value =
+          "Signing..."; //TODO: replace with Logging eith Sending OTP...
       isLoading.value = true; // Start loading
       await Future.delayed(const Duration(seconds: 2));
       isLoading.value = false; // Set loading to false
-      getOTPButton.value = "SENT OTP"; // Reset button text
+      // getOTPButton.value = "SENT OTP"; //TODO: When otp get uncomment the line
 
-      phoneNumber = mobileController.text.trim();
       final fullname = nameController.text.trim();
       final mobileNumber = mobileController.text.trim();
+
       try {
         final response =
-            await _loginapiService.signInOrSignUp(fullname, mobileNumber);
+            await _loginapiService.sendUserDataWithFCMToken(fullname, mobileNumber);
         if (response['status'] == 200) {
-          getOTPButton.value = "GET OTP";
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (ctx) => Otpscreencustomer(
-                PhoneNumberstored: phoneNumber!,
-                username: fullname,
-              ),
-            ),
-          );
+          getOTPButton.value =
+              "SIGN IN"; //TODO: replace with SIGN IN eith GET OTP
+          final prefs = await SharedPreferences.getInstance();
+
+          // ✅ Store session data
+          await prefs.setBool('isFirstLoginDone', true);
+          await prefs.setBool('isAuthenticated', true);
+          await prefs.setString('username', fullname);
+          await prefs.setString('mobileNumber', mobileNumber);
+
+          final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
+
+          if (!isAuthenticated) {
+            Get.offAll(() => ConsultationsType(
+                  mobileNumber: mobileNumber,
+                  username: fullname,
+                ));
+          } else {
+            Get.to(RegisterScreen(
+              fullName: fullname,
+              mobileNumber: mobileNumber,
+            ));
+          }
+
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (ctx) => Otpscreencustomer(
+          //       PhoneNumberstored: phoneNumber!,
+          //       username: fullname,
+          //     ),
+          //   ),
+          // );
         } else {
-          getOTPButton.value = "GET OTP";
+          getOTPButton.value =
+              "SIGN IN"; //TODO: replace with SIGN IN eith GET OTP
         }
       } catch (e) {
-        getOTPButton.value = "GET OTP";
+        getOTPButton.value =
+            "SIGN IN"; //TODO: replace with SIGN IN eith GET OTP
       } finally {
         isLoading.value = false; // Hide loading state
       }

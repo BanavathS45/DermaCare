@@ -27,7 +27,6 @@ class AppointmentService {
             emailId: json['emailId'],
             age: json['age'],
             customerNumber: json['customerNumber'],
-            addressDto: AddressDto.fromJson(json['addressDto']),
             categoryName: json['categoryName'],
             servicesAdded: (json['servicesAdded'] as List)
                 .map((item) => ServiceAdded.fromJson(item))
@@ -37,7 +36,9 @@ class AppointmentService {
                 (json['totalDiscountAmount'] as num).toDouble(),
             totalTax: (json['totalTax'] as num).toDouble(),
             payAmount: (json['payAmount'] as num).toDouble(),
-            bookedAt: json['bookedAt'], totalDiscountedAmount: (json['totalDiscountedAmount'] as num).toDouble(),
+            bookedAt: json['bookedAt'],
+            totalDiscountedAmount:
+                (json['totalDiscountedAmount'] as num).toDouble(),
           );
         }).toList();
       } else {

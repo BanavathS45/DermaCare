@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,9 +12,9 @@ class Patientdetailsformcontroller extends GetxController {
   final TextEditingController ageController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
   Registercontroller registercontroller = Registercontroller();
-  final Color activeColor = Colors.green.shade900;
+  final Color activeColor = mainColor;
   final Color inactiveColor = Colors.transparent;
-  final Color borderColor = Colors.green.shade300;
+  final Color borderColor = mainColor;
   final formKey = GlobalKey<FormState>();
 
   submitSchedule() {

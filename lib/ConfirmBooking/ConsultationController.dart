@@ -1,12 +1,10 @@
-import 'package:cutomer_app/AddPatient/AddPatientOther.dart';
+import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:get/get.dart';
 
 class Consultationcontroller extends GetxController {
-  RxInt consultationId = 0.obs;
+  Rx<ConsultationModel?> selectedConsultation = Rx<ConsultationModel?>(null);
 
-  void setConsultationId(int id) {
-    consultationId.value = id;
+  void setConsultation(ConsultationModel consultation) {
+    selectedConsultation.value = consultation;
   }
-
-  int get getConsultationId => consultationId.value;
 }

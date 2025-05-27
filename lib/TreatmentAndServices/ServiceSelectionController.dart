@@ -3,18 +3,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../APIs/FetchAddress.dart';
 import '../APIs/FetchServices.dart';
 import '../Controller/CustomerController.dart';
-import '../Doctors/ListOfDoctors/DoctorScreen.dart';
-import '../Modals/AddressModal.dart';
+
 import '../Modals/ServiceModal.dart';
 import '../Services/CarouselSliderService.dart';
 
 class Serviceselectioncontroller extends GetxController {
-  // RxInt totalItems = 0.obs;
-
-  // RxDouble totalPrice = 0.0.obs;
+ 
 
   late AnimationController animationController;
   late Animation<Color?> skeletonColorAnimation;
@@ -26,6 +22,7 @@ class Serviceselectioncontroller extends GetxController {
   TextEditingController searchController = TextEditingController();
 
   final RxList<Service> services = <Service>[].obs;
+  final RxList<SubService> subservices = <SubService>[].obs;
   final RxList<Service> filteredServices = <Service>[].obs;
 
   final RxBool isLoading = true.obs;
@@ -58,8 +55,14 @@ class Serviceselectioncontroller extends GetxController {
 
   Future<void> fetchServices(String categoryId) async {
     final fetchedServices = await serviceFetcher.fetchServices(categoryId);
+    final fetchedSubServices = await serviceFetcher.fetchsubServices(categoryId);
+    
+
+    print("fetchedServices ${categoryId}");
+    print("fetchedServices fetchedServices ${fetchedServices}");
 
     services.assignAll(fetchedServices); // ✅ Fix
+    subservices.assignAll(fetchedSubServices); // ✅ Fix
     filteredServices.assignAll(fetchedServices); // ✅ Fix
 
     isLoading.value = false;
@@ -74,192 +77,38 @@ class Serviceselectioncontroller extends GetxController {
 
     filteredServices.assignAll(results); // Assuming you're using RxList
   }
+    
 
-  RxInt totalItems = 0.obs;
-  RxDouble totalPrice = 0.0.obs;
+//   void navigateToConfirmation(
+//       {String? categoryId, String? categoryName, String? serviceId, String? subserviceId }) async {
+//     await serviceFetcher.fetchsubServices(serviceId!);
 
-  void updateTotal() {
-    totalItems.value = services.where((s) => s.quantity > 0).length;
-    totalPrice.value = services.fold(
-      0.0,
-      (sum, s) => sum + s.discountedCost * s.quantity,
-    );
-  }
+//     try {
+//       Service? selectedService = services.firstWhere(
+//         (service) => service.serviceId == serviceId,
+//       );
+//         SubService? selectedSubService = subservices.firstWhere(
+//         (service) => service.subServiceId == subserviceId,
+//       );
 
-  Fetchaddress fetchFirstAddress = Fetchaddress();
-
-  void navigateToConfirmation(
-      {String? mobileNumber,
-      String? username,
-      String? categoryId,
-      String? categoryName}) async {
-    try {
-      // Fetch the first address
-      // AddressModel? firstAddress =
-      //     await fetchFirstAddress.fetchFirstAddress(mobileNumber!);
-      AddressModel? firstAddress = AddressModel(
-          houseNo: "dfsd",
-          street: "street",
-          city: "city",
-          state: "state",
-          postalCode: "504293",
-          country: "country",
-          latitude: 45.343434,
-          longitude: 34.324234);
-
-      if (firstAddress != null) {
-        // Use the instance of the SelectedServicesController to update selected services
-        List<Service> selectedServices =
-            services.where((service) => service.quantity > 0).toList();
-
-        final selectedServicesController =
-            Get.find<SelectedServicesController>();
-        selectedServicesController.updateSelectedServices(selectedServices);
-        selectedServicesController.categoryId.value = categoryId!;
-        selectedServicesController.categoryName.value = categoryName!;
-
-        // Navigate to PatientDetailScreen with the first address
-
-        Get.to(() => Doctorscreen(
-              mobileNumber: mobileNumber!,
-              username: username!,
-            ));
-      } else {
-        print('No address available');
-        // Handle case when no address is found
-      }
-    } catch (e) {
-      print('Error fetching address: $e');
-      // Handle error
-    }
-  }
-
-  void showAddedItemsAlert(BuildContext context) {
-    List<Service> selectedServices =
-        services.where((service) => service.quantity > 0).toList();
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-      ),
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState) {
-            return Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Selected Services',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF6B3FA0),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.black,
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          padding: EdgeInsets.zero,
-                        ),
-                        child: const Icon(Icons.close, size: 20),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  selectedServices.isEmpty
-                      ? const Center(
-                          child: Text(
-                            "No services selected yet",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        )
-                      : Expanded(
-                          child: ListView.builder(
-                            itemCount: selectedServices.length,
-                            itemBuilder: (context, index) {
-                              final service = selectedServices[index];
-                              return ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
-                                leading: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.20,
-                                  child: service.serviceImage != null
-                                      ? Image.memory(
-                                          service.serviceImage as Uint8List,
-                                          fit: BoxFit.cover,
-                                          height: double.infinity,
-                                        )
-                                      : Container(
-                                          color: Colors.grey,
-                                          child: const Center(
-                                              child:
-                                                  Text('Image not available')),
-                                        ),
-                                ),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      service.serviceName,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "₹ ${service.discountedCost.toStringAsFixed(0)}",
-                                      style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color.fromARGB(
-                                              255, 146, 150, 147)),
-                                    ),
-                                  ],
-                                ),
-                                trailing: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.15,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      setModalState(() {
-                                        service.quantity = 0; // Reset quantity
-                                        selectedServices
-                                            .removeAt(index); // Remove item
-                                      });
-
-                                      updateTotal(); // Recalculate total
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+// // Only proceed if found
+//       if (selectedService != null) {
+//         final selectedServicesController =
+//             Get.find<SelectedServicesController>();
+//         selectedServicesController.updateSelectedServices([selectedService]); 
+//          selectedServicesController
+//                       .updateSelectedSubServices([selectedSubService!]);
+//         // Pass as a list
+//         selectedServicesController.categoryId.value = categoryId!;
+//         selectedServicesController.categoryName.value = categoryName!;
+//       } else {
+//         print("Service with ID $serviceId not found.");
+//       }
+//     } catch (e) {
+//       print('Error fetching address: $e');
+//       // Handle error
+//     }
+//   }
 
   void clearSearch() {
     searchController.clear(); // Clear the search text field
@@ -279,6 +128,5 @@ class Serviceselectioncontroller extends GetxController {
 
   onRefresh(String categoryId) async {
     await fetchServices(categoryId);
-    updateTotal();
   }
 }

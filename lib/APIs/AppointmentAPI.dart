@@ -38,7 +38,6 @@ class AppointmentAPI {
                 emailId: json['emailId'],
                 age: json['age'],
                 customerNumber: json['customerNumber'],
-                addressDto: AddressDto.fromJson(json['addressDto']),
                 categoryName: json['categoryName'],
                 servicesAdded: (json['servicesAdded'] as List)
                     .map((item) => ServiceAdded.fromJson(item))
@@ -47,7 +46,8 @@ class AppointmentAPI {
                 totalDiscountAmount: json['totalDiscountAmount'],
                 totalTax: json['totalTax'],
                 payAmount: json['payAmount'],
-                bookedAt: json['bookedAt'], totalDiscountedAmount: json['totalDiscountedAmount'],
+                bookedAt: json['bookedAt'],
+                totalDiscountedAmount: json['totalDiscountedAmount'],
               );
             }).toList();
 
@@ -56,7 +56,6 @@ class AppointmentAPI {
             // Return the list of appointments to be used elsewhere
             return allAppointments;
           } else {
-            
             print("Error: 'data' key not found in the response.");
             showErrorToast(msg: "No appointments data found.");
             return [];

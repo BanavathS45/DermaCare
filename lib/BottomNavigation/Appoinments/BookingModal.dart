@@ -9,13 +9,13 @@ class AppointmentData {
   final String emailId;
   final String age;
   final String customerNumber;
-  final AddressDto addressDto;
+
   final String categoryName;
   final List<ServiceAdded> servicesAdded;
   final double totalPrice;
   final double totalDiscountAmount;
   final double totalDiscountedAmount;
-  
+
   final double totalTax;
   final double payAmount;
   final String bookedAt;
@@ -29,7 +29,6 @@ class AppointmentData {
     required this.emailId,
     required this.age,
     required this.customerNumber,
-    required this.addressDto,
     required this.categoryName,
     required this.servicesAdded,
     required this.totalPrice,
@@ -50,7 +49,6 @@ class AppointmentData {
       emailId: json['emailId'],
       age: json['age'],
       customerNumber: json['customerNumber'],
-      addressDto: AddressDto.fromJson(json['addressDto']),
       categoryName: json['categoryName'],
       servicesAdded: (json['servicesAdded'] as List)
           .map((item) => ServiceAdded.fromJson(item))
@@ -61,47 +59,6 @@ class AppointmentData {
       totalTax: (json['totalTax'] as num).toDouble(),
       payAmount: (json['payAmount'] as num).toDouble(),
       bookedAt: json['bookedAt'],
-    );
-  }
-}
-
-class AddressDto {
-  final String houseNo;
-  final String street;
-  final String city;
-  final String state;
-  final String postalCode;
-  final String country;
-  final String apartment;
-  final String direction;
-  final double latitude;
-  final double longitude;
-
-  AddressDto({
-    required this.houseNo,
-    required this.street,
-    required this.city,
-    required this.state,
-    required this.postalCode,
-    required this.country,
-    required this.apartment,
-    required this.direction,
-    required this.latitude,
-    required this.longitude,
-  });
-
-  factory AddressDto.fromJson(Map<String, dynamic> json) {
-    return AddressDto(
-      houseNo: json['houseNo'],
-      street: json['street'],
-      city: json['city'],
-      state: json['state'],
-      postalCode: json['postalCode'],
-      country: json['country'],
-      apartment: json['apartment'],
-      direction: json['direction'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
     );
   }
 }
