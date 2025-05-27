@@ -9,6 +9,7 @@ import '../Dashboard/DashBoardController.dart';
 import '../Loading/SkeletonLoder.dart';
 import '../Modals/ServiceModal.dart';
 
+import '../SubserviceAndHospital/HospitalCardScreen .dart';
 import '../TreatmentAndServices/ServiceSelectionController.dart';
 import '../Utils/CommonCarouselAds.dart';
 import '../Utils/GradintColor.dart';
@@ -42,19 +43,6 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
   bool isSubServiceLoading = false;
   SubService? selectedSubService;
 
-  final List<String> hairRemovalSubServices = [
-    "Laser Hair Removal - Face",
-    "Laser Hair Removal - Underarms",
-    "Laser Hair Removal - Full Arms",
-    "Laser Hair Removal - Full Legs",
-    "Laser Hair Removal - Bikini Line",
-    "Laser Hair Removal - Chest & Back",
-    "Threading - Eyebrows",
-    "Threading - Upper Lip",
-    "Waxing - Arms",
-    "Waxing - Legs",
-    "Waxing - Full Body"
-  ];
   var suggestion;
   @override
   void initState() {
@@ -277,149 +265,6 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
     );
   }
 
-  // void _showOptionBottomSheet(BuildContext context, Service service) {
-  //   String? selectedOption;
-
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //     ),
-  //     builder: (context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           return Padding(
-  //             padding: EdgeInsets.only(
-  //               left: 16,
-  //               right: 16,
-  //               top: 16,
-  //               bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-  //             ),
-  //             child: SingleChildScrollView(
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   Row(
-  //                     children: [
-  //                       Expanded(
-  //                         child: Text(
-  //                           "Select an option for \n${service.serviceName}",
-  //                           style: const TextStyle(
-  //                             fontSize: 20,
-  //                             fontWeight: FontWeight.bold,
-  //                           ),
-  //                         ),
-  //                       ),
-  //                       IconButton(
-  //                         icon: const Icon(Icons.close, color: Colors.red),
-  //                         onPressed: () => Navigator.pop(context),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 12),
-  //                   ...hairRemovalSubServices.map((option) {
-  //                     final isSelected = selectedOption == option;
-  //                     return GestureDetector(
-  //                       onTap: () => setState(() => selectedOption = option),
-  //                       child: Container(
-  //                         margin: const EdgeInsets.only(bottom: 12),
-  //                         padding: const EdgeInsets.symmetric(
-  //                             vertical: 14, horizontal: 16),
-  //                         decoration: BoxDecoration(
-  //                           color: isSelected
-  //                               ? Theme.of(context)
-  //                                   .primaryColor
-  //                                   .withOpacity(0.1)
-  //                               : Colors.white,
-  //                           border: Border.all(
-  //                             color: isSelected
-  //                                 ? Theme.of(context).primaryColor
-  //                                 : Colors.grey.shade300,
-  //                             width: 1.5,
-  //                           ),
-  //                           borderRadius: BorderRadius.circular(12),
-  //                           boxShadow: [
-  //                             BoxShadow(
-  //                               color: Colors.black.withOpacity(0.05),
-  //                               blurRadius: 6,
-  //                               offset: Offset(0, 2),
-  //                             ),
-  //                           ],
-  //                         ),
-  //                         child: Row(
-  //                           children: [
-  //                             Icon(
-  //                               isSelected
-  //                                   ? Icons.radio_button_checked
-  //                                   : Icons.radio_button_off,
-  //                               color: isSelected
-  //                                   ? Theme.of(context).primaryColor
-  //                                   : Colors.grey,
-  //                             ),
-  //                             const SizedBox(width: 10),
-  //                             Expanded(
-  //                               child: Text(
-  //                                 option,
-  //                                 style: TextStyle(
-  //                                   fontSize: 16,
-  //                                   fontWeight: FontWeight.w500,
-  //                                   color: isSelected
-  //                                       ? Colors.black
-  //                                       : Colors.grey[800],
-  //                                 ),
-  //                               ),
-  //                             ),
-  //                           ],
-  //                         ),
-  //                       ),
-  //                     );
-  //                   }).toList(),
-  //                   const SizedBox(height: 20),
-  //                   SizedBox(
-  //                     width: double.infinity,
-  //                     child: ElevatedButton(
-  //                       style: ElevatedButton.styleFrom(
-  //                         padding: const EdgeInsets.symmetric(
-  //                             vertical: 14, horizontal: 32),
-  //                         shape: RoundedRectangleBorder(
-  //                             borderRadius: BorderRadius.circular(12)),
-  //                       ),
-  //                       onPressed: selectedOption == null
-  //                           ? null
-  //                           : () {
-  //                               Navigator.pop(context);
-  //                               Navigator.push(
-  //                                 context,
-  //                                 MaterialPageRoute(
-  //                                   builder: (context) => ServiceDetailsPage(
-  //                                     categoryName: service.categoryName,
-  //                                     serviceId: service.serviceId,
-  //                                     serviceName: service.serviceName,
-  //                                     categoryId: widget.categoryId,
-
-  //                                     mobileNumber: widget.mobileNumber,
-  //                                     username: widget.username,
-  //                                     services: service,
-  //                                     selectedOption: selectedOption!,
-  //                                   ),
-  //                                 ),
-  //                               );
-  //                             },
-  //                       child: const Text("Continue",
-  //                           style: TextStyle(fontSize: 16)),
-  //                     ),
-  //                   )
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
   void _showOptionBottomSheet(BuildContext context, Service service) async {
     setState(() {
       isSubServiceLoading = true;
@@ -547,16 +392,23 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                           padding: const EdgeInsets.symmetric(
                               vertical: 14, horizontal: 32),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          backgroundColor: (selectedSubService == null ||
+                                  dynamicSubServices.isEmpty)
+                              ? Colors.grey // ❌ disabled color
+                              : Theme.of(context)
+                                  .primaryColor, // ✅ enabled color
                         ),
-                        onPressed: selectedSubService == null
-                            ? null
+                        onPressed: (selectedSubService == null ||
+                                dynamicSubServices.isEmpty)
+                            ? null // ❌ disable button
                             : () {
                                 Navigator.pop(context);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ServiceDetailsPage(
+                                    builder: (context) => HospitalCardScreen(
                                       categoryName: service.categoryName,
                                       serviceId: service.serviceId,
                                       serviceName: service.serviceName,
@@ -569,8 +421,10 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                                   ),
                                 );
                               },
-                        child: const Text("Continue",
-                            style: TextStyle(fontSize: 16)),
+                        child: const Text(
+                          "Continue",
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
                     )
                   ],

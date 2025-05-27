@@ -1,5 +1,5 @@
 // String serverUrl = 'http://alb-dev-sc-197990416.ap-south-1.elb.amazonaws.com/api';
-const String wifiUrl = "192.168.1.27";
+const String wifiUrl = "192.168.1.13";
 const String serverUrl = "http://${wifiUrl}:9090/api";
 const String baseUrl = '$serverUrl/customers';
 const String consultationUrl =
@@ -12,8 +12,10 @@ const String categoryUrl = 'http://${wifiUrl}:8081/admin/getCategories';
 const String getServiceByCategoriesID =
     'http://${wifiUrl}:8800/api/v1/services/getServices';
 
-    const String getSubServiceByServiceID =
-    'http://${wifiUrl}:8800/api/v1/subServices/getSubServicesByServiceId';
+const String getSubServiceByServiceID =
+    'http://${wifiUrl}:8081/admin/getSubServicesByServiceId';
+const String getSubServiceByServiceIDHospitalID =
+    'http://${wifiUrl}:8080/clinic-admin/getSubService';
 
 const String getCustomer =
     '$baseUrl/getCustomer'; //http://localhost:8083/api/customer/getBasicDetails/${mobileNumber}

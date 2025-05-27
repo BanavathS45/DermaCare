@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
+import 'package:cutomer_app/Services/SubServiceServices.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:cutomer_app/ServiceView/FetchViewService.dart';
@@ -22,22 +23,12 @@ class ServiceDetailsPage extends StatefulWidget {
 
   const ServiceDetailsPage({
     super.key,
-    required this.categoryName,
-    required this.categoryId,
-    required this.serviceId,
-    required this.serviceName,
     required this.mobileNumber,
     required this.username,
     required this.selectedService,
-    required this.services,
   });
-  final String categoryName;
-  final String categoryId;
-  final String serviceId;
-  final String serviceName;
 
   final SubService selectedService;
-  final Service services;
 
   @override
   _ServiceDetailsPageState createState() => _ServiceDetailsPageState();
@@ -46,6 +37,8 @@ class ServiceDetailsPage extends StatefulWidget {
 class _ServiceDetailsPageState extends State<ServiceDetailsPage>
     with SingleTickerProviderStateMixin {
   late ApiService apiService;
+  SubService? subServiceDetails;
+
   bool isLoading = false;
 
   late AnimationController _animationController;
@@ -59,6 +52,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
   void initState() {
     super.initState();
     apiService = ApiService();
+    loadSubService();
 
     // Initialize animation for skeleton loading
     _animationController = AnimationController(
@@ -78,9 +72,17 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
     super.dispose();
   }
 
+  void loadSubService() async {
+    print("calling....");
+    final result = await fetchSubServiceDetails(
+        "H_1", widget.selectedService.subServiceId);
+    setState(() {
+      subServiceDetails = result;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final service = widget.services;
     return Scaffold(
       appBar: CommonHeader(
         title: "Service & Treatment Details",
@@ -93,9 +95,9 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              widget.selectedService.subServiceImage.isNotEmpty
+              subServiceDetails!.subServiceImage.isNotEmpty
                   ? Image.memory(
-                      widget.selectedService.subServiceImage,
+                      subServiceDetails!.subServiceImage,
                       height: 150,
                       width: double.infinity,
                       fit: BoxFit.fill,
@@ -108,7 +110,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               const SizedBox(height: 16),
 
               Text(
-                widget.selectedService.viewDescription,
+                subServiceDetails!.viewDescription,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -120,7 +122,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 ),
               ),
               Text(
-                widget.categoryName,
+                subServiceDetails!.categoryName,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -132,7 +134,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 ),
               ),
               Text(
-                widget.serviceName,
+                subServiceDetails!.serviceName,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -145,7 +147,8 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 ),
               ),
               Text(
-                widget.selectedService.subServiceName,
+                // widget.selectedService.subServiceName,
+                subServiceDetails!.subServiceName,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -158,7 +161,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 ),
               ),
               Text(
-                widget.selectedService.minTime,
+                subServiceDetails!.minTime,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -167,7 +170,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ...widget.selectedService.descriptionQA.expand((descQA) {
+                  ...subServiceDetails!.descriptionQA.expand((descQA) {
                     return descQA.qa.entries.map((entry) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
@@ -221,7 +224,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "₹ ${widget.selectedService.price}",
+                      "₹ ${subServiceDetails!.finalCost}",
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -229,7 +232,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                       ),
                     ),
                     Text(
-                      "(include all taxes\n& discount (if any))",
+                      "(including tax\n& discount (if any))",
                       style: TextStyle(fontSize: 12, color: Colors.white),
                       textAlign: TextAlign.center,
                     )
@@ -244,17 +247,19 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               margin: const EdgeInsets.symmetric(horizontal: 16),
             ),
             TextButton(
-              onPressed: () {
-                Get.to(() => Doctorscreen(
-                      mobileNumber: widget.mobileNumber,
-                      username: widget.username,
-                    ));
+              onPressed: subServiceDetails!.finalCost > 0
+                  ? () {
+                      Get.to(() => Doctorscreen(
+                            mobileNumber: widget.mobileNumber,
+                            username: widget.username,
+                          ));
 
-                final selectedServicesController =
-                    Get.find<SelectedServicesController>();
-                selectedServicesController
-                    .updateSelectedSubServices([widget.selectedService]);
-              },
+                      final selectedServicesController =
+                          Get.find<SelectedServicesController>();
+                      selectedServicesController
+                          .updateSelectedSubServices([subServiceDetails!]);
+                    }
+                  : null, // disables the button
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
                 padding:
@@ -262,15 +267,18 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
+                // backgroundColor: widget.selectedService.price > 0
+                //     ? Colors.blue
+                //     : Colors.grey, // visually show it's disabled
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: const Text(
+              child: const Padding(
+                padding: EdgeInsets.only(right: 10.0),
+                child: Text(
                   "CONTINUE",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),

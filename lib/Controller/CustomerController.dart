@@ -3,7 +3,7 @@ import 'package:get/get.dart';
  
 
 import '../Modals/ServiceModal.dart';
-import '../Services/Service.dart';
+import '../Services/SubServiceServices.dart';
 import '../TreatmentAndServices/ServiceSelectionScreen.dart'; // Adjust the import based on your project structure
 
 class SelectedServicesController extends GetxController {

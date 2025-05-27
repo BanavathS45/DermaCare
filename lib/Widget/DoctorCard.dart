@@ -407,28 +407,28 @@ Widget buildFilters(DoctorController controller) {
                 SizedBox(
                   width: 10,
                 ),
-                FilterChip(
-                  label: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6.0),
-                    child: Text(
-                      "Our Recommended",
-                      style: TextStyle(
-                        color: controller.selectedRecommended.value
-                            ? Colors.white
-                            : mainColor,
-                      ),
-                    ),
-                  ),
-                  selectedColor: mainColor,
-                  showCheckmark: false,
-                  selected:
-                      controller.selectedRecommended.value, // expects a bool
+                // FilterChip(
+                //   label: Padding(
+                //     padding: const EdgeInsets.symmetric(vertical: 6.0),
+                //     child: Text(
+                //       "Our Recommended",
+                //       style: TextStyle(
+                //         color: controller.selectedRecommended.value
+                //             ? Colors.white
+                //             : mainColor,
+                //       ),
+                //     ),
+                //   ),
+                //   selectedColor: mainColor,
+                //   showCheckmark: false,
+                //   selected:
+                //       controller.selectedRecommended.value, // expects a bool
 
-                  onSelected: (val) {
-                    controller.selectedRecommended.value = val;
-                    controller.applyFilters();
-                  },
-                ),
+                //   onSelected: (val) {
+                //     controller.selectedRecommended.value = val;
+                //     controller.applyFilters();
+                //   },
+                // ),
               ],
             ),
           ],

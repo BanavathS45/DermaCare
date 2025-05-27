@@ -52,38 +52,41 @@ class ServiceFetcher {
 
   Future<List<SubService>> fetchsubServices(String serviceId) async {
     final url = '$getSubServiceByServiceID/$serviceId';
+    print("🔄 Sending request to URL: $url");
 
     try {
-      print("🔄 Sending request to URL serviceId: $url");
       final response = await http.get(Uri.parse(url));
-      print("📦 API response status: ${response.statusCode}");
+      print("📦 Response status: ${response.statusCode}");
 
       if (response.statusCode == 200 || response.statusCode == 302) {
         final decodedResponse = json.decode(response.body);
-        print("🧩 Decoded JSON: $decodedResponse");
+        final data = decodedResponse['data'];
+        print("📦 Response status: ${data}");
 
-        if (decodedResponse['data'] is List) {
-          final List<dynamic> data = decodedResponse['data'];
-          print("✅ Data length: ${data.length}");
+        if (data != null && data['subServices'] is List) {
+          final List<dynamic> subServices = data['subServices'];
 
-          return data.expand<SubService>((json) {
-            try {
-              return [SubService.fromJson(json)];
-            } catch (e) {
-              print("❌ Error parsing service: $e");
-              return [];
-            }
-          }).toList();
+          return subServices
+              .map((json) {
+                try {
+                  return SubService.fromJson(json);
+                } catch (e) {
+                  print("❌ Parse error: $e");
+                  return null; // ✔ allowed because of whereType below
+                }
+              })
+              .whereType<SubService>() // ✅ filters out nulls
+              .toList();
         } else {
-          print('❗ Error: "data" is not a list');
+          print("❗ 'subServices' not found or is not a list");
           return [];
         }
       } else {
-        print('❗ Error: ${response.reasonPhrase}');
+        print("❗ HTTP error: ${response.reasonPhrase}");
         return [];
       }
     } catch (e) {
-      print('❌ Exception fetching services: $e');
+      print("❌ Exception during fetch: $e");
       return [];
     }
   }
