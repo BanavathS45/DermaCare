@@ -1129,7 +1129,7 @@
               "availableTimings": "09:00 AM - 05:00 PM",
               "slots": [
                 {
-                  "date": "2025-04-03",
+                  "date": "2025-05-27",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -1202,7 +1202,7 @@
                   ]
                 },
                 {
-                  "date": "2025-04-04",
+                  "date": "2025-05-28",
                   "availableSlots": [
                     {
                       "slot": "09:00 AM",
@@ -2577,6 +2577,26 @@
       "monthYear": "May 27, 2025",
       "serviceDate": "Tuesday",
       "servicetime": "09:30 AM",
+      "servicename": "Skin Rejuvenation",
+      "resoan": null,
+      "status": "pending",
+      "serviceId": "682815e688942d0c0b954f64",
+      "doctorId": "DC_2",
+      "consultationType": "Services & Treatments",
+      "totalFee": 970,
+      "consultattionFee": 950
+    },
+    {
+      "id": "2629",
+      "name": "prashath kumar",
+      "mobileNumber": "7842259803",
+      "age": "25",
+      "gender": "Male",
+      "bookingFor": "Self",
+      "problem": "bshbsbsbbsnsbdbndhnns",
+      "monthYear": "May 27, 2025",
+      "serviceDate": "Tuesday",
+      "servicetime": "11:30 AM",
       "servicename": "Skin Rejuvenation",
       "resoan": null,
       "status": "pending",

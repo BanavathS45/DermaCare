@@ -86,8 +86,8 @@ dependencies:
   firebase_core: ^3.13.0
   firebase_messaging: ^15.2.5
   firebase_app_installations: ^0.3.2+5
-
-  # flutter_local_notifications: ^16.1.0
+  upi_india: ^3.0.1
+  # flutter_locrl_notifications: ^16.1.0
 
   # ext_storage: ^1.0.3
   # storage_path: ^0.2.0
