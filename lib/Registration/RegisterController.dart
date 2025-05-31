@@ -1,6 +1,7 @@
 import 'package:cutomer_app/Registration/RegisterAPI.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 import '../BottomNavigation/BottomNavigation.dart';
@@ -84,13 +85,16 @@ class Registercontroller extends GetxController {
     if (formKey.currentState!.validate()) {
       context.loaderOverlay.show(); // Show loading overlay
 
+      String formattedDate = DateFormat('dd-MM-yyyy')
+          .format(DateFormat('dd/MM/yyyy').parse(dateOfBirthController.text));
+
       final RegisterModel user = RegisterModel(
         fullName: fullName,
         mobileNumber: mobileNumber,
         emailId: emailController.text,
         referCode: referralController.text,
         gender: selectedGender,
-        dateOfBirth: dateOfBirthController.text,
+        dateOfBirth: formattedDate,
       );
 
       try {
@@ -98,7 +102,6 @@ class Registercontroller extends GetxController {
         // print("Iam calling from Basic Details....${response.bod}");
 
         if (response['status'] == 200) {
-          
           context.loaderOverlay.hide(); // Hide loading overlay
           showSnackbar("Success", "${response['message']}", "success");
           Get.offAll(ConsultationsType(
@@ -107,11 +110,11 @@ class Registercontroller extends GetxController {
           ));
         } else {
           // Handle cases where the server responds with an error status
-
-          showSnackbar(
-              "Error",
-              "${response['message'] ?? "Failed to register. Please try again."}",
-              "errror");
+          showSnackbar("Error", "${response['message']}", "errror");
+          // showSnackbar(
+          //     "Error",
+          //     "${response['message'] ?? "Failed to register. Please try again."}",
+          //     "errror");
         }
       } catch (e) {
         context.loaderOverlay.hide(); // Hide loading overlay on error

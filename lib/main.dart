@@ -7,7 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
+// import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'APIs/FetchServices.dart';
@@ -32,7 +32,7 @@ void main() async {
   RemoteMessage? initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();
   // Init PhonePe SDK
-  await PhonePePaymentSdk.init("SANDBOX", null, "PGTESTPAYUAT", true);
+  // await PhonePePaymentSdk.init("SANDBOX", null, "PGTESTPAYUAT", true);
 
   // Init Network Service
   NetworkService().initialize();

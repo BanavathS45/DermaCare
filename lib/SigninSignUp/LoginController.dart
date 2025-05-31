@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cutomer_app/APIs/BaseUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,6 +8,7 @@ import '../ConfirmBooking/Consultations.dart';
 import '../OTP/OtpScreen.dart';
 import '../Registration/RegisterScreen.dart';
 import 'LoginService.dart';
+import 'package:http/http.dart' as http;
 
 class SiginSignUpController extends GetxController {
   var getOTPButton = "SIGN IN".obs;
@@ -73,64 +77,52 @@ class SiginSignUpController extends GetxController {
 
   void submitForm(BuildContext context) async {
     if (formKey.currentState!.validate() && agreeToTerms) {
-      getOTPButton.value =
-          "Signing..."; //TODO: replace with Logging eith Sending OTP...
-      isLoading.value = true; // Start loading
-      await Future.delayed(const Duration(seconds: 2));
-      isLoading.value = false; // Set loading to false
-      // getOTPButton.value = "SENT OTP"; //TODO: When otp get uncomment the line
+      getOTPButton.value = "Signing in...";
+      isLoading.value = true;
 
       final fullname = nameController.text.trim();
       final mobileNumber = mobileController.text.trim();
 
       try {
-        final response =
-            await _loginapiService.sendUserDataWithFCMToken(fullname, mobileNumber);
-        if (response['status'] == 200) {
-          getOTPButton.value =
-              "SIGN IN"; //TODO: replace with SIGN IN eith GET OTP
-          final prefs = await SharedPreferences.getInstance();
+        // STEP 1: Check if user already exists
+        final response = await http.get(
+          Uri.parse('${registerUrl}/getBasicDetails/$mobileNumber'),
+        );
 
-          // ✅ Store session data
-          await prefs.setBool('isFirstLoginDone', true);
-          await prefs.setBool('isAuthenticated', true);
-          await prefs.setString('username', fullname);
-          await prefs.setString('mobileNumber', mobileNumber);
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
 
-          final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
+          // STEP 2: Navigate based on user data availability
+          if (data != null && data['success'] == true && data['data'] != null) {
+            // ✅ Existing user – go to ConsultationsType
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('isAuthenticated', true);
+            await prefs.setString('username', fullname);
+            await prefs.setString('mobileNumber', mobileNumber);
 
-          if (!isAuthenticated) {
             Get.offAll(() => ConsultationsType(
                   mobileNumber: mobileNumber,
                   username: fullname,
                 ));
           } else {
+            // 🆕 New user – go to registration
             Get.to(RegisterScreen(
               fullName: fullname,
               mobileNumber: mobileNumber,
             ));
           }
-
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (ctx) => Otpscreencustomer(
-          //       PhoneNumberstored: phoneNumber!,
-          //       username: fullname,
-          //     ),
-          //   ),
-          // );
         } else {
-          getOTPButton.value =
-              "SIGN IN"; //TODO: replace with SIGN IN eith GET OTP
+          // Unexpected response
+          Get.snackbar("Error", "Failed to verify user. Try again later.");
         }
       } catch (e) {
-        getOTPButton.value =
-            "SIGN IN"; //TODO: replace with SIGN IN eith GET OTP
+        Get.snackbar("Exception", e.toString());
       } finally {
-        isLoading.value = false; // Hide loading state
+        getOTPButton.value = "SIGN IN";
+        isLoading.value = false;
       }
     }
+
     if (!agreeToTerms) {
       errorMessage.value = "Please agree to terms and conditions";
     }

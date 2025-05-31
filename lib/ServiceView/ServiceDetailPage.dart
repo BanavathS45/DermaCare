@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:cutomer_app/Services/SubServiceServices.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:cutomer_app/ServiceView/FetchViewService.dart';
@@ -20,12 +21,16 @@ import 'ServiceDetail.dart';
 class ServiceDetailsPage extends StatefulWidget {
   final String mobileNumber;
   final String username;
+  final String hospitalName;
+  final String hospitalId;
 
   const ServiceDetailsPage({
     super.key,
     required this.mobileNumber,
     required this.username,
     required this.selectedService,
+    required this.hospitalName,
+    required this.hospitalId,
   });
 
   final SubService selectedService;
@@ -51,6 +56,8 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
   @override
   void initState() {
     super.initState();
+    print('🔍 hospitalId: ${widget.hospitalId}');
+
     apiService = ApiService();
     loadSubService();
 
@@ -75,7 +82,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
   void loadSubService() async {
     print("calling....");
     final result = await fetchSubServiceDetails(
-        "H_1", widget.selectedService.subServiceId);
+        widget.hospitalId, widget.selectedService.subServiceId);
     setState(() {
       subServiceDetails = result;
     });
@@ -95,6 +102,30 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.local_hospital,
+                    color: mainColor, // or mainColor if defined
+                    size: 28,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.hospitalName,
+                      style: TextStyle(
+                        color: mainColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
               subServiceDetails!.subServiceImage.isNotEmpty
                   ? Image.memory(
                       subServiceDetails!.subServiceImage,

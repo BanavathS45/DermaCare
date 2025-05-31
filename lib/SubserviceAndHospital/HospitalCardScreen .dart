@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../ServiceView/ServiceDetailPage.dart';
+import 'HospitalService.dart';
 
 class HospitalCardScreen extends StatefulWidget {
   final String mobileNumber;
@@ -34,36 +38,28 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
   final TextEditingController _searchController = TextEditingController();
   String searchText = '';
   bool showRecommendedOnly = false;
+  List<Map<String, dynamic>> hospitalCards = [];
+  bool isLoading = true;
 
-  final List<Map<String, dynamic>> hospitalCards = [
-    {
-      "hospitalLogo":
-          "https://thumbs.dreamstime.com/b/hospital-building-modern-parking-lot-59693686.jpg",
-      "hospitalName": "City Hospital",
-      "serviceName": "Skin Care",
-      "subServiceName": "Acne Treatment",
-      "cost": "₹1500",
-      "recommended": true
-    },
-    {
-      "hospitalLogo":
-          "https://tse1.mm.bing.net/th/id/OIP.4ltnqFueQIIE-CudNSnT2QHaD3?cb=iwp1&w=843&h=441&rs=1&pid=ImgDetMain",
-      "hospitalName": "Glow Clinic",
-      "serviceName": "Hair Removal",
-      "subServiceName": "Laser",
-      "cost": "₹1800",
-      "recommended": false
-    },
-    {
-      "hospitalLogo":
-          "https://tse1.mm.bing.net/th/id/OIP.tuWKtt16SGVcH1UXXkxDIgHaFC?cb=iwp1&w=1080&h=734&rs=1&pid=ImgDetMain",
-      "hospitalName": "SkinGlow",
-      "serviceName": "Skin Care",
-      "subServiceName": "Acne Treatment",
-      "cost": "₹1200",
-      "recommended": false
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    print(
+        "widget.selectedService!.subServiceId ${(widget.selectedService!.subServiceId)}");
+    HospitalService()
+        .fetchHospitalCards(widget.selectedService!.subServiceId)
+        .then((data) {
+      setState(() {
+        hospitalCards = data;
+        isLoading = false;
+      });
+    }).catchError((error) {
+      print('Error: $error');
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +87,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: "Search hospital or subservice",
+                      hintText: "Search hospital ",
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -107,7 +103,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
             ElevatedButton.icon(
               icon: Icon(Icons.star,
                   color: showRecommendedOnly ? Colors.white : Colors.teal),
-              label: Text("Recommended Hospitals"),
+              label: Text(" Click Here For Recommended Hospitals"),
               style: ElevatedButton.styleFrom(
                 backgroundColor:
                     showRecommendedOnly ? Colors.teal : Colors.grey[300],
@@ -128,63 +124,71 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
             ),
             // Cards
             Expanded(
-              child: filteredCards.isEmpty
-                  ? Center(child: Text("No results found."))
-                  : ListView.builder(
-                      itemCount: filteredCards.length,
-                      itemBuilder: (context, index) {
-                        final card = filteredCards[index];
-                        return GestureDetector(
-                          onTap: () {
-                            if (widget.selectedService != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ServiceDetailsPage(
-                                    mobileNumber: widget.mobileNumber,
-                                    username: widget.username,
-                                    selectedService: widget.selectedService!,
-                                  ),
+              child: isLoading
+                  ? Center(
+                      child: SpinKitFadingCircle(
+                        color: Colors.blue,
+                        size: 40.0,
+                      ),
+                    )
+                  : filteredCards.isEmpty
+                      ? Center(child: Text("No results found."))
+                      : ListView.builder(
+                          itemCount: filteredCards.length,
+                          itemBuilder: (context, index) {
+                            final card = filteredCards[index];
+                            return GestureDetector(
+                              onTap: () {
+                                if (widget.selectedService != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ServiceDetailsPage(
+                                          mobileNumber: widget.mobileNumber,
+                                          username: widget.username,
+                                          selectedService:
+                                              widget.selectedService!,
+                                          hospitalName: card['hospitalName'],
+                                          hospitalId: card['hospitalId']),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Please select a service first')),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                margin: EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                  color: Colors.white,
                                 ),
-                              );
-                            } else {
-                              // Handle the null case – show error, fallback page, or skip navigation
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content:
-                                        Text('Please select a service first')),
-                              );
-                            }
-                          },
-                          child: Container(
-                            margin: EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                              color: Colors.white,
-                            ),
-                            child: Stack(
-                              children: [
-                                Padding(
+                                child: Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.network(
-                                          card['hospitalLogo'],
-                                          width: 80,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                        ),
+                                      Image.memory(
+                                        base64Decode(card['hospitalLogo']),
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
+                                              'assets/images/fallback_logo.png');
+                                        },
                                       ),
                                       SizedBox(width: 12),
                                       Expanded(
@@ -214,13 +218,11 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
+                              ),
+                            );
+                          },
+                        ),
+            )
           ],
         ),
       ),
