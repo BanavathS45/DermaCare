@@ -1,5 +1,6 @@
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
-import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+ 
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';

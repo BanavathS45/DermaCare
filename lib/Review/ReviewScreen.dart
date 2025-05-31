@@ -1,10 +1,11 @@
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart'; // Import the rating bar package
 
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
-import '../Doctors/ListOfDoctors/DoctorModel.dart';
+ 
 import '../Utils/ElevatedButtonGredint.dart';
 
 class ReviewScreen extends StatefulWidget {
@@ -68,11 +69,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
               CircleAvatar(
                 radius: 60,
                 backgroundImage:
-                    NetworkImage(widget.doctorData!.doctor.profileImage),
+                    NetworkImage(widget.doctorData!.doctor.doctorPicture),
               ),
               SizedBox(height: 10),
               Text(
-                widget.doctorData!.doctor.name,
+                widget.doctorData!.doctor.doctorName,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 4),

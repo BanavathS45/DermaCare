@@ -1,4 +1,4 @@
-import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
@@ -36,9 +36,11 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
   Future<void> _fetchDoctor() async {
     print("dsfdsfsdfdsfdsfdsf calling");
-
-    final result =
-        await doctorService.getDoctorById(widget.doctorData.booking.doctorId);
+    final subServiceId = doctorController
+        .selectedServicesController.selectedSubServices.first.subServiceId;
+    final hospitalId = doctorController.hospitalId.value;
+    final result = await doctorService.getDoctorById(
+        widget.doctorData.booking.doctorId, hospitalId, subServiceId);
 
     print("dsfdsfsdfdsfdsfdsf ${result}");
     if (result != null) {

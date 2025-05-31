@@ -1,5 +1,6 @@
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
-import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+ 
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -62,11 +63,11 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
           });
         } else if (selectedId == consultations[1].consultationId) {
           setState(() {
-            consultationFee = doctor?.fee.inClinicFee ?? 0;
+            consultationFee = doctor?.doctorFees.inClinicFee ?? 0;
           });
         } else if (selectedId == consultations[2].consultationId) {
           setState(() {
-            consultationFee = doctor?.fee.videoConsultationFee ?? 0;
+            consultationFee = doctor?.doctorFees.vedioConsultationFee ?? 0;
           });
         } else {
           setState(() {
@@ -303,8 +304,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
-                    doctor!.profileImage.isNotEmpty
-                        ? doctor!.profileImage
+                    doctor!.doctorPicture.isNotEmpty
+                        ? doctor!.doctorPicture
                         : "https://via.placeholder.com/150",
                     width: 90,
                     height: 90,
@@ -321,7 +322,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                     children: [
                       const SizedBox(height: 8),
                       Text(
-                        "${doctor!.name}",
+                        "${doctor!.doctorName}",
                         style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -397,11 +398,11 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
       consultationType = consultations[0].consultationType;
     } else if (consultations[1].consultationId == id) {
       color = Colors.white;
-      consultationFee = doctor!.fee.inClinicFee;
+      consultationFee = doctor!.doctorFees.inClinicFee;
       consultationType = consultations[1].consultationType;
     } else if (consultations[2].consultationId == id) {
       color = Colors.white;
-      consultationFee = doctor!.fee.videoConsultationFee;
+      consultationFee = doctor!.doctorFees.vedioConsultationFee;
       consultationType = consultations[2].consultationType;
     } else {
       color = Colors.grey;

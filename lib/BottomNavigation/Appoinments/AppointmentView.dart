@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/MapOnGoogle.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -7,7 +8,7 @@ import 'package:cutomer_app/Utils/Header.dart';
 import 'package:get/get.dart';
 import '../../Doctors/DoctorDetails/DoctorDetailsController.dart';
 import '../../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
-import '../../Doctors/ListOfDoctors/DoctorModel.dart';
+
 import '../../Reports/ReportsDownload.dart';
 import '../../Utils/GradintColor.dart';
 
@@ -108,8 +109,8 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                     // Doctor Image
                     CircleAvatar(
                       radius: 40,
-                      backgroundImage: doctor.doctor.profileImage.isNotEmpty
-                          ? NetworkImage(doctor.doctor.profileImage)
+                      backgroundImage: doctor.doctor.doctorPicture.isNotEmpty
+                          ? NetworkImage(doctor.doctor.doctorPicture)
                           : const AssetImage('assets/placeholder.png')
                               as ImageProvider,
                     ),
@@ -121,7 +122,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            doctor.doctor.name,
+                            doctor.doctor.doctorName,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -137,7 +138,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "${doctor.doctor.experienceYears} years Experience",
+                            "${doctor.doctor.experience} years Experience",
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,

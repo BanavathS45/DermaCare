@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
@@ -7,7 +8,7 @@ import '../../Help/Numbers.dart';
 import '../../Utils/MapOnGoogle.dart';
 import '../ListOfDoctors/DoctorController.dart';
 import 'DoctorDetailsController.dart';
-import '../ListOfDoctors/DoctorModel.dart';
+
 import '../RatingAndFeedback/RatingAndFeedback.dart';
 
 class DoctorDetailScreen extends StatelessWidget {
@@ -47,7 +48,7 @@ class DoctorDetailScreen extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        backgroundImage: NetworkImage(doctor.profileImage),
+                        backgroundImage: NetworkImage(doctor.doctorPicture),
                         onBackgroundImageError: (_, __) =>
                             const Icon(Icons.person, size: 40),
                       ),
@@ -57,7 +58,7 @@ class DoctorDetailScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              doctor.name,
+                              doctor.doctorName,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
@@ -89,17 +90,17 @@ class DoctorDetailScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   /// Stats Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      doctordetailscontroller.iconText(
-                          Icons.star, "${doctor.overallRating}"),
-                      doctordetailscontroller.iconText(
-                          Icons.message, "${doctor.comments.length}"),
-                      doctordetailscontroller.iconText(
-                          Icons.location_city, hospital.city),
-                    ],
-                  ),
+                  // Row( //TODO:imapement pending
+                  //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //   children: [
+                  //     doctordetailscontroller.iconText(
+                  //         Icons.star, "${doctor.overallRating}"),
+                  //     doctordetailscontroller.iconText(
+                  //         Icons.message, "${doctor.comments.length}"),
+                  //     doctordetailscontroller.iconText(
+                  //         Icons.location_city, hospital.city),
+                  //   ],
+                  // ),
                   const SizedBox(height: 10),
 
                   /// hospital
@@ -122,7 +123,7 @@ class DoctorDetailScreen extends StatelessWidget {
                       const Icon(Icons.badge, color: Colors.white, size: 18),
                       const SizedBox(width: 6),
                       Text(
-                        "${doctor.experienceYears} years experience",
+                        "${doctor.experience} years experience",
                         style: const TextStyle(color: Colors.white),
                       ),
                     ],
@@ -136,7 +137,7 @@ class DoctorDetailScreen extends StatelessWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          "${doctor.availableDays}, ${doctor.availableTimings}",
+                          "${doctor.availableDays}, ${doctor.availableTimes}",
                           style: const TextStyle(color: Colors.white),
                         ),
                       ),
@@ -181,7 +182,7 @@ class DoctorDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              doctor.profile,
+              doctor.profileDescription,
               style: const TextStyle(color: mainColor),
             ),
 
@@ -242,7 +243,7 @@ class DoctorDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             doctordetailscontroller.buildTimingAndContactSection(
-                timing: doctor.availableTimings,
+                timing: doctor.availableTimes,
                 // doctor: doctor,
                 onCall: () {
                   customerCare();

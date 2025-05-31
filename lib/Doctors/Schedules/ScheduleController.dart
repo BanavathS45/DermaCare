@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorSlotModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

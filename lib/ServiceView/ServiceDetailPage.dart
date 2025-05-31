@@ -283,12 +283,25 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                       Get.to(() => Doctorscreen(
                             mobileNumber: widget.mobileNumber,
                             username: widget.username,
+                            subServiceID: subServiceDetails!.subServiceId, hospiatlName: widget.hospitalName,
                           ));
 
                       final selectedServicesController =
                           Get.find<SelectedServicesController>();
                       selectedServicesController
                           .updateSelectedSubServices([subServiceDetails!]);
+                      // WidgetsBinding.instance.addPostFrameCallback((_) {
+                      //   final selectedServicesController =
+                      //       Get.find<SelectedServicesController>();
+                      //   selectedServicesController
+                      //       .setHospitalId(widget.hospitalId);
+
+                      //   // Or any other state update or navigation
+                      //   print("Hospital ID set post build");
+                      // });
+
+                      selectedServicesController
+                          .setHospitalId(widget.hospitalId);
                     }
                   : null, // disables the button
               style: TextButton.styleFrom(

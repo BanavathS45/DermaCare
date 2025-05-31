@@ -39,10 +39,10 @@ void main() async {
 
   // Init GetX Controllers
   Get.put(SelectedServicesController());
+  Get.put(DoctorController());
   Get.put(Dashboardcontroller());
   Get.put(Serviceselectioncontroller());
   Get.put(Consultationcontroller());
-  Get.put(DoctorController());
   Get.put(ScheduleController());
   Get.put(AppointmentController());
   Get.put(NotificationController());

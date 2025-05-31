@@ -73,20 +73,20 @@
 // // }
 
 import 'dart:convert';
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../../APIs/BaseUrl.dart';
 import 'DoctorController.dart';
-import 'DoctorModel.dart';
+ 
 
 class DoctorService {
-  // final DoctorController doctorController = Get.put(DoctorController());
-  String url = "http://${wifiUrl}:3000/services"; // New hierarchical endpoint
-
-  /// Fetches all services → hospitals → doctors from API
-  Future<List<ServiceModel>> fetchServices() async {
-    print("📡 Calling fetchServices...");
+  Future<List<HospitalDoctorModel>> fetchDoctorsAndClinic(
+      String hospitalId, String subServiceId) async {
+    String url =
+        "$registerUrl/getDoctorsAndClinicDetails/$hospitalId/$subServiceId";
+    print("📡 Calling fetchDoctorsAndClinic...");
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -94,97 +94,102 @@ class DoctorService {
       print("📦 Raw body: ${response.body}");
 
       if (response.statusCode == 200) {
-        try {
-          final jsonData = jsonDecode(response.body);
-          print("✅ Decoded JSON: $jsonData");
+        final jsonData = jsonDecode(response.body);
+        final data = jsonData['data'];
 
-          if (jsonData is List) {
-            final services =
-                jsonData.map((e) => ServiceModel.fromJson(e)).toList();
-            print("📊 Parsed ${services.length} services.");
-            return services;
+        if (data != null && data is Map<String, dynamic>) {
+          final clinicJson = data['clinic'];
+          final doctorsJson = data['doctors'];
+
+          if (doctorsJson is List) {
+            final List<HospitalDoctorModel> doctors = doctorsJson
+                .map((doc) => HospitalDoctorModel.fromJson(doc, clinicJson))
+                .toList();
+
+            print("📊 Parsed ${doctors.length} doctors.");
+            return doctors;
           } else {
-            throw FormatException(
-                "Expected a list but got: ${jsonData.runtimeType}");
+            throw FormatException("Expected 'doctors' to be a list.");
           }
-        } catch (e) {
-          print("❌ JSON decoding error: $e");
-          return Future.error("JSON decoding failed: $e");
+        } else {
+          throw FormatException("Missing or malformed 'data' object.");
         }
       } else {
-        print("❌ Server returned status: ${response.statusCode}");
-        return Future.error('Error: ${response.statusCode}');
+        return Future.error('Server error: ${response.statusCode}');
       }
     } catch (e, s) {
-      print('❌ Outer catch Exception: $e');
-      print('🪵 StackTrace: $s');
-      return Future.error('Fetch failed: $e');
+      print("❌ Exception: $e");
+      print("🪵 StackTrace: $s");
+      return Future.error("Fetch failed: $e");
     }
   }
 
-  /// Flatten all doctors from all services for listing/search
-  Future<List<HospitalDoctorModel>> fetchAllDoctors() async {
-    final services = await fetchServices();
-    List<HospitalDoctorModel> allDoctors = [];
-
-    for (var service in services) {
-      for (var hospital in service.hospitals) {
-        for (var doctor in hospital.doctors) {
-          allDoctors.add(doctor);
-        }
-      }
-    }
-
-    return allDoctors;
-  }
-
-  /// Get doctor by their ID (from any service or hospital)
-  Future<HospitalDoctorModel?> getDoctorById(String doctorId) async {
-    final services = await fetchServices();
-
-    // doctorController.setDoctorId(services.length.toString());
-
-    for (var service in services) {
-      for (var hospital in service.hospitals) {
-        for (var doctor in hospital.doctors) {
-          if (doctor.doctor.doctorId == doctorId) {
-            print("✅ Doctor Found:");
-            print("ID: ${doctor.doctor.doctorId}");
-            print("Name: ${doctor.doctor.name}");
-            print("Specialization: ${doctor.doctor.specialization}");
-            print("Hospital: ${doctor.hospital.name}");
-            print("City: ${doctor.hospital.city}");
-            return doctor;
-          }
-        }
-      }
-    }
-
-    print("❌ Doctor with ID $doctorId not found.");
-    return null;
-  }
-  // Future<HospitalDoctorModel?> getDoctorNotification(String doctorId) async {
-  //   final services = await fetchServices();
-
-  //   // doctorController.setDoctorId(services.length.toString());
+  // /// Flatten all doctors from all services for listing/search
+  // Future<List<HospitalDoctorModel>> fetchAllDoctors(String hospitalId, String subserviceId) async {
+  //   final services = await fetchServices(hospitalId,subserviceId);
+  //   List<HospitalDoctorModel> allDoctors = [];
 
   //   for (var service in services) {
   //     for (var hospital in service.hospitals) {
   //       for (var doctor in hospital.doctors) {
-  //         if (doctor.doctor.doctorId == doctorId) {
-  //           print("✅ Doctor Found:");
-  //           print("ID: ${doctor.doctor.doctorId}");
-  //           print("Name: ${doctor.doctor.name}");
-  //           print("Specialization: ${doctor.doctor.specialization}");
-  //           print("Hospital: ${doctor.hospital.name}");
-  //           print("City: ${doctor.hospital.city}");
-  //           return doctor;
-  //         }
+  //         allDoctors.add(doctor);
   //       }
   //     }
   //   }
 
-  //   print("❌ Doctor with ID $doctorId not found.");
-  //   return null;
+  //   return allDoctors;
   // }
+
+  // /// Get doctor by their ID (from any service or hospital)
+  Future<HospitalDoctorModel?> getDoctorById(String doctorId, String hospitalId, String subserviceId ) async {
+    final services = await fetchDoctorsAndClinic( hospitalId, subserviceId);
+
+    // doctorController.setDoctorId(services.length.toString());
+
+    // for (var service in services) {
+    //   for (var hospital in service.hospital) {
+    //     for (var doctor in hospital.doctors) {
+    //       if (doctor.doctor.doctorId == doctorId) {
+    //         print("✅ Doctor Found:");
+    //         print("ID: ${doctor.doctor.doctorId}");
+    //         print("Name: ${doctor.doctor.name}");
+    //         print("Specialization: ${doctor.doctor.specialization}");
+    //         print("Hospital: ${doctor.hospital.name}");
+    //         print("City: ${doctor.hospital.city}");
+    //         return doctor;
+    //       }
+    //     }
+    //   }
+    // }
+
+    print("❌ Doctor with ID $doctorId not found.");
+    return null;
+  }
+  
+  
+  
+  // // Future<HospitalDoctorModel?> getDoctorNotification(String doctorId) async {
+  // //   final services = await fetchServices();
+
+  // //   // doctorController.setDoctorId(services.length.toString());
+
+  // //   for (var service in services) {
+  // //     for (var hospital in service.hospitals) {
+  // //       for (var doctor in hospital.doctors) {
+  // //         if (doctor.doctor.doctorId == doctorId) {
+  // //           print("✅ Doctor Found:");
+  // //           print("ID: ${doctor.doctor.doctorId}");
+  // //           print("Name: ${doctor.doctor.name}");
+  // //           print("Specialization: ${doctor.doctor.specialization}");
+  // //           print("Hospital: ${doctor.hospital.name}");
+  // //           print("City: ${doctor.hospital.city}");
+  // //           return doctor;
+  // //         }
+  // //       }
+  // //     }
+  // //   }
+
+  // //   print("❌ Doctor with ID $doctorId not found.");
+  // //   return null;
+  // // }
 }

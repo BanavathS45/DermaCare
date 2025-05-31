@@ -1,4 +1,5 @@
-import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
+ 
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:flutter/material.dart';
@@ -34,8 +35,8 @@ class _SuccessScreenState extends State<SuccessScreen> {
   void initState() {
     super.initState();
     print("servicesAddedList: ${widget..serviceDetails}");
-    getDoctor = service.getDoctorById(widget.serviceDetails.doctor.doctorId);
-    doctorController.setDoctorId(widget.serviceDetails.doctor.doctorId);
+    // getDoctor = service.getDoctorById(widget.serviceDetails.doctor.doctorId);
+    // doctorController.setDoctorId(widget.serviceDetails.doctor.doctorId);
   }
 
   @override
@@ -102,7 +103,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          "${widget.serviceDetails.doctor.name}, ${widget.serviceDetails.doctor.qualification}",
+                          "${widget.serviceDetails.doctor.doctorName}, ${widget.serviceDetails.doctor.qualification}",
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge
@@ -169,7 +170,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
             Get.offAll(
               BottomNavController(
                 mobileNumber: widget.mobileNumber,
-                username: widget.serviceDetails.doctor.name,
+                username: widget.serviceDetails.doctor.doctorName,
                 index: 1,
               ),
             );

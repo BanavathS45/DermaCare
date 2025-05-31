@@ -8,8 +8,31 @@ import '../../Widget/DoctorCard.dart';
 class Doctorscreen extends StatelessWidget {
   final String mobileNumber;
   final String username;
+  final String subServiceID;
+  final String hospiatlName;
 
-  Doctorscreen({required this.mobileNumber, required this.username});
+  Doctorscreen(
+      {required this.mobileNumber,
+      required this.username,
+      required this.subServiceID,
+      required this.hospiatlName}) {
+    // Trigger fetch after widget builds
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final doctorController = Get.find<DoctorController>();
+      final hospitalId =
+          doctorController.selectedServicesController.hospitalId.value;
+
+      if (hospitalId.isNotEmpty && subServiceID.isNotEmpty) {
+        doctorController.hospitalId.value = hospitalId;
+        doctorController.fetchDoctors(
+          hospitalId: hospitalId,
+          subServiceId: subServiceID,
+        );
+      } else {
+        print("❌ Missing hospitalId or subServiceID");
+      }
+    });
+  }
 
   final DoctorController doctorController = Get.find<DoctorController>();
 
@@ -29,35 +52,86 @@ class Doctorscreen extends StatelessWidget {
             buildFilters(doctorController),
             Padding(
               padding: EdgeInsets.only(left: 15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Doctors",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: mainColor,
+                  Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.local_hospital, color: mainColor),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              text: "Selected Hospital: ",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: hospiatlName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: mainColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20.0, bottom: 10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color:
-                            mainColor, // You can replace with your desired color
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        "${doctorController.filteredDoctors.length} ",
-                        style: const TextStyle(
-                          color: Colors.white,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Doctors",
+                        style: TextStyle(
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
+                          color: mainColor,
                         ),
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20.0, bottom: 10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color:
+                                mainColor, // You can replace with your desired color
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            "${doctorController.filteredDoctors.length} ",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -65,7 +139,7 @@ class Doctorscreen extends StatelessWidget {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
-                  doctorController.refreshDoctors();
+                  doctorController.refreshDoctors(subServiceId: subServiceID);
                 },
                 child: doctorController.filteredDoctors.isEmpty
                     ? ListView(
@@ -82,8 +156,7 @@ class Doctorscreen extends StatelessWidget {
                               context,
                               doctorController.filteredDoctors[index],
                               doctorController,
-                              mobileNumber
-                              );
+                              mobileNumber);
                         },
                       ),
               ),

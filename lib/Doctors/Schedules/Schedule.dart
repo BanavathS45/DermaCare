@@ -1,3 +1,5 @@
+import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorSlotModel.dart';
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Doctors/Schedules/ScheduleController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
@@ -13,7 +15,7 @@ import '../../ConfirmBooking/ConfirmBookingDetails.dart';
 import '../../ConfirmBooking/ConsultationController.dart';
 import '../../Utils/GradintColor.dart';
 import '../../Widget/Bottomsheet.dart';
-import '../ListOfDoctors/DoctorModel.dart';
+
 import 'package:intl/intl.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -42,7 +44,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   void initState() {
     super.initState();
     scheduleController.initializeWeekDates();
-    scheduleController.setDoctorSlots(widget.doctorData.doctor.slots);
+    // scheduleController.setDoctorSlots(widget.doctorData.doctor);  //TODO:impement pending
 
     //  controller.setDoctorSlots(widget.doctor.slots);
 
@@ -175,7 +177,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: widget.doctorData.doctor.languagesKnown.map((lang) {
+          children: widget.doctorData.doctor.languages.map((lang) {
             String displayText =
                 scheduleController.languageLabels[lang] ?? lang;
 
@@ -342,8 +344,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               setState(() {
                 scheduleController.selectedDayIndex = index;
                 scheduleController.selectedDate.value = date;
-                scheduleController
-                    .setDoctorSlots(widget.doctorData.doctor.slots);
+                // scheduleController
+                //     .setDoctorSlots(widget.doctorData.doctor.slots); //TODO:impement pending
               });
             },
             child: Container(

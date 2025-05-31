@@ -155,6 +155,8 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                 builder: (_) => Doctorscreen(
                                   mobileNumber: widget.mobileNumber,
                                   username: widget.username,
+                                  subServiceID: widget.subserviceid,
+                                  hospiatlName: '',
                                 ),
                               ),
                             );

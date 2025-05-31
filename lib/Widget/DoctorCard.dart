@@ -1,4 +1,6 @@
-import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
+import 'dart:convert';
+
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,7 +17,8 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     decoration: BoxDecoration(
-      gradient: doctor.availablity ? appGradient() : appGradientGrey(),
+      gradient:
+          doctor.doctorAvailabilityStatus ? appGradient() : appGradientGrey(),
       borderRadius: BorderRadius.circular(18),
     ),
     child: Padding(
@@ -49,13 +52,13 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                   ),
                 ),
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.thumb_up,
-                  color: doctor.favorites ? Colors.yellow : Colors.white60,
-                ),
-                onPressed: () => controller.toggleFavorite(doctorModel),
-              ),
+              // IconButton( //TODO:implement pending
+              //   icon: Icon(
+              //     Icons.thumb_up,
+              //     color: doctor.favorites ? Colors.yellow : Colors.white60,
+              //   ),
+              //   onPressed: () => controller.toggleFavorite(doctorModel),
+              // ),
             ],
           ),
           const SizedBox(height: 8),
@@ -65,7 +68,8 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundImage: NetworkImage(doctor.profileImage),
+                backgroundImage:
+                    MemoryImage(base64Decode(doctor.doctorPicture)),
                 onBackgroundImageError: (_, __) => const Icon(Icons.person),
               ),
               const SizedBox(width: 12),
@@ -93,7 +97,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${doctor.name} ",
+                                      "${doctor.doctorName} ",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
@@ -155,13 +159,13 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                               ),
                               // Availability at Bottom
                               Text(
-                                doctor.availablity
+                                doctor.doctorAvailabilityStatus
                                     ? "Available\nNow"
                                     : "Not\nAvailable",
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: doctor.availablity
+                                  color: doctor.doctorAvailabilityStatus
                                       ? Colors.green
                                       : Colors.red,
                                 ),
@@ -186,8 +190,8 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                 children: [
                   const Icon(Icons.star, size: 16, color: Colors.white),
                   const SizedBox(width: 4),
-                  Text("${doctor.overallRating}",
-                      style: const TextStyle(color: Colors.white)),
+                  // Text("${doctor.overallRating}", //TODO : imaplent pending
+                  Text("4", style: const TextStyle(color: Colors.white)),
                 ],
               ),
               const SizedBox(width: 12),
@@ -195,8 +199,8 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                 children: [
                   const Icon(Icons.people, size: 16, color: Colors.white),
                   const SizedBox(width: 4),
-                  Text("${doctor.comments.length}",
-                      style: const TextStyle(color: Colors.white)),
+                  // Text("${doctor.comments.length}", //TODO : imaplent pending
+                  Text("10", style: const TextStyle(color: Colors.white)),
                 ],
               ),
               const Spacer(),
@@ -234,11 +238,11 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                   ),
                   InkWell(
                     onTap: () {
-                      if (doctor.availablity) {
+                      if (doctor.doctorAvailabilityStatus) {
                         // showSn
                         // showSnackbar();
                       }
-                      doctor.availablity
+                      doctor.doctorAvailabilityStatus
                           ? Get.to(() => ScheduleScreen(
                                 doctorData: doctorModel,
                                 mobileNumber: mobileNumber,
@@ -260,10 +264,14 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        doctor.availablity ? "BOOK" : "Unavailable",
+                        doctor.doctorAvailabilityStatus
+                            ? "BOOK"
+                            : "Unavailable",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: doctor.availablity ? mainColor : Colors.grey,
+                          color: doctor.doctorAvailabilityStatus
+                              ? mainColor
+                              : Colors.grey,
                         ),
                       ),
                     ),
