@@ -68,7 +68,8 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
               .toLowerCase()
               .contains(searchText.toLowerCase()) ||
           card['hospitalName'].toLowerCase().contains(searchText.toLowerCase());
-      final isRecommended = !showRecommendedOnly || card['recommended'] == true;
+      final isRecommended = !showRecommendedOnly ||
+          card['recommandation'] == true; //TODO: not working recommandation
       return matchesSearch && isRecommended;
     }).toList();
 

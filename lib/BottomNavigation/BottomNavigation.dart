@@ -53,7 +53,9 @@ class _BottomNavControllerState extends State<BottomNavController> {
       OnlineCounsultation(
         mobileNumber: widget.mobileNumber,
       ),
-      CustomerProfilePage(),
+      CustomerProfilePage(
+        mobileNumber: widget.mobileNumber,
+      ),
     ];
   }
 

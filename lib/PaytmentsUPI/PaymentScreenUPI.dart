@@ -1,8 +1,11 @@
+import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:upi_india/upi_india.dart';
-import 'package:cutomer_app/Utils/Header.dart'; // Custom header from your project
 
 class UpiPaymentPage extends StatefulWidget {
+  final double amount;
+  const UpiPaymentPage({Key? key, required this.amount}) : super(key: key);
+
   @override
   _UpiPaymentPageState createState() => _UpiPaymentPageState();
 }
@@ -11,23 +14,20 @@ class _UpiPaymentPageState extends State<UpiPaymentPage> {
   UpiIndia _upiIndia = UpiIndia();
   late Future<List<UpiApp>> apps;
 
-  final String upiId = "9148986699@ybl"; // Replace with clinic's UPI ID
-  final double amount = 1.0;
+  final String upiId = "9148986699@ybl"; // Replace with your real UPI ID
 
   @override
   void initState() {
     super.initState();
     apps = _upiIndia.getAllUpiApps(mandatoryTransactionId: false);
-    apps.then((value) {
-      print("UPI Apps found: ${value.map((e) => e.name).toList()}");
-    }).catchError((e) {
-      print("Error fetching UPI apps: $e");
+
+    // Automatically open UPI app list when the page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showUpiApps();
     });
   }
 
   void _startTransaction(UpiApp app) async {
-    print("Starting transaction with ${app.name}");
-
     try {
       UpiResponse response = await _upiIndia.startTransaction(
         app: app,
@@ -35,18 +35,15 @@ class _UpiPaymentPageState extends State<UpiPaymentPage> {
         receiverName: "Clinic Payment",
         transactionRefId: "TXN-${DateTime.now().millisecondsSinceEpoch}",
         transactionNote: "Clinic Consultation",
-        amount: amount,
+        amount: widget.amount,
       );
-
-      print("Transaction Status: ${response.status}");
-      print("Transaction ID: ${response.transactionId}");
 
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: Text("Payment Status"),
           content: Text(
-            "Status: ${response.status}\nTransaction ID: ${response.transactionId ?? 'N/A'}",
+            "Status: \${response.status}\nTransaction ID: \${response.transactionId ?? 'N/A'}",
           ),
           actions: [
             TextButton(
@@ -57,14 +54,12 @@ class _UpiPaymentPageState extends State<UpiPaymentPage> {
         ),
       );
     } catch (e) {
-      print("Transaction failed: $e");
-
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: Text("Error"),
           content: Text(
-            "Transaction failed due to security restrictions.\nYou can also pay manually to:\n\nUPI ID: $upiId\nAmount: ₹$amount",
+            "Transaction failed.\nYou can also pay manually to:\n\nUPI ID: $upiId\nAmount: ₹\${widget.amount}",
           ),
           actions: [
             TextButton(
@@ -77,7 +72,7 @@ class _UpiPaymentPageState extends State<UpiPaymentPage> {
     }
   }
 
-  void _showUpiApps() {
+  void showUpiApps() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -98,8 +93,7 @@ class _UpiPaymentPageState extends State<UpiPaymentPage> {
               }
 
               if (snapshot.hasError) {
-                print("Snapshot error: ${snapshot.error}");
-                return Center(child: Text("Error: ${snapshot.error}"));
+                return Center(child: Text("Error: \${snapshot.error}"));
               }
 
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -155,13 +149,10 @@ class _UpiPaymentPageState extends State<UpiPaymentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonHeader(
-        title: "Pay Clinic",
+        title: "UPI Payment",
       ),
-      body: Center(
-        child: ElevatedButton(
-          child: Text("Pay ₹$amount"),
-          onPressed: _showUpiApps,
-        ),
+      body: const Center(
+        child: Text("Fetching UPI Apps..."),
       ),
     );
   }

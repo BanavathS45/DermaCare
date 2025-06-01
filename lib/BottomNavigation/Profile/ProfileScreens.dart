@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:cutomer_app/APIs/BaseUrl.dart';
+import 'package:cutomer_app/Customers/GetCustomerModel.dart';
+import 'package:cutomer_app/Dashboard/DashBoardController.dart';
+import 'package:cutomer_app/Dashboard/ImagePreview.dart';
 
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -19,15 +24,18 @@ import 'package:http/http.dart' as http;
 // adjust the import to your model path
 
 class ProfileDetailScreen extends StatelessWidget {
+  final GetCustomerModel cusData;
   const ProfileDetailScreen({
     super.key,
+    required this.cusData,
   });
 
   @override
   Widget build(BuildContext context) {
+    final dashboardcontroller = Get.put(Dashboardcontroller());
     return Scaffold(
       appBar: CommonHeader(
-        title: 'Doctor Profile',
+        title: 'Customer Profile',
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -38,32 +46,37 @@ class ProfileDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 40,
-                    child: ClipOval(
-                      child: Center(
-                        child: Image.asset(
-                          "assets/DermaText.png",
-                          width: 100, // adjust size as needed
-                          height: 100,
-                          fit: BoxFit.contain,
-                        ),
+                  Obx(() {
+                    final image = dashboardcontroller.imageFile.value;
+
+                    return GestureDetector(
+                      onTap: () {
+                        dashboardcontroller.showImagePickerOptions(
+                            context, image);
+                      },
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage: image != null
+                            ? FileImage(image)
+                            : const AssetImage('assets/surecare_launcher.png')
+                                as ImageProvider,
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text("Banavath Prashnath",
+                        Text("${capitalizeEachWord(cusData.fullName)}",
                             style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: mainColor)),
                         const SizedBox(height: 4),
                         Text(
-                          "Customer ID : CUS_002",
+                          "Customer ID : ${cusData.customerId}",
                           style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.normal,
@@ -86,13 +99,15 @@ class ProfileDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
                 children: [
-                  _buildDetailTile(Icons.call, "Mobile Number", "7842259803"),
                   _buildDetailTile(
-                      Icons.email, "Email ID", "prashanthr803@gmail.com"),
-                  _buildDetailTile(Icons.account_circle, "Gender", "Male"),
-                  _buildDetailTile(Icons.cake, "Age", "20 Yrs"),
+                      Icons.call, "Mobile Number", "${cusData.mobileNumber}"),
                   _buildDetailTile(
-                      Icons.confirmation_number, "Refferal Code", "123456"),
+                      Icons.email, "Email ID", "${cusData.emailId}"),
+                  _buildDetailTile(
+                      Icons.account_circle, "Gender", "${cusData.gender}"),
+                  _buildDetailTile(Icons.cake, "DOB", "${cusData.dateOfBirth}"),
+                  _buildDetailTile(Icons.confirmation_number, "Refferal Code",
+                      "${cusData.referCode.isNotEmpty ? cusData.referCode : "No Refferial Code Avaiable"}"),
                 ],
               ),
             ),

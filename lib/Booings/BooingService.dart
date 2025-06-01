@@ -8,6 +8,7 @@ import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 Future<Map<String, dynamic>?> postBookings(
     PostBookingModel bookingDetails) async {
   final Url = Uri.parse(BookingUrl); // Replace with your endpoint
+  print("response.body Url: ${Url}");
 
   try {
     final response = await http.post(
@@ -15,9 +16,12 @@ Future<Map<String, dynamic>?> postBookings(
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(bookingDetails.toJson()),
     );
+    print("response.body....: ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('Booking posted successfully!');
+      print("response.body....: ${response.body}");
+      print("response.body....: ${response}");
       return jsonDecode(response.body); // Return response data
     } else {
       print('Failed to post booking. Status code: ${response.statusCode}');
@@ -33,7 +37,8 @@ Future<List<Map<String, dynamic>>> getBookingsByMobileNumber(
     String mobileNumber) async {
   print("dshffdfjsd ${mobileNumber}");
   // final String mobileNumber = "7842259802";
-  final url = Uri.parse('$GetBookings=$mobileNumber'); // Adjust param name as per your API
+  final url = Uri.parse(
+      '$GetBookings=$mobileNumber'); // Adjust param name as per your API
 
   try {
     final response = await http.get(url);

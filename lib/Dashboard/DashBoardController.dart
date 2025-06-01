@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cutomer_app/Dashboard/ImagePreview.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,11 +37,13 @@ class Dashboardcontroller extends GetxController {
   var subServiceArray = <SubService>[].obs;
 
   String statusMessage = "";
-  
+
   RxString mobileNumber = ''.obs;
   void setMobileNumber(String number) {
     mobileNumber.value = number;
   }
+
+  File? _imageFile;
 
   void fetchSubServices(String categoryId) async {
     print("categoryId ${categoryId}");
@@ -48,7 +51,8 @@ class Dashboardcontroller extends GetxController {
     subServiceList.assignAll(result);
     print("subServiceList ${subServiceList}");
   }
-   void fetchSubSubServices(String serviceId) async {
+
+  void fetchSubSubServices(String serviceId) async {
     print("categoryId ${serviceId}");
     final result = await ServiceFetcher().fetchsubServices(serviceId);
     subServiceArray.assignAll(result);
@@ -59,8 +63,6 @@ class Dashboardcontroller extends GetxController {
   void storeUserData(String mobileNumber, String username) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLoggedIn', true);
-    prefs.setString('mobileNumber', mobileNumber);
-    prefs.setString('username', username);
   }
 
   /// Load saved profile image
@@ -72,19 +74,50 @@ class Dashboardcontroller extends GetxController {
     }
   }
 
-  /// Pick new image and store in SharedPreferences
+  // /// Pick new image and store in SharedPreferences
+  // Future<void> _pickImage(ImageSource source) async {
+  //   final pickedFile = await _picker.pickImage(source: source);
+  //   if (pickedFile != null) {
+  //     final file = File(pickedFile.path);
+  //     SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     prefs.setString('profile_image', file.path);
+  //     imageFile.value = file;
+  //   }
+  // }
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
+
     if (pickedFile != null) {
       final file = File(pickedFile.path);
+
+      // Store the file path in SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('profile_image', file.path);
+
+      // Update the reactive imageFile variable
       imageFile.value = file;
     }
   }
 
+  // Load the stored profile image from SharedPreferences
+  Future<void> loadProfileImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? imagePath = prefs.getString('profile_image');
+
+    if (imagePath != null && imagePath.isNotEmpty) {
+      // If the image path exists, load the image file
+      imageFile.value = File(imagePath);
+    }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadProfileImage(); // Load the image when the controller is initialized
+  }
+
   /// Show modal to pick image from gallery or camera
-  void showImagePickerOptions(BuildContext context) {
+  void showImagePickerOptions(BuildContext context, image) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -104,6 +137,27 @@ class Dashboardcontroller extends GetxController {
                 title: const Text('Camera'),
                 onTap: () {
                   _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.preview),
+                title: const Text('Preview'),
+                onTap: () {
+                  // Ensure that the image exists
+                  if (image != null) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ImagePreviewScreen(imagePath: image),
+                      ),
+                    );
+                  } else {
+                    // Handle case where no image is selected
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("No image selected for preview")),
+                    );
+                  }
                   Navigator.of(context).pop();
                 },
               ),

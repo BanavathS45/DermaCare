@@ -75,50 +75,124 @@ class SiginSignUpController extends GetxController {
     return null; // No error
   }
 
+  // void submitForm(BuildContext context) async {
+  //   if (formKey.currentState!.validate() && agreeToTerms) {
+  //     getOTPButton.value = "Signing in...";
+  //     isLoading.value = true;
+
+  //     final fullname = nameController.text.trim();
+  //     final mobileNumber = mobileController.text.trim();
+
+  //     try {
+  //       // STEP 1: Check if user already exists
+  //       final response = await http.get(
+  //         Uri.parse('${registerUrl}/getBasicDetails/$mobileNumber'),
+  //       );
+
+  //       final loginresponse = await _loginapiService.sendUserDataWithFCMToken(
+  //           fullname, mobileNumber);
+  //       if (response.statusCode == 200 && loginresponse['status'] == 200) {
+  //         final data = json.decode(response.body);
+  //         // STEP 2: Navigate based on user data availability
+  //         if (data != null && data['success'] == true && data['data'] != null) {
+  //           // ✅ Existing user – go to ConsultationsType
+  //           final prefs = await SharedPreferences.getInstance();
+  //           await prefs.setBool('isAuthenticated', true);
+  //           await prefs.setString('username', fullname);
+  //           await prefs.setString('mobileNumber', mobileNumber);
+
+  //           Get.offAll(() => ConsultationsType(
+  //                 mobileNumber: mobileNumber,
+  //                 username: fullname,
+  //               ));
+  //         } else {
+  //           // 🆕 New user – go to registration
+  //           Get.to(RegisterScreen(
+  //             fullName: fullname,
+  //             mobileNumber: mobileNumber,
+  //           ));
+  //         }
+  //       } else {
+  //         // Unexpected response
+  //         Get.snackbar("Error", "Failed to verify user. Try again later.");
+  //       }
+  //     } catch (e) {
+  //       Get.snackbar("Exception", e.toString());
+  //     } finally {
+  //       getOTPButton.value = "SIGN IN";
+  //       isLoading.value = false;
+  //     }
+  //   }
+
   void submitForm(BuildContext context) async {
     if (formKey.currentState!.validate() && agreeToTerms) {
-      getOTPButton.value = "Signing in...";
+      getOTPButton.value = "Signing...";
       isLoading.value = true;
+
+      await Future.delayed(const Duration(seconds: 2));
 
       final fullname = nameController.text.trim();
       final mobileNumber = mobileController.text.trim();
 
       try {
-        // STEP 1: Check if user already exists
-        final response = await http.get(
-          Uri.parse('${registerUrl}/getBasicDetails/$mobileNumber'),
-        );
+        final response = await _loginapiService.sendUserDataWithFCMToken(
+            fullname, mobileNumber);
 
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
+        if (response['status'] == 200) {
+          getOTPButton.value = "SIGN IN";
 
-          // STEP 2: Navigate based on user data availability
-          if (data != null && data['success'] == true && data['data'] != null) {
-            // ✅ Existing user – go to ConsultationsType
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setBool('isAuthenticated', true);
-            await prefs.setString('username', fullname);
-            await prefs.setString('mobileNumber', mobileNumber);
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isFirstLoginDone', true);
+          await prefs.setBool('isAuthenticated', true);
+          await prefs.setString('username', fullname);
+          await prefs.setString('mobileNumber', mobileNumber);
 
-            Get.offAll(() => ConsultationsType(
-                  mobileNumber: mobileNumber,
-                  username: fullname,
-                ));
+          final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
+
+          // ✅ Step 1: Check if user is already registered
+          final checkUserResponse = await http.get(
+            Uri.parse('${registerUrl}/getBasicDetails/$mobileNumber'),
+          );
+
+          if (checkUserResponse.statusCode == 200) {
+            final data = json.decode(checkUserResponse.body);
+
+            if (data != null &&
+                data['success'] == true &&
+                data['data'] != null) {
+              // ✅ User is registered
+              if (isAuthenticated) {
+                Get.offAll(() => ConsultationsType(
+                      mobileNumber: mobileNumber,
+                      username: fullname,
+                    ));
+              } else {
+                Get.to(() => RegisterScreen(
+                      fullName: fullname,
+                      mobileNumber: mobileNumber,
+                    ));
+              }
+            } else {
+              // ❌ Not registered
+              Get.to(() => RegisterScreen(
+                    fullName: fullname,
+                    mobileNumber: mobileNumber,
+                  ));
+            }
           } else {
-            // 🆕 New user – go to registration
-            Get.to(RegisterScreen(
-              fullName: fullname,
-              mobileNumber: mobileNumber,
-            ));
+            // ❌ Failed to fetch registration details
+            Get.to(() => RegisterScreen(
+                  fullName: fullname,
+                  mobileNumber: mobileNumber,
+                ));
           }
         } else {
-          // Unexpected response
-          Get.snackbar("Error", "Failed to verify user. Try again later.");
+          getOTPButton.value = "SIGN IN";
         }
       } catch (e) {
-        Get.snackbar("Exception", e.toString());
-      } finally {
+        print("Error during login: $e");
         getOTPButton.value = "SIGN IN";
+      } finally {
         isLoading.value = false;
       }
     }

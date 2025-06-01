@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
- 
+import 'package:cutomer_app/PaytmentsUPI/PaymentScreenUPI.dart';
+
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -80,7 +83,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
   @override
   Widget build(BuildContext context) {
-    totalFee = platformFee + consultationFee;
+    // totalFee = platformFee + consultationFee;
+    totalFee = consultationFee;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -167,9 +171,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                infoRow("Service Cost", "₹ ${consultationFee}"),
-                infoRow("Platform Fee", "₹ ${platformFee}"),
-                infoRow("Total Fee", "₹ ${totalFee}"),
+                infoRow("${consultationType} Fee", "₹ ${consultationFee}"),
+
+                // infoRow("Platform Fee", "₹ ${platformFee}"),
+                // infoRow("Total Fee", "₹ ${consultationFee}"),
               ],
             ),
 
@@ -185,7 +190,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         decoration: BoxDecoration(gradient: appGradient()),
         child: TextButton(
           onPressed: () {
-            print("PayAmount to be confirmbookingcontroller ${totalFee}");
+            print(
+                "PayAmount to be confirmbookingcontroller ${consultationFee}");
             final bookingDetails = BookingDetailsModel(
               servicename: selectedServicesController
                   .selectedSubServices.first.serviceName,
@@ -195,16 +201,26 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               consultationType: consultationController
                   .selectedConsultation.value!.consultationType,
               consultattionFee: consultationFee.toDouble(),
-              totalFee: (totalFee).toDouble(),
+              totalFee: (consultationFee).toDouble(),
               status: 'pending',
             );
 
             Get.to(RazorpaySubscription(
               context: context,
-              amount: totalFee.toString(),
+              amount: consultationFee.toString(),
               onPaymentInitiated: () {
                 showSnackbar("Warning", "Paytments Initiated", "warning");
               },
+
+              // Get.to(() => UpiPaymentPage(amount: consultationFee.toDouble()));
+
+              // Get.to(RazorpaySubscription(
+              //   context: context,
+              //   amount: consultationFee.toString(),
+              //   onPaymentInitiated: () {
+              //     showSnackbar("Warning", "Paytments Initiated", "warning");
+              //   },
+
               serviceDetails: widget.doctor,
               patient: widget.patient,
               bookingDetails: PostBookingModel(
@@ -213,7 +229,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             ));
           },
           child: Text(
-            "BOOKING & PAY (₹ ${totalFee})",
+            "BOOKING & PAY (₹ ${consultationFee})",
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
@@ -273,10 +289,9 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 20,
-            ),
             Column(
               children: [
                 Text(
@@ -297,20 +312,32 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 ),
               ],
             ),
+            Divider(
+              height: 1,
+              color: secondaryColor,
+            ),
+            SizedBox(
+              height: 10,
+            ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Doctor Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    doctor!.doctorPicture.isNotEmpty
-                        ? doctor!.doctorPicture
-                        : "https://via.placeholder.com/150",
-                    width: 90,
-                    height: 90,
-                    fit: BoxFit.cover,
-                  ),
+                  child: doctor!.doctorPicture.isNotEmpty
+                      ? Image.memory(
+                          base64Decode(doctor!.doctorPicture.split(',').last),
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          "https://via.placeholder.com/150",
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
+                        ),
                 ),
 
                 const SizedBox(width: 12),
@@ -379,9 +406,9 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     );
   }
 
+  String consultationType = "";
   Future<Widget> _getServiceButton(String id) async {
     Color color = Colors.white;
-    String consultationType = "";
     int consultationFee = 0;
 
     // Find the consultation matching the passed 'id' (consultationId)

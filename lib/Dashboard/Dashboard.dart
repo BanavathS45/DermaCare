@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:cutomer_app/Dashboard/ImagePreview.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -28,10 +29,12 @@ class DashboardScreen extends StatefulWidget {
   _DashboardScreenState createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen>
+    with SingleTickerProviderStateMixin {
   final Dashboardcontroller dashboardcontroller =
       Get.put(Dashboardcontroller());
   final controller = Get.put(AppointmentController());
+  late AnimationController _animationController;
 
   bool showLabel = false;
   bool isFabVisible = true;
@@ -40,6 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -62,7 +66,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     controller.fetchBookings();
     dashboardcontroller.storeUserData(widget.mobileNumber, widget.username);
     // dashboardcontroller.setMobileNumber(widget.mobileNumber);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(); // Repeats by default, but stop initially
 
+    _animationController.stop();
     _scrollController = ScrollController()
       ..addListener(() {
         if (_scrollController.position.userScrollDirection ==
@@ -82,6 +91,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -92,11 +102,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
             decoration: BoxDecoration(gradient: appGradient()),
           ),
           title: Row(children: [
+            // Obx(() {
+            //   final image = dashboardcontroller.imageFile.value;
+            //   return GestureDetector(
+            //     onTap: () =>
+            //         dashboardcontroller.showImagePickerOptions(context),
+            //     child: CircleAvatar(
+            //       radius: 20,
+            //       backgroundColor: Colors.grey[200],
+            //       backgroundImage: image != null
+            //           ? FileImage(image)
+            //           : const AssetImage('assets/surecare_launcher.png')
+            //               as ImageProvider,
+            //     ),
+            //   );
+            // }),
             Obx(() {
               final image = dashboardcontroller.imageFile.value;
+
               return GestureDetector(
-                onTap: () =>
-                    dashboardcontroller.showImagePickerOptions(context),
+                onTap: () {
+                  if (image != null) {
+                    Get.to(ImagePreviewScreen(imagePath: image.path));
+                  } else {
+                    dashboardcontroller.showImagePickerOptions(context, image);
+                  }
+                },
                 child: CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.grey[200],
@@ -107,6 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               );
             }),
+
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

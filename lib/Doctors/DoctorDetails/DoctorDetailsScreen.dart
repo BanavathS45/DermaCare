@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
@@ -46,12 +48,21 @@ class DoctorDetailScreen extends StatelessWidget {
                   /// Profile Row
                   Row(
                     children: [
+// ...
+
                       CircleAvatar(
                         radius: 40,
-                        backgroundImage: NetworkImage(doctor.doctorPicture),
-                        onBackgroundImageError: (_, __) =>
-                            const Icon(Icons.person, size: 40),
+                        backgroundImage: doctor.doctorPicture.isNotEmpty
+                            ? MemoryImage(
+                                base64Decode(
+                                    doctor.doctorPicture.split(',').last),
+                              )
+                            : null,
+                        child: doctor.doctorPicture.isEmpty
+                            ? const Icon(Icons.person, size: 40)
+                            : null,
                       ),
+
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(

@@ -18,6 +18,8 @@ import '../../Widget/Bottomsheet.dart';
 
 import 'package:intl/intl.dart';
 
+import 'DoctorSlotService.dart';
+
 class ScheduleScreen extends StatefulWidget {
   final HospitalDoctorModel doctorData;
   final String mobileNumber;
@@ -49,7 +51,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     //  controller.setDoctorSlots(widget.doctor.slots);
 
     id = consultationController.selectedConsultation.value!.consultationId;
+    fetchDoctorSlotsOnce();
     timeslots();
+  }
+
+  Future<void> fetchDoctorSlotsOnce() async {
+    print("iam calling slots");
+    final allSlots = await DoctorSlotService.fetchDoctorSlots(
+        widget.doctorData.doctor.doctorId);
+    scheduleController.filterSlotsForSelectedDate(allSlots);
   }
 
   @override
@@ -340,12 +350,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           final date = scheduleController.weekDates[index];
           final isSelected = index == scheduleController.selectedDayIndex;
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
+              final slots = await DoctorSlotService.fetchDoctorSlots(
+                  widget.doctorData.doctor.doctorId);
+
               setState(() {
                 scheduleController.selectedDayIndex = index;
                 scheduleController.selectedDate.value = date;
-                // scheduleController
-                //     .setDoctorSlots(widget.doctorData.doctor.slots); //TODO:impement pending
+                scheduleController
+                    .filterSlotsForSelectedDate(slots); // now typed correctly
               });
             },
             child: Container(

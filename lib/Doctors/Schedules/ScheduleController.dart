@@ -60,28 +60,49 @@ class ScheduleController extends GetxController {
     selectedDate.value = weekDates[0];
   }
 
-  void setDoctorSlots(List<DoctorSlot> allSlots) {
-    final date = selectedDate.value;
-    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+  // void setDoctorSlots(List<DoctorSlot> allSlots) {
+  //   final date = selectedDate.value;
+  //   final dateStr = DateFormat('yyyy-MM-dd').format(date);
 
-    final slotsForDate =
-        allSlots.firstWhereOrNull((e) => e.date == dateStr)?.availableSlots ??
-            [];
+  //   final slotsForDate =
+  //       allSlots.firstWhereOrNull((e) => e.date == dateStr)?.availableSlots ??
+  //           [];
 
-    // 🕐 Filter only if selected date is today
-    if (DateFormat('yyyy-MM-dd').format(DateTime.now()) == dateStr) {
-      final now = DateTime.now();
+  //   // 🕐 Filter only if selected date is today
+  //   if (DateFormat('yyyy-MM-dd').format(DateTime.now()) == dateStr) {
+  //     final now = DateTime.now();
 
-      final filtered = slotsForDate.where((slot) {
+  //     final filtered = slotsForDate.where((slot) {
+  //       final slotTime = _parseSlotTime(slot.slot);
+  //       return slotTime.isAfter(now);
+  //     }).toList();
+
+  //     currentSlots.assignAll(filtered);
+  //   } else {
+  //     currentSlots.assignAll(slotsForDate);
+  //   }
+  // }
+
+  void filterSlotsForSelectedDate(List<DoctorSlot> allSlots) {
+  final dateStr = DateFormat('yyyy-MM-dd').format(selectedDate.value);
+
+  final slotsForDate = allSlots.firstWhereOrNull(
+    (slot) => slot.date == dateStr,
+  )?.availableSlots ?? [];
+
+  if (dateStr == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+    final now = DateTime.now();
+    currentSlots.assignAll(
+      slotsForDate.where((slot) {
         final slotTime = _parseSlotTime(slot.slot);
         return slotTime.isAfter(now);
-      }).toList();
-
-      currentSlots.assignAll(filtered);
-    } else {
-      currentSlots.assignAll(slotsForDate);
-    }
+      }).toList(),
+    );
+  } else {
+    currentSlots.assignAll(slotsForDate);
   }
+}
+
 
   DateTime _parseSlotTime(String slot) {
     final date = selectedDate.value;
