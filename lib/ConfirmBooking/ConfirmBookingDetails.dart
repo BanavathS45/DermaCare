@@ -135,6 +135,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             infoRow("Patient Name", widget.patient.name),
             infoRow("Patient Age", "${widget.patient.age} Yrs"),
             infoRow("Patient Gender", widget.patient.gender),
+
             Divider(
               height: 1,
               color: secondaryColor,
@@ -194,7 +195,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 "PayAmount to be confirmbookingcontroller ${consultationFee}");
             final bookingDetails = BookingDetailsModel(
               servicename: selectedServicesController
-                  .selectedSubServices.first.serviceName,
+                  .selectedSubServices.first.subServiceName,
               serviceId: selectedServicesController
                   .selectedSubServices.first.subServiceId,
               doctorId: widget.doctor.doctor.doctorId,
@@ -203,6 +204,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               consultattionFee: consultationFee.toDouble(),
               totalFee: (consultationFee).toDouble(),
               status: 'pending',
+              clinicId: widget.doctor.hospital.hospitalId,
             );
 
             Get.to(RazorpaySubscription(

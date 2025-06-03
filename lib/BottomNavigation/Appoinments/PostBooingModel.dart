@@ -9,6 +9,7 @@ class BookingDetailsModel {
   final double consultattionFee; // kept as-is based on your earlier message
   final String status;
   final String? resoan;
+  final String clinicId;
 
   BookingDetailsModel({
     required this.servicename,
@@ -19,6 +20,7 @@ class BookingDetailsModel {
     required this.consultattionFee,
     required this.status,
     this.resoan,
+    required this.clinicId,
   });
 
   factory BookingDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class BookingDetailsModel {
       servicename: json['servicename'],
       status: json['status'],
       serviceId: json['serviceId'],
+      clinicId: json['clinicId'],
       doctorId: json['doctorId'],
       consultationType: json['consultationType'],
       resoan: json['resoan'],
@@ -44,6 +47,7 @@ class BookingDetailsModel {
       'consultationType': consultationType,
       'totalFee': totalFee,
       'consultattionFee': consultattionFee,
+      'clinicId': clinicId,
     };
   }
 }

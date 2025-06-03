@@ -17,21 +17,23 @@ class AppointmentPage extends StatefulWidget {
 }
 
 class _AppointmentPageState extends State<AppointmentPage> {
-  
   final dashboardcontroller = Get.put(Dashboardcontroller());
+
   // final couns = Get.put(Dashboardcontroller());
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     dashboardcontroller.setMobileNumber(widget.mobileNumber);
-  
+    final appointmentController = Get.put(AppointmentController());
+    appointmentController.fetchBookings();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller =
-        Get.put(AppointmentController()); // Pass mobileNumber here
+    // final controller =
+    //     Get.put(AppointmentController()); // Pass mobileNumber here
+    final controller = Get.find<AppointmentController>();
 
     return Scaffold(
       appBar: CommonHeader(
@@ -42,57 +44,65 @@ class _AppointmentPageState extends State<AppointmentPage> {
         },
         automaticallyImplyLeading: false,
       ),
-      body: Obx(() => RefreshIndicator(
-            onRefresh: controller.refreshBookings,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Expanded(
-                          child: _buildTabButton(
-                              controller, 'UPCOMING', mainColor)),
-                      const SizedBox(width: 10.0),
-                      Expanded(
-                          child: _buildTabButton(
-                              controller, 'COMPLETED', secondaryColor)),
-                    ],
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    'MY APPOINTMENTS',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: mainColor,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  // Prevent overflow
-                  child: controller.isLoading.value
-                      ? const Center(child: CircularProgressIndicator())
-                      : controller.filteredBookings.isEmpty
-                          ? const Center(
-                              child: Text('No bookings found for this tab'))
-                          : ListView.builder(
-                              itemCount: controller.filteredBookings.length,
-                              itemBuilder: (context, index) {
-                                final booking =
-                                    controller.filteredBookings[index];
-                                return AppointmentCard(doctorData: booking);
-                              },
-                            ),
-                )
-              ],
+      body: RefreshIndicator(
+        onRefresh: controller.refreshBookings,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                      child:
+                          _buildTabButton(controller, 'UPCOMING', mainColor)),
+                  const SizedBox(width: 10.0),
+                  Expanded(
+                      child: _buildTabButton(
+                          controller, 'COMPLETED', secondaryColor)),
+                ],
+              ),
             ),
-          )),
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'MY APPOINTMENTS',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: mainColor,
+                ),
+              ),
+            ),
+
+            /// 👇 Wrap ONLY this section in Obx
+            Expanded(
+              child: Obx(() {
+                print(
+                    "controller.isLoading.value ${controller.isLoading.value}");
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (controller.filteredBookings.isEmpty) {
+                  return const Center(
+                      child: Text('No bookings found for this tab'));
+                } else {
+                  return ListView.builder(
+                    itemCount: controller.filteredBookings.length,
+                    itemBuilder: (context, index) {
+                      print(
+                          "Item count ${controller.filteredBookings.map((e) => e.age)}");
+                      final booking = controller.filteredBookings[index];
+                      return AppointmentCard(doctorData: booking);
+                    },
+                  );
+                }
+              }),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

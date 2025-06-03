@@ -58,7 +58,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Future<void> fetchDoctorSlotsOnce() async {
     print("iam calling slots");
     final allSlots = await DoctorSlotService.fetchDoctorSlots(
-        widget.doctorData.doctor.doctorId);
+        widget.doctorData.doctor.doctorId,
+        widget.doctorData.hospital.hospitalId);
     scheduleController.filterSlotsForSelectedDate(allSlots);
   }
 
@@ -352,7 +353,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           return GestureDetector(
             onTap: () async {
               final slots = await DoctorSlotService.fetchDoctorSlots(
-                  widget.doctorData.doctor.doctorId);
+                  widget.doctorData.doctor.doctorId,
+                  widget.doctorData.hospital.hospitalId);
 
               setState(() {
                 scheduleController.selectedDayIndex = index;

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/MapOnGoogle.dart';
@@ -11,10 +13,11 @@ import '../../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 
 import '../../Reports/ReportsDownload.dart';
 import '../../Utils/GradintColor.dart';
+import 'GetAppointmentModel.dart';
 
 class AppointmentPreview extends StatefulWidget {
   final HospitalDoctorModel doctor;
-  final PostBookingModel doctorBookings;
+  final Getappointmentmodel doctorBookings;
 
   const AppointmentPreview({
     Key? key,
@@ -32,21 +35,29 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final patient = widget.doctorBookings.patient;
-    final booking = widget.doctorBookings.booking;
-    final doctor = widget.doctor;
+    final patient = widget.doctorBookings;
 
-    final isCompletedStatus = booking.status.toLowerCase() == 'completed';
-    final hasReports = patient.reports != null && patient.reports!.isNotEmpty;
+    final doctor = widget.doctor;
+    String base64String = doctor.doctor.doctorPicture;
+    final regex = RegExp(r'data:image/[^;]+;base64,');
+    base64String = base64String.replaceAll(regex, '');
+
+// Remove the prefix if present
+    final prefix = 'data:image/jpeg;base64,';
+    if (base64String.startsWith(prefix)) {
+      base64String = base64String.substring(prefix.length);
+    }
+    final isCompletedStatus = patient.status.toLowerCase() == 'completed';
+    // final hasReports = patient.reports != null && patient.reports!.isNotEmpty;
     return Scaffold(
       appBar: CommonHeader(
-        title: "Booking ID: #${booking.serviceId}",
+        title: "Booking ID: #${patient.serviceId}",
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            booking.status.toLowerCase() == "rejected"
+            patient.status.toLowerCase() == "rejected"
                 ? Card(
                     color: Colors.red,
                     child: Padding(
@@ -59,10 +70,10 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
-                          Text(
-                            "${booking.resoan!} ",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          // Text(
+                          //   "${patient} ",
+                          //   style: TextStyle(color: Colors.white),
+                          // ),
                         ],
                       ),
                     ),
@@ -100,130 +111,134 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               ],
               title: 'Hospital Details',
             ),
-            _sectionCard(
-              icon: Icons.person_outline,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Doctor Image
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundImage: doctor.doctor.doctorPicture.isNotEmpty
-                          ? NetworkImage(doctor.doctor.doctorPicture)
-                          : const AssetImage('assets/placeholder.png')
-                              as ImageProvider,
-                    ),
-                    const SizedBox(
-                        width: 16), // spacing between image and details
-                    // Doctor Info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            doctor.doctor.doctorName,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            doctor.doctor.specialization,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "${doctor.doctor.experience} years Experience",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+            if (widget.doctorBookings.status == "confirmed" ||
+                widget.doctorBookings.status == "In_Progress")
+              _sectionCard(
+                icon: Icons.person_outline,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Doctor Image
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundImage: doctor.doctor.doctorPicture.isNotEmpty
+                            ? MemoryImage(base64Decode(base64String))
+                            : const AssetImage('assets/placeholder.png')
+                                as ImageProvider,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12), // spacing before the button
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton.icon(
-                    onPressed: () {
-                      Get.to(DoctorDetailScreen(doctorData: doctor));
-                    },
-                    icon: const Icon(Icons.info_outline),
-                    label: const Text("About Doctor"),
+                      const SizedBox(
+                          width: 16), // spacing between image and details
+                      // Doctor Info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              doctor.doctor.doctorName,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              doctor.doctor.specialization,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "${doctor.doctor.experience} years Experience",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-              title: "Doctor Details",
-            ),
+                  const SizedBox(height: 12), // spacing before the button
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Get.to(DoctorDetailScreen(doctorData: doctor));
+                      },
+                      icon: const Icon(Icons.info_outline),
+                      label: const Text("About Doctor"),
+                    ),
+                  ),
+                ],
+                title: "Doctor Details",
+              ),
+
             _sectionCard(
               icon: Icons.account_circle_outlined,
               title: "Patient Details",
               children: [
                 _infoRow("Name", patient.name),
-                _infoRow("Age", patient.age),
+                _infoRow("Age", patient.age.toString()), // ✅ Now it's a String
+
                 _infoRow("Gender", patient.gender),
                 _infoRow("Booking For", patient.bookingFor),
                 _infoRow("Problem", patient.problem),
-                _infoRow("Date", patient.monthYear),
+                _infoRow("Date", patient.serviceDate),
                 _infoRow("Time", patient.servicetime),
-                _infoRow(
-                    "Patient Notes",
-                    (patient.notes!.isNotEmpty
-                        ? patient.notes!
-                        : "No Patient Notes Provide")),
+                // _infoRow(
+                //     "Patient Notes",
+                //     (patient.notes!.isNotEmpty
+                //         ? patient.notes!
+                //         : "No Patient Notes Provide")),
               ],
             ),
             _sectionCard(
               icon: Icons.payment_outlined,
               title: "Payment Details",
               children: [
-                _infoRow("Service", booking.servicename),
-                _infoRow("Consultation Type", booking.consultationType),
-                _infoRow("Consultation Fee", "₹${booking.consultattionFee}"),
-                _infoRow("Total Fee", "₹${booking.totalFee}"),
+                _infoRow("Service", patient.servicename),
+                _infoRow("Consultation Type", patient.consultationType),
+                _infoRow("Consultation Fee", "₹${patient.consultationFee}"),
+                _infoRow("Total Fee", "₹${patient.totalFee}"),
               ],
             ),
             const SizedBox(height: 10),
-            isCompletedStatus && hasReports
-                ? Container(
-                    width: 200,
-                    decoration: BoxDecoration(
-                      gradient: appGradient(),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final reports = widget.doctorBookings.patient.reports;
-                        print("dshfjkshdfhkd${reports}");
-                        if (reports != null && reports.isNotEmpty) {
-                          showReportDownloadSheet(context, reports);
-                        } else {
-                          showSnackbar("Error", "No report found.", "error");
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        "Download Reports",
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
+            // isCompletedStatus && hasReports
+            //     ? Container(
+            //         width: 200,
+            //         decoration: BoxDecoration(
+            //           gradient: appGradient(),
+            //           borderRadius: BorderRadius.circular(8),
+            //         ),
+            //         child: ElevatedButton(
+            //           onPressed: () async {
+            //             final reports = widget.doctorBookings.patient.reports;
+            //             print("dshfjkshdfhkd${reports}");
+            //             if (reports != null && reports.isNotEmpty) {
+            //               showReportDownloadSheet(context, reports);
+            //             } else {
+            //               showSnackbar("Error", "No report found.", "error");
+            //             }
+            //           },
+            //           style: ElevatedButton.styleFrom(
+            //             elevation: 0,
+            //             backgroundColor: Colors.transparent,
+            //             shadowColor: Colors.transparent,
+            //             shape: RoundedRectangleBorder(
+            //               borderRadius: BorderRadius.circular(8),
+            //             ),
+            //           ),
+            //           child: Text(
+            //             "Download Reports",
+            //             style: const TextStyle(fontSize: 18),
+            //           ),
+            //         ),
+            //       )
+            //     : const SizedBox.shrink(),
           ],
         ),
       ),

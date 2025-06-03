@@ -7,8 +7,8 @@ import '../Toasters/Toaster.dart';
 class AppointmentAPI {
   Future<List<AppointmentData>> fetchAppointments(String mobileNumber) async {
     print("Fetching appointments for mobile number: $mobileNumber");
-    final url = '$baseUrl/getBookedServices/$mobileNumber';
-
+    final url = '$registerUrl/getBookedServices/$mobileNumber';
+// getBookedServices
     try {
       // Make the GET request
       final response = await http.get(Uri.parse(url));

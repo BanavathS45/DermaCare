@@ -11,7 +11,6 @@ import 'ReportController.dart';
 class Doctordetailscontroller extends GetxController {
   TextEditingController moreDetails = TextEditingController();
 
-
   Widget iconText(IconData icon, String text) {
     return Row(
       children: [
@@ -32,17 +31,10 @@ class Doctordetailscontroller extends GetxController {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 1,
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        // color: Colors.white,
+
         border: Border.all(
-            color: const Color.fromARGB(140, 158, 158, 158), width: 1),
+            color: const Color.fromARGB(255, 255, 255, 255), width: 1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -57,7 +49,7 @@ class Doctordetailscontroller extends GetxController {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
+                    // color: Colors.white,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,12 +57,14 @@ class Doctordetailscontroller extends GetxController {
                       Text(
                         days,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, color: mainColor),
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 255, 255, 255)),
                       ),
                       Text(
                         timing,
                         style: const TextStyle(
-                            fontWeight: FontWeight.normal, color: mainColor),
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromARGB(255, 255, 255, 255)),
                       ),
                     ],
                   ),
@@ -83,9 +77,9 @@ class Doctordetailscontroller extends GetxController {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
+                    border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
+                    // color: Colors.white,
                   ),
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +87,8 @@ class Doctordetailscontroller extends GetxController {
                       Text(
                         "Sunday",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, color: mainColor),
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 255, 255, 255)),
                       ),
                       SizedBox(height: 4),
                       Text(
@@ -112,15 +107,22 @@ class Doctordetailscontroller extends GetxController {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: onCall,
-                  icon: const Icon(Icons.phone, size: 18),
-                  label: const Text("Contact Clinic"),
+                  icon: const Icon(
+                    Icons.phone,
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Contact Clinic",
+                    style: TextStyle(color: Colors.white),
+                  ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     side: BorderSide(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: const Color.fromARGB(255, 255, 255, 255),
                       width: 1,
                     ),
                   ),
@@ -130,15 +132,19 @@ class Doctordetailscontroller extends GetxController {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: onDirection,
-                  icon: const Icon(Icons.near_me, size: 18),
-                  label: const Text("Get Direction"),
+                  icon:
+                      const Icon(Icons.near_me, size: 18, color: Colors.white),
+                  label: const Text(
+                    "Get Direction",
+                    style: TextStyle(color: Colors.white),
+                  ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     side: BorderSide(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: const Color.fromARGB(255, 255, 255, 255),
                       width: 1,
                     ),
                   ),

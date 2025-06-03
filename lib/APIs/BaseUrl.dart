@@ -1,5 +1,5 @@
 // String serverUrl = 'http://alb-dev-sc-197990416.ap-south-1.elb.amazonaws.com/api';
-const String wifiUrl = "192.168.1.5";
+const String wifiUrl = "192.168.1.12";
 const String serverUrl = "http://${wifiUrl}:9090/api";
 const String clinicUrl = "http://${wifiUrl}:8080/clinic-admin";
 const String baseUrl = '$serverUrl/customers';
@@ -20,7 +20,7 @@ const String getSubServiceByServiceIDHospitalID =
 
 const String getCustomer =
     '$baseUrl/getCustomer'; //http://localhost:8083/api/customer/getBasicDetails/${mobileNumber}
-const String BookingUrl = 'http://$wifiUrl:3000/bookings';
-// const String BookingUrl = '${registerUrl}/bookService';
+// const String BookingUrl = 'http://$wifiUrl:3000/bookings';
+const String BookingUrl = '${registerUrl}/bookService';
 // http://localhost:8083/api/customer/bookService
-const String GetBookings = 'http://$wifiUrl:3000/bookings?mobileNumber';
+// const String GetBookings = 'http://$wifiUrl:3000/bookings?mobileNumber';

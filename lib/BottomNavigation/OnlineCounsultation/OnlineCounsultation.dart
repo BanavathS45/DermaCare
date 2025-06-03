@@ -6,6 +6,8 @@ import '../../Booings/BooingService.dart';
 import '../../Doctors/ListOfDoctors/DoctorController.dart';
 import '../../Doctors/ListOfDoctors/DoctorService.dart';
 import '../../Utils/AppointmentCard.dart';
+import '../Appoinments/AppointmentService.dart';
+import '../Appoinments/GetAppointmentModel.dart';
 import '../Appoinments/PostBooingModel.dart';
 
 class OnlineCounsultation extends StatefulWidget {
@@ -21,8 +23,8 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
   final DoctorService doctorService = DoctorService();
 
   bool isLoading = true;
-  List<PostBookingModel> doctorBookings = [];
-
+  List<Getappointmentmodel> doctorBookings = [];
+  final AppointmentService appointmentService = AppointmentService();
   @override
   void initState() {
     super.initState();
@@ -32,34 +34,20 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
 
   Future<void> fetchBookings() async {
     try {
-      final bookingsJson = await getBookingsByMobileNumber(widget.mobileNumber);
-      print("📥 Received bookings JSON: ${bookingsJson}");
+      final bookings =
+          await appointmentService.fetchAppointments(widget.mobileNumber);
+      print("📥 Received bookings: $bookings");
 
-      if (bookingsJson != null && bookingsJson is List) {
-        List<PostBookingModel> parsedBookings = [];
-
-        for (var item in bookingsJson) {
-          try {
-            final booking = PostBookingModel.fromJson(item);
-            print(
-                "✅ Parsed Booking ConsultationType: ${booking.booking.consultationType}");
-            parsedBookings.add(booking);
-          } catch (e, st) {
-            print("❌ Failed to parse booking: $e");
-            print("Stack trace: $st");
-            print("❗ Faulty item: $item");
-          }
-        }
-
+      if (bookings != null && bookings is List<Getappointmentmodel>) {
         setState(() {
-          doctorBookings = parsedBookings;
+          doctorBookings = bookings;
           isLoading = false;
         });
       } else {
         setState(() {
           isLoading = false;
         });
-        print("❌ Error: bookingsJson is not a list or is null");
+        print("❌ Error: bookings is not a List<Getappointmentmodel>");
       }
     } catch (e) {
       print("🚨 Exception during fetch: $e");
@@ -74,10 +62,10 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
     await fetchBookings();
   }
 
-  List<PostBookingModel> _filteredBookings() {
+  List<Getappointmentmodel> _filteredBookings() {
     return doctorBookings.where((b) {
-      final type = b.booking.consultationType.trim().toLowerCase();
-      final status = b.booking.status.trim().toLowerCase();
+      final type = b.consultationType.trim().toLowerCase();
+      final status = b.status.trim().toLowerCase();
       return type == 'online consultation' && status == 'pending';
     }).toList();
   }
@@ -102,7 +90,6 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
                       ],
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16),
                       itemCount: _filteredBookings().length,
                       itemBuilder: (context, index) {
                         final booking = _filteredBookings()[index];

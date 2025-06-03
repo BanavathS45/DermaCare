@@ -14,6 +14,7 @@ import '../APIs/BaseUrl.dart';
 import '../APIs/FetchServices.dart';
 import '../BottomNavigation/Appoinments/AppointmentService.dart';
 import '../BottomNavigation/Appoinments/BookingModal.dart';
+import '../BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import '../Services/CarouselSliderService.dart';
 import '../Services/serviceb.dart';
 
@@ -25,7 +26,8 @@ class Dashboardcontroller extends GetxController {
   final Rx<File?> imageFile = Rx<File?>(null);
   final RxBool isLoading = true.obs;
   final RxList<Serviceb> services = <Serviceb>[].obs;
-  final RxList<AppointmentData> allAppointments = <AppointmentData>[].obs;
+  final RxList<Getappointmentmodel> allAppointments =
+      <Getappointmentmodel>[].obs;
   final RxList<String> carouselImages = <String>[].obs;
   final selectedService = Rxn<Serviceb>();
 
@@ -170,17 +172,40 @@ class Dashboardcontroller extends GetxController {
 
   /// Fetch user appointments
   Future<void> fetchAppointments(String mobileNumber) async {
-    final appointments =
-        await _appointmentService.fetchAppointments(mobileNumber);
+    if (mobileNumber.trim().isEmpty) {
+      // No mobile number provided, clear list and exit
+      allAppointments.clear();
+      return;
+    }
 
-    allAppointments.assignAll(
-      appointments.where((appointment) {
-        return appointment.servicesAdded
-            .any((service) => service.status.toLowerCase() == 'in_progress');
-      }).toList(),
-    );
+    try {
+      isLoading.value = true;
 
-    isLoading.value = false;
+      // Fetch all appointments from the service
+      final appointments =
+          await _appointmentService.fetchAppointments(mobileNumber);
+
+      if (appointments != null && appointments.isNotEmpty) {
+        // Filter appointments with status 'in_progress' (case-insensitive)
+        final filtered = appointments
+            .where((appointment) =>
+                appointment.status.toLowerCase() == 'in_progress')
+            .toList();
+
+        // Update reactive list
+        allAppointments.assignAll(filtered);
+      } else {
+        // No appointments found
+        allAppointments.clear();
+      }
+    } catch (e) {
+      // Handle error gracefully
+      print("Error fetching appointments: $e");
+      allAppointments.clear();
+    } finally {
+      // Always set loading to false at the end
+      isLoading.value = false;
+    }
   }
 
   /// Fetch images for carousel
@@ -196,6 +221,7 @@ class Dashboardcontroller extends GetxController {
 
   /// Fetch services/categories
   Future<void> fetchUserServices() async {
+    isLoading.value = true;
     try {
       print("Starting API call to fetch services...");
       isLoading.value = true;
@@ -214,6 +240,7 @@ class Dashboardcontroller extends GetxController {
       print("response.statusCoderesponse.statusCode ${response.statusCode}");
 
       if (response.statusCode == 200) {
+        isLoading.value = false;
         final responseBody = json.decode(response.body);
         if (responseBody['data'] != null && responseBody['data'] is List) {
           final List<dynamic> serviceList = responseBody['data'];
@@ -235,6 +262,7 @@ class Dashboardcontroller extends GetxController {
             'Failed to fetch services. Status code: ${response.statusCode}';
       }
     } catch (e) {
+      isLoading.value = false;
       statusMessage = e is TimeoutException
           ? 'Your network seems to be down! \n Please check your internet connection.'
           : 'An error occurred while fetching services.';
@@ -245,9 +273,27 @@ class Dashboardcontroller extends GetxController {
   }
 
   /// Pull to refresh
+  // Future<void> onRefresh(String mobileNumber) async {
+  //   await fetchUserServices();
+  //   await fetchAppointments(mobileNumber);
+  //   await fetchImages();
+  // }
   Future<void> onRefresh(String mobileNumber) async {
-    await fetchUserServices();
-    await fetchAppointments(mobileNumber);
-    await fetchImages();
+    isLoading.value = true; // start loading
+
+    try {
+      // Fetch services
+      await fetchUserServices;
+
+      // Fetch bookings or other needed data
+      await fetchAppointments(mobileNumber);
+      await fetchImages();
+      // ✅ Only after data is fetched, stop loading
+      isLoading.value = false;
+    } catch (e) {
+      // handle errors
+      statusMessage = "Something went wrong. Please try again.";
+      isLoading.value = false;
+    }
   }
 }

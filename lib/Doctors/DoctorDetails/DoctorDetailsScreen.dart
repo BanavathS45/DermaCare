@@ -252,19 +252,19 @@ class DoctorDetailScreen extends StatelessWidget {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 20),
-            doctordetailscontroller.buildTimingAndContactSection(
-                timing: doctor.availableTimes,
-                // doctor: doctor,
-                onCall: () {
-                  customerCare();
-                },
-                onDirection: () {
-                  String address = "${hospital.name},${hospital.address}";
-                  MapUtils.openMapByAddress(address);
-                },
-                hospitalNumber: hospital.contactNumber,
-                days: doctor.availableDays),
+
+            // doctordetailscontroller.buildTimingAndContactSection(
+            //     timing: doctor.availableTimes,
+            //     // doctor: doctor,
+            //     onCall: () {
+            //       customerCare();
+            //     },
+            //     onDirection: () {
+            //       String address = "${hospital.name},${hospital.address}";
+            //       MapUtils.openMapByAddress(address);
+            //     },
+            //     hospitalNumber: hospital.contactNumber,
+            //     days: doctor.availableDays),
             const SizedBox(height: 20),
             doctordetailscontroller.buildReportContactSection(
                 context, doctordetailscontroller.moreDetails),

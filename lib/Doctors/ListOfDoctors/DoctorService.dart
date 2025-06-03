@@ -79,7 +79,6 @@ import 'package:http/http.dart' as http;
 
 import '../../APIs/BaseUrl.dart';
 import 'DoctorController.dart';
- 
 
 class DoctorService {
   Future<List<HospitalDoctorModel>> fetchDoctorsAndClinic(
@@ -124,72 +123,38 @@ class DoctorService {
     }
   }
 
-  // /// Flatten all doctors from all services for listing/search
-  // Future<List<HospitalDoctorModel>> fetchAllDoctors(String hospitalId, String subserviceId) async {
-  //   final services = await fetchServices(hospitalId,subserviceId);
-  //   List<HospitalDoctorModel> allDoctors = [];
+  Future<Map<String, dynamic>?> fetchDoctorByDoctorId(String doctorId) async {
+    final url = Uri.parse('${clinicUrl}/doctor/$doctorId');
+    print("🔍 [fetchDoctorByDoctorId] Fetching from URL: $url");
 
-  //   for (var service in services) {
-  //     for (var hospital in service.hospitals) {
-  //       for (var doctor in hospital.doctors) {
-  //         allDoctors.add(doctor);
-  //       }
-  //     }
-  //   }
+    final response = await http.get(url);
+    print("📥 [fetchDoctorByDoctorId] Response Status: ${response.statusCode}");
 
-  //   return allDoctors;
-  // }
-
-  // /// Get doctor by their ID (from any service or hospital)
-  Future<HospitalDoctorModel?> getDoctorById(String doctorId, String hospitalId, String subserviceId ) async {
-    final services = await fetchDoctorsAndClinic( hospitalId, subserviceId);
-
-    // doctorController.setDoctorId(services.length.toString());
-
-    // for (var service in services) {
-    //   for (var hospital in service.hospital) {
-    //     for (var doctor in hospital.doctors) {
-    //       if (doctor.doctor.doctorId == doctorId) {
-    //         print("✅ Doctor Found:");
-    //         print("ID: ${doctor.doctor.doctorId}");
-    //         print("Name: ${doctor.doctor.name}");
-    //         print("Specialization: ${doctor.doctor.specialization}");
-    //         print("Hospital: ${doctor.hospital.name}");
-    //         print("City: ${doctor.hospital.city}");
-    //         return doctor;
-    //       }
-    //     }
-    //   }
-    // }
-
-    print("❌ Doctor with ID $doctorId not found.");
-    return null;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("✅ [fetchDoctorByDoctorId] Response Body: ${data['data']}");
+      return data['data'];
+    } else {
+      print(
+          "❌ [fetchDoctorByDoctorId] Failed to fetch doctor. Body: ${response.body}");
+      return null;
+    }
   }
-  
-  
-  
-  // // Future<HospitalDoctorModel?> getDoctorNotification(String doctorId) async {
-  // //   final services = await fetchServices();
 
-  // //   // doctorController.setDoctorId(services.length.toString());
+  Future<Map<String, dynamic>?> fetchclinicByClinicId(String hospitalId) async {
+    final url = '${clinicUrl}/getClinic/$hospitalId';
+    print("Fetching clinic data from URL: $url");
 
-  // //   for (var service in services) {
-  // //     for (var hospital in service.hospitals) {
-  // //       for (var doctor in hospital.doctors) {
-  // //         if (doctor.doctor.doctorId == doctorId) {
-  // //           print("✅ Doctor Found:");
-  // //           print("ID: ${doctor.doctor.doctorId}");
-  // //           print("Name: ${doctor.doctor.name}");
-  // //           print("Specialization: ${doctor.doctor.specialization}");
-  // //           print("Hospital: ${doctor.hospital.name}");
-  // //           print("City: ${doctor.hospital.city}");
-  // //           return doctor;
-  // //         }
-  // //       }
-  // //     }
-  // //   }
+    final response = await http.get(Uri.parse(url));
 
-  // //   print("❌ Doctor with ID $doctorId not found.");
-  // //   return null;
-  // // }
+    print("Response status code: ${response.statusCode}");
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("Response fetchclinicByClinicId body: ${data['data']}");
+      return data['data'];
+    } else {
+      print("Failed to fetch clinic data. Status code: ${response.statusCode}");
+      return null;
+    }
+  }
 }

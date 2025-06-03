@@ -13,7 +13,15 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
     DoctorController controller, String mobileNumber) {
   final doctor = doctorModel.doctor;
   final hospital = doctorModel.hospital;
+  String base64String = doctor.doctorPicture;
+  final regex = RegExp(r'data:image/[^;]+;base64,');
+  base64String = base64String.replaceAll(regex, '');
 
+// Remove the prefix if present
+  final prefix = 'data:image/jpeg;base64,';
+  if (base64String.startsWith(prefix)) {
+    base64String = base64String.substring(prefix.length);
+  }
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     decoration: BoxDecoration(
@@ -68,8 +76,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundImage:
-                    MemoryImage(base64Decode(doctor.doctorPicture)),
+                backgroundImage: MemoryImage(base64Decode(base64String)),
                 onBackgroundImageError: (_, __) => const Icon(Icons.person),
               ),
               const SizedBox(width: 12),

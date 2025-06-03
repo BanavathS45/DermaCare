@@ -34,18 +34,13 @@ class _DashboardScreenState extends State<DashboardScreen>
   final Dashboardcontroller dashboardcontroller =
       Get.put(Dashboardcontroller());
   final controller = Get.put(AppointmentController());
-  late AnimationController _animationController;
+
+  late final AnimationController _rotationController;
 
   bool showLabel = false;
   bool isFabVisible = true;
   late ScrollController _scrollController;
   bool isOpaque = false;
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _animationController.dispose();
-    super.dispose();
-  }
 
   void _onFabTapped() {
     if (!showLabel) {
@@ -66,12 +61,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     controller.fetchBookings();
     dashboardcontroller.storeUserData(widget.mobileNumber, widget.username);
     // dashboardcontroller.setMobileNumber(widget.mobileNumber);
-    _animationController = AnimationController(
-      vsync: this,
+    _rotationController = AnimationController(
       duration: const Duration(seconds: 1),
-    )..repeat(); // Repeats by default, but stop initially
+      vsync:
+          this, // Make sure your state class mixes in `TickerProviderStateMixin`
+    ); // Repeats by default, but stop initially
 
-    _animationController.stop();
     _scrollController = ScrollController()
       ..addListener(() {
         if (_scrollController.position.userScrollDirection ==
@@ -91,6 +86,13 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+
+    _rotationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -198,11 +200,23 @@ class _DashboardScreenState extends State<DashboardScreen>
                   FloatingActionButton(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.green,
-                    onPressed: () =>
-                        dashboardcontroller.onRefresh(widget.mobileNumber),
+                    onPressed: () async {
+                      _rotationController.repeat(); // Start spinning
+                      await dashboardcontroller.onRefresh(widget.mobileNumber);
+                      _rotationController.reset(); // Stop spinning
+                    },
                     tooltip: 'Refresh',
-                    child: const Icon(Icons.refresh),
-                  )
+                    child: AnimatedBuilder(
+                      animation: _rotationController,
+                      builder: (context, child) {
+                        return Transform.rotate(
+                          angle: _rotationController.value * 2 * pi,
+                          child: child,
+                        );
+                      },
+                      child: const Icon(Icons.refresh),
+                    ),
+                  ),
                 ],
               ),
             );

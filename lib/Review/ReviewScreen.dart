@@ -1,3 +1,4 @@
+import 'package:cutomer_app/BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
@@ -10,7 +11,7 @@ import '../Utils/ElevatedButtonGredint.dart';
 
 class ReviewScreen extends StatefulWidget {
   final HospitalDoctorModel? doctorData;
-  final PostBookingModel? doctorBookings;
+  final Getappointmentmodel? doctorBookings;
   const ReviewScreen(
       {super.key, required this.doctorData, required this.doctorBookings});
 

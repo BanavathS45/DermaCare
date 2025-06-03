@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../Booings/BooingService.dart';
 import '../BottomNavigation/Appoinments/AppointmentView.dart';
+import '../BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/ListOfDoctors/DoctorService.dart';
@@ -13,7 +14,7 @@ import '../Review/ReviewScreen.dart';
 import 'GradintColor.dart';
 
 class AppointmentCard extends StatefulWidget {
-  final PostBookingModel doctorData;
+  final Getappointmentmodel doctorData;
   const AppointmentCard({super.key, required this.doctorData});
 
   @override
@@ -31,40 +32,64 @@ class _AppointmentCardState extends State<AppointmentCard> {
   void initState() {
     super.initState();
 
-    _fetchDoctor(); // Fetch doctor data only once
+    _fetchHospitaAndDoctorData(); // Fetch doctor data only once
   }
 
-  Future<void> _fetchDoctor() async {
-    print("dsfdsfsdfdsfdsfdsf calling");
-    final subServiceId = doctorController
-        .selectedServicesController.selectedSubServices.first.subServiceId;
-    final hospitalId = doctorController.hospitalId.value;
-    final result = await doctorService.getDoctorById(
-        widget.doctorData.booking.doctorId, hospitalId, subServiceId);
+  Future<void> _fetchHospitaAndDoctorData() async {
+    print(">> _fetchHospitaAndDoctorData called");
 
-    print("dsfdsfsdfdsfdsfdsf ${result}");
-    if (result != null) {
-      setState(() {
-        doctor = result;
-        isLoading = false;
-      });
-    } else {
+    try {
+      // Move these inside try to catch errors if null or empty
+
+      final hospitalId = widget.doctorData.clinicId;
+
+      print("hospitalIdfgdfgf: ${widget.doctorData.clinicId}");
+      print("doctorDatadoctorId: ${widget.doctorData.doctorId}");
+
+      final doctorJson = await doctorService.fetchDoctorByDoctorId(
+        widget.doctorData.doctorId,
+      );
+
+      final clinicJson = await doctorService.fetchclinicByClinicId(
+        hospitalId,
+      );
+
+      if (doctorJson != null && clinicJson != null) {
+        final result = HospitalDoctorModel.fromJson(doctorJson, clinicJson);
+        setState(() {
+          doctor = result;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          doctor = null;
+          isLoading = false;
+        });
+      }
+    } catch (e, stackTrace) {
       setState(() {
         doctor = null;
         isLoading = false;
       });
-      print(
-          "Error: doctor not found for ID ${widget.doctorData.booking.doctorId}");
+      print("Exception occurred: $e");
+      print("StackTrace: $stackTrace");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading || doctor == null) {
+    // if (isLoading || doctor == null) {
+    //   return const Center(child: CircularProgressIndicator());
+    // }
+    if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    var doctorData = doctor!.doctor;
-    var hospitalData = doctor!.hospital;
+
+    if (doctor == null) {
+      return const Center(child: Text("No doctor data found"));
+    }
+    var doctorData = doctor;
+    var bookingData = widget.doctorData;
     return InkWell(
       onTap: () {
         print("dfhjdsfkhdsjkfhdshfjd");
@@ -92,24 +117,26 @@ class _AppointmentCardState extends State<AppointmentCard> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // or a fallback widget like Text("No data")
             Text(
-              "${hospitalData.name}",
+              "${doctor?.hospital.name ?? 'Unknown Hospital'}",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.blueGrey[900],
-                fontSize: 18,
+                fontSize: 20,
               ),
               maxLines: 2,
             ),
             Text(
-              "${hospitalData.city}",
+              "${capitalizeEachWord(doctor?.hospital.city ?? 'Unknown Hospital')}",
               style: TextStyle(
                 fontWeight: FontWeight.normal,
-                color: Colors.blueGrey[900],
-                fontSize: 16,
+                color: Colors.blueGrey[500],
+                fontSize: 20,
               ),
               maxLines: 2,
             ),
+
             SizedBox(
               height: 5,
             ),
@@ -127,7 +154,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${capitalizeEachWord(widget.doctorData.patient.name)}",
+                      "${capitalizeEachWord(widget.doctorData.name)}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.blueGrey[900],
@@ -140,7 +167,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 Row(
                   children: [
                     Text(
-                      "${widget.doctorData.patient.age} Yrs /",
+                      "${widget.doctorData.age} Yrs /",
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         color: Colors.blueGrey[900],
@@ -150,7 +177,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       width: 5,
                     ),
                     Text(
-                      widget.doctorData.patient.gender,
+                      widget.doctorData.gender,
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         color: Colors.blueGrey[900],
@@ -164,7 +191,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Date : ${widget.doctorData.patient.monthYear}",
+                  "Date : ${widget.doctorData.serviceDate}",
                   style: TextStyle(
                     fontWeight: FontWeight.normal,
                     fontSize: 15,
@@ -172,7 +199,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                   ),
                 ),
                 Text(
-                  "Time :  ${widget.doctorData.patient.servicetime}",
+                  "Time :  ${widget.doctorData.servicetime}",
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.black87,
@@ -198,14 +225,14 @@ class _AppointmentCardState extends State<AppointmentCard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      widget.doctorData.booking.servicename,
+                      widget.doctorData.servicename,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                           color: Colors.black87),
                       textAlign: TextAlign.center,
                     ),
-                    Text(widget.doctorData.booking.consultationType,
+                    Text(widget.doctorData.consultationType,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black54,
@@ -216,16 +243,16 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 ),
                 const SizedBox(width: 6),
                 Row(
-                  children: widget.doctorData.booking.status.toLowerCase() !=
+                  children: widget.doctorData.status.toLowerCase() !=
                           'completed'
                       ? _buildStatusBadges(
-                          widget.doctorData.booking.status.toLowerCase())
+                          widget.doctorData.status.toLowerCase())
                       : [], // Return an empty list when status is not 'completed'
                 ),
                 Row(
                   children: [
                     // This returns List<Widget>
-                    if (widget.doctorData.booking.status.toLowerCase() ==
+                    if (widget.doctorData.status.toLowerCase() ==
                         'completed') ...[
                       Container(
                         height: 40,

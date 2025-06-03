@@ -38,7 +38,7 @@ Future<List<Map<String, dynamic>>> getBookingsByMobileNumber(
   print("dshffdfjsd ${mobileNumber}");
   // final String mobileNumber = "7842259802";
   final url = Uri.parse(
-      '$GetBookings=$mobileNumber'); // Adjust param name as per your API
+      '$BookingUrl/$mobileNumber'); // Adjust param name as per your API
 
   try {
     final response = await http.get(url);

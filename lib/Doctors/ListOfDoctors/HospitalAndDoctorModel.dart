@@ -71,13 +71,18 @@ class Doctor {
       doctorPicture: json['doctorPicture'] ?? '',
       doctorLicence: json['doctorLicence'] ?? '',
       doctorMobileNumber: json['doctorMobileNumber'] ?? '',
-      category:
-          (json['category'] as List).map((e) => Category.fromJson(e)).toList(),
-      service:
-          (json['service'] as List).map((e) => Service.fromJson(e)).toList(),
-      subServices: (json['subServices'] as List)
-          .map((e) => SubService.fromJson(e))
-          .toList(),
+      category: (json['category'] as List<dynamic>?)
+              ?.map((e) => Category.fromJson(e))
+              .toList() ??
+          [],
+      service: (json['service'] as List<dynamic>?)
+              ?.map((e) => Service.fromJson(e))
+              .toList() ??
+          [],
+      subServices: (json['subServices'] as List<dynamic>?)
+              ?.map((e) => SubService.fromJson(e))
+              .toList() ??
+          [],
       specialization: json['specialization'] ?? '',
       gender: json['gender'] ?? '',
       experience: json['experience'] ?? '',
@@ -85,10 +90,19 @@ class Doctor {
       availableDays: json['availableDays'] ?? '',
       availableTimes: json['availableTimes'] ?? '',
       profileDescription: json['profileDescription'] ?? '',
-      doctorFees: DoctorFees.fromJson(json['doctorFees']),
-      focusAreas: List<String>.from(json['focusAreas'] ?? []),
-      languages: List<String>.from(json['languages'] ?? []),
-      highlights: List<String>.from(json['highlights'] ?? []),
+      doctorFees: DoctorFees.fromJson(json['doctorFees'] ?? {}),
+      focusAreas: (json['focusAreas'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      languages: (json['languages'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      highlights: (json['highlights'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
       doctorAvailabilityStatus: json['doctorAvailabilityStatus'] ?? false,
     );
   }

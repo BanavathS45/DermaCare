@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'package:cutomer_app/APIs/BaseUrl.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorSlotModel.dart';
 import 'package:http/http.dart' as http;
- 
 
 class DoctorSlotService {
-  static Future<List<DoctorSlot>> fetchDoctorSlots(String doctorId) async {
-    final url = Uri.parse('$clinicUrl/doctorId/$doctorId/getDoctorslots');
+  static Future<List<DoctorSlot>> fetchDoctorSlots(
+      String doctorId, String hospitalId) async {
+    final url = Uri.parse(
+        '$clinicUrl/getDoctorslots/${hospitalId}/$doctorId'); //TODO:chnage api
+
     print('📡 Requesting slots from: $url');
 
     try {
