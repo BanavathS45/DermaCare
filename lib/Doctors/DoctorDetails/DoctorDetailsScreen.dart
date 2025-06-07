@@ -9,6 +9,8 @@ import 'package:get/get.dart';
 import '../../Help/Numbers.dart';
 import '../../Utils/MapOnGoogle.dart';
 import '../ListOfDoctors/DoctorController.dart';
+import '../RatingAndFeedback/RatingController.dart';
+import '../RatingAndFeedback/RatingService.dart';
 import 'DoctorDetailsController.dart';
 
 import '../RatingAndFeedback/RatingAndFeedback.dart';
@@ -268,7 +270,8 @@ class DoctorDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
             doctordetailscontroller.buildReportContactSection(
                 context, doctordetailscontroller.moreDetails),
-            buildRatingAndFeedback(context, doctorData, doctorController),
+            buildRatingAndFeedback(context, doctorData, doctorController, ),
+         
           ],
         ),
       ),

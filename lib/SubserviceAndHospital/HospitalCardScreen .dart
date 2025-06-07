@@ -64,13 +64,31 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredCards = hospitalCards.where((card) {
-      final matchesSearch = card['subServiceName']
-              .toLowerCase()
-              .contains(searchText.toLowerCase()) ||
-          card['hospitalName'].toLowerCase().contains(searchText.toLowerCase());
-      final isRecommended = !showRecommendedOnly ||
-          card['recommandation'] == true; //TODO: not working recommandation
-      return matchesSearch && isRecommended;
+      final subServiceName =
+          card['subServiceName']?.toString().toLowerCase() ?? '';
+      final hospitalName = card['hospitalName']?.toString().toLowerCase() ?? '';
+      final recommendedRaw = card['recommended'];
+
+      final recommended = recommendedRaw == true ||
+          recommendedRaw == 'true' ||
+          recommendedRaw == 1 ||
+          recommendedRaw?.toString().toLowerCase() == 'yes';
+
+      final matchesSearch = subServiceName.contains(searchText.toLowerCase()) ||
+          hospitalName.contains(searchText.toLowerCase());
+
+      final shouldShow = showRecommendedOnly ? recommended : true;
+
+      print('=========================');
+      print('Hospital: $hospitalName');
+      print('RecommendedRaw: $recommendedRaw (${recommendedRaw.runtimeType})');
+      print('Parsed Recommended: $recommended');
+      print('Search Match: $matchesSearch');
+      print('Show Recommended Only: $showRecommendedOnly');
+      print('Included in List: ${matchesSearch && shouldShow}');
+      print('=========================');
+
+      return matchesSearch && shouldShow;
     }).toList();
 
     return Scaffold(
@@ -117,6 +135,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
               onPressed: () {
                 setState(() {
                   showRecommendedOnly = !showRecommendedOnly;
+                  print("Recommended Filter Toggled: $showRecommendedOnly");
                 });
               },
             ),

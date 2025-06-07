@@ -51,7 +51,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
     // final hasReports = patient.reports != null && patient.reports!.isNotEmpty;
     return Scaffold(
       appBar: CommonHeader(
-        title: "Booking ID: #${patient.serviceId}",
+        title: "Booking ID: #${patient.bookingId}",
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -112,6 +112,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               title: 'Hospital Details',
             ),
             if (widget.doctorBookings.status == "confirmed" ||
+                widget.doctorBookings.status == "completed" ||
                 widget.doctorBookings.status == "In_Progress")
               _sectionCard(
                 icon: Icons.person_outline,
@@ -200,7 +201,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               icon: Icons.payment_outlined,
               title: "Payment Details",
               children: [
-                _infoRow("Service", patient.servicename),
+                _infoRow("Service", patient.subServiceName),
                 _infoRow("Consultation Type", patient.consultationType),
                 _infoRow("Consultation Fee", "₹${patient.consultationFee}"),
                 _infoRow("Total Fee", "₹${patient.totalFee}"),

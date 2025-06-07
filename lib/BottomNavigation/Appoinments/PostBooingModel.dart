@@ -1,8 +1,8 @@
 import '../../PatientsDetails/PatientModel.dart';
 
 class BookingDetailsModel {
-  final String servicename;
-  final String serviceId;
+  final String subServiceName;
+  final String subServiceId;
   final String doctorId;
   final String consultationType;
   final double totalFee;
@@ -12,8 +12,8 @@ class BookingDetailsModel {
   final String clinicId;
 
   BookingDetailsModel({
-    required this.servicename,
-    required this.serviceId,
+    required this.subServiceName,
+    required this.subServiceId,
     required this.doctorId,
     required this.consultationType,
     required this.totalFee,
@@ -25,9 +25,9 @@ class BookingDetailsModel {
 
   factory BookingDetailsModel.fromJson(Map<String, dynamic> json) {
     return BookingDetailsModel(
-      servicename: json['servicename'],
+      subServiceName: json['subServiceName'],
       status: json['status'],
-      serviceId: json['serviceId'],
+      subServiceId: json['subServiceId'],
       clinicId: json['clinicId'],
       doctorId: json['doctorId'],
       consultationType: json['consultationType'],
@@ -39,10 +39,10 @@ class BookingDetailsModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'servicename': servicename,
+      'subServiceName': subServiceName,
       'resoan': resoan,
       'status': status,
-      'serviceId': serviceId,
+      'subServiceId': subServiceId,
       'doctorId': doctorId,
       'consultationType': consultationType,
       'totalFee': totalFee,

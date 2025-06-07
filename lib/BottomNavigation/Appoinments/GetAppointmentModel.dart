@@ -1,13 +1,13 @@
 class Getappointmentmodel {
-  final String  bookingId;
+  final String bookingId;
   final String bookingFor;
   final String name;
   final int age;
   final String gender;
   final String mobileNumber;
   final String problem;
-  final String servicename;
-  final String serviceId;
+  final String subServiceName;
+  final String subServiceId;
   final String doctorId;
   final String clinicId;
   final String serviceDate;
@@ -27,8 +27,8 @@ class Getappointmentmodel {
     required this.gender,
     required this.mobileNumber,
     required this.problem,
-    required this.servicename,
-    required this.serviceId,
+    required this.subServiceName,
+    required this.subServiceId,
     required this.doctorId,
     required this.clinicId,
     required this.serviceDate,
@@ -51,8 +51,8 @@ class Getappointmentmodel {
       gender: json['gender'] ?? '',
       mobileNumber: json['mobileNumber'] ?? '',
       problem: json['problem'] ?? '',
-      servicename: json['servicename'] ?? '',
-      serviceId: json['serviceId'] ?? '',
+      subServiceName: json['subServiceName'] ?? '',
+      subServiceId: json['subServiceId'] ?? '',
       doctorId: json['doctorId'] ?? '',
       clinicId: json['clinicId'],
       serviceDate: json['serviceDate'] ?? '',
@@ -77,8 +77,8 @@ class Getappointmentmodel {
       'gender': gender,
       'mobileNumber': mobileNumber,
       'problem': problem,
-      'servicename': servicename,
-      'serviceId': serviceId,
+      'subServiceName': subServiceName,
+      'subServiceId': subServiceId,
       'doctorId': doctorId,
       'clinicId': clinicId,
       'serviceDate': serviceDate,

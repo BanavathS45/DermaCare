@@ -1,12 +1,16 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:cutomer_app/BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Review/ReviewService.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart'; // Import the rating bar package
 
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
- 
+
 import '../Utils/ElevatedButtonGredint.dart';
 
 class ReviewScreen extends StatefulWidget {
@@ -17,6 +21,20 @@ class ReviewScreen extends StatefulWidget {
 
   @override
   State<ReviewScreen> createState() => _ReviewScreenState();
+}
+
+Uint8List _getDecodedImage(String base64String) {
+  try {
+    // Remove the data URI prefix if it exists
+    if (base64String.contains(',')) {
+      base64String = base64String.split(',')[1];
+    }
+    return base64Decode(base64String);
+  } catch (e) {
+    print("⚠️ Image decode error: $e");
+    // Return a blank image or fallback
+    return Uint8List(0);
+  }
 }
 
 class _ReviewScreenState extends State<ReviewScreen> {
@@ -69,8 +87,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
               SizedBox(height: 20),
               CircleAvatar(
                 radius: 60,
-                backgroundImage:
-                    NetworkImage(widget.doctorData!.doctor.doctorPicture),
+                backgroundImage: MemoryImage(
+                  _getDecodedImage(widget.doctorData!.doctor.doctorPicture),
+                ),
               ),
               SizedBox(height: 10),
               Text(
@@ -167,11 +186,36 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   Widget _buildSubmitButton() {
     return GradientButton(
-      onPressed: () {
-        // Handle the submission of the review here
+      onPressed: () async {
+        print('➡️ Submit button pressed');
+
         print('Doctor Rating: $_doctorRating');
         print('Hospital Rating: $_hospitalRating');
         print('Comment: ${_commentController.text}');
+
+        if (widget.doctorBookings != null) {
+          print('🟢 doctorBookings is NOT null');
+          print('📦 Payload values:');
+          print('doctorId: ${widget.doctorBookings!.doctorId}');
+          print('mobileNumber: ${widget.doctorBookings!.mobileNumber}');
+          print('appointmentId: ${widget.doctorBookings!.bookingId}');
+
+          try {
+            await submitCustomerRating(
+                doctorRating: _doctorRating,
+                hospitalRating: _hospitalRating,
+                feedback: _commentController.text,
+                doctorId: widget.doctorBookings!.doctorId,
+                customerMobileNumber: widget.doctorBookings!.mobileNumber,
+                appointmentId: widget.doctorBookings!.bookingId,
+                hospitalId: widget.doctorBookings!.clinicId);
+            print('✅ submitCustomerRating called successfully');
+          } catch (e) {
+            print('❌ Error in submitCustomerRating: $e');
+          }
+        } else {
+          print('🔴 doctorBookings is null');
+        }
       },
       child: Text(
         "Add Review",

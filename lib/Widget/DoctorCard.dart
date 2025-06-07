@@ -104,7 +104,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${doctor.doctorName} ",
+                                      "${doctor.doctorName}, ${doctor.doctorId} ",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,

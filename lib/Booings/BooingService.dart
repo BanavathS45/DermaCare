@@ -21,7 +21,7 @@ Future<Map<String, dynamic>?> postBookings(
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('Booking posted successfully!');
       print("response.body....: ${response.body}");
-      print("response.body....: ${response}");
+      
       return jsonDecode(response.body); // Return response data
     } else {
       print('Failed to post booking. Status code: ${response.statusCode}');

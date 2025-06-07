@@ -1,16 +1,22 @@
+import 'package:cutomer_app/Doctors/RatingAndFeedback/RatingModal.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
 import '../ListOfDoctors/DoctorController.dart';
-import '../ListOfDoctors/DoctorModel.dart';
+import '../ListOfDoctors/HospitalAndDoctorModel.dart';
 
 class Allfeedbacks extends StatefulWidget {
   final HospitalDoctorModel item;
   final DoctorController controller;
+  final RatingSummary rating;
 
-  const Allfeedbacks({super.key, required this.item, required this.controller});
+  const Allfeedbacks(
+      {super.key,
+      required this.item,
+      required this.controller,
+      required this.rating});
 
   @override
   State<Allfeedbacks> createState() => _AllfeedbacksState();
@@ -51,7 +57,7 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${doctor.name}, ${doctor.qualification}",
+                        "${doctor.doctorName}, ${doctor.qualification}",
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight:
@@ -78,12 +84,13 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
                         const Icon(Icons.star, color: Colors.amber),
                         const SizedBox(width: 6),
                         Text(
-                          doctor.overallRating.toStringAsFixed(1),
+                          widget.rating.overallHospitalRating
+                              .toStringAsFixed(1),
                           style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(width: 6),
-                        Text("(${doctor.comments.length} Reviews)",
+                        Text("(${widget.rating.comments.length} Reviews)",
                             style: const TextStyle(color: Colors.grey)),
                       ],
                     ),
@@ -103,9 +110,9 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
                   const SizedBox(height: 16),
 
                   // Comments
-                  ...doctor.comments.map((comment) {
-                    final userId = comment.userId;
-                    final commentText = comment.comment;
+                  ...widget.rating.comments.map((comment) {
+                    final userId = comment.customerMobileNumber;
+                    // final commentText = comment.comment;
                     final createdAt = DateTime.now().subtract(const Duration(
                         minutes: 1)); // Replace with actual timestamp
 
@@ -156,7 +163,7 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
                                             const Icon(Icons.star,
                                                 color: Colors.yellow),
                                             Text(
-                                              "${comment.rating}",
+                                              "${comment.doctorRating}",
                                               style: const TextStyle(
                                                 fontSize: 16,
                                                 color: Color.fromARGB(
@@ -174,10 +181,10 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
                                           fontSize: 12, color: Colors.grey),
                                     ),
                                     const SizedBox(height: 4),
-                                    Text(
-                                      commentText,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
+                                    // Text(
+                                    //   commentText,
+                                    //   style: const TextStyle(fontSize: 14),
+                                    // ),
                                   ],
                                 ),
                               ),

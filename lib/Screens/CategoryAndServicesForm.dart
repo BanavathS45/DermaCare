@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import '../ConfirmBooking/ConsultationPrice.dart';
 import '../Controller/CustomerController.dart';
 import '../Dashboard/DashBoardController.dart';
+import '../Doctors/ListOfDoctors/ConsuationDoctors.dart';
 import '../Doctors/ListOfDoctors/DoctorScreen.dart';
 import '../Services/serviceb.dart';
 import '../TreatmentAndServices/ServiceSelectionController.dart';
@@ -214,17 +215,23 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                     selectedServicesController.categoryName.value =
                         selectedMain.categoryName;
 
-                    Get.to(() => ConsultationPrice(
+                    // Get.to(() => ConsultationPrice(
+                    //       mobileNumber: widget.mobileNumber,
+                    //       username: widget.username,
+                    //       categoryName: selectedMain.categoryName,
+                    //       categoryId: selectedMain.categoryId,
+                    //       serviceId: selectedSub.serviceId,
+                    //       serviceName: selectedSub.serviceName,
+                    //       subserviceName: selectedSubService.subServiceName,
+                    //       subserviceid: selectedSubService.subServiceId,
+                    //       consulationType:
+                    //           widget.consulationType, // ✅ send it here
+                    //     ));
+                    Get.to(() => ConsulationDoctorScreen(
                           mobileNumber: widget.mobileNumber,
                           username: widget.username,
-                          categoryName: selectedMain.categoryName,
-                          categoryId: selectedMain.categoryId,
-                          serviceId: selectedSub.serviceId,
-                          serviceName: selectedSub.serviceName,
-                          subserviceName: selectedSubService.subServiceName,
-                          subserviceid: selectedSubService.subServiceId,
-                          consulationType:
-                              widget.consulationType, // ✅ send it here
+                          subServiceID: selectedSubService.subServiceId,
+                          hospiatlName: selectedSubService.subServiceName,
                         ));
                   },
                   style: ElevatedButton.styleFrom(

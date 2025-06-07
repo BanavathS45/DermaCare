@@ -3,6 +3,7 @@ import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../Booings/BooingService.dart';
 import '../BottomNavigation/Appoinments/AppointmentView.dart';
@@ -10,6 +11,8 @@ import '../BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/ListOfDoctors/DoctorService.dart';
+import '../Doctors/RatingAndFeedback/RatingModal.dart';
+import '../Doctors/RatingAndFeedback/RatingService.dart';
 import '../Review/ReviewScreen.dart';
 import 'GradintColor.dart';
 
@@ -31,8 +34,31 @@ class _AppointmentCardState extends State<AppointmentCard> {
   @override
   void initState() {
     super.initState();
+    _fetchHospitaAndDoctorData();
+    _fetchRating(); // Call rating fetch here
+  }
+  // Ensure you import your model
 
-    _fetchHospitaAndDoctorData(); // Fetch doctor data only once
+  RatingSummary? ratingSummary;
+  bool hasReviewed = false;
+
+  Future<void> _fetchRating() async {
+    try {
+      final summary = await fetchRatingSummary(
+        widget.doctorData.clinicId,
+        widget.doctorData.doctorId,
+      );
+
+      setState(() {
+        ratingSummary = summary;
+        hasReviewed = summary.comments.any((e) => e.rated == true);
+      });
+    } catch (e) {
+      print("Rating fetch error: $e");
+      setState(() {
+        hasReviewed = false;
+      });
+    }
   }
 
   Future<void> _fetchHospitaAndDoctorData() async {
@@ -187,6 +213,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 ),
               ],
             ),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -225,7 +252,15 @@ class _AppointmentCardState extends State<AppointmentCard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      widget.doctorData.servicename,
+                      "Consultation Type",
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 13,
+                          color: Colors.black87),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      widget.doctorData.subServiceName,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
@@ -281,30 +316,54 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         ),
                       ),
                       SizedBox(width: 10),
+                      // Container(
+                      //   height: 45,
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.blue, // Set the background color
+                      //     borderRadius:
+                      //         BorderRadius.circular(8), // Set the border radius
+                      //     border: Border.all(
+                      //         color: Colors.white,
+                      //         width: 2), // Set the border color and width
+                      //   ),
+                      //   child: TextButton(
+                      //     onPressed: () {
+                      //       Get.to(ReviewScreen(
+                      //           doctorData: doctor,
+                      //           doctorBookings: widget.doctorData));
+                      //     },
+                      //     child: const Text(
+                      //       'Review',
+                      //       style: TextStyle(
+                      //           color: Colors.white), // Set the text color
+                      //     ),
+                      //   ),
+                      // ),
                       Container(
                         height: 45,
                         decoration: BoxDecoration(
-                          color: Colors.blue, // Set the background color
-                          borderRadius:
-                              BorderRadius.circular(8), // Set the border radius
-                          border: Border.all(
-                              color: Colors.white,
-                              width: 2), // Set the border color and width
+                          color: hasReviewed ? Colors.grey : Colors.blue,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.white, width: 2),
                         ),
                         child: TextButton(
-                          onPressed: () {
-                            Get.to(ReviewScreen(
-                                doctorData: doctor,
-                                doctorBookings: widget.doctorData));
-                          },
-                          child: const Text(
-                            'Review',
+                          onPressed: hasReviewed
+                              ? null
+                              : () {
+                                  Get.to(ReviewScreen(
+                                    doctorData: doctor,
+                                    doctorBookings: widget.doctorData,
+                                  ));
+                                },
+                          child: Text(
+                            hasReviewed ? 'Reviewed' : 'Review',
                             style: TextStyle(
-                                color: Colors.white), // Set the text color
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                      // Add some space between the buttons
+// Add some space between the buttons
                     ],
                   ],
                 )

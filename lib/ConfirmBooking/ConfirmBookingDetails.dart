@@ -9,6 +9,7 @@ import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 import '../Controller/CustomerController.dart';
 import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
@@ -194,9 +195,9 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             print(
                 "PayAmount to be confirmbookingcontroller ${consultationFee}");
             final bookingDetails = BookingDetailsModel(
-              servicename: selectedServicesController
+              subServiceName: selectedServicesController
                   .selectedSubServices.first.subServiceName,
-              serviceId: selectedServicesController
+              subServiceId: selectedServicesController
                   .selectedSubServices.first.subServiceId,
               doctorId: widget.doctor.doctor.doctorId,
               consultationType: consultationController
@@ -505,7 +506,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     final services = selectedServicesController.selectedSubServices;
     print(
         "selectedServicesControllersdds __ ${selectedServicesController.selectedSubServices.first.finalCost}");
-
+    DateTime date = DateTime.parse(widget.patient.serviceDate);
+    String dayName = DateFormat('EEEE').format(date);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
       child: Row(
@@ -531,7 +533,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               ),
               const SizedBox(height: 5),
               Text(
-                "${widget.patient.serviceDate}, ${widget.patient.servicetime}",
+                "${dayName}, ${widget.patient.servicetime}",
                 style: const TextStyle(fontSize: 14),
               ),
             ],

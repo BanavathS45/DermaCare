@@ -61,6 +61,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         widget.doctorData.doctor.doctorId,
         widget.doctorData.hospital.hospitalId);
     scheduleController.filterSlotsForSelectedDate(allSlots);
+    print("iam calling doctorId ${widget.doctorData.doctor.doctorId}");
+    print("iam calling hospitalId ${widget.doctorData.hospital.hospitalId}");
   }
 
   @override
@@ -131,7 +133,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     .validate()) {
                   if (scheduleController.selectedSlotText.value.isNotEmpty) {
                     showSnackbar("Success", "Form Validated", "success");
-
+                    String formattedDate = DateFormat('yyyy-MM-dd')
+                        .format(scheduleController.selectedDate.value);
                     PatientModel patientmodel = PatientModel(
                         name: patientdetailsformcontroller.nameController.text,
                         age: patientdetailsformcontroller.ageController.text,
@@ -141,8 +144,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             patientdetailsformcontroller.notesController.text,
                         monthYear: DateFormat('MMMM dd, yyyy')
                             .format(scheduleController.selectedDate.value),
-                        serviceDate: DateFormat('EEEE')
-                            .format(scheduleController.selectedDate.value),
+                        serviceDate: formattedDate,
                         servicetime: scheduleController.selectedSlotText.value,
                         mobileNumber: widget.mobileNumber);
 

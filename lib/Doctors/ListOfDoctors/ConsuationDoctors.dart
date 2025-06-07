@@ -5,28 +5,30 @@ import '../../Utils/Constant.dart';
 import '../../Utils/Header.dart';
 import '../../Widget/DoctorCard.dart';
 
-class Doctorscreen extends StatelessWidget {
+class ConsulationDoctorScreen extends StatelessWidget {
   final String mobileNumber;
   final String username;
   final String subServiceID;
-  final String? hospiatlName;
+  final String hospiatlName;
 
-  Doctorscreen(
+  ConsulationDoctorScreen(
       {required this.mobileNumber,
       required this.username,
       required this.subServiceID,
-      this.hospiatlName}) {
+      required this.hospiatlName}) {
     // Trigger fetch after widget builds
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final doctorController = Get.find<DoctorController>();
-      final hospitalId =
-          doctorController.selectedServicesController.hospitalId.value;
+      final hospitalId = "H_6";
+
+      print("❌ Missing hospitalId or subServiceID ${hospitalId}");
+      print("❌ Missing hospitalId or subServiceID ${subServiceID}");
 
       if (hospitalId.isNotEmpty && subServiceID.isNotEmpty) {
         doctorController.hospitalId.value = hospitalId;
         doctorController.fetchDoctors(
-          hospitalId: hospitalId,
-          subServiceId: subServiceID,
+          hospitalId: "H_9",
+          subServiceId: "683ad13a3fd93777eef8d7b0",
         );
       } else {
         print("❌ Missing hospitalId or subServiceID");
@@ -80,7 +82,7 @@ class Doctorscreen extends StatelessWidget {
                         Expanded(
                           child: RichText(
                             text: TextSpan(
-                              text: "Selected Hospital: ",
+                              text: "Selected Subservice: ",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,

@@ -1,6 +1,6 @@
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
- 
+
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +26,8 @@ class RazorpaySubscription extends StatefulWidget {
     required this.amount,
     required this.context,
     required this.patient,
-    required this.bookingDetails, required this.mobileNumber,
+    required this.bookingDetails,
+    required this.mobileNumber,
   });
 
   @override
@@ -91,6 +92,9 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
         "Success", "Payment Successful: ${response.paymentId}", "success");
     paymentId = response.paymentId;
     print("Payment Successful: ${response.paymentId}");
+    print("Payment Successful: ${response.orderId}");
+    print("Payment Successful: ${response.data}");
+    print("Payment Successful: ${response.signature}");
 
     var responseData = await postBookings(widget.bookingDetails);
 
@@ -99,11 +103,10 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
           context,
           MaterialPageRoute(
             builder: (ctx) => SuccessScreen(
-              serviceDetails: widget.serviceDetails,
-              paymentId: paymentId.toString(),
-              patient: widget.patient,
-              mobileNumber:widget.mobileNumber
-            ),
+                serviceDetails: widget.serviceDetails,
+                paymentId: paymentId.toString(),
+                patient: widget.patient,
+                mobileNumber: widget.mobileNumber),
           ),
           (route) => false);
     }
