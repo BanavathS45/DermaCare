@@ -1,11 +1,15 @@
 import 'dart:math';
+import 'package:cutomer_app/ConfirmBooking/Consultations.dart';
 import 'package:cutomer_app/Dashboard/ImagePreview.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigation/Appoinments/AppointmentController.dart';
 import '../BottomNavigation/BottomNavigation.dart';
+import '../ConfirmBooking/ConsultationController.dart';
+import '../ConfirmBooking/ConsultationServices.dart';
 import '../Help/Numbers.dart';
 import '../Modals/ServiceCard.dart';
 import '../Utils/AppointmentCard.dart';
@@ -41,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   bool isFabVisible = true;
   late ScrollController _scrollController;
   bool isOpaque = false;
-
+  final consultationcontroller = Get.find<Consultationcontroller>();
   void _onFabTapped() {
     if (!showLabel) {
       setState(() => showLabel = true);
@@ -54,18 +58,41 @@ class _DashboardScreenState extends State<DashboardScreen>
   void initState() {
     super.initState();
 
+    // Wrap in a separate async function because initState() can't be async directly
+    loadInitialData();
+  }
+
+  void loadInitialData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? firstConsultationId = prefs.getString('firstConsultationId');
+    String? firstConsultationType = prefs.getString('firstConsultationType');
+
+    if (firstConsultationId != null && firstConsultationType != null) {
+      ConsultationModel consultation = ConsultationModel(
+        consultationType: firstConsultationType,
+        consultationId: firstConsultationId,
+      );
+
+      consultationcontroller.setConsultation(consultation);
+
+      print('Stored ID: $firstConsultationId');
+      print('Stored Type: $firstConsultationType');
+    } else {
+      print('No consultation stored yet.');
+    }
+
     dashboardcontroller.loadSavedImage();
     dashboardcontroller.fetchUserServices();
     dashboardcontroller.fetchAppointments(widget.mobileNumber);
     dashboardcontroller.fetchImages();
     controller.fetchBookings();
     dashboardcontroller.storeUserData(widget.mobileNumber, widget.username);
-    // dashboardcontroller.setMobileNumber(widget.mobileNumber);
+
     _rotationController = AnimationController(
       duration: const Duration(seconds: 1),
-      vsync:
-          this, // Make sure your state class mixes in `TickerProviderStateMixin`
-    ); // Repeats by default, but stop initially
+      vsync: this,
+    );
 
     _scrollController = ScrollController()
       ..addListener(() {
@@ -338,7 +365,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                         isOpaque = true;
                       });
                     } else {
-                      Navigator.pop(context); // or your logic
+                      // Navigator.pop(context); // or your logic
+                      Get.to(ConsultationsType(
+                        mobileNumber: widget.mobileNumber,
+                        username: widget.username,
+                      ));
                     }
                   },
                   icon: Icon(Icons.arrow_back_ios_new_rounded),

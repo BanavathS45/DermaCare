@@ -49,7 +49,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final selectedId =
-          consultationController.selectedConsultation.value!.consultationId;
+          consultationController.selectedConsultation.value?.consultationId ??
+              "";
 
       final consultations = await getConsultationDetails();
 

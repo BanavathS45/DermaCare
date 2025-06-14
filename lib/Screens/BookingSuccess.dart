@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Dashboard/DashBoardController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
 import 'package:cutomer_app/Utils/GradintColor.dart';
@@ -5,6 +6,8 @@ import 'package:cutomer_app/Utils/MapOnGoogle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../BottomNavigation/BottomNavigation.dart';
+import '../ConfirmBooking/ConsultationController.dart';
+import '../Controller/CustomerController.dart';
 import '../Doctors/DoctorDetails/DoctorDetailsController.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/ListOfDoctors/DoctorService.dart';
@@ -31,8 +34,11 @@ class _SuccessScreenState extends State<SuccessScreen> {
   DoctorService service = DoctorService();
   final doctorController = Get.put(DoctorController());
   Doctordetailscontroller doctordetailscontroller = Doctordetailscontroller();
-  var getDoctor;
+  Dashboardcontroller controller = Dashboardcontroller();
 
+  final consultationController = Get.put(Consultationcontroller());
+  var getDoctor;
+  final selectedServicesController = Get.find<SelectedServicesController>();
   @override
   void initState() {
     super.initState();
@@ -184,6 +190,12 @@ class _SuccessScreenState extends State<SuccessScreen> {
         decoration: BoxDecoration(gradient: appGradient()),
         child: TextButton(
           onPressed: () {
+            controller.clearAfterAppointment();
+            selectedServicesController.clearAll();
+            consultationController.selectedConsultation.value = null;
+
+            consultationController.clear();
+
             Get.offAll(
               BottomNavController(
                 mobileNumber: widget.mobileNumber,

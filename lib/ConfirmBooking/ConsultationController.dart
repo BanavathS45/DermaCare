@@ -6,5 +6,13 @@ class Consultationcontroller extends GetxController {
 
   void setConsultation(ConsultationModel consultation) {
     selectedConsultation.value = consultation;
+    print("✅ Consultation set: ${consultation.consultationType}");
+  }
+
+  // ✅ Method to clear the selected consultation with print
+  void clear() {
+    print("🧹 Clearing selected consultation...");
+    selectedConsultation.value = null;
+    print("✅ selectedConsultation cleared: ${selectedConsultation.value}");
   }
 }

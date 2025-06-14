@@ -1,6 +1,12 @@
-import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorScreen.dart';
-import 'package:cutomer_app/Utils/Header.dart';
+import 'dart:convert';
+import 'package:cutomer_app/Doctors/Schedules/Schedule.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import '../Doctors/ListOfDoctors/DoctorScreen.dart';
+import '../Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import '../Services/GetHospiatlsAndDoctorWithSubService.dart';
+import '../Utils/Header.dart';
 
 class ConsultationPrice extends StatefulWidget {
   final String mobileNumber;
@@ -35,62 +41,51 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
   String searchText = '';
   bool showRecommendedOnly = false;
 
-  final List<Map<String, dynamic>> hospitalCards = [
-    {
-      "hospitalLogo":
-          "https://thumbs.dreamstime.com/b/hospital-building-modern-parking-lot-59693686.jpg",
-      "hospitalName": "City Hospital",
-      "serviceName": "Skin Care",
-      "subServiceName": "Acne Treatment",
-      "consultationType": "In-Clinic",
-      "cost": "₹1500",
-      "recommended": true
-    },
-    {
-      "hospitalLogo":
-          "https://tse1.mm.bing.net/th/id/OIP.4ltnqFueQIIE-CudNSnT2QHaD3?cb=iwp1",
-      "hospitalName": "Glow Clinic",
-      "serviceName": "Hair Removal",
-      "subServiceName": "Laser",
-      "consultationType": "Video",
-      "cost": "₹1800",
-      "recommended": false
-    },
-    {
-      "hospitalLogo":
-          "https://tse1.mm.bing.net/th/id/OIP.tuWKtt16SGVcH1UXXkxDIgHaFC?cb=iwp1",
-      "hospitalName": "SkinGlow",
-      "serviceName": "Skin Care",
-      "subServiceName": "Acne Treatment",
-      "consultationType": "In-Clinic",
-      "cost": "₹1200",
-      "recommended": false
-    },
-  ];
+  List<HospitalDoctorModel> hospitalDoctors = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchHospitalDoctorBySubServiceId(widget.subserviceid).then((value) {
+      setState(() {
+        hospitalDoctors = value;
+      });
+    }).catchError((e) {
+      print("Error: $e");
+    });
+  }
+
+  String cleanBase64(String base64String) {
+    if (base64String.contains(',')) {
+      return base64String.split(',')[1];
+    }
+    return base64String;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filteredCards = hospitalCards.where((card) {
-      final matchesSearch = card['subServiceName']
-              .toLowerCase()
-              .contains(searchText.toLowerCase()) ||
-          card['hospitalName'].toLowerCase().contains(searchText.toLowerCase());
-      final isRecommended = !showRecommendedOnly || card['recommended'] == true;
+    final filteredData = hospitalDoctors.where((item) {
+      final matchesSearch =
+          item.hospital.name.toLowerCase().contains(searchText.toLowerCase()) ||
+              item.doctor.doctorName
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase());
+      final isRecommended =
+          !showRecommendedOnly || (item.hospital.recommended ?? false);
       return matchesSearch && isRecommended;
     }).toList();
 
     return Scaffold(
-      appBar: CommonHeader(title: "Hospitals & Services"),
+      appBar: CommonHeader(title: "Hospitals & Doctors"),
       backgroundColor: Colors.grey[100],
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            // Search bar
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: "Search hospital or subservice",
+                hintText: "Search hospital or doctor",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -99,8 +94,6 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
               onChanged: (val) => setState(() => searchText = val),
             ),
             SizedBox(height: 12),
-
-            // Recommended toggle
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -119,7 +112,7 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                   label: Text(
                     showRecommendedOnly
                         ? "Showing Recommended"
-                        : "Recommended Hospitals",
+                        : "Recommended Only",
                     style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -136,31 +129,41 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                 ),
               ],
             ),
-
             SizedBox(height: 12),
-
-            // Hospital cards
             Expanded(
-              child: filteredCards.isEmpty
+              child: filteredData.isEmpty
                   ? Center(child: Text("No results found."))
                   : ListView.builder(
-                      itemCount: filteredCards.length,
+                      itemCount: filteredData.length,
                       itemBuilder: (context, index) {
-                        final card = filteredCards[index];
-                        return GestureDetector(
+                        final item = filteredData[index];
+                        final hospital = item.hospital;
+                        final doctor = item.doctor;
+                        final isVideo =
+                            widget.consulationType.toLowerCase() == "video";
+                        final cost = isVideo
+                            ? doctor.doctorFees.vedioConsultationFee
+                            : doctor.doctorFees.inClinicFee;
+
+                        return InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => Doctorscreen(
+                            Get.to(() => ScheduleScreen(
+                                  doctorData: item,
                                   mobileNumber: widget.mobileNumber,
-                                  username: widget.username,
-                                  subServiceID: widget.subserviceid,
-                                  hospiatlName: '',
-                                ),
-                              ),
-                            );
+                                ));
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (_) => Doctorscreen(
+                            //       mobileNumber: widget.mobileNumber,
+                            //       username: widget.username,
+                            //       subServiceID: widget.subserviceid,
+                            //       hospiatlName: hospital.name,
+                            //     ),
+                            //   ),
+                            // );
                           },
+                          borderRadius: BorderRadius.circular(12),
                           child: Container(
                             margin: EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
@@ -169,8 +172,8 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black12,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
                                 ),
                               ],
                             ),
@@ -181,12 +184,21 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                     topLeft: Radius.circular(12),
                                     bottomLeft: Radius.circular(12),
                                   ),
-                                  child: Image.network(
-                                    card['hospitalLogo'],
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child: doctor.doctorPicture != null &&
+                                          doctor.doctorPicture.isNotEmpty
+                                      ? Image.memory(
+                                          base64Decode(cleanBase64(
+                                              doctor.doctorPicture)),
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.network(
+                                          "https://via.placeholder.com/100",
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                                 Expanded(
                                   child: Padding(
@@ -195,15 +207,25 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(card['hospitalName'],
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16)),
-                                        SizedBox(height: 4),
-                                        Text("Service: ${card['serviceName']}"),
                                         Text(
-                                            "Subservice: ${card['subServiceName']}"),
+                                          hospital.name,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.teal[800],
+                                          ),
+                                        ),
+                                        SizedBox(height: 6),
+                                        Text(
+                                          "Dr. ${doctor.doctorName}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500),
+                                        ),
                                         SizedBox(height: 4),
+                                        Text("Service: ${widget.serviceName}"),
+                                        Text(
+                                            "Subservice: ${widget.subserviceName}"),
+                                        SizedBox(height: 6),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -212,14 +234,32 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                               widget.consulationType,
                                               style: TextStyle(
                                                   color: Colors.teal,
-                                                  fontWeight: FontWeight.w500),
+                                                  fontWeight: FontWeight.w600),
                                             ),
                                             Text(
-                                              card['cost'],
+                                              "₹${cost ?? 'N/A'}",
                                               style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.teal),
-                                            )
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.teal[700],
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.star,
+                                                color: Colors.amber, size: 18),
+                                            SizedBox(width: 4),
+                                            // Text(
+                                            //   doctor.averageRating
+                                            //           ?.toStringAsFixed(1) ??
+                                            //       "4.0",
+                                            //   style: TextStyle(
+                                            //       fontWeight: FontWeight.w500),
+                                            // )
+                                            Text("4.0") //TODO :do dynamically
                                           ],
                                         )
                                       ],

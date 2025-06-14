@@ -111,9 +111,9 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               ],
               title: 'Hospital Details',
             ),
-            if (widget.doctorBookings.status == "confirmed" ||
-                widget.doctorBookings.status == "completed" ||
-                widget.doctorBookings.status == "In_Progress")
+            if (widget.doctorBookings.status.toLowerCase() == "confirmed" ||
+                widget.doctorBookings.status.toLowerCase() == "completed" ||
+                widget.doctorBookings.status.toLowerCase() == "in_progress")
               _sectionCard(
                 icon: Icons.person_outline,
                 children: [

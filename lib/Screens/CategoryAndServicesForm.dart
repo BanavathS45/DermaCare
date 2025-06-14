@@ -154,8 +154,16 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                     controller.selectedSubSubService.value;
                 final isSubServiceAvailable = subServiceArray.isNotEmpty;
 
+                // 🛡 Safety: Ensure selectedSubSubService exists in list
+                if (selectedSubSubService != null &&
+                    !subServiceArray.contains(selectedSubSubService)) {
+                  controller.selectedSubSubService.value = null;
+                }
+
                 return CustomDropdownField<SubService>(
-                  value: isSubServiceAvailable ? selectedSubSubService : null,
+                  value: isSubServiceAvailable
+                      ? controller.selectedSubSubService.value
+                      : null,
                   labelText: 'Sub-Service',
                   items: isSubServiceAvailable
                       ? subServiceArray.map((service) {
@@ -177,6 +185,7 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                   },
                 );
               }),
+
               SizedBox(
                 height: 20,
               ),
@@ -215,24 +224,24 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                     selectedServicesController.categoryName.value =
                         selectedMain.categoryName;
 
-                    // Get.to(() => ConsultationPrice(
-                    //       mobileNumber: widget.mobileNumber,
-                    //       username: widget.username,
-                    //       categoryName: selectedMain.categoryName,
-                    //       categoryId: selectedMain.categoryId,
-                    //       serviceId: selectedSub.serviceId,
-                    //       serviceName: selectedSub.serviceName,
-                    //       subserviceName: selectedSubService.subServiceName,
-                    //       subserviceid: selectedSubService.subServiceId,
-                    //       consulationType:
-                    //           widget.consulationType, // ✅ send it here
-                    //     ));
-                    Get.to(() => ConsulationDoctorScreen(
+                    Get.to(() => ConsultationPrice(
                           mobileNumber: widget.mobileNumber,
                           username: widget.username,
-                          subServiceID: selectedSubService.subServiceId,
-                          hospiatlName: selectedSubService.subServiceName,
+                          categoryName: selectedMain.categoryName,
+                          categoryId: selectedMain.categoryId,
+                          serviceId: selectedSub.serviceId,
+                          serviceName: selectedSub.serviceName,
+                          subserviceName: selectedSubService.subServiceName,
+                          subserviceid: selectedSubService.subServiceId,
+                          consulationType:
+                              widget.consulationType, // ✅ send it here
                         ));
+                    // Get.to(() => ConsulationDoctorScreen(
+                    //       mobileNumber: widget.mobileNumber,
+                    //       username: widget.username,
+                    //       subServiceID: selectedSubService.subServiceId,
+                    //       hospiatlName: selectedSubService.subServiceName,
+                    //     ));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,

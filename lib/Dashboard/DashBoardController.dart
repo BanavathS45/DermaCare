@@ -76,6 +76,18 @@ class Dashboardcontroller extends GetxController {
     }
   }
 
+  void clearAfterAppointment() async {
+    // Clear selected services
+    Get.snackbar("Success", "Appointment booked and form reset!",
+        snackPosition: SnackPosition.BOTTOM);
+
+    selectedService.value = null;
+    selectedSubService.value = null;
+    selectedSubSubService.value = null;
+    subServiceList.clear();
+    subServiceArray.clear();
+  }
+
   // /// Pick new image and store in SharedPreferences
   // Future<void> _pickImage(ImageSource source) async {
   //   final pickedFile = await _picker.pickImage(source: source);

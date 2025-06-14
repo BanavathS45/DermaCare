@@ -33,9 +33,14 @@ class LoginApiService {
       // });
 
       final id = await FirebaseInstallations.instance.getId();
+      final deviceid = await FirebaseInstallations.instance.getToken();
       print('Installation ID: $id');
+      // FCM Token (used for sending push notifications)
+      final fcmToken = await FirebaseMessaging.instance.getToken();
 
+      print('FCM Token1: $fcmToken');
       print("FCM Token: $token");
+      print("FCM deviceid: $deviceid");
 
       // Optional: Listen for token refresh
       FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {

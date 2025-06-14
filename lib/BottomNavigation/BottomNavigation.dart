@@ -2,6 +2,8 @@ import 'package:cutomer_app/BottomNavigation/Profile/Profile.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../ConfirmBooking/ConsultationServices.dart';
+import '../ConfirmBooking/Consultations.dart';
 import '../Dashboard/Dashboard.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import 'Appoinments/Appoinments.dart';
@@ -13,12 +15,14 @@ class BottomNavController extends StatefulWidget {
   final String mobileNumber;
   final String username;
   final int index;
+  final ConsultationModel? consultation;
 
   const BottomNavController({
     Key? key,
     required this.mobileNumber,
     required this.username,
     required this.index,
+    this.consultation,
   }) : super(key: key);
 
   @override

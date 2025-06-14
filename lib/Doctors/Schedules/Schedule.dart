@@ -50,7 +50,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
     //  controller.setDoctorSlots(widget.doctor.slots);
 
-    id = consultationController.selectedConsultation.value!.consultationId;
+    id = consultationController.selectedConsultation.value?.consultationId;
     fetchDoctorSlotsOnce();
     timeslots();
   }
@@ -149,6 +149,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         mobileNumber: widget.mobileNumber);
 
                     print("patientmodel ${patientmodel.toJson()}");
+
+                    // Get.to(() => Confirmbookingdetails(doctor: doctorData, patient: patientData));
+                    print('Doctor 8888: ${widget.doctorData}');
+                    print('Patient: $patientmodel');
+
                     Get.to(Confirmbookingdetails(
                       doctor: widget.doctorData,
                       patient: patientmodel,

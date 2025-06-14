@@ -1,5 +1,5 @@
 // String serverUrl = 'http://alb-dev-sc-197990416.ap-south-1.elb.amazonaws.com/api';
-const String wifiUrl = "192.168.1.22";
+const String wifiUrl = "192.168.1.9";
 const String serverUrl = "http://${wifiUrl}:9090/api";
 const String clinicUrl = "http://${wifiUrl}:8080/clinic-admin";
 const String baseUrl = '$serverUrl/customers';

@@ -7,6 +7,7 @@ import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigation/BottomNavigation.dart';
 import '../Screens/CategoryAndServicesForm.dart';
 import '../Utils/GradientTextWidget .dart';
@@ -31,12 +32,11 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   final consultationcontroller = Get.find<Consultationcontroller>();
   List<ConsultationModel> _consultations = [];
   bool loading = true;
-  final  dashboardcontroller =
-      Get.put(Dashboardcontroller());
+  final dashboardcontroller = Get.put(Dashboardcontroller());
   @override
   void initState() {
     super.initState();
-dashboardcontroller.setMobileNumber(widget.mobileNumber);
+    dashboardcontroller.setMobileNumber(widget.mobileNumber);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final consultations = await getConsultationDetails();
@@ -200,10 +200,24 @@ dashboardcontroller.setMobileNumber(widget.mobileNumber);
   Widget _serviceButton(String title, Color backgroundColor, String id,
       IconData icon, ConsultationModel consultation) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        // consultationcontroller.setConsultation(consultation);
+
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+
         consultationcontroller.setConsultation(consultation);
 
-        showSnackbar("Selected", "$title [$id]", "success");
+        // showSnackbar("Selected", "$title [$id]", "success");
+
+        // Save permanently only if not already saved
+        if (!prefs.containsKey('firstConsultationId')) {
+          await prefs.setString(
+              'firstConsultationId', _consultations.first.consultationId);
+          await prefs.setString(
+              'firstConsultationType', _consultations.first.consultationType);
+        }
+
+        // showSnackbar("Selected", "$title [$id]", "success");
         String firstId = _consultations.first.consultationId;
 
         // Check if the 'id' matches the first consultationId in any consultation
@@ -211,6 +225,7 @@ dashboardcontroller.setMobileNumber(widget.mobileNumber);
           Get.to(BottomNavController(
             mobileNumber: widget.mobileNumber,
             username: widget.username,
+            consultation: consultation,
             index: 0,
           ));
         } else {
