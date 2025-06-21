@@ -42,17 +42,40 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   String? id;
   List<DoctorSlot>? slots;
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   //
+  //   // scheduleController.setDoctorSlots(widget.doctorData.doctor);  //TODO:impement pending
+
+  //   //  controller.setDoctorSlots(widget.doctor.slots);
+  //   scheduleController.initializeWeekDates();
+
+  //   id = consultationController.selectedConsultation.value?.consultationId;
+  //   fetchDoctorSlotsOnce();
+  // }
+
   @override
   void initState() {
     super.initState();
-    scheduleController.initializeWeekDates();
-    // scheduleController.setDoctorSlots(widget.doctorData.doctor);  //TODO:impement pending
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
+  }
 
-    //  controller.setDoctorSlots(widget.doctor.slots);
+  Future<void> _initialize() async {
+    if (!mounted) return;
 
-    id = consultationController.selectedConsultation.value?.consultationId;
-    fetchDoctorSlotsOnce();
-    timeslots();
+    try {
+      await scheduleController.initializeWeekDates();
+      id = consultationController.selectedConsultation.value?.consultationId;
+      await fetchDoctorSlotsOnce();
+    } catch (e) {
+      debugPrint('Initialization error: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> fetchDoctorSlotsOnce() async {
@@ -63,6 +86,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     scheduleController.filterSlotsForSelectedDate(allSlots);
     print("iam calling doctorId ${widget.doctorData.doctor.doctorId}");
     print("iam calling hospitalId ${widget.doctorData.hospital.hospitalId}");
+    // scheduleController.initializeWeekDates();
   }
 
   @override
@@ -224,9 +248,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  timeslots() {
-    // final filteredSlots = getFilteredSlots();
-
+// In your timeslots() widget:
+  Widget timeslots() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -259,7 +282,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   ],
                   onSelected: (selected) {
                     print("User selected: $selected");
-                    // Handle your action here
                   },
                 );
               },
@@ -267,134 +289,148 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ],
         ),
         const SizedBox(height: 10),
-        scheduleController.currentSlots.isNotEmpty
-            ? Column(
-                children: List.generate(
-                  (scheduleController.currentSlots.length / 4).ceil(),
-                  (rowIndex) {
-                    final startIndex = rowIndex * 4;
-                    final endIndex = (startIndex + 4 <
-                            scheduleController.currentSlots.length)
+        Obx(() {
+          if (scheduleController.currentSlots.isEmpty) {
+            return const Text("No available slots",
+                style: TextStyle(color: Colors.red));
+          }
+
+          return Column(
+            children: List.generate(
+              (scheduleController.currentSlots.length / 4).ceil(),
+              (rowIndex) {
+                final startIndex = rowIndex * 4;
+                final endIndex =
+                    (startIndex + 4 < scheduleController.currentSlots.length)
                         ? startIndex + 4
                         : scheduleController.currentSlots.length;
-                    final rowSlots = scheduleController.currentSlots
-                        .sublist(startIndex, endIndex);
+                final rowSlots = scheduleController.currentSlots
+                    .sublist(startIndex, endIndex);
 
-                    return Row(
-                      children: List.generate(4, (i) {
-                        if (i < rowSlots.length) {
-                          final slotData = rowSlots[i];
-                          final slotText = slotData.slot;
-                          final isBooked = slotData.slotbooked;
-                          final actualIndex = startIndex + i;
+                return Row(
+                  children: List.generate(4, (i) {
+                    if (i < rowSlots.length) {
+                      final slotData = rowSlots[i];
+                      final slotText = slotData.slot;
+                      final isBooked = slotData.slotbooked;
+                      final actualIndex = startIndex + i;
 
-                          final isSelected = actualIndex ==
-                              scheduleController.selectedSlotIndex.value;
+                      final isSelected = actualIndex ==
+                          scheduleController.selectedSlotIndex.value;
 
-                          return Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(4),
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (!isBooked) {
-                                    setState(() {
-                                      scheduleController.selectSlot(
-                                          actualIndex, slotText);
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    color: isBooked
-                                        ? Colors.grey.shade300
-                                        : isSelected
-                                            ? mainColor
-                                            : Colors.white,
-                                    border: Border.all(
-                                        color:
-                                            isBooked ? Colors.grey : mainColor),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    slotText,
-                                    style: TextStyle(
-                                      color: isBooked
-                                          ? Colors.grey
-                                          : isSelected
-                                              ? Colors.white
-                                              : mainColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: GestureDetector(
+                            onTap: () {
+                              if (!isBooked) {
+                                scheduleController.selectSlot(
+                                    actualIndex, slotText);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 4),
+                              decoration: BoxDecoration(
+                                color: isBooked
+                                    ? Colors.grey.shade300
+                                    : isSelected
+                                        ? mainColor
+                                        : Colors.white,
+                                border: Border.all(
+                                    color: isBooked ? Colors.grey : mainColor),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                slotText,
+                                style: TextStyle(
+                                  color: isBooked
+                                      ? Colors.grey
+                                      : isSelected
+                                          ? Colors.white
+                                          : mainColor,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
-                          );
-                        } else {
-                          return const Expanded(child: SizedBox(height: 48));
-                        }
-                      }),
-                    );
-                  },
-                ),
-              )
-            : const Text("No available slots",
-                style: TextStyle(color: Colors.red)),
+                          ),
+                        ),
+                      );
+                    } else {
+                      return const Expanded(child: SizedBox(height: 48));
+                    }
+                  }),
+                );
+              },
+            ),
+          );
+        }),
       ],
     );
   }
 
-  showDays() {
-    return SizedBox(
-      height: 70,
-      child: ListView.builder(
-        controller: _dateScrollController,
-        scrollDirection: Axis.horizontal,
-        itemCount: scheduleController.weekDates.length,
-        itemBuilder: (context, index) {
-          final date = scheduleController.weekDates[index];
-          final isSelected = index == scheduleController.selectedDayIndex;
-          return GestureDetector(
-            onTap: () async {
-              final slots = await DoctorSlotService.fetchDoctorSlots(
-                  widget.doctorData.doctor.doctorId,
-                  widget.doctorData.hospital.hospitalId);
+// In your showDays() widget:
+  Widget showDays() {
+    return Obx(() {
+      return SizedBox(
+        height: 70,
+        child: ListView.builder(
+          controller: _dateScrollController,
+          scrollDirection: Axis.horizontal,
+          itemCount: scheduleController.weekDates.length,
+          itemBuilder: (context, index) {
+            final date = scheduleController.weekDates[index];
+         final isSelected = index == scheduleController.selectedDayIndex.value;
 
-              setState(() {
-                scheduleController.selectedDayIndex = index;
-                scheduleController.selectedDate.value = date;
-                scheduleController
-                    .filterSlotsForSelectedDate(slots); // now typed correctly
-              });
-            },
-            child: Container(
-              width: 50,
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              decoration: BoxDecoration(
-                color: isSelected ? mainColor : Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: mainColor),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(DateFormat('dd').format(date),
+
+            return GestureDetector(
+              onTap: () async {
+                // ✅ Store the index and date before async
+                final tappedDate = date;
+
+                // ✅ First fetch slots
+                final slots = await DoctorSlotService.fetchDoctorSlots(
+                  widget.doctorData.doctor.doctorId,
+                  widget.doctorData.hospital.hospitalId,
+                );
+
+                // ✅ Update controller AFTER fetch completes
+                scheduleController.selectDate(tappedDate, slots);
+                scheduleController.selectedDayIndex.value = index;
+              },
+              child: Container(
+                width: 50,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                decoration: BoxDecoration(
+                  color: isSelected ? mainColor : Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: mainColor),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      DateFormat('dd').format(date),
                       style: TextStyle(
-                          color: isSelected ? Colors.white : mainColor,
-                          fontWeight: FontWeight.bold)),
-                  Text(DateFormat('E').format(date).toUpperCase(),
+                        color: isSelected ? Colors.white : mainColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      DateFormat('E').format(date).toUpperCase(),
                       style: TextStyle(
-                          fontSize: 12,
-                          color: isSelected ? Colors.white : mainColor)),
-                ],
+                        fontSize: 12,
+                        color: isSelected ? Colors.white : mainColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      ),
-    );
+            );
+          },
+        ),
+      );
+    });
   }
 }

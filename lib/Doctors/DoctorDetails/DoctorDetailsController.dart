@@ -157,48 +157,48 @@ class Doctordetailscontroller extends GetxController {
     );
   }
 
-  Widget buildReportContactSection(
-      BuildContext context, TextEditingController title) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () => showReportBottomSheet(context),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 1,
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-              border: Border.all(
-                  color: const Color.fromARGB(140, 158, 158, 158), width: 1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text(
-                  "Report an issue",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: mainColor,
-                    fontSize: 16,
-                  ),
-                ),
-                Icon(Icons.flag, color: Colors.red),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
+  // Widget buildReportContactSection(
+  //     BuildContext context, TextEditingController title) {
+  //   return Column(
+  //     children: [
+  //       GestureDetector(
+  //         onTap: () => showReportBottomSheet(context),
+  //         child: Container(
+  //           padding: const EdgeInsets.all(12),
+  //           decoration: BoxDecoration(
+  //             color: Colors.white,
+  //             boxShadow: [
+  //               BoxShadow(
+  //                 color: Colors.grey.withOpacity(0.3),
+  //                 spreadRadius: 1,
+  //                 blurRadius: 6,
+  //                 offset: const Offset(0, 3),
+  //               ),
+  //             ],
+  //             border: Border.all(
+  //                 color: const Color.fromARGB(140, 158, 158, 158), width: 1),
+  //             borderRadius: BorderRadius.circular(8),
+  //           ),
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //             children: const [
+  //               Text(
+  //                 "Report an issue",
+  //                 style: TextStyle(
+  //                   fontWeight: FontWeight.bold,
+  //                   color: mainColor,
+  //                   fontSize: 16,
+  //                 ),
+  //               ),
+  //               Icon(Icons.flag, color: Colors.red),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //       const SizedBox(height: 20),
+  //     ],
+  //   );
+  // }
 
   void showReportBottomSheet(BuildContext context) {
     final ReportController controller = Get.put(ReportController());

@@ -8,7 +8,7 @@ import '../Utils/ShowSnackBar.dart';
 // import 'BaseUrl.dart';
 
 class LoginApiService {
-  final String endpoint = 'sign-in-or-sign-up';
+  final String endpoint = 'registerOrLogin';
 
   Future<Map<String, dynamic>> sendUserDataWithFCMToken(
       String fullname, String mobileNumber) async {
@@ -50,7 +50,7 @@ class LoginApiService {
 
       // Send user data and FCM token to backend
       final response = await http.post(
-        Uri.parse('$baseUrl/$endpoint'),
+        Uri.parse('$registerUrl/$endpoint'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'fullName': fullname,

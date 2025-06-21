@@ -22,7 +22,7 @@ class DoctorSlotService {
         final List<DoctorSlot> slots =
             dataList.map((e) => DoctorSlot.fromJson(e)).toList();
 
-        print('✅ Parsed DoctorSlots Count: ${slots.length}');
+        print('✅ Parsed DoctorSlots Count: ${slots.map((e) => e.date)}');
         return slots;
       } else {
         print('❌ Failed: ${response.body}');

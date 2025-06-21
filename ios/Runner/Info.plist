@@ -45,6 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+<false/>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>This app needs access to your photo library</string>
+
 	<key>LSApplicationQueriesSchemes</key>
 	<key>NSPhoneUsageDescription</key>
 <string>We need phone permissions to allow calling.</string>
