@@ -35,43 +35,60 @@ class AppointmentController extends GetxController {
       final List<Getappointmentmodel> response =
           await appointmentService.fetchAppointments(mobileNumber);
 
+      print("📥 Bookings response: ${response}");
       print("📥 Bookings fetched: ${response.length}");
 
       if (response.isNotEmpty) {
         doctorBookings.assignAll(response);
         print("🩺 Bookings assigned: ${doctorBookings.length}");
 
-        // Calculate counts...
+        // 🔍 Debug: Print all booking statuses and types
+        for (var b in doctorBookings) {
+          print(
+              "📝 status: '${b.status}', consultationType: '${b.consultationType}'");
+        }
+
+        // ✅ Calculate upcoming (excluding online consultations)
         upcomingCountRx.value = doctorBookings.where((b) {
-          final status = b.status.toLowerCase();
-          final consultationType = b.consultationType.toLowerCase();
+          final status = b.status.trim().toLowerCase();
+          final consultationType = b.consultationType.trim().toLowerCase();
           return (status == 'pending' || status == 'confirmed') &&
               consultationType != 'online consultation';
         }).length;
 
+        // ✅ Calculate online consultations that are not completed
         videoConsultationCountRx.value = doctorBookings.where((b) {
           final type = b.consultationType.trim().toLowerCase();
           final status = b.status.trim().toLowerCase();
+          print("upcomingCount type : ${type}");
           return type == 'online consultation' && status != 'completed';
         }).length;
 
+        // ✅ In-progress bookings
         inProgressBookings.assignAll(
           doctorBookings
-              .where((b) => b.status.toLowerCase() == 'in_progress')
+              .where((b) => b.status.trim().toLowerCase() == 'in_progress')
               .toList(),
         );
+
+        print("📊 upcomingCount: ${upcomingCountRx.value}");
+        print("📹 videoConsultationCount: ${videoConsultationCountRx.value}");
+        print("🚧 inProgressCount: ${inProgressBookings.length}");
       } else {
+        // No data
         doctorBookings.clear();
         upcomingCountRx.value = 0;
         videoConsultationCountRx.value = 0;
+        inProgressBookings.clear();
+        print("📭 No bookings found.");
       }
     } catch (e) {
       print("❌ Error in fetchBookings(): $e");
       doctorBookings.clear();
       upcomingCountRx.value = 0;
       videoConsultationCountRx.value = 0;
+      inProgressBookings.clear();
     } finally {
-      // Always stop loader
       isLoading.value = false;
       print("🔁 isLoading set to false");
     }

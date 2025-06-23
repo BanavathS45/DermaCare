@@ -48,7 +48,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
       base64String = base64String.substring(prefix.length);
     }
     final isCompletedStatus = patient.status.toLowerCase() == 'completed';
-    // final hasReports = patient.reports != null && patient.reports!.isNotEmpty;
+    final hasReports = patient.reports != null;
     return Scaffold(
       appBar: CommonHeader(
         title: "Booking ID: #${patient.bookingId}",
@@ -177,7 +177,6 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                 ],
                 title: "Doctor Details",
               ),
-
             _sectionCard(
               icon: Icons.account_circle_outlined,
               title: "Patient Details",
@@ -187,16 +186,23 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
 
                 _infoRow("Gender", patient.gender),
                 _infoRow("Booking For", patient.bookingFor),
-                _infoRow("Problem", patient.problem),
                 _infoRow("Date", patient.serviceDate),
                 _infoRow("Time", patient.servicetime),
-                // _infoRow(
-                //     "Patient Notes",
-                //     (patient.notes!.isNotEmpty
-                //         ? patient.notes!
-                //         : "No Patient Notes Provide")),
+                _infoRow("Problem", patient.problem),
               ],
             ),
+            if (patient.notes != "")
+              _sectionCard(
+                icon: Icons.payment_outlined,
+                title: "Patient Notes",
+                children: [
+                  _infoRow(
+                      "📝🩺",
+                      (patient.notes!.isNotEmpty
+                          ? patient.notes!
+                          : "No Patient Notes Provide")),
+                ],
+              ),
             _sectionCard(
               icon: Icons.payment_outlined,
               title: "Payment Details",
@@ -208,38 +214,39 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               ],
             ),
             const SizedBox(height: 10),
-            // isCompletedStatus && hasReports
-            //     ? Container(
-            //         width: 200,
-            //         decoration: BoxDecoration(
-            //           gradient: appGradient(),
-            //           borderRadius: BorderRadius.circular(8),
-            //         ),
-            //         child: ElevatedButton(
-            //           onPressed: () async {
-            //             final reports = widget.doctorBookings.patient.reports;
-            //             print("dshfjkshdfhkd${reports}");
-            //             if (reports != null && reports.isNotEmpty) {
-            //               showReportDownloadSheet(context, reports);
-            //             } else {
-            //               showSnackbar("Error", "No report found.", "error");
-            //             }
-            //           },
-            //           style: ElevatedButton.styleFrom(
-            //             elevation: 0,
-            //             backgroundColor: Colors.transparent,
-            //             shadowColor: Colors.transparent,
-            //             shape: RoundedRectangleBorder(
-            //               borderRadius: BorderRadius.circular(8),
-            //             ),
-            //           ),
-            //           child: Text(
-            //             "Download Reports",
-            //             style: const TextStyle(fontSize: 18),
-            //           ),
-            //         ),
-            //       )
-            //     : const SizedBox.shrink(),
+            isCompletedStatus && hasReports
+                ? Container(
+                    width: 200,
+                    decoration: BoxDecoration(
+                      gradient: appGradient(),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final reports = widget.doctorBookings.reports;
+                        print("dshfjkshdfhkd${reports}");
+                        if (reports != null) {
+                          showReportDownloadSheet(
+                              context, reports?.reportsList ?? []);
+                        } else {
+                          showSnackbar("Error", "No report found.", "error");
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        "Download Reports",
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ],
         ),
       ),

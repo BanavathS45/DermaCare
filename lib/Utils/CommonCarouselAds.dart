@@ -105,16 +105,21 @@ class _CommonCarouselAdsState extends State<CommonCarouselAds> {
   }
 
   Widget _buildImageItem(String imagePath) {
-    if (_isBase64(imagePath)) {
+    if (imagePath.startsWith('data:image')) {
       try {
-        final decodedBytes = base64Decode(imagePath);
+        final base64Data = imagePath.split(',').last;
+        final decodedBytes = base64Decode(base64Data);
         return ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: Image.memory(decodedBytes,
-              fit: BoxFit.cover, width: double.infinity, height: widget.height),
+          child: Image.memory(
+            decodedBytes,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: widget.height,
+          ),
         );
       } catch (e) {
-        print("❌ Base64 Image Error: $e");
+        print("❌ Failed to decode base64 image: $e");
         return _fallbackImage();
       }
     }

@@ -8,7 +8,9 @@ class CarouselSliderService {
   // Method to fetch image URLs from the API and return them
   Future<List<String>> fetchImages() async {
     final url = Uri.parse(
-        '$serverUrl/dashboard-images/getAllImages'); // Replace with your API endpoint
+        '$serverUrl/admin/categoryAdvertisement/getAll'); // Replace with your API endpoint
+    print("carouselPicture ${url}");
+
     try {
       final response = await http.get(url);
       print("carouselPicture ${response.body}");
@@ -24,8 +26,8 @@ class CarouselSliderService {
 
         // Loop through the response data to extract 'carouselPicture' from each object
         for (var item in data) {
-          if (item.containsKey('carouselPicture')) {
-            imageUrls.add(item['carouselPicture']);
+          if (item.containsKey('mediaUrlOrImage')) {
+            imageUrls.add(item['mediaUrlOrImage']);
           }
         }
 
@@ -42,7 +44,7 @@ class CarouselSliderService {
 
   Future<List<String>> fetchServiceImages() async {
     final url = Uri.parse(
-        '$serverUrl/service-images/getAllImages'); // Replace with your API endpoint
+        '$serverUrl/admin/categoryAdvertisement/getAll'); // Replace with your API endpoint
     try {
       final response = await http.get(url);
       print("carouselPicture ${response.body}");
@@ -62,7 +64,7 @@ class CarouselSliderService {
             imageUrls.add(item['carouselPicture']);
           }
         }
-print("imageUrlsimageUrls lengrt ${imageUrls.length}");
+        print("imageUrlsimageUrls lengrt ${imageUrls.length}");
         return imageUrls;
       } else {
         print("carouselPicture ${response.statusCode}");

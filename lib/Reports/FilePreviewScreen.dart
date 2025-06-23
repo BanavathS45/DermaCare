@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 
@@ -44,7 +45,9 @@ class _FilePreviewScreenState extends State<FilePreviewScreen> {
     final isPdf = widget.fileUrl.toLowerCase().endsWith('.pdf');
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Preview")),
+      appBar: CommonHeader(
+        title: "Preview",
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : isPdf

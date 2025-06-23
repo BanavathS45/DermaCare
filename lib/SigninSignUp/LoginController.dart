@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cutomer_app/APIs/BaseUrl.dart';
+import 'package:cutomer_app/OTP/FireBaseOtp.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -167,23 +168,23 @@ class SiginSignUpController extends GetxController {
                       username: fullname,
                     ));
               } else {
-                Get.to(() => RegisterScreen(
-                      fullName: fullname,
+                Get.to(() => OTPLoginScreen(
                       mobileNumber: mobileNumber,
+                      fullname: fullname,
                     ));
               }
             } else {
               // ❌ Not registered
-              Get.to(() => RegisterScreen(
-                    fullName: fullname,
+              Get.to(() => OTPLoginScreen(
                     mobileNumber: mobileNumber,
+                    fullname: fullname,
                   ));
             }
           } else {
             // ❌ Failed to fetch registration details
-            Get.to(() => RegisterScreen(
-                  fullName: fullname,
+            Get.to(() => OTPLoginScreen(
                   mobileNumber: mobileNumber,
+                  fullname: fullname,
                 ));
           }
         } else {

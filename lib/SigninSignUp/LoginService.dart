@@ -65,7 +65,7 @@ class LoginApiService {
         print("response for login $decoded");
 
         // showSnackbar("Success", "${decoded['message']}", "success");
-        showSnackbar("Success", "Login Successfully...!", "success");
+        showSnackbar("Success", "Otp Send Successfully..!", "success");
 
         return decoded;
       } else {

@@ -6,11 +6,18 @@ import 'package:http/http.dart' as http;
 
 class ServiceFetcher {
   Future<List<Service>> fetchServices(String categoryId) async {
+    print("🔄 Sending request to categoryId: $categoryId");
+
     final url = '$getServiceByCategoriesID/$categoryId';
 
     try {
       print("🔄 Sending request to URL: $url");
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
       print("📦 API response status: ${response.statusCode}");
 
       if (response.statusCode == 200 || response.statusCode == 302) {
