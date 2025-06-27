@@ -139,29 +139,29 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                         final item = filteredData[index];
                         final hospital = item.hospital;
                         final doctor = item.doctor;
-                        final isVideo =
-                            widget.consulationType.toLowerCase() == "video";
+                        final isVideo = widget.consulationType.toLowerCase() ==
+                                "video" ||
+                            widget.consulationType.toLowerCase() == "online";
                         final cost = isVideo
                             ? doctor.doctorFees.vedioConsultationFee
                             : doctor.doctorFees.inClinicFee;
 
                         return InkWell(
                           onTap: () {
-                            Get.to(() => ScheduleScreen(
-                                  doctorData: item,
-                                  mobileNumber: widget.mobileNumber,
-                                ));
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (_) => Doctorscreen(
-                            //       mobileNumber: widget.mobileNumber,
-                            //       username: widget.username,
-                            //       subServiceID: widget.subserviceid,
-                            //       hospiatlName: hospital.name,
-                            //     ),
-                            //   ),
-                            // );
+                            print(item.doctor.doctorAvailabilityStatus);
+                            if (item.doctor.doctorAvailabilityStatus == true) {
+                              Get.to(() => ScheduleScreen(
+                                    doctorData: item,
+                                    mobileNumber: widget.mobileNumber,
+                                  ));
+                            } else {
+                              // Optional: Show a snackbar or dialog to inform user
+                              Get.snackbar(
+                                'Unavailable',
+                                'Doctor is not available at the moment.',
+                                snackPosition: SnackPosition.BOTTOM,
+                              );
+                            }
                           },
                           borderRadius: BorderRadius.circular(12),
                           child: Container(

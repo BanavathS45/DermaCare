@@ -8,10 +8,38 @@ import '../ListOfDoctors/DoctorSlotModel.dart';
 
 class ScheduleController extends GetxController {
   // Language labels for doctor languages
-  final Map<String, String> languageLabels = {
+   final Map<String, String> languageLabels = {
     "English": "English",
     "Hindi": "हिन्दी",
-    // ... keep all your language mappings ...
+    "Telugu": "తెలుగు",
+    "Urdu": "اردو",
+    "Marathi": "मराठी",
+    "Kannada": "ಕನ್ನಡ",
+    "Gujarati": "ગુજરાતી",
+    "Tamil": "தமிழ்",
+    "Bengali": "বাংলা",
+    "Punjabi": "ਪੰਜਾਬੀ",
+    "Malayalam": "മലയാളം",
+    "Odia": "ଓଡ଼ିଆ",
+    "Assamese": "অসমীয়া",
+    "Konkani": "कोंकणी",
+    "Manipuri": "মৈতৈলোন্",
+    "Santali": "ᱥᱟᱱᱛᱟᱲᱤ",
+    "Bodo": "बर'",
+    "Kashmiri": "کٲشُر",
+    "Dogri": "ڈوگری",
+    "Maithili": "मैथिली",
+    "Sindhi": "سنڌي",
+    "Sanskrit": "संस्कृतम्",
+    "Nepali": "नेपाली",
+    "Tulu": "ತುಳು",
+    "Bhili": "भीली",
+    "Khasi": "Khasi",
+    "Mizo": "Mizo",
+    "Garo": "Garo",
+    "Nagamese": "Nagamese",
+    "Ladakhi": "ལ་དྭགས་སྐད།",
+    // Add more tribal/regional languages as needed
   };
 
   // Reactive state variables

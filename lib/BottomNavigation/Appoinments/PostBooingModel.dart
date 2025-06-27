@@ -10,6 +10,7 @@ class BookingDetailsModel {
   final String status;
   final String? resoan;
   final String clinicId;
+  final String deviceId;
 
   BookingDetailsModel({
     required this.subServiceName,
@@ -21,6 +22,7 @@ class BookingDetailsModel {
     required this.status,
     this.resoan,
     required this.clinicId,
+    required this.deviceId,
   });
 
   factory BookingDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class BookingDetailsModel {
       doctorId: json['doctorId'],
       consultationType: json['consultationType'],
       resoan: json['resoan'],
+      deviceId: json['deviceId'],
       totalFee: (json['totalFee'] ?? 0).toDouble(),
       consultattionFee: (json['consultattionFee'] ?? 0).toDouble(),
     );
@@ -48,6 +51,7 @@ class BookingDetailsModel {
       'totalFee': totalFee,
       'consultattionFee': consultattionFee,
       'clinicId': clinicId,
+      'deviceId': deviceId,
     };
   }
 }

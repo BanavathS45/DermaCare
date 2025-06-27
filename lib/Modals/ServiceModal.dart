@@ -105,7 +105,7 @@ class SubService {
   final String viewDescription;
   final String status;
   final Uint8List subServiceImage;
-  final Uint8List viewImage;// Removed this line
+  final Uint8List viewImage; // Removed this line
   final String minTime;
   final List<DescriptionQA> descriptionQA;
   final double price;
@@ -113,11 +113,11 @@ class SubService {
   final double taxPercentage;
   final double platformFeePercentage;
   final double discountAmount; // Removed this line
-  final double taxAmount;// Removed this line
-  final double platformFee;// Removed this line
-  final double discountedCost;// Removed this line
-  final double clinicPay;// Removed this line
-  final double finalCost;// Removed this line
+  final double taxAmount; // Removed this line
+  final double platformFee; // Removed this line
+  final double discountedCost; // Removed this line
+  final double clinicPay; // Removed this line
+  final double finalCost; // Removed this line
 
   SubService({
     required this.subServiceId,
@@ -156,10 +156,10 @@ class SubService {
       description: json['description'] ?? '',
       viewDescription: json['viewDescription'] ?? '',
       status: json['status'] ?? '',
-      subServiceImage:
-          (json['subServiceImage'] != null && json['subServiceImage'].isNotEmpty)
-              ? base64Decode(json['subServiceImage'])
-              : Uint8List(0),
+      subServiceImage: (json['subServiceImage'] != null &&
+              json['subServiceImage'].isNotEmpty)
+          ? base64Decode(json['subServiceImage'])
+          : Uint8List(0),
       viewImage: (json['viewImage'] != null && json['viewImage'].isNotEmpty)
           ? base64Decode(json['viewImage'])
           : Uint8List(0),
@@ -226,7 +226,6 @@ class DescriptionQA {
     return qa;
   }
 }
- 
 
 class Service {
   final String serviceId;
@@ -268,4 +267,66 @@ class Service {
   }
 }
 
+//SUbservice model
 
+class CategoryAdmin {
+  final String id;
+  final String categoryId;
+  final String categoryName;
+  final List<SubServiceAdmin> subServices;
+
+  CategoryAdmin({
+    required this.id,
+    required this.categoryId,
+    required this.categoryName,
+    required this.subServices,
+  });
+
+  factory CategoryAdmin.fromJson(Map<String, dynamic> json) {
+    return CategoryAdmin(
+      id: json['id'],
+      categoryId: json['categoryId'],
+      categoryName: json['categoryName'],
+      subServices: (json['subServices'] as List)
+          .map((e) => SubServiceAdmin.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'categoryId': categoryId,
+        'categoryName': categoryName,
+        'subServices': subServices.map((s) => s.toJson()).toList(),
+      };
+}
+
+class SubServiceAdmin {
+  final String subServiceId;
+  final String subServiceName;
+  final String serviceName;
+  final String serviceId;
+
+  SubServiceAdmin({
+    required this.subServiceId,
+    required this.subServiceName,
+    required this.serviceName,
+    required this.serviceId,
+  });
+
+  factory SubServiceAdmin.fromJson(Map<String, dynamic> json) {
+    return SubServiceAdmin(
+      subServiceId: json['subServiceId'],
+      subServiceName: json['subServiceName'],
+      serviceName: json['serviceName'],
+      serviceId: json['serviceId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'subServiceId': subServiceId,
+        'subServiceName': subServiceName,
+        'serviceName': serviceName,
+        'serviceId': serviceId,
+      };
+}

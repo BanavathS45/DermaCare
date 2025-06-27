@@ -248,7 +248,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
                   ),
                 ],
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Get.to(Loginscreen()),
                   child: Text(
                     'Change Mobile Number',
                     style: TextStyle(

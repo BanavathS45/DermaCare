@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cutomer_app/APIs/BaseUrl.dart';
 import 'package:cutomer_app/OTP/FireBaseOtp.dart';
+import 'package:cutomer_app/SigninSignUp/BiometricPermissionScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -143,10 +144,11 @@ class SiginSignUpController extends GetxController {
           getOTPButton.value = "SIGN IN";
 
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool('isFirstLoginDone', true);
-          await prefs.setBool('isAuthenticated', true);
+          // await prefs.setBool('isFirstLoginDone', true);
+          // await prefs.setBool('isAuthenticated', true);
           await prefs.setString('username', fullname);
           await prefs.setString('mobileNumber', mobileNumber);
+          await prefs.setString('fcm', response['fcm'] ?? "");
 
           final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
 
@@ -168,21 +170,21 @@ class SiginSignUpController extends GetxController {
                       username: fullname,
                     ));
               } else {
-                Get.to(() => OTPLoginScreen(
+                Get.to(() => EnableBiometricScreen(
                       mobileNumber: mobileNumber,
                       fullname: fullname,
                     ));
               }
             } else {
               // ❌ Not registered
-              Get.to(() => OTPLoginScreen(
+              Get.to(() => EnableBiometricScreen(
                     mobileNumber: mobileNumber,
                     fullname: fullname,
                   ));
             }
           } else {
             // ❌ Failed to fetch registration details
-            Get.to(() => OTPLoginScreen(
+            Get.to(() => EnableBiometricScreen(
                   mobileNumber: mobileNumber,
                   fullname: fullname,
                 ));

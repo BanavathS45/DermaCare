@@ -30,7 +30,7 @@
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 <!--for bring app to foreground from background in Android 10 -->
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
+<uses-feature android:name="android.hardware.fingerprint" android:required="false"/>
  
     <application
         android:label="Derma Care"
@@ -39,7 +39,9 @@
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
         android:foregroundServiceType="location"
+        
         >
+
 
          <meta-data
                 android:name="com.google.android.geo.API_KEY"

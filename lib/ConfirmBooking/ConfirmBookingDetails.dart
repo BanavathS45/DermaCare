@@ -207,6 +207,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               totalFee: (consultationFee).toDouble(),
               status: 'pending',
               clinicId: widget.doctor.hospital.hospitalId,
+              deviceId: widget.doctor.doctor.deviceId,
             );
 
             Get.to(RazorpaySubscription(

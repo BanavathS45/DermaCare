@@ -31,6 +31,7 @@ class Doctor {
   final String availableDays;
   final String availableTimes;
   final String profileDescription;
+  final String deviceId;
   final DoctorFees doctorFees;
   final List<String> focusAreas;
   final List<String> languages;
@@ -60,6 +61,7 @@ class Doctor {
     required this.languages,
     required this.highlights,
     required this.doctorAvailabilityStatus,
+    required this.deviceId,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
@@ -71,6 +73,7 @@ class Doctor {
       doctorPicture: json['doctorPicture'] ?? '',
       doctorLicence: json['doctorLicence'] ?? '',
       doctorMobileNumber: json['doctorMobileNumber'] ?? '',
+      deviceId: json['deviceId'] ?? '',
       category: (json['category'] as List<dynamic>?)
               ?.map((e) => Category.fromJson(e))
               .toList() ??

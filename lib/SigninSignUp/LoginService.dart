@@ -47,6 +47,11 @@ class LoginApiService {
         print("Token refreshed: $newToken");
         // You could resend the token here if needed
       });
+      final body = {
+        'fullName': fullname,
+        'mobileNumber': mobileNumber,
+        'deviceId': token,
+      };
 
       // Send user data and FCM token to backend
       final response = await http.post(
@@ -55,10 +60,12 @@ class LoginApiService {
         body: json.encode({
           'fullName': fullname,
           'mobileNumber': mobileNumber,
-          // 'fcmToken': token,
+          'deviceId': token,
         }),
       );
+
       print("response for statusCode ${response.statusCode}");
+      print("response for statusCode body ${body}");
 
       final decoded = jsonDecode(response.body);
       if (response.statusCode == 200) {
