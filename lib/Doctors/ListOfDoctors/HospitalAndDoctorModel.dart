@@ -23,7 +23,7 @@ class Doctor {
   final String doctorMobileNumber;
   final List<Category> category;
   final List<Service> service;
-  final List<SubService> subServices;
+  final List<SubServices> subServices;
   final String specialization;
   final String gender;
   final String experience;
@@ -83,7 +83,7 @@ class Doctor {
               .toList() ??
           [],
       subServices: (json['subServices'] as List<dynamic>?)
-              ?.map((e) => SubService.fromJson(e))
+              ?.map((e) => SubServices.fromJson(e))
               .toList() ??
           [],
       specialization: json['specialization'] ?? '',
@@ -197,14 +197,14 @@ class Service {
   }
 }
 
-class SubService {
+class SubServices {
   final String subServiceId;
   final String subServiceName;
 
-  SubService({required this.subServiceId, required this.subServiceName});
+  SubServices({required this.subServiceId, required this.subServiceName});
 
-  factory SubService.fromJson(Map<String, dynamic> json) {
-    return SubService(
+  factory SubServices.fromJson(Map<String, dynamic> json) {
+    return SubServices(
       subServiceId: json['subServiceId'] ?? '',
       subServiceName: json['subServiceName'] ?? '',
     );

@@ -203,11 +203,21 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               doctorId: widget.doctor.doctor.doctorId,
               consultationType: consultationController
                   .selectedConsultation.value!.consultationType,
-              consultattionFee: consultationFee.toDouble(),
+              consultationFee: consultationFee.toDouble(),
               totalFee: (consultationFee).toDouble(),
-              status: 'pending',
               clinicId: widget.doctor.hospital.hospitalId,
-              deviceId: widget.doctor.doctor.deviceId,
+              doctorDeviceId: widget.doctor.doctor.deviceId,
+              categoryName: selectedServicesController
+                  .selectedSubServices.first.categoryName,
+              clinicAddress: widget.doctor.hospital.address,
+              categoryId: selectedServicesController
+                  .selectedSubServices.first.categoryId,
+              servicename: selectedServicesController
+                  .selectedSubServices.first.serviceName,
+              serviceId: selectedServicesController
+                  .selectedSubServices.first.serviceID,
+              clinicName: widget.doctor.hospital.name,
+              doctorName: widget.doctor.doctor.doctorName,
             );
 
             Get.to(RazorpaySubscription(

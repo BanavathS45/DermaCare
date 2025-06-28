@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Doctors/Schedules/Schedule.dart';
+import 'package:cutomer_app/Modals/ServiceModal.dart';
+import 'package:cutomer_app/Services/SubServiceServices.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -62,6 +65,20 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
     return base64String;
   }
 
+  SubService? subServiceDetails;
+  void loadSubService(hospitalId) async {
+    print("calling....");
+    final result =
+        await fetchSubServiceDetails(hospitalId, widget.subserviceid);
+    setState(() {
+      subServiceDetails = result;
+      final selectedServicesController = Get.find<SelectedServicesController>();
+      selectedServicesController
+          .updateSelectedSubServices([subServiceDetails!]);
+    });
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
     final filteredData = hospitalDoctors.where((item) {
@@ -154,6 +171,8 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                     doctorData: item,
                                     mobileNumber: widget.mobileNumber,
                                   ));
+
+                              loadSubService(item.hospital.hospitalId);
                             } else {
                               // Optional: Show a snackbar or dialog to inform user
                               Get.snackbar(

@@ -154,26 +154,26 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                     controller.selectedSubSubService.value;
                 final isSubServiceAvailable = subServiceArray.isNotEmpty;
 
-                // 🛡 Safety: Ensure selectedSubSubService exists in list
+                // 🛡 Ensure the selected value is still valid
                 if (selectedSubSubService != null &&
                     !subServiceArray.contains(selectedSubSubService)) {
                   controller.selectedSubSubService.value = null;
                 }
 
-                return CustomDropdownField<SubService>(
+                return CustomDropdownField<SubServiceAdmin>(
                   value: isSubServiceAvailable
                       ? controller.selectedSubSubService.value
                       : null,
                   labelText: 'Sub-Service',
                   items: isSubServiceAvailable
                       ? subServiceArray.map((service) {
-                          return DropdownMenuItem<SubService>(
+                          return DropdownMenuItem<SubServiceAdmin>(
                             value: service,
                             child: Text(service.subServiceName),
                           );
                         }).toList()
                       : [
-                          const DropdownMenuItem<SubService>(
+                          const DropdownMenuItem<SubServiceAdmin>(
                             value: null,
                             child: Text("No Sub-Services Available"),
                           ),
@@ -218,7 +218,7 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                     selectedServicesController
                         .updateSelectedServices([selectedSub]);
                     selectedServicesController
-                        .updateSelectedSubServices([selectedSubService!]);
+                        .updateSelectedSubServicesName([selectedSubService!]);
                     selectedServicesController.categoryId.value =
                         selectedMain.categoryId;
                     selectedServicesController.categoryName.value =

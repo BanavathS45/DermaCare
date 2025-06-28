@@ -57,7 +57,7 @@ class ServiceFetcher {
     }
   }
 
-  Future<List<SubService>> fetchsubServices(String serviceId) async {
+  Future<List<SubServiceAdmin>> fetchsubServices(String serviceId) async {
     final url = '$getSubServiceByServiceID/$serviceId';
     print("🔄 Sending request to URL: $url");
 
@@ -67,25 +67,26 @@ class ServiceFetcher {
 
       if (response.statusCode == 200 || response.statusCode == 302) {
         final decodedResponse = json.decode(response.body);
-        final data = decodedResponse['data'];
-        print("📦 Response status: ${data}");
+        final List<dynamic> data = decodedResponse['data'];
 
-        if (data != null && data['subServices'] is List) {
-          final List<dynamic> subServices = data['subServices'];
-
-          return subServices
+        if (data != null && data is List) {
+          // Flatten subServices from each category object
+          final allSubServices = data
+              .expand((category) => category['subServices'] as List<dynamic>)
               .map((json) {
                 try {
-                  return SubService.fromJson(json);
+                  return SubServiceAdmin.fromJson(json);
                 } catch (e) {
                   print("❌ Parse error: $e");
-                  return null; // ✔ allowed because of whereType below
+                  return null;
                 }
               })
-              .whereType<SubService>() // ✅ filters out nulls
+              .whereType<SubServiceAdmin>()
               .toList();
+
+          return allSubServices;
         } else {
-          print("❗ 'subServices' not found or is not a list");
+          print("❗ 'data' is not a list");
           return [];
         }
       } else {

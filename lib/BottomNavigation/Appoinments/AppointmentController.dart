@@ -29,11 +29,17 @@ class AppointmentController extends GetxController {
     final mobileNumber = dashboardcontroller.mobileNumber.value.trim();
     if (mobileNumber.isEmpty) return;
 
+    print("📱 fetchBookings – mobileNumber: '$mobileNumber'");
+
     isLoading.value = true;
 
     try {
-      final List<Getappointmentmodel> response =
-          await appointmentService.fetchAppointments(mobileNumber);
+      final response = await appointmentService.fetchAppointments(mobileNumber);
+      print("📥 fetchBookings – raw list length: ${response.length}");
+
+      // Debug each booking's fields
+      response.forEach((b) => print(
+          "📝 booking => status='${b.status}', type='${b.consultationType}'"));
 
       print("📥 Bookings response: ${response}");
       print("📥 Bookings fetched: ${response.length}");

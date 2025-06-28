@@ -32,11 +32,11 @@ class Dashboardcontroller extends GetxController {
   final selectedService = Rxn<Serviceb>();
 
   var selectedSubService = Rxn<Service>();
-  var selectedSubSubService = Rxn<SubService>();
+  var selectedSubSubService = Rxn<SubServiceAdmin>();
   var serviceList = <Serviceb>[];
 
   var subServiceList = <Service>[].obs;
-  var subServiceArray = <SubService>[].obs;
+  var subServiceArray = <SubServiceAdmin>[].obs;
 
   String statusMessage = "";
 

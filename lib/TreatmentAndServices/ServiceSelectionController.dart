@@ -10,8 +10,6 @@ import '../Modals/ServiceModal.dart';
 import '../Services/CarouselSliderService.dart';
 
 class Serviceselectioncontroller extends GetxController {
- 
-
   late AnimationController animationController;
   late Animation<Color?> skeletonColorAnimation;
   final CarouselSliderService carouselSliderService = CarouselSliderService();
@@ -22,7 +20,7 @@ class Serviceselectioncontroller extends GetxController {
   TextEditingController searchController = TextEditingController();
 
   final RxList<Service> services = <Service>[].obs;
-  final RxList<SubService> subservices = <SubService>[].obs;
+  final RxList<SubServiceAdmin> subservices = <SubServiceAdmin>[].obs;
   final RxList<Service> filteredServices = <Service>[].obs;
 
   final RxBool isLoading = true.obs;
@@ -55,8 +53,14 @@ class Serviceselectioncontroller extends GetxController {
 
   Future<void> fetchServices(String categoryId) async {
     final fetchedServices = await serviceFetcher.fetchServices(categoryId);
-    final fetchedSubServices = await serviceFetcher.fetchsubServices(categoryId);
-    
+
+    final allSubServices = await Future.wait(
+      fetchedServices
+          .map((service) => serviceFetcher.fetchsubServices(service.serviceId)),
+    );
+
+// Flatten the list of lists
+    final fetchedSubServices = allSubServices.expand((e) => e).toList();
 
     print("fetchedServices ${categoryId}");
     print("fetchedServices fetchedServices ${fetchedServices}");
@@ -77,7 +81,6 @@ class Serviceselectioncontroller extends GetxController {
 
     filteredServices.assignAll(results); // Assuming you're using RxList
   }
-    
 
 //   void navigateToConfirmation(
 //       {String? categoryId, String? categoryName, String? serviceId, String? subserviceId }) async {
@@ -95,7 +98,7 @@ class Serviceselectioncontroller extends GetxController {
 //       if (selectedService != null) {
 //         final selectedServicesController =
 //             Get.find<SelectedServicesController>();
-//         selectedServicesController.updateSelectedServices([selectedService]); 
+//         selectedServicesController.updateSelectedServices([selectedService]);
 //          selectedServicesController
 //                       .updateSelectedSubServices([selectedSubService!]);
 //         // Pass as a list

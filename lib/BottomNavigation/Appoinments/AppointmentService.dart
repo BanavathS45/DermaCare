@@ -10,23 +10,25 @@ class AppointmentService {
   Future<List<Getappointmentmodel>> fetchAppointments(
       String mobileNumber) async {
     final url = '$registerUrl/getBookedServices/$mobileNumber';
+    print("🔍 Service – Response url: ${url}");
+
     try {
       final response = await http.get(Uri.parse(url));
-      print("Response status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
+      print("🔍 Service – Response code: ${response.statusCode}");
+      print("🔍 Service – Response body: ${response.body}");
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        final List<dynamic> data = responseData['data'] ?? [];
-        print("Booking Data: $data");
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        final List<dynamic> data = jsonData['data'] ?? [];
+        print("📥 Service – Received ${data.length} booking items");
 
-        return data.map((json) => Getappointmentmodel.fromJson(json)).toList();
+        return data.map((e) => Getappointmentmodel.fromJson(e)).toList();
       } else {
-        print("Error: ${response.reasonPhrase}");
+        print("⚠️ Service – HTTP error: ${response.reasonPhrase}");
         return [];
       }
     } catch (e) {
-      print("Failed to fetch appointments: $e");
+      print("❌ Service – fetchAppointments Exception: $e");
       return [];
     }
   }

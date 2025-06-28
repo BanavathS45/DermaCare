@@ -32,6 +32,19 @@ class AppointmentPreview extends StatefulWidget {
 class _AppointmentPreviewState extends State<AppointmentPreview>
     with AutomaticKeepAliveClientMixin {
   Doctordetailscontroller doctordetailscontroller = Doctordetailscontroller();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print("dsdsadgsadsadsa${widget.doctor.doctor.availableDays}");
+    print("dsdsadgsadsadsa${widget.doctor.doctor.availableTimes}");
+    print("dsdsadgsadsadsa${widget.doctor.doctor.deviceId}");
+    print("dsdsadgsadsadsa${widget.doctor.doctor.doctorAvailabilityStatus}");
+    print("dsdsadgsadsadsa${widget.doctor.doctor.specialization}");
+    print("dsdsadgsadsadsa${widget.doctor.doctor.doctorId}");
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -70,10 +83,10 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
-                          // Text(
-                          //   "${patient} ",
-                          //   style: TextStyle(color: Colors.white),
-                          // ),
+                          Text(
+                            "${patient.reasonForCancel} ",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ],
                       ),
                     ),
@@ -191,18 +204,24 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                 _infoRow("Problem", patient.problem),
               ],
             ),
-            if (patient.notes != "")
-              _sectionCard(
-                icon: Icons.payment_outlined,
-                title: "Patient Notes",
-                children: [
-                  _infoRow(
-                      "📝🩺",
-                      (patient.notes!.isNotEmpty
-                          ? patient.notes!
-                          : "No Patient Notes Provide")),
-                ],
-              ),
+            if (widget.doctorBookings.status.toLowerCase() == "completed")
+              if (patient.notes != null && patient.notes!.isNotEmpty)
+                _sectionCard(
+                  icon: Icons.payment_outlined,
+                  title: "Patient Notes",
+                  children: [
+                    _infoRow("📝🩺", patient.notes!),
+                  ],
+                )
+              else
+                _sectionCard(
+                  icon: Icons.payment_outlined,
+                  title: "Patient Notes",
+                  children: [
+                    _infoRow("📝🩺", "No Patient Notes Provided"),
+                  ],
+                ),
+                
             _sectionCard(
               icon: Icons.payment_outlined,
               title: "Payment Details",

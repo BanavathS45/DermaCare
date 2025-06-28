@@ -28,7 +28,7 @@ class HospitalCardScreen extends StatefulWidget {
   final String serviceId;
   final String serviceName;
 
-  final SubService? selectedService;
+  final SubServiceAdmin? selectedService;
   final Service services;
   @override
   _HospitalCardScreenState createState() => _HospitalCardScreenState();
@@ -167,7 +167,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                           mobileNumber: widget.mobileNumber,
                                           username: widget.username,
                                           selectedService:
-                                              widget.selectedService!,
+                                              widget.selectedService!.subServiceId,
                                           hospitalName: card['hospitalName'],
                                           hospitalId: card['hospitalId']),
                                     ),

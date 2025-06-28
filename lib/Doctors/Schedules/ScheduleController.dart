@@ -8,7 +8,7 @@ import '../ListOfDoctors/DoctorSlotModel.dart';
 
 class ScheduleController extends GetxController {
   // Language labels for doctor languages
-   final Map<String, String> languageLabels = {
+  final Map<String, String> languageLabels = {
     "English": "English",
     "Hindi": "हिन्दी",
     "Telugu": "తెలుగు",
@@ -84,11 +84,13 @@ class ScheduleController extends GetxController {
   void filterSlotsForSelectedDate(List<DoctorSlot> allSlots) {
     try {
       final dateStr = DateFormat('yyyy-MM-dd').format(selectedDate.value);
+      print("slotsForDate : ${dateStr}");
 
       final slotsForDate = allSlots
               .firstWhereOrNull((slot) => slot.date == dateStr)
               ?.availableSlots ??
           [];
+      print("slotsForDate : ${slotsForDate}");
 
       if (dateStr == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
         final now = DateTime.now();

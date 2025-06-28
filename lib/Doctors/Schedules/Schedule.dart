@@ -170,7 +170,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             .format(scheduleController.selectedDate.value),
                         serviceDate: formattedDate,
                         servicetime: scheduleController.selectedSlotText.value,
-                        mobileNumber: widget.mobileNumber);
+                        mobileNumber: widget.mobileNumber,
+                        customerDeviceId:
+                            'dB4XJQ7xQ1KsY_BLUxo0r-:APA91bE74fgP5hWGuf26QAXAB6pFpimSaB22MWw9ccLK44TkFYPnMHaz7vXI7otlxPkLn28zAzNoU5zRIG_Un5fGebPU9TMSTfPWzpnmLgH7MyFxHlSlA3M');
 
                     print("patientmodel ${patientmodel.toJson()}");
 
@@ -381,8 +383,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           itemCount: scheduleController.weekDates.length,
           itemBuilder: (context, index) {
             final date = scheduleController.weekDates[index];
-         final isSelected = index == scheduleController.selectedDayIndex.value;
-
+            final isSelected =
+                index == scheduleController.selectedDayIndex.value;
 
             return GestureDetector(
               onTap: () async {

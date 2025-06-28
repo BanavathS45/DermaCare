@@ -104,18 +104,21 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
   @override
   Widget build(BuildContext context) {
-    // if (isLoading || doctor == null) {
-    //   return const Center(child: CircularProgressIndicator());
-    // }
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (doctor == null) {
-      return const Center(child: Text("No doctor data found"));
+      // Fallback if no data yet
+      return const SizedBox(
+        height: 100,
+        child: Center(child: Text("No doctor data found")),
+      );
     }
-    var doctorData = doctor;
-    var bookingData = widget.doctorData;
+
+    final d = doctor!;
+    final data = widget.doctorData;
+
     return InkWell(
       onTap: () {
         print("dfhjdsfkhdsjkfhdshfjd");
@@ -124,252 +127,153 @@ class _AppointmentCardState extends State<AppointmentCard> {
           doctorBookings: widget.doctorData,
         ));
       },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            // gradient: acrdGradient(),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(0, 3),
-              )
-            ],
-            border: Border.all(width: 1, color: Colors.grey)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // or a fallback widget like Text("No data")
-            Text(
-              "${doctor?.hospital.name ?? 'Unknown Hospital'}",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.blueGrey[900],
-                fontSize: 20,
-              ),
-              maxLines: 2,
-            ),
-            Text(
-              "${capitalizeEachWord(doctor?.hospital.city ?? 'Unknown Hospital')}",
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Colors.blueGrey[500],
-                fontSize: 20,
-              ),
-              maxLines: 2,
-            ),
-
-            SizedBox(
-              height: 5,
-            ),
-            Divider(
-              height: 1,
-              color: secondaryColor,
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Colors.grey.shade300, width: 1),
+        ),
+        elevation: 0,
+        child: Container(
+          height: 100, // Fixed height
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Left side: Hospital name + city, doctor name
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${capitalizeEachWord(widget.doctorData.name)}",
+                      d?.hospital?.name ?? 'Unknown Hospital',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        fontSize: 14,
                         color: Colors.blueGrey[900],
-                        fontSize: 18,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      d?.hospital?.city ?? 'Unknown City',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blueGrey[600],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      capitalizeEachWord(
+                          data?.name ?? 'Patient Name'), // Patient Name Display
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: Colors.blueGrey[700],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "${widget.doctorData.age} Yrs /",
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.blueGrey[900],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      widget.doctorData.gender,
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.blueGrey[900],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Date : ${widget.doctorData.serviceDate}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 15,
-                    color: Colors.black87,
-                  ),
-                ),
-                Text(
-                  "Time :  ${widget.doctorData.servicetime}",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Divider(
-              height: 1,
-              color: secondaryColor,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Consultation Type",
-                      style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 13,
-                          color: Colors.black87),
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      widget.doctorData.subServiceName,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: Colors.black87),
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(widget.doctorData.consultationType,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black54,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        textAlign: TextAlign.center),
-                  ],
-                ),
-                const SizedBox(width: 6),
-                Row(
-                  children: widget.doctorData.status.toLowerCase() !=
-                          'completed'
-                      ? _buildStatusBadges(
-                          widget.doctorData.status.toLowerCase())
-                      : [], // Return an empty list when status is not 'completed'
-                ),
-                Row(
-                  children: [
-                    // This returns List<Widget>
-                    if (widget.doctorData.status.toLowerCase() ==
-                        'completed') ...[
-                      Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                          // color: Colors.green, // Set the background color
-                          borderRadius:
-                              BorderRadius.circular(8), // Set the border radius
-                          border: Border.all(
-                              color: mainColor,
-                              width: 1), // Set the border color and width
-                        ),
-                        child: TextButton(
-                          onPressed: () {
-                            Get.to(
-                              AppointmentPreview(
-                                doctor: doctor!,
-                                doctorBookings: widget.doctorData,
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            'Details',
-                            style: TextStyle(
-                                color: mainColor), // Set the text color
-                          ),
-                        ),
+              // Middle: Date & time stacked vertically
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today,
+                          size: 14, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        data?.serviceDate ?? '--/--/----',
+                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                       ),
-                      SizedBox(width: 10),
-                      // Container(
-                      //   height: 45,
-                      //   decoration: BoxDecoration(
-                      //     color: Colors.blue, // Set the background color
-                      //     borderRadius:
-                      //         BorderRadius.circular(8), // Set the border radius
-                      //     border: Border.all(
-                      //         color: Colors.white,
-                      //         width: 2), // Set the border color and width
-                      //   ),
-                      //   child: TextButton(
-                      //     onPressed: () {
-                      //       Get.to(ReviewScreen(
-                      //           doctorData: doctor,
-                      //           doctorBookings: widget.doctorData));
-                      //     },
-                      //     child: const Text(
-                      //       'Review',
-                      //       style: TextStyle(
-                      //           color: Colors.white), // Set the text color
-                      //     ),
-                      //   ),
-                      // ),
-                      Container(
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color: hasReviewed ? Colors.grey : Colors.blue,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: TextButton(
-                          onPressed: hasReviewed
-                              ? null
-                              : () {
-                                  Get.to(ReviewScreen(
-                                    doctorData: doctor,
-                                    doctorBookings: widget.doctorData,
-                                  ));
-                                },
-                          child: Text(
-                            hasReviewed ? 'Reviewed' : 'Review',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-// Add some space between the buttons
                     ],
-                  ],
-                )
-              ],
-            ),
-          ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time,
+                          size: 14, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        data?.servicetime ?? '--:--',
+                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(width: 10),
+
+              // Right: Status badges (compact) and Consultation type (bottom-right)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // If consultation type is 'Online' or 'Video', show Join button
+                  if ((data.consultationType.toLowerCase() ==
+                              'online consultation' ||
+                          data.consultationType.toLowerCase() ==
+                              'video consultation') &&
+                      data.status.toLowerCase() == 'confirmed')
+                    ElevatedButton(
+                      onPressed: () {
+                        // Replace with actual joining logic (URL, room ID, etc.)
+                        print('Joining ${data.consultationType} consultation');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                      ),
+                      child: const Text(
+                        'Join',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ),
+                  // Status badges based on appointment status
+                  ..._buildStatusBadges((data.status).toLowerCase()),
+
+                  // Only show consultation type if the "Join" button is not shown
+                  if (!((data.consultationType.toLowerCase() ==
+                              'online consultation' ||
+                          data.consultationType.toLowerCase() ==
+                              'video consultation') &&
+                      data.status.toLowerCase() == 'confirmed'))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          data.consultationType ?? 'Consultation',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 11,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -377,11 +281,11 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
   Widget _statusBadge(String label, Color color) {
     return Container(
+      margin: const EdgeInsets.only(right: 6),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      margin: const EdgeInsets.only(left: 4),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         label,
@@ -391,11 +295,11 @@ class _AppointmentCardState extends State<AppointmentCard> {
   }
 
   List<Widget> _buildStatusBadges(String status) {
-    switch (status.toLowerCase()) {
+    switch (status) {
       case 'pending':
         return [_statusBadge("Pending", Colors.amber)];
       case 'confirmed':
-        return [_statusBadge("confirmed", Colors.green)];
+        return [_statusBadge("Confirmed", Colors.green)];
       case 'in_progress':
         return [_statusBadge("In Progress", Colors.blue)];
       case 'rejected':
@@ -403,7 +307,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
       case 'completed':
         return [_statusBadge("Completed", Colors.grey)];
       default:
-        return [_statusBadge("Review", Colors.black)];
+        return [_statusBadge("Unknown", Colors.black54)];
     }
   }
 }

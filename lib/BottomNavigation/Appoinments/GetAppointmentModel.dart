@@ -111,11 +111,11 @@ class Getappointmentmodel {
   final double consultationFee;
   final String? channelId;
   final String? reasonForCancel;
-  final String notes;
+  final String? notes; // ✅ make nullable
   final Reports? reports;
   final String status;
   final double totalFee;
-  final String? bookedAt;
+  final String bookedAt;
 
   Getappointmentmodel({
     required this.bookingId,
@@ -135,11 +135,11 @@ class Getappointmentmodel {
     required this.consultationFee,
     this.channelId,
     this.reasonForCancel,
-    required this.notes,
+    this.notes,
     this.reports,
     required this.status,
     required this.totalFee,
-    this.bookedAt,
+    required this.bookedAt,
   });
 
   factory Getappointmentmodel.fromJson(Map<String, dynamic> json) {
@@ -148,7 +148,7 @@ class Getappointmentmodel {
         bookingId: json['bookingId'] ?? '',
         bookingFor: json['bookingFor'] ?? '',
         name: json['name'] ?? '',
-        age: json['age']?.toString() ?? '',
+        age: json['age'] ?? '',
         gender: json['gender'] ?? '',
         mobileNumber: json['mobileNumber'] ?? '',
         problem: json['problem'] ?? '',
@@ -160,9 +160,9 @@ class Getappointmentmodel {
         servicetime: json['servicetime'] ?? '',
         consultationType: json['consultationType'] ?? '',
         consultationFee: (json['consultationFee'] ?? 0).toDouble(),
-        channelId: json['channelId']?.toString(),
+        channelId: json['channelId'],
         reasonForCancel: json['reasonForCancel'],
-        notes: json['notes'] ?? '',
+        notes: json['notes'],
         reports:
             json['reports'] != null ? Reports.fromJson(json['reports']) : null,
         status: json['status'] ?? '',
@@ -173,33 +173,6 @@ class Getappointmentmodel {
       print('❌ Error parsing Getappointmentmodel: $e\nData: $json');
       rethrow;
     }
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'bookingId': bookingId,
-      'bookingFor': bookingFor,
-      'name': name,
-      'age': age,
-      'gender': gender,
-      'mobileNumber': mobileNumber,
-      'problem': problem,
-      'subServiceName': subServiceName,
-      'subServiceId': subServiceId,
-      'doctorId': doctorId,
-      'clinicId': clinicId,
-      'serviceDate': serviceDate,
-      'servicetime': servicetime,
-      'consultationType': consultationType,
-      'consultationFee': consultationFee,
-      'channelId': channelId,
-      'reasonForCancel': reasonForCancel,
-      'notes': notes,
-      'reports': reports?.toJson(),
-      'status': status,
-      'totalFee': totalFee,
-      'bookedAt': bookedAt,
-    };
   }
 }
 

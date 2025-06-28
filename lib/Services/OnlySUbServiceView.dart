@@ -39,9 +39,9 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
   final Dashboardcontroller dashboardcontroller =
       Get.put(Dashboardcontroller());
   final serviceFetcher = Get.put(ServiceFetcher());
-  List<SubService> dynamicSubServices = [];
+  List<SubServiceAdmin> dynamicSubServices = [];
   bool isSubServiceLoading = false;
-  SubService? selectedSubService;
+  SubServiceAdmin? selectedSubService;
 
   var suggestion;
   @override

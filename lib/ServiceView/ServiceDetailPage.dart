@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cutomer_app/Controller/CustomerController.dart';
+import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:cutomer_app/Services/SubServiceServices.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
@@ -33,7 +34,7 @@ class ServiceDetailsPage extends StatefulWidget {
     required this.hospitalId,
   });
 
-  final SubService selectedService;
+  final String selectedService;
 
   @override
   _ServiceDetailsPageState createState() => _ServiceDetailsPageState();
@@ -81,8 +82,8 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
 
   void loadSubService() async {
     print("calling....");
-    final result = await fetchSubServiceDetails(
-        widget.hospitalId, widget.selectedService.subServiceId);
+    final result =
+        await fetchSubServiceDetails(widget.hospitalId, widget.selectedService);
     setState(() {
       subServiceDetails = result;
     });
@@ -283,7 +284,8 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                       Get.to(() => Doctorscreen(
                             mobileNumber: widget.mobileNumber,
                             username: widget.username,
-                            subServiceID: subServiceDetails!.subServiceId, hospiatlName: widget.hospitalName,
+                            subServiceID: subServiceDetails!.subServiceId,
+                            hospiatlName: widget.hospitalName,
                           ));
 
                       final selectedServicesController =

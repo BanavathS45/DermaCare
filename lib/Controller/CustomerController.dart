@@ -8,6 +8,7 @@ class SelectedServicesController extends GetxController {
   // Observable list of selected services
   var selectedServices = <Service>[].obs;
   var selectedSubServices = <SubService>[].obs;
+  var selectedSubServicesNmae = <SubServiceAdmin>[].obs;
   RxString categoryId = "".obs;
   RxString categoryName = "".obs;
   RxString hospitalId = ''.obs; // ✅ Correct spelling
@@ -19,6 +20,9 @@ class SelectedServicesController extends GetxController {
 
   void updateSelectedSubServices(List<SubService> subservices) {
     selectedSubServices.assignAll(subservices);
+  }
+  void updateSelectedSubServicesName(List<SubServiceAdmin> selectedSubServicesNmae) {
+    selectedSubServicesNmae.assignAll(selectedSubServicesNmae);
   }
 
   void setHospitalId(String id) {
