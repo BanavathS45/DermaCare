@@ -167,7 +167,7 @@ class Getappointmentmodel {
             json['reports'] != null ? Reports.fromJson(json['reports']) : null,
         status: json['status'] ?? '',
         totalFee: (json['totalFee'] ?? 0).toDouble(),
-        bookedAt: json['bookedAt'],
+        bookedAt: (json['bookedAt'] ?? '').toString(),
       );
     } catch (e) {
       print('❌ Error parsing Getappointmentmodel: $e\nData: $json');
@@ -221,7 +221,7 @@ class ReportItem {
   factory ReportItem.fromJson(Map<String, dynamic> json) {
     return ReportItem(
       bookingId: json['bookingId'],
-      customerMobileNumber: json['customerMobileNumber'],
+      customerMobileNumber: json['customerMobileNumber'] ?? '',
       reportName: json['reportName'],
       reportDate: json['reportDate'],
       reportStatus: json['reportStatus'],

@@ -66,7 +66,12 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
     return doctorBookings.where((b) {
       final type = b.consultationType.trim().toLowerCase();
       final status = b.status.trim().toLowerCase();
-      return type == 'online consultation' && status == 'pending';
+
+      final isOnlineOrVideo =
+          type == 'online consultation' || type == 'video consultation';
+      final isPendingOrConfirmed = status == 'pending' || status == 'confirmed';
+
+      return isOnlineOrVideo && isPendingOrConfirmed;
     }).toList();
   }
 

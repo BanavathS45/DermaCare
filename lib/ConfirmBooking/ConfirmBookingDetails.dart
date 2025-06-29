@@ -206,7 +206,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               consultationFee: consultationFee.toDouble(),
               totalFee: (consultationFee).toDouble(),
               clinicId: widget.doctor.hospital.hospitalId,
-              doctorDeviceId: widget.doctor.doctor.deviceId,
+              // doctorDeviceId: widget.doctor.doctor.deviceId,
+              doctorDeviceId:
+                  "eUUdjrjsSwmajCU2jy10Zd:APA91bFCMRNBW3elwrpzttAZPqAxsYMNirpChaC1fjq1lNsxyDQZeqkCecuxgx1domCvN8e3tDTlUpQKJv0vE2J950naZWhAcoxETjOon0w2VFwjY-wRQkM",
+
               categoryName: selectedServicesController
                   .selectedSubServices.first.categoryName,
               clinicAddress: widget.doctor.hospital.address,
@@ -242,6 +245,11 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   patient: widget.patient, booking: bookingDetails),
               mobileNumber: widget.patient.mobileNumber,
             ));
+
+            print(
+                "PostBookingModel data patient: ${widget.patient.customerDeviceId}");
+            print(
+                "PostBookingModel data bookingDetails: ${bookingDetails.doctorDeviceId}");
           },
           child: Text(
             "BOOKING & PAY (₹ ${consultationFee})",

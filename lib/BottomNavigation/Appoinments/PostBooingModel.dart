@@ -1,7 +1,6 @@
 import '../../PatientsDetails/PatientModel.dart';
 
 class BookingDetailsModel {
- 
   final String categoryName;
   final String categoryId;
   final String servicename;
@@ -14,13 +13,12 @@ class BookingDetailsModel {
   final String doctorId;
   final String doctorName;
   final String doctorDeviceId;
- 
+
   final String consultationType;
   final double consultationFee;
   final double totalFee;
 
   BookingDetailsModel({
- 
     required this.categoryName,
     required this.categoryId,
     required this.servicename,
@@ -33,8 +31,6 @@ class BookingDetailsModel {
     required this.doctorId,
     required this.doctorName,
     required this.doctorDeviceId,
- 
- 
     required this.consultationType,
     required this.consultationFee,
     required this.totalFee,
@@ -42,7 +38,6 @@ class BookingDetailsModel {
 
   factory BookingDetailsModel.fromJson(Map<String, dynamic> json) {
     return BookingDetailsModel(
-   
       categoryName: json['categoryName'],
       categoryId: json['categoryId'],
       servicename: json['servicename'],
@@ -55,8 +50,6 @@ class BookingDetailsModel {
       doctorId: json['doctorId'],
       doctorName: json['doctorName'],
       doctorDeviceId: json['doctorDeviceId'],
- 
- 
       consultationType: json['consultationType'],
       consultationFee: (json['consultationFee'] ?? 0).toDouble(),
       totalFee: (json['totalFee'] ?? 0).toDouble(),
@@ -65,7 +58,6 @@ class BookingDetailsModel {
 
   Map<String, dynamic> toJson() {
     return {
-   
       'categoryName': categoryName,
       'categoryId': categoryId,
       'servicename': servicename,
@@ -78,8 +70,6 @@ class BookingDetailsModel {
       'doctorId': doctorId,
       'doctorName': doctorName,
       'doctorDeviceId': doctorDeviceId,
- 
-     
       'consultationType': consultationType,
       'consultationFee': consultationFee,
       'totalFee': totalFee,

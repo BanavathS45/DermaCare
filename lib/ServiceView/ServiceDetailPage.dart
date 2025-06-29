@@ -82,8 +82,13 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
 
   void loadSubService() async {
     print("calling....");
+    print("hospitalId....${widget.hospitalId}");
+    print("selectedService....${widget.selectedService}");
+
     final result =
         await fetchSubServiceDetails(widget.hospitalId, widget.selectedService);
+    print("selectedService....@@@${result}");
+
     setState(() {
       subServiceDetails = result;
     });
@@ -91,6 +96,17 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+    if (subServiceDetails == null) {
+      // Show loading indicator while data is being fetched
+      return Scaffold(
+        appBar: CommonHeader(
+          title: "Service & Treatment Details",
+          onNotificationPressed: () {},
+          onSettingPressed: () {},
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       appBar: CommonHeader(
         title: "Service & Treatment Details",

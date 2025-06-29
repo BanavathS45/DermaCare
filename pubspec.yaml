@@ -35,7 +35,7 @@ dependencies:
   whatsapp_chatbot: ^1.0.0
   get: ^4.6.6
   video_player: ^2.5.0
-  permission_handler: ^10.3.0 # This is used to manage location permissions
+  permission_handler: ^11.3.1
   geolocator: ^13.0.1 # Check for the latest version of the package
   geocoding: ^2.0.0
   google_maps_flutter: ^2.1.1
@@ -50,7 +50,7 @@ dependencies:
   flutter_contacts: ^1.1.9+2
   sms_autofill: ^2.3.0
   # contacts_service: ^0.6.1
-  fluttercontactpicker: ^5.0.0
+  # fluttercontactpicker: ^5.0.0
   font_awesome_flutter: ^10.1.0
   carousel_slider: ^5.0.0
   date_picker_plus: ^3.0.2
@@ -89,7 +89,7 @@ dependencies:
   firebase_messaging: ^15.2.7
   firebase_app_installations: ^0.3.2+7
   pin_code_fields: ^8.0.1
-
+  zego_uikit_prebuilt_call: ^4.16.27
   # upi_india: ^3.0.1
   # flutter_locrl_notifications: ^16.1.0
 

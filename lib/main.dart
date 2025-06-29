@@ -22,6 +22,7 @@ import 'SigninSignUp/BiometricAuthScreen.dart';
 import 'SigninSignUp/LoginScreen.dart';
 import 'TreatmentAndServices/ServiceSelectionController.dart';
 import 'Utils/Constant.dart';
+import 'VideoCalling/CallController.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +47,9 @@ void main() async {
   Get.put(ScheduleController());
   Get.put(AppointmentController());
   Get.put(NotificationController());
-  Get.put(ServiceFetcher());
+  Get.put(ServiceFetcher()); 
+  Get.put(CallController());
+
 
   // SharedPreferences
   final prefs = await SharedPreferences.getInstance();

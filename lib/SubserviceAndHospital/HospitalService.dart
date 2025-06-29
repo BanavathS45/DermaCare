@@ -14,9 +14,9 @@ class HospitalService {
       final decoded = json.decode(response.body);
       print('🔓 Decoded response: $decoded');
 
-      if (response.statusCode == 200 && decoded['success'] == true) {
+      if (response.statusCode == 200) {
         final List<dynamic> data = decoded['data'];
-        print('📦 Data list contains ${data.length} items');
+        print('📦 Data list contains ${decoded.length} items');
 
         List<Map<String, dynamic>> result = [];
 

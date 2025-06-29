@@ -59,7 +59,8 @@ class AppointmentController extends GetxController {
           final status = b.status.trim().toLowerCase();
           final consultationType = b.consultationType.trim().toLowerCase();
           return (status == 'pending' || status == 'confirmed') &&
-              consultationType != 'online consultation';
+                  consultationType != 'online consultation' ||
+              consultationType != 'video consultation';
         }).length;
 
         // ✅ Calculate online consultations that are not completed
@@ -112,7 +113,8 @@ class AppointmentController extends GetxController {
                 status == 'confirmed' ||
                 status == 'in_progress' ||
                 status == 'rejected') &&
-            consultationType != 'online consultation';
+            !(consultationType == 'online consultation' ||
+                consultationType == 'video consultation');
 
         print("🧪 Checking Booking ID: ${b.bookingId}, Status: $status, "
             "Type: $consultationType => Match: $isMatch");

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 
@@ -95,6 +97,10 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
     print("Payment Successful: ${response.orderId}");
     print("Payment Successful: ${response.data}");
     print("Payment Successful: ${response.signature}");
+
+    print("Booking Payload: ${jsonEncode(widget.bookingDetails)}");
+ 
+
 
     var responseData = await postBookings(widget.bookingDetails);
  

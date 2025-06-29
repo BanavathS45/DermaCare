@@ -82,45 +82,63 @@ import 'DoctorController.dart';
 
 class DoctorService {
   Future<List<HospitalDoctorModel>> fetchDoctorsAndClinic(
-      String hospitalId, String subServiceId) async {
-    String url =
-        "$registerUrl/getDoctorsAndClinicDetails/$hospitalId/$subServiceId";
-    print("📡 Calling fetchDoctorsAndClinic...");
+    String hospitalId,
+    String subServiceId,
+  ) async {
+    final url =
+        '$registerUrl/getDoctorsAndClinicDetails/$hospitalId/$subServiceId';
+    print('📡  GET $url');
 
-    try {
-      final response = await http.get(Uri.parse(url));
-      print("🔁 Response status: ${response.statusCode}");
-      print("📦 Raw body: ${response.body}");
+    final res = await http.get(Uri.parse(url));
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        final data = jsonData['data'];
-
-        if (data != null && data is Map<String, dynamic>) {
-          final clinicJson = data['clinic'];
-          final doctorsJson = data['doctors'];
-
-          if (doctorsJson is List) {
-            final List<HospitalDoctorModel> doctors = doctorsJson
-                .map((doc) => HospitalDoctorModel.fromJson(doc, clinicJson))
-                .toList();
-
-            print("📊 Parsed ${doctors.length} doctors.");
-            return doctors;
-          } else {
-            throw FormatException("Expected 'doctors' to be a list.");
-          }
-        } else {
-          throw FormatException("Missing or malformed 'data' object.");
-        }
-      } else {
-        return Future.error('Server error: ${response.statusCode}');
-      }
-    } catch (e, s) {
-      print("❌ Exception: $e");
-      print("🪵 StackTrace: $s");
-      return Future.error("Fetch failed: $e");
+    if (res.statusCode != 200) {
+      throw Exception('Server error: ${res.statusCode}');
     }
+
+    // --- Decode safely
+    late final dynamic decoded;
+    try {
+      decoded = jsonDecode(utf8.decode(res.bodyBytes));
+    } catch (e) {
+      throw FormatException('Response is not valid JSON: $e');
+    }
+
+    // --- Normalise to a map that has clinic + doctors -------------------------
+    Map<String, dynamic>? root;
+
+    if (decoded is Map<String, dynamic>) {
+      // Case 1 or 2
+      root = decoded.containsKey('data')
+          ? decoded['data'] as Map<String, dynamic>?
+          : decoded;
+    } else if (decoded is List && decoded.isNotEmpty) {
+      // Case 3 – take the first element or merge as you wish
+      root = decoded.first as Map<String, dynamic>?;
+    }
+
+    if (root == null) {
+      throw FormatException(
+          'Unexpected payload format – expected an object with clinic & doctors');
+    }
+
+    final clinicJson = root['clinic'];
+    final doctorsJson = root['doctors'];
+
+    if (clinicJson == null) {
+      throw FormatException('Key "clinic" missing in response.');
+    }
+    if (doctorsJson is! List) {
+      throw FormatException('Key "doctors" is not a list.');
+    }
+
+    // --- Build models ---------------------------------------------------------
+    final doctors = doctorsJson
+        .map<HospitalDoctorModel>(
+            (doc) => HospitalDoctorModel.fromJson(doc, clinicJson))
+        .toList();
+
+    print('📊 Parsed ${doctors.length} doctors.');
+    return doctors;
   }
 
   Future<Map<String, dynamic>?> fetchDoctorByDoctorId(String doctorId) async {

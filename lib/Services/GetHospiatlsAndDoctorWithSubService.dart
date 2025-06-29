@@ -30,7 +30,7 @@ Future<List<HospitalDoctorModel>> fetchHospitalDoctorBySubServiceId(
         if (item['doctors'] is List) {
           print('Doctors Found: ${item['doctors'].length}');
           for (var doctorJson in item['doctors']) {
-            print('Parsing Doctor: ${doctorJson['doctorName']}');
+            print('Parsing Doctor: ${doctorJson['deviceId']}');
             Doctor doctor = Doctor.fromJson(doctorJson);
 
             result.add(HospitalDoctorModel(

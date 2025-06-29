@@ -186,9 +186,12 @@ class DoctorController extends GetxController {
 
       final hospitalIdToUse = selectedServicesController.hospitalId.value;
       print("🏥 Using hospitalId: $hospitalIdToUse");
+      print("🏥 Using hospitalId hospitalId: $hospitalId");
+      print("🏥 Using hospitalId subServiceId: $subServiceId");
 
       final List<HospitalDoctorModel> doctors =
           await doctorService.fetchDoctorsAndClinic(hospitalId, subServiceId);
+      print("🏥 Using hospitalId doctors: $doctors");
 
       allDoctorsFlat.value = doctors;
       allServices.value = doctors;

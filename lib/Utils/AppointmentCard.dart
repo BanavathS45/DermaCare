@@ -14,6 +14,8 @@ import '../Doctors/ListOfDoctors/DoctorService.dart';
 import '../Doctors/RatingAndFeedback/RatingModal.dart';
 import '../Doctors/RatingAndFeedback/RatingService.dart';
 import '../Review/ReviewScreen.dart';
+import '../VideoCalling/VideoCallScreen.dart';
+import '../VideoCalling/VideoCalling.dart';
 import 'GradintColor.dart';
 
 class AppointmentCard extends StatefulWidget {
@@ -228,6 +230,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       onPressed: () {
                         // Replace with actual joining logic (URL, room ID, etc.)
                         print('Joining ${data.consultationType} consultation');
+                        Get.to(HomeScreen(
+                            // callID: data.clinicId,
+                            roomId: data.channelId!,
+                            username: data.name));
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.blue,
