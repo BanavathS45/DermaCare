@@ -240,22 +240,22 @@ Widget _buildRatingContent(
                                                     fontSize: 14)),
 
                                             /// Reply Button
-                                            Obx(() {
-                                              return TextButton(
-                                                onPressed: () {
-                                                  commentController
-                                                      .toggleReplyField(index);
-                                                },
-                                                child: Text(
-                                                  commentController
-                                                              .replyingIndex
-                                                              .value ==
-                                                          index
-                                                      ? "Cancel"
-                                                      : "Reply",
-                                                ),
-                                              );
-                                            }),
+                                            // Obx(() {
+                                            //   return TextButton(
+                                            //     onPressed: () {
+                                            //       commentController
+                                            //           .toggleReplyField(index);
+                                            //     },
+                                            //     child: Text(
+                                            //       commentController
+                                            //                   .replyingIndex
+                                            //                   .value ==
+                                            //               index
+                                            //           ? "Cancel"
+                                            //           : "Reply",
+                                            //     ),
+                                            //   );
+                                            // }), //TODO:replay when reply button is pressed
 
                                             /// Reply Field
                                             Obx(() {

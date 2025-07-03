@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:cutomer_app/APIs/BaseUrl.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorService.dart';
 import 'package:cutomer_app/Firebase/RequestNotificationPermissions.dart';
 import 'package:cutomer_app/SigninSignUp/LoginController.dart';
 import 'package:cutomer_app/SigninSignUp/LoginService.dart';
+import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigation/BottomNavigation.dart';
 import '../ConfirmBooking/Consultations.dart';
 import '../SigninSignUp/LoginScreen.dart';
+import 'package:http/http.dart' as http;
 
 class BiometricAuthScreen extends StatefulWidget {
   @override
@@ -71,29 +76,43 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
           username != null &&
           mobileNumber != null) {
         print("🎯 Authentication and session valid. Proceeding to login API.");
-
+        final prefs = await SharedPreferences.getInstance();
+        final deviceId = prefs.getString('fcm');
         // Call login/sign-up API
-        final loginData = await _loginApiService.sendUserDataWithFCMToken(
-            username, mobileNumber);
-        print("📥 Login API Response: $loginData");
+        // final loginData = await _loginApiService.sendUserDataWithFCMToken(
+        //     username, mobileNumber, deviceId ?? '');
+        // print("📥 Login API Response: $loginData");
 
         // Check login API response and navigate accordingly
-        if (loginData != null && loginData['status'] == 200) {
-          print("🚀 Login successful. Navigating to ConsultationsType.");
-          Get.offAll(() => ConsultationsType(
-                mobileNumber: mobileNumber,
-                username: username,
-              ));
-        
+        // if (loginData != null && loginData['status'] == 200) {
+        final checkUserResponse = await http.get(
+          Uri.parse('$registerUrl/getBasicDetails/${mobileNumber}'),
+        );
+
+        if (checkUserResponse.statusCode == 200) {
+          final data = json.decode(checkUserResponse.body);
+          if (data['success'] == true && data['data'] != null) {
+            Get.offAll(() => ConsultationsType(
+                  mobileNumber: mobileNumber,
+                  username: username,
+                ));
+            print("🚀 Login successful. Navigating to ConsultationsType.");
+          } else {
+            print("⚠️ Incomplete session data. Redirecting to LoginScreen.");
+            showSnackbar(
+                "Warning",
+                "No user data found for this biometric. Please log in again to continue.",
+                "warning");
+
+            Get.offAll(() => Loginscreen());
+          }
         } else {
-          print("⚠️ Incomplete session data. Redirecting to LoginScreen.");
+          print(
+              "⚠️ Authentication or session invalid. Redirecting to LoginScreen.");
           Get.offAll(() => Loginscreen());
         }
-      } else {
-        print(
-            "⚠️ Authentication or session invalid. Redirecting to LoginScreen.");
-        Get.offAll(() => Loginscreen());
       }
+      // }
     } catch (e) {
       // Handle biometric authentication errors
       print("❌ Biometric authentication error: $e");

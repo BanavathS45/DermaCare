@@ -31,11 +31,12 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // clear session
+    await prefs.setBool('isFirstLoginDone', true);
+    await prefs.setBool('isAuthenticated', true);
     Get.offAllNamed('/login'); // or use Get.offAll(() => Loginscreen());
   }
 
-  final dashboardcontroller =
-      Get.put(Dashboardcontroller());
+  final dashboardcontroller = Get.put(Dashboardcontroller());
 
   bool isAvailable = true;
   GetCustomerModel? userData;
@@ -53,7 +54,8 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           Obx(() {
             final image = dashboardcontroller.imageFile.value;
             return GestureDetector(
-              onTap: () => dashboardcontroller.showImagePickerOptions(context,image),
+              onTap: () =>
+                  dashboardcontroller.showImagePickerOptions(context, image),
               child: CircleAvatar(
                 radius: 40,
                 backgroundColor: Colors.grey[200],

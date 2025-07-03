@@ -206,9 +206,9 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               consultationFee: consultationFee.toDouble(),
               totalFee: (consultationFee).toDouble(),
               clinicId: widget.doctor.hospital.hospitalId,
-              // doctorDeviceId: widget.doctor.doctor.deviceId,
-              doctorDeviceId:
-                  "eUUdjrjsSwmajCU2jy10Zd:APA91bFCMRNBW3elwrpzttAZPqAxsYMNirpChaC1fjq1lNsxyDQZeqkCecuxgx1domCvN8e3tDTlUpQKJv0vE2J950naZWhAcoxETjOon0w2VFwjY-wRQkM",
+              doctorDeviceId: widget.doctor.doctor.deviceId,
+              // doctorDeviceId:
+                  // "eUUdjrjsSwmajCU2jy10Zd:APA91bFCMRNBW3elwrpzttAZPqAxsYMNirpChaC1fjq1lNsxyDQZeqkCecuxgx1domCvN8e3tDTlUpQKJv0vE2J950naZWhAcoxETjOon0w2VFwjY-wRQkM",
 
               categoryName: selectedServicesController
                   .selectedSubServices.first.categoryName,

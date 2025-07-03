@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cutomer_app/Dashboard/ImagePreview.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
+import 'package:cutomer_app/Notification/LocalNotification.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -75,6 +76,26 @@ class Dashboardcontroller extends GetxController {
       imageFile.value = File(savedImagePath);
     }
   }
+
+ 
+void scheduleAlertsForUpcomingVideoCalls(List appointments) {
+  for (var appt in appointments) {
+    final type = appt.consultationType.toLowerCase();
+    final status = appt.status.toLowerCase();
+
+    if ((type == 'video consultation' || type == 'online consultation') &&
+        !['completed', 'cancelled'].contains(status)) {
+      final callTime = DateTime.parse(appt.scheduledTime); // use your real field
+      if (callTime.difference(DateTime.now()) > Duration(minutes: 6)) {
+        scheduleVideoCallNotification(
+          title: 'Doctor Video Call',
+          body: 'Your video call with the doctor starts in 5 minutes.',
+          videoCallTime: callTime,
+        );
+      }
+    }
+  }
+}
 
   void clearAfterAppointment() async {
     // Clear selected services
@@ -206,6 +227,7 @@ class Dashboardcontroller extends GetxController {
 
         // Update reactive list
         allAppointments.assignAll(filtered);
+       
       } else {
         // No appointments found
         allAppointments.clear();

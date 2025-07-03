@@ -20,6 +20,18 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
   final patientdetailsformcontroller = Get.put(Patientdetailsformcontroller());
   final registercontroller = Get.put(Registercontroller());
   SiginSignUpController siginSignUpController = SiginSignUpController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Add listener to update UI on typing
+    patientdetailsformcontroller.notesController.addListener(() {
+      if (patientdetailsformcontroller.formKey.currentState != null) {
+        patientdetailsformcontroller.formKey.currentState!.validate();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -169,13 +181,14 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
             child: CustomTextAera(
               controller: patientdetailsformcontroller.notesController,
               labelText: "Enter Your problem....",
-              autovalidateMode: AutovalidateMode.onUnfocus,
+              autovalidateMode:
+                  AutovalidateMode.onUserInteraction, // ✅ Real-time validation
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return "Please enter notes";
+                  return "Please enter Problem";
                 }
-                if (value.length < 10) {
-                  return "Notes must be at least 10 characters";
+                if (value.trim().length < 10) {
+                  return "Problem must be at least 10 characters";
                 }
                 return null;
               },

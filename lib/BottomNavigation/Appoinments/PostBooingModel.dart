@@ -13,7 +13,6 @@ class BookingDetailsModel {
   final String doctorId;
   final String doctorName;
   final String doctorDeviceId;
-
   final String consultationType;
   final double consultationFee;
   final double totalFee;

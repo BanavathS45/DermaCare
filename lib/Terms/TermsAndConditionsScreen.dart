@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 
 class TermsAndConditionsScreen extends StatelessWidget {
@@ -6,14 +7,8 @@ class TermsAndConditionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Terms and Conditions',
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: CommonHeader(
+        title: "Terms and Conditions",
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -21,7 +16,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Terms and Conditions for Sure Care',
+              'Terms and Conditions for Derma Care',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -29,7 +24,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             const Text(
-              'Welcome to the Sure Care App. Please read these Terms and Conditions carefully before using the app.',
+              'Welcome to the Derma Care App. Please read these Terms and Conditions carefully before using the app.',
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 24.0),
@@ -43,7 +38,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'By accessing or using the Sure Care App, you agree to comply with these Terms. If you do not agree, you must uninstall the app and discontinue its use immediately.',
+              'By accessing or using the Derma Care App, you agree to comply with these Terms. If you do not agree, you must uninstall the app and discontinue its use immediately.',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16.0),
@@ -57,7 +52,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'The Sure Care App is provided for personal, non-commercial use. You agree not to misuse the app or use it for unlawful purposes.',
+              'The Derma Care App is provided for personal, non-commercial use. You agree not to misuse the app or use it for unlawful purposes.',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16.0),
@@ -71,7 +66,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'All content, including text, graphics, and logos, is the property of Sure Care and protected under copyright laws. Unauthorized use is strictly prohibited.',
+              'All content, including text, graphics, and logos, is the property of Derma Care and protected under copyright laws. Unauthorized use is strictly prohibited.',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16.0),
@@ -85,7 +80,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'Sure Care is not responsible for any damages or loss resulting from the use of the app. All information is provided "as is" without warranties of any kind.',
+              'Derma Care is not responsible for any damages or loss resulting from the use of the app. All information is provided "as is" without warranties of any kind.',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16.0),

@@ -19,3 +19,13 @@
 -keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.firebase.**
+
+
+# Fix for Jackson missing JavaBeans annotations
+-dontwarn java.beans.**
+
+# Fix for missing DOM classes
+-dontwarn org.w3c.dom.bootstrap.DOMImplementationRegistry
+
+# Jackson core fix
+-keep class com.fasterxml.jackson.** { *; }

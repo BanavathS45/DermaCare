@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:cutomer_app/APIs/BaseUrl.dart';
 import 'package:cutomer_app/OTP/FireBaseOtp.dart';
 import 'package:cutomer_app/SigninSignUp/BiometricPermissionScreen.dart';
+import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:firebase_app_installations/firebase_app_installations.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -137,8 +140,33 @@ class SiginSignUpController extends GetxController {
       final mobileNumber = mobileController.text.trim();
 
       try {
+        String? token = await FirebaseMessaging.instance.getToken();
+
+        //   FirebaseInstallations.getInstance().getId()
+        // .addOnCompleteListener(task -> {
+        //     if (task.isSuccessful()) {
+        //         String installationId = task.getResult();
+        //         Log.d("InstallationID", installationId);
+        //     }
+        // });
+
+        final id = await FirebaseInstallations.instance.getId();
+        final deviceid = await FirebaseInstallations.instance.getToken();
+        print('Installation ID: $id');
+        // FCM Token (used for sending push notifications)
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+
+        print('FCM Token1: $fcmToken');
+        print("FCM Token: $token");
+        print("FCM deviceid: $deviceid");
+
+        // Optional: Listen for token refresh
+        FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+          print("Token refreshed: $newToken");
+          // You could resend the token here if needed
+        });
         final response = await _loginapiService.sendUserDataWithFCMToken(
-            fullname, mobileNumber);
+            fullname, mobileNumber, token ?? "");
 
         if (response['status'] == 200) {
           getOTPButton.value = "SIGN IN";
@@ -148,49 +176,30 @@ class SiginSignUpController extends GetxController {
           // await prefs.setBool('isAuthenticated', true);
           await prefs.setString('username', fullname);
           await prefs.setString('mobileNumber', mobileNumber);
-          await prefs.setString('fcm', response['fcm'] ?? "");
+          await prefs.setString('fcm', token ?? "");
 
+          print("funmnmndhjshdhsa $token");
           final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
+          final isFirstTimeAuthenticated =
+              prefs.getBool('isFirstLoginDone') ?? true;
 
-          // ✅ Step 1: Check if user is already registered
-          final checkUserResponse = await http.get(
-            Uri.parse('${registerUrl}/getBasicDetails/$mobileNumber'),
-          );
+          // ✅ User is registered
+          if (isAuthenticated && isFirstTimeAuthenticated) {
+            showSnackbar("Success",
+                "OTP has been sent successfully to $mobileNumber", "success");
 
-          if (checkUserResponse.statusCode == 200) {
-            final data = json.decode(checkUserResponse.body);
-
-            if (data != null &&
-                data['success'] == true &&
-                data['data'] != null) {
-              // ✅ User is registered
-              if (isAuthenticated) {
-                Get.offAll(() => ConsultationsType(
-                      mobileNumber: mobileNumber,
-                      username: fullname,
-                    ));
-              } else {
-                Get.to(() => EnableBiometricScreen(
-                      mobileNumber: mobileNumber,
-                      fullname: fullname,
-                    ));
-              }
-            } else {
-              // ❌ Not registered
-              Get.to(() => EnableBiometricScreen(
-                    mobileNumber: mobileNumber,
-                    fullname: fullname,
-                  ));
-            }
+            Get.offAll(() => OTPLoginScreen(
+                  mobileNumber: mobileNumber,
+                  fullname: fullname,
+                  deviceId: token,
+                ));
           } else {
-            // ❌ Failed to fetch registration details
             Get.to(() => EnableBiometricScreen(
                   mobileNumber: mobileNumber,
                   fullname: fullname,
+                  deviceId:token
                 ));
           }
-        } else {
-          getOTPButton.value = "SIGN IN";
         }
       } catch (e) {
         print("Error during login: $e");

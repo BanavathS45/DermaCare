@@ -383,9 +383,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           itemCount: scheduleController.weekDates.length,
           itemBuilder: (context, index) {
             final date = scheduleController.weekDates[index];
+            
             final isSelected =
                 index == scheduleController.selectedDayIndex.value;
-
+            print("isSelected ${isSelected}");
             return GestureDetector(
               onTap: () async {
                 // ✅ Store the index and date before async
@@ -399,7 +400,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
                 // ✅ Update controller AFTER fetch completes
                 scheduleController.selectDate(tappedDate, slots);
-                scheduleController.selectedDayIndex.value = index;
+
+                // scheduleController.selectedDayIndex.value = index;
               },
               child: Container(
                 width: 50,

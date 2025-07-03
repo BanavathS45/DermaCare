@@ -1,22 +1,13 @@
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
-import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-
-import '../Booings/BooingService.dart';
 import '../BottomNavigation/Appoinments/AppointmentView.dart';
 import '../BottomNavigation/Appoinments/GetAppointmentModel.dart';
-import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/ListOfDoctors/DoctorService.dart';
 import '../Doctors/RatingAndFeedback/RatingModal.dart';
 import '../Doctors/RatingAndFeedback/RatingService.dart';
-import '../Review/ReviewScreen.dart';
-import '../VideoCalling/VideoCallScreen.dart';
-import '../VideoCalling/VideoCalling.dart';
-import 'GradintColor.dart';
 
 class AppointmentCard extends StatefulWidget {
   final Getappointmentmodel doctorData;
@@ -107,7 +98,13 @@ class _AppointmentCardState extends State<AppointmentCard> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: SizedBox(
+          height: 20, // You can adjust height and width as needed
+          width: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
     }
 
     if (doctor == null) {
@@ -123,7 +120,6 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
     return InkWell(
       onTap: () {
-        print("dfhjdsfkhdsjkfhdshfjd");
         Get.to(AppointmentPreview(
           doctor: doctor!,
           doctorBookings: widget.doctorData,
@@ -133,33 +129,33 @@ class _AppointmentCardState extends State<AppointmentCard> {
         margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.grey.shade300, width: 1),
+          side: BorderSide(color: Colors.grey.shade300),
         ),
         elevation: 0,
         child: Container(
-          height: 100, // Fixed height
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          height: 100,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Left side: Hospital name + city, doctor name
+              /// LEFT SIDE (Hospital, City, Patient Name, Consultation Type)
               Expanded(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      d?.hospital?.name ?? 'Unknown Hospital',
+                      d.hospital.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: 13.5,
                         color: Colors.blueGrey[900],
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      d?.hospital?.city ?? 'Unknown City',
+                      d.hospital.city,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.blueGrey[600],
@@ -167,25 +163,43 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
                     Text(
-                      capitalizeEachWord(
-                          data?.name ?? 'Patient Name'), // Patient Name Display
+                      capitalizeEachWord(data.name),
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
-                        color: Colors.blueGrey[700],
+                        color: Colors.blueGrey[800],
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade100,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        data.consultationType,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blue,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
 
-              // Middle: Date & time stacked vertically
+              const SizedBox(width: 10),
+
+              /// RIGHT SIDE (Date, Time, Status)
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Row(
                     children: [
@@ -193,8 +207,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
-                        data?.serviceDate ?? '--/--/----',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                        data.serviceDate,
+                        style: TextStyle(fontSize: 12, color: Colors.grey[800]),
                       ),
                     ],
                   ),
@@ -205,77 +219,14 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
-                        data?.servicetime ?? '--:--',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                        data.servicetime,
+                        style: TextStyle(fontSize: 12, color: Colors.grey[800]),
                       ),
                     ],
                   ),
-                ],
-              ),
-
-              const SizedBox(width: 10),
-
-              // Right: Status badges (compact) and Consultation type (bottom-right)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // If consultation type is 'Online' or 'Video', show Join button
-                  if ((data.consultationType.toLowerCase() ==
-                              'online consultation' ||
-                          data.consultationType.toLowerCase() ==
-                              'video consultation') &&
-                      data.status.toLowerCase() == 'confirmed')
-                    ElevatedButton(
-                      onPressed: () {
-                        // Replace with actual joining logic (URL, room ID, etc.)
-                        print('Joining ${data.consultationType} consultation');
-                        Get.to(HomeScreen(
-                            // callID: data.clinicId,
-                            roomId: data.channelId!,
-                            username: data.name));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.blue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                      ),
-                      child: const Text(
-                        'Join',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ),
-                  // Status badges based on appointment status
-                  ..._buildStatusBadges((data.status).toLowerCase()),
-
-                  // Only show consultation type if the "Join" button is not shown
-                  if (!((data.consultationType.toLowerCase() ==
-                              'online consultation' ||
-                          data.consultationType.toLowerCase() ==
-                              'video consultation') &&
-                      data.status.toLowerCase() == 'confirmed'))
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          data.consultationType ?? 'Consultation',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
-                            color: Colors.blue,
-                          ),
-                        ),
-                      ),
-                    ),
+                  const SizedBox(height: 4),
+                  ..._buildStatusBadges(data.status
+                      .toLowerCase()), // Example: Confirmed, Cancelled
                 ],
               ),
             ],

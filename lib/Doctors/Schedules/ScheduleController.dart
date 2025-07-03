@@ -148,15 +148,16 @@ class ScheduleController extends GetxController {
     selectedSlotIndex.value = -1;
     selectedSlotText.value = '';
 
-    // ✅ Set selectedDayIndex to the index of the selected date in weekDates
     final index = weekDates.indexWhere((d) =>
         DateFormat('yyyy-MM-dd').format(d) ==
         DateFormat('yyyy-MM-dd').format(date));
     if (index != -1) {
       selectedDayIndex.value = index;
+      selectedDayIndex.refresh(); // ✅ Force rebuild
+      print("selectedDayIndex updated: $index");
     }
 
-    _updateSlotsForDate(allSlots, date);
+    filterSlotsForSelectedDate(allSlots);
   }
 
   void _updateSlotsForDate(List<DoctorSlot> allSlots, DateTime date) {

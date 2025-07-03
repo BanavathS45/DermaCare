@@ -85,6 +85,7 @@ class DoctorService {
     String hospitalId,
     String subServiceId,
   ) async {
+     print('📡  hospitalId & subServiceId ${hospitalId}, ${subServiceId}');
     final url =
         '$registerUrl/getDoctorsAndClinicDetails/$hospitalId/$subServiceId';
     print('📡  GET $url');

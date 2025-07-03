@@ -8,8 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart'; // ✅ Needed impor
 class EnableBiometricScreen extends StatefulWidget {
   final mobileNumber;
   final fullname;
+  final String? deviceId;
 
-  const EnableBiometricScreen({super.key, this.mobileNumber, this.fullname});
+  const EnableBiometricScreen({super.key, this.mobileNumber, this.fullname, this.deviceId});
   @override
   _EnableBiometricScreenState createState() => _EnableBiometricScreenState();
 }
