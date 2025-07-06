@@ -113,6 +113,7 @@ class Getappointmentmodel {
   final String? reasonForCancel;
   final String? notes; // ✅ make nullable
   final Reports? reports;
+
   final String status;
   final double totalFee;
   final String bookedAt;
@@ -189,13 +190,6 @@ class Reports {
           .map((e) => ReportItem.fromJson(e))
           .toList(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'reportsList': reportsList.map((e) => e.toJson()).toList(),
-    };
   }
 }
 

@@ -1,33 +1,37 @@
 import 'package:cutomer_app/Notification/Notifications.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import '../Notification/NotificationModel.dart'; // Adjust your import
+import 'package:get/get.dart';
+import 'NotificationModel.dart';
 
 class NotificationController extends GetxController {
   var title = ''.obs;
   var body = ''.obs;
   var notifications = <NotificationModel>[].obs;
   var unreadCount = 0.obs;
-
-  // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  //     FlutterLocalNotificationsPlugin();
+  var isLoading = true.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // _initializeLocalNotifications();
+    fetchNotifications(); // Simulated load
   }
 
-  // void _initializeLocalNotifications() {
-  //   const AndroidInitializationSettings androidSettings =
-  //       AndroidInitializationSettings('@mipmap/ic_launcher');
+  void fetchNotifications() async {
+    isLoading.value = true;
+    await Future.delayed(Duration(seconds: 2));
 
-  //   const InitializationSettings settings =
-  //       InitializationSettings(android: androidSettings);
+    // If no data from server, simulate or leave empty
+    // Remove this if using real data
+    notifications.clear(); // Comment this line if testing dummy
+    // notifications.add(NotificationModel(
+    //   title: 'Welcome!',
+    //   body: 'You have no new notifications.',
+    //   type: 'info',
+    //   timestamp: DateTime.now(),
+    // ));
 
-  //   flutterLocalNotificationsPlugin.initialize(settings);
-  // }
+    isLoading.value = false;
+  }
 
   void handleNotification(RemoteMessage message) {
     final newNotification = NotificationModel(
@@ -42,27 +46,6 @@ class NotificationController extends GetxController {
     notifications.insert(0, newNotification);
     unreadCount.value++;
 
-    // showLocalNotification(newNotification.title, newNotification.body);
     Get.to(() => NotificationScreen());
   }
-
-  // void showLocalNotification(String title, String body) {
-  //   flutterLocalNotificationsPlugin.show(
-  //     0,
-  //     title,
-  //     body,
-  //     const NotificationDetails(
-  //       android: AndroidNotificationDetails(
-  //         'channel_id',
-  //         'channel_name',
-  //         importance: Importance.high,
-  //         priority: Priority.high,
-  //       ),
-  //     ),
-  //   );
-  }
-
-  // void markAllAsRead() {
-  //   unreadCount.value = 0;
-  // }
-
+}

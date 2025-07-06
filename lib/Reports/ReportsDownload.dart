@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import '../PatientsDetails/PatientModel.dart';
 
 Future<void> showReportDownloadSheet(
-    BuildContext context, List<ReportItem> reports) {
+  BuildContext context,
+  List<ReportItem> reports,
+) {
   return showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -25,42 +27,40 @@ Future<void> showReportDownloadSheet(
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              ...reports.expand((report) => report.reportFile.map((file) {
-                    final isPdf = file.toLowerCase().endsWith('.pdf') ||
-                        file.contains('data:application/pdf');
-
-                    return Card(
-                      child: ListTile(
-                        title: Text(report.reportName),
-                        subtitle: Text("Type: ${report.reportType}"),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove_red_eye_outlined),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        FilePreviewScreen(fileUrl: file),
+              for (var report in reports)
+                for (var i = 0; i < report.reportFile.length; i++)
+                  Card(
+                    child: ListTile(
+                      title: Text('${report.reportName} - File ${i + 1}'),
+                      subtitle: Text("Type: ${report.reportType}"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.remove_red_eye_outlined),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FilePreviewScreen(
+                                    fileUrl: report.reportFile[i],
                                   ),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.download),
-                              onPressed: () async {
-                                Navigator.pop(context);
-                                await downloadAndOpenReport(file);
-                              },
-                            ),
-                          ],
-                        ),
+                                ),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.download),
+                            onPressed: () async {
+                              Navigator.pop(context);
+                              await downloadAndOpenReport(report.reportFile[i]);
+                            },
+                          ),
+                        ],
                       ),
-                    );
-                  })),
+                    ),
+                  ),
             ],
           ),
         ),

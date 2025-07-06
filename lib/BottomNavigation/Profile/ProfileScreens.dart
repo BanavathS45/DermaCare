@@ -59,7 +59,7 @@ class ProfileDetailScreen extends StatelessWidget {
                         backgroundColor: Colors.grey[200],
                         backgroundImage: image != null
                             ? FileImage(image)
-                            : const AssetImage('assets/surecare_launcher.png')
+                            : const AssetImage('assets/ic_launcher.png')
                                 as ImageProvider,
                       ),
                     );

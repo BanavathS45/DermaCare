@@ -25,7 +25,8 @@ class CallPage extends StatelessWidget {
       userID: 'User_$uniqueID',
       userName: callController.userName.value,
       callID: callID,
-      config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall(),
+      config: ZegoUIKitPrebuiltCallConfig.groupVideoCall(),
+
       events: ZegoUIKitPrebuiltCallEvents(
         onCallEnd: (callEndEventData, defaultAction) {
           defaultAction.call();

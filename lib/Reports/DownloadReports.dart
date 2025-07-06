@@ -1,25 +1,30 @@
-import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
-import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
+import 'dart:convert';
 import 'dart:io';
 
-Future<void> downloadAndOpenReport(String fileUrl) async {
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file/open_file.dart'; // Optional: to open the file directly
+
+Future<void> downloadAndOpenReport(String base64Str) async {
   try {
-    final fileName = fileUrl.split('/').last; // Extract name from URL
-    final tempDir = await getTemporaryDirectory();
-    final savePath = "${tempDir.path}/$fileName";
+    final decodedBytes = base64Decode(base64Str);
+    final isPdf = _isPdf(decodedBytes);
+    final fileName = isPdf ? "downloaded_report.pdf" : "downloaded_image.jpg";
 
-    print("Downloading: $fileUrl");
-    print("Saving to: $savePath");
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File("${dir.path}/$fileName");
+    await file.writeAsBytes(decodedBytes);
 
-    Dio dio = Dio();
-    await dio.download(fileUrl, savePath);
+    // Optionally open the file using OpenFile plugin
+    await OpenFile.open(file.path);
 
-    showSnackbar("Success", "Report downloaded successfully!", "success");
-    await OpenFile.open(savePath);
+    print("✅ File saved and opened: ${file.path}");
   } catch (e) {
-    print("⛔ Download error: $e");
-    showSnackbar("Error", "Failed to download report", "error");
+    print("❌ Error in downloadAndOpenReport: $e");
   }
+}
+
+bool _isPdf(List<int> bytes) {
+  final header = utf8.decode(bytes.take(4).toList(), allowMalformed: true);
+  return header.contains('%PDF');
 }

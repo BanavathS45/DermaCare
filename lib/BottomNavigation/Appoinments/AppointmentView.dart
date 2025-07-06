@@ -242,14 +242,23 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                     child: ElevatedButton(
                       onPressed: () async {
                         final reports = widget.doctorBookings.reports;
-                        print("dshfjkshdfhkd${reports}");
-                        if (reports != null) {
-                          showReportDownloadSheet(
-                              context, reports.reportsList ?? []);
+
+                        if (reports != null && reports.reportsList.isNotEmpty) {
+                          showReportDownloadSheet(context, reports.reportsList!);
                         } else {
                           showSnackbar("Error", "No report found.", "error");
                         }
                       },
+
+                      // onPressed: () async {
+                      //   final reports = widget.doctorBookings.reports;
+                      //   print("dshfjkshdfhkd${reports}");
+                      //   if (reports != null) {
+                      //     showReportDownloadSheet(context, reports.reportsList);
+                      //   } else {
+                      //     showSnackbar("Error", "No report found.", "error");
+                      //   }
+                      // },
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
                         backgroundColor: Colors.transparent,

@@ -58,7 +58,29 @@ class _DashboardScreenState extends State<DashboardScreen>
   void initState() {
     super.initState();
 
-    // Wrap in a separate async function because initState() can't be async directly
+    _rotationController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+
+    _scrollController = ScrollController()
+      ..addListener(() {
+        if (_scrollController.position.userScrollDirection ==
+                ScrollDirection.reverse &&
+            isFabVisible) {
+          setState(() {
+            isFabVisible = false;
+          });
+        } else if (_scrollController.position.userScrollDirection ==
+                ScrollDirection.forward &&
+            !isFabVisible) {
+          setState(() {
+            isFabVisible = true;
+          });
+        }
+      });
+
+    // Now call async logic separately
     loadInitialData();
   }
 
@@ -89,28 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     controller.fetchBookings();
     dashboardcontroller.storeUserData(widget.mobileNumber, widget.username);
 
-    _rotationController = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    );
-
-    _scrollController = ScrollController()
-      ..addListener(() {
-        if (_scrollController.position.userScrollDirection ==
-                ScrollDirection.reverse &&
-            isFabVisible) {
-          setState(() {
-            isFabVisible = false;
-          });
-        } else if (_scrollController.position.userScrollDirection ==
-                ScrollDirection.forward &&
-            !isFabVisible) {
-          setState(() {
-            isFabVisible = true;
-          });
-        }
-      });
-  }
+}
 
   @override
   void dispose() {

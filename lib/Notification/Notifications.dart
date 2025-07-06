@@ -3,6 +3,7 @@ import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'NotificationModel.dart';
 
 class NotificationScreen extends StatelessWidget {
   final controller = Get.find<NotificationController>();
@@ -11,49 +12,68 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonHeader(title: "Notifications"),
-      body: Obx(() => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (controller.notifications.isEmpty) {
+          return const Center(child: Text("No notifications found."));
+        } else {
+          return ListView.builder(
+            itemCount: controller.notifications.length,
+            itemBuilder: (context, index) {
+              final notif = controller.notifications[index];
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.notifications_active,
-                          color: mainColor, size: 25),
-                      SizedBox(
-                        width: 15,
+                      Row(
+                        children: [
+                          const Icon(Icons.notifications, color: mainColor),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              notif.title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 8),
                       Text(
-                        controller.title.value,
+                        notif.body,
                         style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          fontSize: 15,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        notif.timestamp.toLocal().toString(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    controller.body.value,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )),
+                ),
+              );
+            },
+          );
+        }
+      }),
     );
   }
 }
