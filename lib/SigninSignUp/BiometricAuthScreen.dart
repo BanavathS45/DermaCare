@@ -78,6 +78,9 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
         print("🎯 Authentication and session valid. Proceeding to login API.");
         final prefs = await SharedPreferences.getInstance();
         final deviceId = prefs.getString('fcm');
+
+        print("deviceIddeviceIddeviceId : ${deviceId}");
+        
         // Call login/sign-up API
         // final loginData = await _loginApiService.sendUserDataWithFCMToken(
         //     username, mobileNumber, deviceId ?? '');

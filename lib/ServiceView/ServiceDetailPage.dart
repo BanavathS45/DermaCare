@@ -94,6 +94,22 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
     });
   }
 
+  String formatDuration(int? totalMinutes) {
+    if (totalMinutes == null) return '';
+
+    if (totalMinutes < 60) {
+      return '$totalMinutes mins';
+    } else {
+      final hours = totalMinutes ~/ 60;
+      final minutes = totalMinutes % 60;
+      if (minutes == 0) {
+        return '$hours hr';
+      } else {
+        return '$hours hr $minutes mins';
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (subServiceDetails == null) {
@@ -209,7 +225,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 ),
               ),
               Text(
-                subServiceDetails!.minTime,
+                formatDuration(int.tryParse(subServiceDetails!.minTime)),
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),

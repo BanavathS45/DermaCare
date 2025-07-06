@@ -1,11 +1,16 @@
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Review/ReviewScreen.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:cutomer_app/Utils/RatingBottomSheet.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
+import 'package:cutomer_app/VideoCalling/VideoCalling.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../BottomNavigation/Appoinments/AppointmentView.dart';
 import '../BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/ListOfDoctors/DoctorService.dart';
+import '../Doctors/RatingAndFeedback/RatingAndFeedbackScreen.dart';
 import '../Doctors/RatingAndFeedback/RatingModal.dart';
 import '../Doctors/RatingAndFeedback/RatingService.dart';
 
@@ -120,6 +125,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
     return InkWell(
       onTap: () {
+//Ratingandfeedbackscreen
+
         Get.to(AppointmentPreview(
           doctor: doctor!,
           doctorBookings: widget.doctorData,
@@ -224,9 +231,119 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  ..._buildStatusBadges(data.status
-                      .toLowerCase()), // Example: Confirmed, Cancelled
+                  // Example: Confirmed, Cancelled
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: (widget.doctorData.status.toLowerCase() !=
+                                'completed' &&
+                            widget.doctorData.consultationType.toLowerCase() !=
+                                'online consultation')
+                        ? _buildStatusBadges(
+                            widget.doctorData.status.toLowerCase())
+                        : [], // Empty list when status is 'confirmed' or 'completed'
+                  ),
+
+                  Row(
+                    children: [
+                      // This returns List<Widget>
+                      if (widget.doctorData.status.toLowerCase() ==
+                          'completed') ...[
+                        Container(
+                          height: 35,
+                          decoration: BoxDecoration(
+                            // color: Colors.green, // Set the background color
+                            borderRadius: BorderRadius.circular(
+                                8), // Set the border radius
+                            border: Border.all(
+                                color: mainColor,
+                                width: 1), // Set the border color and width
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              Get.to(
+                                AppointmentPreview(
+                                  doctor: doctor!,
+                                  doctorBookings: widget.doctorData,
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Details',
+                              style: TextStyle(
+                                  color: mainColor), // Set the text color
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+
+                        Container(
+                          height: 35,
+                          decoration: BoxDecoration(
+                            color: hasReviewed ? Colors.grey : Colors.blue,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.white, width: 1),
+                          ),
+                          child: TextButton(
+                            onPressed: hasReviewed
+                                ? null
+                                : () {
+                                    Get.to(ReviewScreen(
+                                      doctorData: doctor,
+                                      doctorBookings: widget.doctorData,
+                                    ));
+                                  },
+                            child: Text(
+                              hasReviewed ? 'Reviewed' : 'Review',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+// Add some space between the buttons
+                      ],
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  if (widget.doctorData.status.toLowerCase() == 'confirmed' &&
+                      (widget.doctorData.consultationType.toLowerCase() ==
+                              'video consultation' ||
+                          widget.doctorData.consultationType.toLowerCase() ==
+                              'online consultation')) ...[
+                    Container(
+                      height: 35,
+                      decoration: BoxDecoration(
+                        // color: Colors.green, // Set the background color
+                        borderRadius:
+                            BorderRadius.circular(8), // Set the border radius
+                        border: Border.all(
+                            color: mainColor,
+                            width: 1), // Set the border color and width
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                          Get.to(
+                            HomeScreen(
+                              // roomId: '987654',
+                              roomId: widget.doctorData.channelId!,
+                              // username: 'Prashnath',
+                              username: widget.doctorData.name,
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'JOIN',
+                          style: TextStyle(
+                            color: mainColor,
+                          ), // Set the text color
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ],

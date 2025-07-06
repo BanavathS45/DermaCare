@@ -221,7 +221,6 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                     _infoRow("📝🩺", "No Patient Notes Provided"),
                   ],
                 ),
-                
             _sectionCard(
               icon: Icons.payment_outlined,
               title: "Payment Details",
@@ -246,7 +245,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                         print("dshfjkshdfhkd${reports}");
                         if (reports != null) {
                           showReportDownloadSheet(
-                              context, reports?.reportsList ?? []);
+                              context, reports.reportsList ?? []);
                         } else {
                           showSnackbar("Error", "No report found.", "error");
                         }

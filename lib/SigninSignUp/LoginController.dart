@@ -5,6 +5,7 @@ import 'package:cutomer_app/OTP/FireBaseOtp.dart';
 import 'package:cutomer_app/SigninSignUp/BiometricPermissionScreen.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -130,14 +131,14 @@ class SiginSignUpController extends GetxController {
   //   }
 
   void submitForm(BuildContext context) async {
+    final fullname = nameController.text.trim();
+    final mobileNumber = mobileController.text.trim();
+ 
     if (formKey.currentState!.validate() && agreeToTerms) {
       getOTPButton.value = "Signing...";
       isLoading.value = true;
 
       await Future.delayed(const Duration(seconds: 2));
-
-      final fullname = nameController.text.trim();
-      final mobileNumber = mobileController.text.trim();
 
       try {
         String? token = await FirebaseMessaging.instance.getToken();
@@ -195,10 +196,9 @@ class SiginSignUpController extends GetxController {
                 ));
           } else {
             Get.to(() => EnableBiometricScreen(
-                  mobileNumber: mobileNumber,
-                  fullname: fullname,
-                  deviceId:token
-                ));
+                mobileNumber: mobileNumber,
+                fullname: fullname,
+                deviceId: token));
           }
         }
       } catch (e) {
@@ -206,6 +206,7 @@ class SiginSignUpController extends GetxController {
         getOTPButton.value = "SIGN IN";
       } finally {
         isLoading.value = false;
+        getOTPButton.value = "SIGN IN";
       }
     }
 

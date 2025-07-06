@@ -145,8 +145,13 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
         print('[🧪] Before scheduling');
         await scheduleVideoCallNotification(
           title: 'Doctor Video Call',
-          body: 'Your video call with the doctor starts in 5 minutes.',
+          body: 'Your video call with the doctor starts in 1 minutes.',
           videoCallTime: testVideoCallTime,
+        );
+        await scheduleVideoCallNotification(
+          title: 'Doctor Video Call',
+          body: 'Your video call with the doctor starts in 5 minutes.',
+          videoCallTime: videoCallTime,
         );
         print('[✅] After scheduling');
       } catch (e) {

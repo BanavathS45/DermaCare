@@ -58,8 +58,9 @@ class AppointmentController extends GetxController {
         upcomingCountRx.value = doctorBookings.where((b) {
           final status = b.status.trim().toLowerCase();
           final consultationType = b.consultationType.trim().toLowerCase();
+
           return (status == 'pending' || status == 'confirmed') &&
-                  consultationType != 'online consultation' ||
+              consultationType != 'online consultation' &&
               consultationType != 'video consultation';
         }).length;
 

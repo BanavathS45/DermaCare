@@ -8,8 +8,8 @@ import '../Utils/ShowSnackBar.dart';
 // import 'BaseUrl.dart';
 
 class LoginApiService {
-  final String endpoint =
-      'registerOrLogin'; //VerifyUserCredentialsAndGenerateAndSendOtp
+  final String endpoint = "VerifyUserCredentialsAndGenerateAndSendOtp";
+  //  'registerOrLogin'; //VerifyUserCredentialsAndGenerateAndSendOtp
 
   Future<Map<String, dynamic>> sendUserDataWithFCMToken(
       String fullname, String mobileNumber, String token) async {
@@ -17,13 +17,11 @@ class LoginApiService {
     print("response for mobileNumber ${mobileNumber}");
 
     try {
-     
-
       if (token == null) {
         print("FCM Token is null. Cannot send data.");
         return {'error': 'FCM Token is null. Cannot send data.'};
       }
- 
+
       final body = {
         'fullName': fullname,
         'mobileNumber': mobileNumber,
@@ -47,9 +45,6 @@ class LoginApiService {
       final decoded = jsonDecode(response.body);
       if (response.statusCode == 200) {
         print("response for login $decoded");
-
-        
-       
 
         return decoded;
       } else {

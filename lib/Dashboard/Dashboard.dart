@@ -33,7 +33,6 @@ class DashboardScreen extends StatefulWidget {
   _DashboardScreenState createState() => _DashboardScreenState();
 }
 
-
 class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
   final Dashboardcontroller dashboardcontroller =
@@ -55,21 +54,13 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
- 
-
-
-
   @override
   void initState() {
     super.initState();
-  
+
     // Wrap in a separate async function because initState() can't be async directly
     loadInitialData();
   }
-
-
- 
-
 
   void loadInitialData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -171,7 +162,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   backgroundColor: Colors.grey[200],
                   backgroundImage: image != null
                       ? FileImage(image)
-                      : const AssetImage('assets/surecare_launcher.png')
+                      : const AssetImage('assets/ic_launcher.png')
                           as ImageProvider,
                 ),
               );

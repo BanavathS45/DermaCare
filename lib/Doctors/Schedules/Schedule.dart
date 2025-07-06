@@ -6,6 +6,7 @@ import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/CustomerController.dart';
 import '../../PatientsDetails/PatientDetailsFormController.dart';
 import '../../PatientsDetails/PatientModel.dart';
@@ -152,7 +153,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             gradient: appGradient(),
           ),
           child: TextButton(
-              onPressed: () {
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                var devicedID = prefs.getString('fcm');
+
+                print("devicedIDdevicedID${devicedID}");
                 if (patientdetailsformcontroller.formKey.currentState!
                     .validate()) {
                   if (scheduleController.selectedSlotText.value.isNotEmpty) {
@@ -171,8 +176,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         serviceDate: formattedDate,
                         servicetime: scheduleController.selectedSlotText.value,
                         mobileNumber: widget.mobileNumber,
-                        customerDeviceId:
-                            'dB4XJQ7xQ1KsY_BLUxo0r-:APA91bE74fgP5hWGuf26QAXAB6pFpimSaB22MWw9ccLK44TkFYPnMHaz7vXI7otlxPkLn28zAzNoU5zRIG_Un5fGebPU9TMSTfPWzpnmLgH7MyFxHlSlA3M');
+                        customerDeviceId: devicedID ?? "");
+                    // 'dB4XJQ7xQ1KsY_BLUxo0r-:APA91bE74fgP5hWGuf26QAXAB6pFpimSaB22MWw9ccLK44TkFYPnMHaz7vXI7otlxPkLn28zAzNoU5zRIG_Un5fGebPU9TMSTfPWzpnmLgH7MyFxHlSlA3M'
 
                     print("patientmodel ${patientmodel.toJson()}");
 
@@ -383,7 +388,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           itemCount: scheduleController.weekDates.length,
           itemBuilder: (context, index) {
             final date = scheduleController.weekDates[index];
-            
+
             final isSelected =
                 index == scheduleController.selectedDayIndex.value;
             print("isSelected ${isSelected}");
