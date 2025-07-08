@@ -80,6 +80,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         }
       });
 
+
     // Now call async logic separately
     loadInitialData();
   }

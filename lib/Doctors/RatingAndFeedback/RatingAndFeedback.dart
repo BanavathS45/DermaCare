@@ -65,19 +65,20 @@ Widget _buildRatingContent(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         FutureBuilder<RatingSummary>(
-          future: fetchRatingSummary(item.hospital.hospitalId, doctor.doctorId),
+          future: fetchAndSetRatingSummary(
+              item.hospital.hospitalId, doctor.doctorId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(
                 child: Text(
-                  'Failed to load feedback: ${snapshot.error}',
+                  'No ratings or comments available.',
                   style: const TextStyle(color: Colors.red),
                 ),
               );
             } else if (!snapshot.hasData ||
-                (snapshot.data!.overallDoctorRating == 0 &&
+                ((snapshot.data!.overallDoctorRating == 0) &&
                     snapshot.data!.comments.isEmpty)) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,9 +228,8 @@ Widget _buildRatingContent(
                                               ],
                                             ),
                                             Text(
-                                              timeago.format(DateTime.now()
-                                                  .subtract(const Duration(
-                                                      hours: 1))),
+                                              timeago.format(
+                                                  comment.parsedDateTime),
                                               style: const TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.grey),

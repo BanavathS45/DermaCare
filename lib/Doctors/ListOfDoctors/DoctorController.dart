@@ -141,6 +141,7 @@
 
 import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Doctors/RatingAndFeedback/RatingService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -153,6 +154,12 @@ class DoctorController extends GetxController {
   RxList<HospitalDoctorModel> allDoctorsFlat = <HospitalDoctorModel>[].obs;
   RxList<HospitalDoctorModel> filteredDoctors = <HospitalDoctorModel>[].obs;
   RxInt appointmentCount = 0.obs;
+
+  // For doctor rating and number of comments
+// RxDouble overallDoctorRating = 0.0.obs;
+// RxInt commentCount = 0.obs;
+  RxMap<String, double> doctorRatings = <String, double>{}.obs;
+  RxMap<String, int> doctorCommentCounts = <String, int>{}.obs;
 
   RxString selectedGender = 'All'.obs;
   RxString selectedCity = 'All'.obs;
@@ -196,9 +203,16 @@ class DoctorController extends GetxController {
       allDoctorsFlat.value = doctors;
       allServices.value = doctors;
 
-      for (var d in doctors) {
-        print(
-            "✅ Doctor loaded: ${d.doctor.doctorName}, ${d.doctor.qualification}");
+      // for (var d in doctors) {
+      //   print(
+      //       "✅ Doctor loaded: ${d.doctor.doctorName}, ${d.doctor.qualification}");
+      // }
+      for (var doctorModel in doctors) {
+        final dId = doctorModel.doctor.doctorId;
+        final hId = doctorModel.hospital.hospitalId;
+
+        // ⚠️ Call rating API here
+        fetchAndSetRatingSummary(hId, dId); // no await — fire and forget
       }
 
       final cities = doctors.map((d) => d.hospital.city).toSet().toList();

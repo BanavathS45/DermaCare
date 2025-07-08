@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class RatingSummary {
   final String doctorId;
   final String hospitalId;
@@ -45,6 +47,7 @@ class Comment {
   final String customerMobileNumber;
   final String appointmentId;
   final bool rated;
+  final String dateAndTimeAtRating;
 
   Comment({
     required this.doctorRating,
@@ -55,6 +58,8 @@ class Comment {
     required this.customerMobileNumber,
     required this.appointmentId,
     required this.rated,
+    required this.dateAndTimeAtRating,
+    
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -67,6 +72,7 @@ class Comment {
       customerMobileNumber: json['customerMobileNumber'],
       appointmentId: json['appointmentId'],
       rated: json['rated'],
+      dateAndTimeAtRating: json['dateAndTimeAtRating'] ?? '',
     );
   }
 
@@ -80,6 +86,14 @@ class Comment {
       'customerMobileNumber': customerMobileNumber,
       'appointmentId': appointmentId,
       'rated': rated,
+      'dateAndTimeAtRating': dateAndTimeAtRating,
     };
+  }
+   DateTime get parsedDateTime {
+    try {
+      return DateFormat("yyyy-MM-dd hh:mm a").parse(dateAndTimeAtRating);
+    } catch (_) {
+      return DateTime.now();
+    }
   }
 }

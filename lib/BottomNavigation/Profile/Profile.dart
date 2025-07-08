@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Doctors/ListOfDoctors/DoctorModel.dart';
+import '../../Terms/TermsAndConditionsScreen.dart';
 
 class CustomerProfilePage extends StatefulWidget {
   final String mobileNumber;
@@ -132,7 +133,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             },
           ),
           SizedBox(
-            height: 20,
+            height: 50,
           ),
           // Cards List
           buildCardItem(
@@ -145,7 +146,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           buildCardItem(
               icon: Icons.help_outline,
               label: "Privacy Policy",
-              onTap: () => Get.to(() => HelpScreen())),
+              onTap: () => Get.to(() => TermsAndConditionsScreen())),
           // onTap: () {}),
           buildCardItem(
               icon: Icons.help_outline,

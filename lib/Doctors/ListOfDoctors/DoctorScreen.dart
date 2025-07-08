@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../Utils/Constant.dart';
 import '../../Utils/Header.dart';
 import '../../Widget/DoctorCard.dart';
+import '../RatingAndFeedback/RatingService.dart';
 
 class Doctorscreen extends StatelessWidget {
   final String mobileNumber;
@@ -32,6 +33,7 @@ class Doctorscreen extends StatelessWidget {
         print("❌ Missing hospitalId or subServiceID");
       }
     });
+     
   }
 
   final DoctorController doctorController = Get.find<DoctorController>();

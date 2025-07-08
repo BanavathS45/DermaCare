@@ -116,7 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                widget.roomId,
+                                // widget.roomId,
+                                "160039",
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -138,13 +139,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
 
                           callController.setCallInfo(
-                            uid: widget.roomId,
+                            uid: "User_${widget.roomId}",
                             uname: name,
                             cid: widget.roomId,
                           );
 
                           Get.to(() => CallPage(
-                                callID: widget.roomId,
+                                // callID: widget.roomId,
+                                callID: "160039",
                                 username: name,
                               ));
                         },

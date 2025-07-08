@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/PaytmentsUPI/PaymentScreenUPI.dart';
+import 'package:cutomer_app/Screens/BookingSuccess.dart';
 
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/Header.dart';
@@ -15,6 +17,7 @@ import '../Controller/CustomerController.dart';
 import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 import '../PatientsDetails/PatientModel.dart';
 import '../Payments/AllPayments.dart';
+import '../Payments/PaymentMode.dart';
 import '../Utils/Constant.dart';
 
 import '../Utils/ScaffoldMessageSnacber.dart';
@@ -35,6 +38,7 @@ class Confirmbookingdetails extends StatefulWidget {
 class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
+
   // final confirmbookingcontroller = Get.find<Confirmbookingcontroller>();
   Doctor? doctor;
   Hospital? hospital;
@@ -121,13 +125,14 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             ),
 
             const SizedBox(height: 20),
+
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 "Patient Details",
                 style: TextStyle(
                     color: mainColor,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold),
               ),
             ),
@@ -164,7 +169,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 "Payment Details",
                 style: TextStyle(
                     color: mainColor,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold),
               ),
             ),
@@ -184,6 +189,16 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             SizedBox(
               height: 25,
             ),
+            Divider(
+              height: 1,
+              color: secondaryColor,
+            ),
+            PaymentModeSelector(
+              consultationType: consultationController
+                  .selectedConsultation.value!.consultationType,
+            ),
+            const SizedBox(height: 20),
+            // Obx(() => Text(selectedServicesController.selectedPayment.value)),
           ],
         ),
       ),
@@ -192,9 +207,12 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         height: 60,
         decoration: BoxDecoration(gradient: appGradient()),
         child: TextButton(
-          onPressed: () {
-            print(
-                "PayAmount to be confirmbookingcontroller ${consultationFee}");
+          onPressed: () async {
+            final selectedPayment =
+                selectedServicesController.selectedPayment.value;
+
+            print("Selected Payment: $selectedPayment");
+
             final bookingDetails = BookingDetailsModel(
               subServiceName: selectedServicesController
                   .selectedSubServices.first.subServiceName,
@@ -207,9 +225,6 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               totalFee: (consultationFee).toDouble(),
               clinicId: widget.doctor.hospital.hospitalId,
               doctorDeviceId: widget.doctor.doctor.deviceId,
-              // doctorDeviceId:
-                  // "eUUdjrjsSwmajCU2jy10Zd:APA91bFCMRNBW3elwrpzttAZPqAxsYMNirpChaC1fjq1lNsxyDQZeqkCecuxgx1domCvN8e3tDTlUpQKJv0vE2J950naZWhAcoxETjOon0w2VFwjY-wRQkM",
-
               categoryName: selectedServicesController
                   .selectedSubServices.first.categoryName,
               clinicAddress: widget.doctor.hospital.address,
@@ -223,38 +238,73 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               doctorName: widget.doctor.doctor.doctorName,
             );
 
-            Get.to(RazorpaySubscription(
-              context: context,
-              amount: consultationFee.toString(),
-              onPaymentInitiated: () {
-                showSnackbar("Warning", "Paytments Initiated", "warning");
-              },
-
-              // Get.to(() => UpiPaymentPage(amount: consultationFee.toDouble()));
-
-              // Get.to(RazorpaySubscription(
-              //   context: context,
-              //   amount: consultationFee.toString(),
-              //   onPaymentInitiated: () {
-              //     showSnackbar("Warning", "Paytments Initiated", "warning");
-              //   },
-
-              serviceDetails: widget.doctor,
+            // 📦 Model ready for API
+            final postBookingPayload = PostBookingModel(
               patient: widget.patient,
-              bookingDetails: PostBookingModel(
-                  patient: widget.patient, booking: bookingDetails),
-              mobileNumber: widget.patient.mobileNumber,
-            ));
+              booking: bookingDetails,
+            );
 
-            print(
-                "PostBookingModel data patient: ${widget.patient.customerDeviceId}");
-            print(
-                "PostBookingModel data bookingDetails: ${bookingDetails.doctorDeviceId}");
+            if (selectedPayment == "Pay at Hospital") {
+              // 🏥 DIRECTLY POST BOOKING
+              print('[🏥] Booking via Pay at Hospital');
+
+              var responseData = await postBookings(postBookingPayload);
+              print('[DEBUG] Response Data: $responseData');
+
+              if (responseData != null &&
+                  responseData['statusCode'] == 201 &&
+                  responseData['data'] != null) {
+                print('[✅] Booking successful');
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (ctx) => SuccessScreen(
+                      serviceDetails: widget.doctor,
+                      paymentId: "pay_at_hospital",
+                      patient: widget.patient,
+                      mobileNumber: widget.patient.mobileNumber,
+                    ),
+                  ),
+                  (route) => false,
+                );
+              } else {
+                print(
+                    '[❌] Booking failed or unexpected response: $responseData');
+                showSnackbar("Error", "Booking failed", "error");
+              }
+            } else {
+              // 💳 GO TO PAYMENT SCREEN
+              print('[💳] Navigating to Razorpay...');
+
+              Get.to(RazorpaySubscription(
+                context: context,
+                amount: consultationFee.toString(),
+                onPaymentInitiated: () {
+                  showSnackbar("Info", "Payment Initiated", "info");
+                },
+                serviceDetails: widget.doctor,
+                patient: widget.patient,
+                bookingDetails: postBookingPayload,
+                mobileNumber: widget.patient.mobileNumber,
+              ));
+            }
           },
-          child: Text(
-            "BOOKING & PAY (₹ ${consultationFee})",
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
+          child: Obx(() {
+            final selectedPayment =
+                selectedServicesController.selectedPayment.value;
+
+            final isPayAtHospital =
+                selectedPayment.toLowerCase() == 'pay at hospital';
+            final buttonText = isPayAtHospital
+                ? "BOOK APPOINTMENT (₹ $consultationFee)"
+                : "BOOK & PAY (₹ $consultationFee)";
+
+            return Text(
+              buttonText,
+              style: const TextStyle(color: Colors.white, fontSize: 18),
+            );
+          }),
         ),
       ),
     );

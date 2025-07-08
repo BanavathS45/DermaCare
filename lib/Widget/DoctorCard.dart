@@ -16,7 +16,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
   String base64String = doctor.doctorPicture;
   final regex = RegExp(r'data:image/[^;]+;base64,');
   base64String = base64String.replaceAll(regex, '');
-
+  final doctorController = Get.find<DoctorController>();
 // Remove the prefix if present
   final prefix = 'data:image/jpeg;base64,';
   if (base64String.startsWith(prefix)) {
@@ -198,7 +198,16 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                   const Icon(Icons.star, size: 16, color: Colors.white),
                   const SizedBox(width: 4),
                   // Text("${doctor.overallRating}", //TODO : imaplent pending
-                  Text("4", style: const TextStyle(color: Colors.white)),
+                  Obx(() {
+                    final rating =
+                        doctorController.doctorRatings[doctor.doctorId] ?? 0.0;
+                    return Text(
+                      rating.toStringAsFixed(1),
+                      style: TextStyle(color: Colors.white),
+                    );
+                  })
+
+                  // Text("${doctorController.}", style: const TextStyle(color: Colors.white)),
                 ],
               ),
               const SizedBox(width: 12),
@@ -206,8 +215,18 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                 children: [
                   const Icon(Icons.people, size: 16, color: Colors.white),
                   const SizedBox(width: 4),
+                  Obx(() {
+                    final comments =
+                        doctorController.doctorCommentCounts[doctor.doctorId] ??
+                            0;
+                    return Text(
+                      comments.toString(),
+                      style: TextStyle(color: Colors.white),
+                    );
+                  })
+
                   // Text("${doctor.comments.length}", //TODO : imaplent pending
-                  Text("10", style: const TextStyle(color: Colors.white)),
+                  // Text("10", style: const TextStyle(color: Colors.white)),
                 ],
               ),
               const Spacer(),

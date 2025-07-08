@@ -20,7 +20,7 @@ class _RatingScreenState extends State<RatingScreen> {
   @override
   void initState() {
     super.initState();
-    ratingFuture = fetchRatingSummary(widget.hospitalId, widget.doctorId);
+    ratingFuture = fetchAndSetRatingSummary(widget.hospitalId, widget.doctorId);
   }
 
   @override

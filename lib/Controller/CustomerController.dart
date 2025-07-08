@@ -35,6 +35,14 @@ class SelectedServicesController extends GetxController {
     }
   }
 
+
+  // Default to Online
+  var selectedPayment = 'Online'.obs;
+
+  void setPayment(String value) {
+    selectedPayment.value = value;
+  }
+
   void clearAll() {
     print("🔄 Clearing all selected service data...");
     selectedServices.clear();

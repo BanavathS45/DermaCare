@@ -6,6 +6,7 @@ import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:cutomer_app/VideoCalling/VideoCalling.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../BottomNavigation/Appoinments/AppointmentView.dart';
 import '../BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
@@ -28,13 +29,30 @@ class _AppointmentCardState extends State<AppointmentCard> {
   bool isDoctorFetched = false; // Flag to track if doctor data is fetched
   bool isLoading = true;
   HospitalDoctorModel? doctor;
-
+  DateTime? appointmentDateTime;
   @override
   void initState() {
     super.initState();
     _fetchHospitaAndDoctorData();
     _fetchRating(); // Call rating fetch here
+
+    // Parse the appointment time safely
+    try {
+      // Combine serviceDate and serviceTime
+      final combinedDateTimeStr =
+          '${widget.doctorData.serviceDate} ${widget.doctorData.servicetime}';
+
+      // Define the format
+      final format =
+          DateFormat('yyyy-MM-dd hh:mm a'); // 12-hour format with AM/PM
+
+      // Parse to DateTime
+      appointmentDateTime = format.parse(combinedDateTimeStr);
+    } catch (e) {
+      appointmentDateTime = null;
+    }
   }
+
   // Ensure you import your model
 
   RatingSummary? ratingSummary;
@@ -42,7 +60,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
   Future<void> _fetchRating() async {
     try {
-      final summary = await fetchRatingSummary(
+      final summary = await fetchAndSetRatingSummary(
         widget.doctorData.clinicId,
         widget.doctorData.doctorId,
       );
@@ -238,8 +256,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                   Row(
                     children: (widget.doctorData.status.toLowerCase() !=
                                 'completed' &&
-                            widget.doctorData.consultationType.toLowerCase() !=
-                                'online consultation')
+                            (widget.doctorData.consultationType.toLowerCase() !=
+                                    'online consultation' ||
+                                widget.doctorData.status.toLowerCase() !=
+                                    'confirmed'))
                         ? _buildStatusBadges(
                             widget.doctorData.status.toLowerCase())
                         : [], // Empty list when status is 'confirmed' or 'completed'
@@ -309,40 +329,36 @@ class _AppointmentCardState extends State<AppointmentCard> {
                   SizedBox(
                     height: 5,
                   ),
+
                   if (widget.doctorData.status.toLowerCase() == 'confirmed' &&
                       (widget.doctorData.consultationType.toLowerCase() ==
                               'video consultation' ||
                           widget.doctorData.consultationType.toLowerCase() ==
-                              'online consultation')) ...[
+                              'online consultation') &&
+                      appointmentDateTime != null &&
+                      DateTime.now().isAfter(appointmentDateTime!
+                          .subtract(const Duration(minutes: 5)))) ...[
                     Container(
                       height: 35,
                       decoration: BoxDecoration(
-                        // color: Colors.green, // Set the background color
-                        borderRadius:
-                            BorderRadius.circular(8), // Set the border radius
-                        border: Border.all(
-                            color: mainColor,
-                            width: 1), // Set the border color and width
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: mainColor, width: 1),
                       ),
                       child: TextButton(
                         onPressed: () {
                           Get.to(
                             HomeScreen(
-                              // roomId: '987654',
                               roomId: widget.doctorData.channelId!,
-                              // username: 'Prashnath',
                               username: widget.doctorData.name,
                             ),
                           );
                         },
                         child: const Text(
                           'JOIN',
-                          style: TextStyle(
-                            color: mainColor,
-                          ), // Set the text color
+                          style: TextStyle(color: mainColor),
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ],
               ),

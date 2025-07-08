@@ -237,9 +237,15 @@ final FlutterTts flutterTts = FlutterTts();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
 
   // ✅ Initialize timezone
   tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
 
   // ✅ Android notification channel settings
   const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
