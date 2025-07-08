@@ -46,7 +46,8 @@ class ScheduleController extends GetxController {
   final currentSlots = <Slot>[].obs;
   final weekDates = <DateTime>[].obs;
   final selectedDate = DateTime.now().obs;
-  final selectedDayIndex = 0.obs;
+RxInt selectedDayIndex = 0.obs;
+
   final selectedSlotIndex = (-1).obs;
   final selectedSlotText = ''.obs;
 

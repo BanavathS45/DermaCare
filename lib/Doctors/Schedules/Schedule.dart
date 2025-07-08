@@ -40,6 +40,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final registercontroller = Get.put(Registercontroller());
+
   String? id;
   List<DoctorSlot>? slots;
 
@@ -130,8 +131,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
               const SizedBox(height: 12),
               showDays(),
-
-              const SizedBox(height: 16),
 
               const SizedBox(height: 24),
               timeslots(),
@@ -379,34 +378,30 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
 // In your showDays() widget:
   Widget showDays() {
-    return Obx(() {
-      return SizedBox(
-        height: 70,
-        child: ListView.builder(
-          controller: _dateScrollController,
-          scrollDirection: Axis.horizontal,
-          itemCount: scheduleController.weekDates.length,
-          itemBuilder: (context, index) {
-            final date = scheduleController.weekDates[index];
+    return SizedBox(
+      height: 70,
+      child: ListView.builder(
+        controller: _dateScrollController,
+        scrollDirection: Axis.horizontal,
+        itemCount: scheduleController.weekDates.length,
+        itemBuilder: (context, index) {
+          final date = scheduleController.weekDates[index];
 
+          return Obx(() {
             final isSelected =
                 index == scheduleController.selectedDayIndex.value;
-            print("isSelected ${isSelected}");
+            print("isSelected $isSelected");
+
             return GestureDetector(
               onTap: () async {
-                // ✅ Store the index and date before async
                 final tappedDate = date;
 
-                // ✅ First fetch slots
                 final slots = await DoctorSlotService.fetchDoctorSlots(
                   widget.doctorData.doctor.doctorId,
                   widget.doctorData.hospital.hospitalId,
                 );
 
-                // ✅ Update controller AFTER fetch completes
                 scheduleController.selectDate(tappedDate, slots);
-
-                // scheduleController.selectedDayIndex.value = index;
               },
               child: Container(
                 width: 50,
@@ -437,9 +432,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 ),
               ),
             );
-          },
-        ),
-      );
-    });
+          });
+        },
+      ),
+    );
   }
 }

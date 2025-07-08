@@ -1,4 +1,5 @@
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Notification/LocalNotification.dart';
 import 'package:cutomer_app/Review/ReviewScreen.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/RatingBottomSheet.dart';
@@ -35,7 +36,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
     super.initState();
     _fetchHospitaAndDoctorData();
     _fetchRating(); // Call rating fetch here
-
+    checkAndScheduleNotification();
     // Parse the appointment time safely
     try {
       // Combine serviceDate and serviceTime
@@ -50,6 +51,32 @@ class _AppointmentCardState extends State<AppointmentCard> {
       appointmentDateTime = format.parse(combinedDateTimeStr);
     } catch (e) {
       appointmentDateTime = null;
+    }
+  }
+
+  bool _notificationSent = false;
+
+  void checkAndScheduleNotification() async {
+    final isVideoCall = widget.doctorData.consultationType.toLowerCase() ==
+            'video consultation' ||
+        widget.doctorData.consultationType.toLowerCase() ==
+            'online consultation';
+
+    final isConfirmed = widget.doctorData.status.toLowerCase() == 'confirmed';
+
+    if (isVideoCall && isConfirmed && appointmentDateTime != null) {
+      final triggerTime =
+          appointmentDateTime?.subtract(const Duration(minutes: 5));
+
+      if (DateTime.now().isAfter(triggerTime!) && !_notificationSent) {
+        _notificationSent = true; // prevent duplicate calls
+
+        await scheduleVideoCallNotification(
+          title: 'Doctor Video Call',
+          body: 'Your video call with the doctor starts in 5 minutes.',
+          videoCallTime: appointmentDateTime!,
+        );
+      }
     }
   }
 

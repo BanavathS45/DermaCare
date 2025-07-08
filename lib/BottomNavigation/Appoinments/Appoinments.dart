@@ -38,7 +38,9 @@ class _AppointmentPageState extends State<AppointmentPage> {
     return Scaffold(
       appBar: CommonHeader(
         title: "Appointments",
-        onNotificationPressed: () {},
+        onNotificationPressed: () {
+          
+        },
         onSettingPressed: () async {
           await whatsUpChat();
         },

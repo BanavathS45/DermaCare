@@ -76,7 +76,7 @@ dependencies:
   flutter_pdfview: ^1.4.0
   chewie: ^1.7.3
   webview_flutter: ^4.4.2
-  timeago: ^3.2.2
+  timeago: ^3.6.2
   # phonepe_payment_sdk: ^2.0.2
   crypto: ^3.0.3
   uuid: ^4.1.0

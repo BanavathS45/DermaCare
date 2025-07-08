@@ -1,4 +1,5 @@
 import 'package:cutomer_app/Notification/NotificationController.dart';
+import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -87,7 +88,9 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.notifications, color: Colors.white),
-                    onPressed: onNotificationPressed,
+                    onPressed: () {
+                      Get.to(NotificationScreen());
+                    },
                   ),
                   if (count > 0)
                     Positioned(

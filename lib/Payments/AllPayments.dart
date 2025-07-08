@@ -47,33 +47,33 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
   void initState() {
     super.initState();
     print("PayAmount to be customer ${widget.amount}");
-    // handleBookAppoint();
+    handleBookAppoint();
     // Payment options
-    options = {
-      'key': 'rzp_test_2z0PiIllMZDHrE',
-      'amount': (double.parse(widget.amount) * 100).toInt(), // Amount in paise
+    // options = {
+    //   'key': 'rzp_test_2z0PiIllMZDHrE',
+    //   'amount': (double.parse(widget.amount) * 100).toInt(), // Amount in paise
 
-      'name': 'Derma Care',
-      'description': 'Service Charges',
-      'prefill': {
-        'contact': '7842259803',
-        'email': 'prashanthr803@gmail.com',
-      },
-      'order_id': '<GENERATED_ORDER_ID>', // <-- THIS!
-    };
+    //   'name': 'Derma Care',
+    //   'description': 'Service Charges',
+    //   'prefill': {
+    //     'contact': '7842259803',
+    //     'email': 'prashanthr803@gmail.com',
+    //   },
+    //   'order_id': '<GENERATED_ORDER_ID>', // <-- THIS!
+    // };
 
     // Razorpay event listeners
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    // _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    // _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    // _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
 
     // Start payment process
-    if (widget.onPaymentInitiated != null) {
-      widget.onPaymentInitiated!();
-      Future.delayed(Duration.zero, () {
-        _razorpay.open(options);
-      });
-    }
+    // if (widget.onPaymentInitiated != null) {
+    //   widget.onPaymentInitiated!();
+    //   Future.delayed(Duration.zero, () {
+    //     _razorpay.open(options);
+    //   });
+    // }
   }
 
   @override
@@ -88,94 +88,18 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
     );
   }
 
-//   void handleBookAppoint() async {
-//     setState(() {
-//       _isLoading = false;
-//     });
-
-//     // showSnackbar(
-//     //     "Success", "Payment Successful: ${response.paymentId}", "success");
-//     // paymentId = response.paymentId;
-//     // print("Payment Successful: ${response.paymentId}");
-//     // print("Payment Successful: ${response.orderId}");
-//     // print("Payment Successful: ${response.data}");
-//     // print("Payment Successful: ${response.signature}");
-
-//     print("Booking Payload: ${jsonEncode(widget.bookingDetails)}");
-
-//     var responseData = await postBookings(widget.bookingDetails);
-
-//     print('[DEBUG] Response Data: $responseData');
-
-//     if (responseData!['statusCode'] == 201 && responseData['data'] != null) {
-//       print('[DEBUG] Inside if block');
-
-//       Navigator.pushAndRemoveUntil(
-//           context,
-//           MaterialPageRoute(
-//             builder: (ctx) => SuccessScreen(
-//                 serviceDetails: widget.serviceDetails,
-//                 paymentId: "paymentId.toString()",
-//                 patient: widget.patient,
-//                 mobileNumber: widget.mobileNumber),
-//           ),
-//           (route) => false);
-
-//       //Testing
-//       final testVideoCallTime = DateTime.now().add(Duration(minutes: 6));
-
-//       //original
-//       // Assume these are coming from your bookingDetails or responseData
-//       final serviceDate =
-//           widget.bookingDetails.patient.serviceDate; // e.g., "2025-06-29"
-//       final serviceTime =
-//           widget.bookingDetails.patient.servicetime; // e.g., "08:00 PM"
-
-// // Combine and parse to DateTime
-//       final String combinedDateTimeStr = '$serviceDate $serviceTime';
-//       print('[📅] Combined Date & Time string: $combinedDateTimeStr');
-
-//       final DateTime videoCallTime =
-//           DateFormat('yyyy-MM-dd hh:mm a').parse(combinedDateTimeStr);
-//       print('[✅] Parsed video call DateTime: $videoCallTime');
-
-//       print('[📞] Scheduling alert at: $testVideoCallTime');
-
-//       try {
-//         print('[🧪] Before scheduling');
-//         await scheduleVideoCallNotification(
-//           title: 'Doctor Video Call',
-//           body: 'Your video call with the doctor starts in 1 minutes.',
-//           videoCallTime: testVideoCallTime,
-//         );
-//         await scheduleVideoCallNotification(
-//           title: 'Doctor Video Call',
-//           body: 'Your video call with the doctor starts in 5 minutes.',
-//           videoCallTime: videoCallTime,
-//         );
-//         print('[✅] After scheduling');
-//       } catch (e) {
-//         print('[❌] Failed to schedule video call: $e');
-//       }
-
-//       print('[DEBUG] Notification scheduled. Navigating to success screen...');
-//     } else {
-//       print('[❌] Booking failed or unexpected response: $responseData');
-//     }
-//   }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+  void handleBookAppoint() async {
     setState(() {
       _isLoading = false;
     });
 
-    showSnackbar(
-        "Success", "Payment Successful: ${response.paymentId}", "success");
-    paymentId = response.paymentId;
-    print("Payment Successful: ${response.paymentId}");
-    print("Payment Successful: ${response.orderId}");
-    print("Payment Successful: ${response.data}");
-    print("Payment Successful: ${response.signature}");
+    // showSnackbar(
+    //     "Success", "Payment Successful: ${response.paymentId}", "success");
+    // paymentId = response.paymentId;
+    // print("Payment Successful: ${response.paymentId}");
+    // print("Payment Successful: ${response.orderId}");
+    // print("Payment Successful: ${response.data}");
+    // print("Payment Successful: ${response.signature}");
 
     print("Booking Payload: ${jsonEncode(widget.bookingDetails)}");
 
@@ -191,7 +115,7 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
           MaterialPageRoute(
             builder: (ctx) => SuccessScreen(
                 serviceDetails: widget.serviceDetails,
-                paymentId: paymentId.toString(),
+                paymentId: "paymentId.toString()",
                 patient: widget.patient,
                 mobileNumber: widget.mobileNumber),
           ),
@@ -221,6 +145,11 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
         print('[🧪] Before scheduling');
         await scheduleVideoCallNotification(
           title: 'Doctor Video Call',
+          body: 'Your video call with the doctor starts in 1 minutes.',
+          videoCallTime: testVideoCallTime,
+        );
+        await scheduleVideoCallNotification(
+          title: 'Doctor Video Call',
           body: 'Your video call with the doctor starts in 5 minutes.',
           videoCallTime: videoCallTime,
         );
@@ -234,6 +163,77 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
       print('[❌] Booking failed or unexpected response: $responseData');
     }
   }
+
+//   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+//     setState(() {
+//       _isLoading = false;
+//     });
+
+//     showSnackbar(
+//         "Success", "Payment Successful: ${response.paymentId}", "success");
+//     paymentId = response.paymentId;
+//     print("Payment Successful: ${response.paymentId}");
+//     print("Payment Successful: ${response.orderId}");
+//     print("Payment Successful: ${response.data}");
+//     print("Payment Successful: ${response.signature}");
+
+//     print("Booking Payload: ${jsonEncode(widget.bookingDetails)}");
+
+//     var responseData = await postBookings(widget.bookingDetails);
+
+//     print('[DEBUG] Response Data: $responseData');
+
+//     if (responseData!['statusCode'] == 201 && responseData['data'] != null) {
+//       print('[DEBUG] Inside if block');
+
+//       Navigator.pushAndRemoveUntil(
+//           context,
+//           MaterialPageRoute(
+//             builder: (ctx) => SuccessScreen(
+//                 serviceDetails: widget.serviceDetails,
+//                 paymentId: paymentId.toString(),
+//                 patient: widget.patient,
+//                 mobileNumber: widget.mobileNumber),
+//           ),
+//           (route) => false);
+
+//       //Testing
+//       final testVideoCallTime = DateTime.now().add(Duration(minutes: 6));
+
+//       //original
+//       // Assume these are coming from your bookingDetails or responseData
+//       final serviceDate =
+//           widget.bookingDetails.patient.serviceDate; // e.g., "2025-06-29"
+//       final serviceTime =
+//           widget.bookingDetails.patient.servicetime; // e.g., "08:00 PM"
+
+// // Combine and parse to DateTime
+//       final String combinedDateTimeStr = '$serviceDate $serviceTime';
+//       print('[📅] Combined Date & Time string: $combinedDateTimeStr');
+
+//       final DateTime videoCallTime =
+//           DateFormat('yyyy-MM-dd hh:mm a').parse(combinedDateTimeStr);
+//       print('[✅] Parsed video call DateTime: $videoCallTime');
+
+//       print('[📞] Scheduling alert at: $testVideoCallTime');
+
+//       try {
+//         print('[🧪] Before scheduling');
+//         await scheduleVideoCallNotification(
+//           title: 'Doctor Video Call',
+//           body: 'Your video call with the doctor starts in 5 minutes.',
+//           videoCallTime: videoCallTime,
+//         );
+//         print('[✅] After scheduling');
+//       } catch (e) {
+//         print('[❌] Failed to schedule video call: $e');
+//       }
+
+//       print('[DEBUG] Notification scheduled. Navigating to success screen...');
+//     } else {
+//       print('[❌] Booking failed or unexpected response: $responseData');
+//     }
+//   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     setState(() {

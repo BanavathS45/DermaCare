@@ -1,4 +1,5 @@
 import 'package:cutomer_app/OTP/FireBaseOtp.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -84,7 +85,7 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
                   Expanded(
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.limeAccent),
+                        side: BorderSide(color: mainColor),
                         foregroundColor: Colors.limeAccent,
                       ),
                       onPressed: () async {
@@ -103,7 +104,7 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.limeAccent,
+                        backgroundColor: mainColor,
                         foregroundColor: Colors.black,
                       ),
                       onPressed: _authenticate,

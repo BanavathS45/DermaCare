@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cutomer_app/ConfirmBooking/Consultations.dart';
 import 'package:cutomer_app/Dashboard/ImagePreview.dart';
+import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -80,7 +81,6 @@ class _DashboardScreenState extends State<DashboardScreen>
         }
       });
 
-
     // Now call async logic separately
     loadInitialData();
   }
@@ -111,8 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     dashboardcontroller.fetchImages();
     controller.fetchBookings();
     dashboardcontroller.storeUserData(widget.mobileNumber, widget.username);
-
-}
+  }
 
   @override
   void dispose() {
@@ -185,12 +184,48 @@ class _DashboardScreenState extends State<DashboardScreen>
               ],
             ),
             const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.notifications, color: Colors.white),
-              onPressed: () {
-                Get.to(() => NotificationScreen());
-              },
-            ),
+            Obx(() {
+              final count =
+                  Get.find<NotificationController>().unreadCount.value;
+
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications, color: Colors.white),
+                    onPressed: () {
+                      // ✅ Reset unread count (optional)
+                      Get.to(() => NotificationScreen());
+                    },
+                  ),
+                  if (count > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Text(
+                          '$count',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }),
+
             IconButton(
               icon: const Icon(Icons.settings, color: Colors.white),
               onPressed: () async {
