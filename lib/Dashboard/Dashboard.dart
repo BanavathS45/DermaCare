@@ -226,12 +226,47 @@ class _DashboardScreenState extends State<DashboardScreen>
               );
             }),
 
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
-              onPressed: () async {
-                await whatsUpChat();
-              },
-            )
+            Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.wallet, color: Colors.white),
+                  onPressed: () {
+                    // ✅ Reset unread count (optional)
+                    // Get.to(() => NotificationScreen());
+                  },
+                ),
+                Positioned(
+                  right: 0,
+                  top: -4,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                        // color: Colors.red,
+                        // shape: BoxShape.circle,
+                        ),
+                    constraints: const BoxConstraints(
+                      minWidth: 25,
+                      minHeight: 18,
+                    ),
+                    child: Text(
+                      '💰 2000',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // IconButton(
+            //   icon: const Icon(Icons.wallet, color: Colors.white),
+            //   onPressed: () async {
+            //     await whatsUpChat();
+            //   },
+            // )
           ]),
         ),
         body: Obx(() {

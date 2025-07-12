@@ -40,6 +40,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final registercontroller = Get.put(Registercontroller());
+  bool showAllRows = false;
 
   String? id;
   List<DoctorSlot>? slots;
@@ -73,8 +74,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     } catch (e) {
       debugPrint('Initialization error: $e');
     }
-  }
-
+  } 
+  
   @override
   void dispose() {
     super.dispose();
@@ -302,74 +303,96 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           }
 
           return Column(
-            children: List.generate(
-              (scheduleController.currentSlots.length / 4).ceil(),
-              (rowIndex) {
-                final startIndex = rowIndex * 4;
-                final endIndex =
-                    (startIndex + 4 < scheduleController.currentSlots.length)
-                        ? startIndex + 4
-                        : scheduleController.currentSlots.length;
-                final rowSlots = scheduleController.currentSlots
-                    .sublist(startIndex, endIndex);
+            children: [
+              // Slot rows (4 per row)
+              ...List.generate(
+                showAllRows
+                    ? (scheduleController.currentSlots.length / 4).ceil()
+                    : ((scheduleController.currentSlots.length / 4).ceil() > 2
+                        ? 2
+                        : (scheduleController.currentSlots.length / 4).ceil()),
+                (rowIndex) {
+                  final startIndex = rowIndex * 4;
+                  final endIndex =
+                      (startIndex + 4 < scheduleController.currentSlots.length)
+                          ? startIndex + 4
+                          : scheduleController.currentSlots.length;
+                  final rowSlots = scheduleController.currentSlots
+                      .sublist(startIndex, endIndex);
 
-                return Row(
-                  children: List.generate(4, (i) {
-                    if (i < rowSlots.length) {
-                      final slotData = rowSlots[i];
-                      final slotText = slotData.slot;
-                      final isBooked = slotData.slotbooked;
-                      final actualIndex = startIndex + i;
+                  return Row(
+                    children: List.generate(4, (i) {
+                      if (i < rowSlots.length) {
+                        final slotData = rowSlots[i];
+                        final slotText = slotData.slot;
+                        final isBooked = slotData.slotbooked;
+                        final actualIndex = startIndex + i;
 
-                      final isSelected = actualIndex ==
-                          scheduleController.selectedSlotIndex.value;
+                        final isSelected = actualIndex ==
+                            scheduleController.selectedSlotIndex.value;
 
-                      return Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: GestureDetector(
-                            onTap: () {
-                              if (!isBooked) {
-                                scheduleController.selectSlot(
-                                    actualIndex, slotText);
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 4),
-                              decoration: BoxDecoration(
-                                color: isBooked
-                                    ? Colors.grey.shade300
-                                    : isSelected
-                                        ? mainColor
-                                        : Colors.white,
-                                border: Border.all(
-                                    color: isBooked ? Colors.grey : mainColor),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                slotText,
-                                style: TextStyle(
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: GestureDetector(
+                              onTap: () {
+                                if (!isBooked) {
+                                  scheduleController.selectSlot(
+                                      actualIndex, slotText);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 4),
+                                decoration: BoxDecoration(
                                   color: isBooked
-                                      ? Colors.grey
+                                      ? Colors.grey.shade300
                                       : isSelected
-                                          ? Colors.white
-                                          : mainColor,
-                                  fontWeight: FontWeight.w500,
+                                          ? mainColor
+                                          : Colors.white,
+                                  border: Border.all(
+                                      color:
+                                          isBooked ? Colors.grey : mainColor),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  slotText,
+                                  style: TextStyle(
+                                    color: isBooked
+                                        ? Colors.grey
+                                        : isSelected
+                                            ? Colors.white
+                                            : mainColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    } else {
-                      return const Expanded(child: SizedBox(height: 48));
-                    }
-                  }),
-                );
-              },
-            ),
+                        );
+                      } else {
+                        return const Expanded(child: SizedBox(height: 48));
+                      }
+                    }),
+                  );
+                },
+              ),
+
+              // 🔘 View More / View Less toggle
+              if ((scheduleController.currentSlots.length / 4).ceil() > 2)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      showAllRows = !showAllRows;
+                    });
+                  },
+                  child: Text(
+                    showAllRows ? 'View Less' : 'View More',
+                    style: TextStyle(color: mainColor),
+                  ),
+                ),
+            ],
           );
         }),
       ],

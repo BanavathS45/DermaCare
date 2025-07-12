@@ -185,7 +185,7 @@ class SiginSignUpController extends GetxController {
               prefs.getBool('isFirstLoginDone') ?? true;
 
           // ✅ User is registered
-          if (isAuthenticated && isFirstTimeAuthenticated) {
+          // if (isAuthenticated && isFirstTimeAuthenticated) {
             showSnackbar("Success",
                 "OTP has been sent successfully to $mobileNumber", "success");
 
@@ -194,12 +194,12 @@ class SiginSignUpController extends GetxController {
                   fullname: fullname,
                   deviceId: token,
                 ));
-          } else {
-            Get.to(() => EnableBiometricScreen(
-                mobileNumber: mobileNumber,
-                fullname: fullname,
-                deviceId: token));
-          }
+          // } else {
+          //   Get.to(() => EnableBiometricScreen(
+          //       mobileNumber: mobileNumber,
+          //       fullname: fullname,
+          //       deviceId: token));
+          // }
         }
       } catch (e) {
         print("Error during login: $e");

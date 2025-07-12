@@ -125,7 +125,11 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             ),
 
             const SizedBox(height: 20),
-
+            PaymentModeSelector(
+              consultationType: consultationController
+                  .selectedConsultation.value!.consultationType,
+            ),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
@@ -193,11 +197,11 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               height: 1,
               color: secondaryColor,
             ),
-            PaymentModeSelector(
-              consultationType: consultationController
-                  .selectedConsultation.value!.consultationType,
-            ),
-            const SizedBox(height: 20),
+            // PaymentModeSelector(
+            //   consultationType: consultationController
+            //       .selectedConsultation.value!.consultationType,
+            // ),
+            // const SizedBox(height: 20),
             // Obx(() => Text(selectedServicesController.selectedPayment.value)),
           ],
         ),
@@ -307,8 +311,6 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
           }),
         ),
       ),
-    
-    
     );
   }
 

@@ -363,8 +363,13 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           widget.doctorData.consultationType.toLowerCase() ==
                               'online consultation') &&
                       appointmentDateTime != null &&
+                      // DateTime.now().isAfter(appointmentDateTime!
+                      //     .subtract(const Duration(minutes: 5))))
+
                       DateTime.now().isAfter(appointmentDateTime!
-                          .subtract(const Duration(minutes: 5)))) ...[
+                          .subtract(const Duration(minutes: 5))) &&
+                      DateTime.now().isBefore(appointmentDateTime!
+                          .add(const Duration(minutes: 30)))) ...[
                     Container(
                       height: 35,
                       decoration: BoxDecoration(

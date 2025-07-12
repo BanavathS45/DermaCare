@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cutomer_app/Registration/RegisterScreen.dart';
+import 'package:cutomer_app/SigninSignUp/BiometricPermissionScreen.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
@@ -48,8 +49,6 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
     super.initState();
     sendOTP();
     startTimer();
-
-   
   }
 
   void startTimer() {
@@ -122,121 +121,139 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
     }
   }
 
-  Future<void> verifyOTP(String otp) async {
-    setState(() => isLoading = true);
-
-    try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: otp,
-      );
-
-      UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-
-      final checkUserResponse = await http.get(
-        Uri.parse('$registerUrl/getBasicDetails/${widget.mobileNumber}'),
-      );
-
-      if (checkUserResponse.statusCode == 200) {
-        final data = json.decode(checkUserResponse.body);
-        if (data['success'] == true && data['data'] != null) {
-          Get.offAll(() => ConsultationsType(
-                mobileNumber: widget.mobileNumber,
-                username: widget.fullname ?? '',
-              ));
-        } else {
-          Get.to(() => RegisterScreen(
-                fullName: widget.fullname!,
-                mobileNumber: widget.mobileNumber,
-              ));
-        }
-      } else {
-        Get.to(() => RegisterScreen(
-              fullName: widget.fullname!,
-              mobileNumber: widget.mobileNumber,
-            ));
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login successful")),
-      );
-    } catch (e) {
-      setState(() {
-        failedAttempts++;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Invalid OTP")),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  //verfy oTP
   // Future<void> verifyOTP(String otp) async {
   //   setState(() => isLoading = true);
 
   //   try {
-  //     final response = await http.post(
-  //       Uri.parse('$registerUrl/verifyOtp'),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: json.encode({
-  //         "mobileNo": widget.mobileNumber,
-  //         "otp": otp,
-  //       }),
+  //     PhoneAuthCredential credential = PhoneAuthProvider.credential(
+  //       verificationId: verificationId,
+  //       smsCode: otp,
   //     );
 
-  //     print("otps: ${widget.mobileNumber}, ${otp}");
+  //     UserCredential userCredential =
+  //         await _auth.signInWithCredential(credential);
 
-  //     final responseData = json.decode(response.body);
-  //     print("otps: ${responseData}");
+  //     final checkUserResponse = await http.get(
+  //       Uri.parse('$registerUrl/getBasicDetails/${widget.mobileNumber}'),
+  //     );
 
-  //     if (response.statusCode == 200 && responseData['success'] == true) {
-  //       // Now check if user exists in your database
-  //       final checkUserResponse = await http.get(
-  //         Uri.parse('$registerUrl/getBasicDetails/${widget.mobileNumber}'),
-  //       );
-
-  //       if (checkUserResponse.statusCode == 200) {
-  //         final data = json.decode(checkUserResponse.body);
-  //         if (data['success'] == true && data['data'] != null) {
-  //           Get.offAll(() => ConsultationsType(
-  //                 mobileNumber: widget.mobileNumber,
-  //                 username: widget.fullname ?? '',
-  //               ));
-  //         } else {
-  //           Get.to(() => RegisterScreen(
-  //                 fullName: widget.fullname!,
-  //                 mobileNumber: widget.mobileNumber,
-  //               ));
-  //         }
+  //     if (checkUserResponse.statusCode == 200) {
+  //       final data = json.decode(checkUserResponse.body);
+  //       if (data['success'] == true && data['data'] != null) {
+  //         Get.offAll(() => ConsultationsType(
+  //               mobileNumber: widget.mobileNumber,
+  //               username: widget.fullname ?? '',
+  //             ));
   //       } else {
   //         Get.to(() => RegisterScreen(
   //               fullName: widget.fullname!,
   //               mobileNumber: widget.mobileNumber,
   //             ));
   //       }
-  //       showSnackbar("Success", "Login successful", "success");
-  //       // ScaffoldMessenger.of(context).showSnackBar(
-  //       //   SnackBar(content: Text("Login successful")),
-  //       // );
   //     } else {
-  //       showSnackbar(
-  //           "Error", "${responseData['message'] ?? 'Invalid OTP'}", "error");
-  //       // ScaffoldMessenger.of(context).showSnackBar(
-  //       //   SnackBar(content: Text(responseData['message'] ?? 'Invalid OTP')),
-  //       // );
+  //       Get.to(() => RegisterScreen(
+  //             fullName: widget.fullname!,
+  //             mobileNumber: widget.mobileNumber,
+  //           ));
   //     }
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Login successful")),
+  //     );
   //   } catch (e) {
-  //     showSnackbar("Error", "Something went wrong: $e", "error");
-  //     // ScaffoldMessenger.of(context).showSnackBar(
-  //     //   SnackBar(content: Text("Something went wrong: $e")),
-  //     // );
+  //     setState(() {
+  //       failedAttempts++;
+  //     });
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Invalid OTP")),
+  //     );
   //   } finally {
   //     setState(() => isLoading = false);
   //   }
   // }
+
+  //verfy oTP
+  Future<void> verifyOTP(String otp) async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await http.post(
+        Uri.parse('$registerUrl/verifyOtp'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          "mobileNumber": widget.mobileNumber,
+          "otp": otp,
+        }),
+      );
+
+      print("otps: ${widget.mobileNumber}, ${otp}");
+
+      final responseData = json.decode(response.body);
+      print("otps: ${responseData}");
+
+      if (response.statusCode == 200 && responseData['success'] == true) {
+        // Now check if user exists in your database
+        final checkUserResponse = await http.get(
+          Uri.parse('$registerUrl/getBasicDetails/${widget.mobileNumber}'),
+        );
+        final prefs = await SharedPreferences.getInstance();
+        final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
+        final token = prefs.getString('fcm');
+        if (checkUserResponse.statusCode == 200) {
+          final data = json.decode(checkUserResponse.body);
+          if (data['success'] == true && data['data'] != null) {
+            final isFirstTimeAuthenticated =
+                prefs.getBool('isFirstLoginDone') ?? true;
+
+            if (isAuthenticated && isFirstTimeAuthenticated) {
+              showSnackbar(
+                  "Success",
+                  "OTP has been sent successfully to $widget.mobileNumber",
+                  "success");
+
+              Get.offAll(() => ConsultationsType(
+                    mobileNumber: widget.mobileNumber,
+                    username: widget.fullname ?? '',
+                  ));
+            } else {
+              Get.to(() => EnableBiometricScreen(
+                  mobileNumber: widget.mobileNumber,
+                  fullname: widget.fullname ?? '',
+                  deviceId: token));
+            }
+          } else {
+            Get.to(() => RegisterScreen(
+                  fullName: widget.fullname!,
+                  mobileNumber: widget.mobileNumber,
+                ));
+          }
+        } else {
+          Get.to(() => RegisterScreen(
+                fullName: widget.fullname!,
+                mobileNumber: widget.mobileNumber,
+              ));
+        }
+
+        showSnackbar("Success", "Login successful", "success");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("Login successful")),
+        // );
+      } else {
+        showSnackbar(
+            "Error", "${responseData['message'] ?? 'Invalid OTP'}", "error");
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text(responseData['message'] ?? 'Invalid OTP')),
+        // );
+      }
+    } catch (e) {
+      showSnackbar("Error", "Something went wrong: $e", "error");
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text("Something went wrong: $e")),
+      // );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -310,7 +327,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
                       ? () => Get.toNamed('/gethelp')
                       : (canResend
                           ? () {
-                              sendOTP();
+                              // sendOTP();
                               resendOtp(widget.mobileNumber, widget.deviceId!);
                               startTimer();
                             }

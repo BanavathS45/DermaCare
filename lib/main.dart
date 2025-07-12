@@ -202,6 +202,7 @@
 
 import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
+import 'package:cutomer_app/PushNotification/PushNotification.dart';
 import 'package:cutomer_app/Routes/Navigation.dart';
 import 'package:cutomer_app/SubserviceAndHospital/HospitalCardScreen%20.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -285,10 +286,10 @@ Future<void> main() async {
       await FirebaseMessaging.instance.getInitialMessage();
 
   final notificationController = Get.put(NotificationController());
-
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    notificationController.handleNotification(message);
-  });
+  await NotificationService.instance.init();
+  // FirebaseMessaging.onMessageOpenedApp.listen((message) {
+  //   notificationController.handleNotification(message);
+  // });
 
   if (initialMessage != null) {
     notificationController.handleNotification(initialMessage);

@@ -1,3 +1,4 @@
+import 'package:cutomer_app/ConfirmBooking/Consultations.dart';
 import 'package:cutomer_app/OTP/FireBaseOtp.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,8 @@ class EnableBiometricScreen extends StatefulWidget {
   final fullname;
   final String? deviceId;
 
-  const EnableBiometricScreen({super.key, this.mobileNumber, this.fullname, this.deviceId});
+  const EnableBiometricScreen(
+      {super.key, this.mobileNumber, this.fullname, this.deviceId});
   @override
   _EnableBiometricScreenState createState() => _EnableBiometricScreenState();
 }
@@ -39,9 +41,9 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Biometric authentication enabled")),
         );
-        Get.to(OTPLoginScreen(
+        Get.to(ConsultationsType(
           mobileNumber: widget.mobileNumber,
-          fullname: widget.fullname,
+          username: widget.fullname ?? '',
         ));
         // Navigator.pop(context); // Or navigate to home/dashboard
       }
@@ -53,7 +55,7 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -64,7 +66,7 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
                 Text(
                   "Enable Biometrics",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: mainColor,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -75,7 +77,12 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
                   style: TextStyle(color: Colors.grey),
                 ),
                 SizedBox(height: 40),
-                Icon(Icons.fingerprint, size: 120, color: Colors.blueAccent),
+                // Icon(Icons.fingerprint, size: 120, color: Colors.blueAccent),
+                Image.asset(
+                  'assets/fin.gif',
+                  height: 120,
+                  width: 120,
+                )
               ],
             ),
             Padding(
@@ -97,7 +104,7 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
                           fullname: widget.fullname,
                         ));
                       },
-                      child: Text("Skip"),
+                      child: Text("Skip", style: TextStyle(color: mainColor)),
                     ),
                   ),
                   SizedBox(width: 16),
@@ -108,7 +115,10 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
                         foregroundColor: Colors.black,
                       ),
                       onPressed: _authenticate,
-                      child: Text("Allow"),
+                      child: Text(
+                        "Allow",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ],

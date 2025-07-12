@@ -23,7 +23,7 @@ class LoginApiService {
       }
 
       final body = {
-        'fullName': fullname,
+        'userName': fullname,
         'mobileNumber': mobileNumber,
         'deviceId': token,
       };
