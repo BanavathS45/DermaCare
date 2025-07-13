@@ -64,17 +64,25 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
   }
 
-  Future<void> _initialize() async {
-    if (!mounted) return;
+ Future<void> _initialize() async {
+  if (!mounted) return;
 
-    try {
-      await scheduleController.initializeWeekDates();
-      id = consultationController.selectedConsultation.value?.consultationId;
-      await fetchDoctorSlotsOnce();
-    } catch (e) {
-      debugPrint('Initialization error: $e');
-    }
-  } 
+  try {
+    await scheduleController.initializeWeekDates();
+    id = consultationController.selectedConsultation.value?.consultationId;
+
+    await fetchDoctorSlotsOnce();
+
+    // ⏰ Schedule refresh after midnight
+    scheduleController.scheduleMidnightRefresh(
+      doctorId: widget.doctorData.doctor.doctorId,
+      hospitalId: widget.doctorData.hospital.hospitalId,
+    );
+  } catch (e) {
+    debugPrint('Initialization error: $e');
+  }
+}
+
   
   @override
   void dispose() {

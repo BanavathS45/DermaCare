@@ -60,7 +60,6 @@ class NotificationService {
       // final ctx = navigatorKey.currentContext;
 
       if (Platform.isAndroid) {
-        
         final testVideoCallTime = DateTime.now().add(Duration(minutes: 6));
         await scheduleVideoCallNotification(
           title: title,
@@ -70,7 +69,7 @@ class NotificationService {
       } else {
         Fluttertoast.showToast(msg: "$title: $body");
       }
-      Get.find<NotificationController>().handleNotification(msg);
+      // Get.find<NotificationController>().handleNotification(msg);
     });
 
     // Background ➜ foreground
@@ -133,27 +132,26 @@ class _NotificationHelper {
     _initDone = true;
   }
 
-static Future<void> _createChannel({
-  required String id,
-  required String name,
-  required Importance importance,
-  String? sound,
-}) async {
-  final androidNotificationChannel = AndroidNotificationChannel(
-    id,
-    name,
-    description: '$name notifications',
-    importance: importance,
-    sound: sound != null
-        ? RawResourceAndroidNotificationSound(sound)
-        : null,
-    playSound: sound != null,
-  );
+  static Future<void> _createChannel({
+    required String id,
+    required String name,
+    required Importance importance,
+    String? sound,
+  }) async {
+    final androidNotificationChannel = AndroidNotificationChannel(
+      id,
+      name,
+      description: '$name notifications',
+      importance: importance,
+      sound: sound != null ? RawResourceAndroidNotificationSound(sound) : null,
+      playSound: sound != null,
+    );
 
-  await _flutterLocal
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(androidNotificationChannel);
-}
+    await _flutterLocal
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidNotificationChannel);
+  }
 
   /* === Public helpers === */
   static Future<void> requestUserPermission() async {
@@ -169,6 +167,4 @@ static Future<void> _createChannel({
       debugPrint('✅ Notification permission granted');
     }
   }
-
-  
 }

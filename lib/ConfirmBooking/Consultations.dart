@@ -92,7 +92,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(30),
                             child: Image.asset(
-                              'assets/DermaText.png',
+                              'assets/ic_launcher.png',
                               fit: BoxFit.cover,
                             ),
                           ),

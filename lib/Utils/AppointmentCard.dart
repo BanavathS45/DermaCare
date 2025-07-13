@@ -147,22 +147,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(
-        child: SizedBox(
-          height: 20, // You can adjust height and width as needed
-          width: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      );
-    }
-
     if (doctor == null) {
-      // Fallback if no data yet
-      return const SizedBox(
-        height: 100,
-        child: Center(child: Text("No doctor data found")),
-      );
+      return const SizedBox.shrink(); // Avoid showing anything at all
     }
 
     final d = doctor!;

@@ -268,6 +268,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                       paymentId: "pay_at_hospital",
                       patient: widget.patient,
                       mobileNumber: widget.patient.mobileNumber,
+                      paymentType:"cash"
                     ),
                   ),
                   (route) => false,

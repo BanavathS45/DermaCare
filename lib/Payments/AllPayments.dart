@@ -193,7 +193,7 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
                 serviceDetails: widget.serviceDetails,
                 paymentId: paymentId.toString(),
                 patient: widget.patient,
-                mobileNumber: widget.mobileNumber),
+                mobileNumber: widget.mobileNumber,paymentType:"online"),
           ),
           (route) => false);
 

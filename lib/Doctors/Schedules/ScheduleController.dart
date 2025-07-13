@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Doctors/Schedules/DoctorSlotService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -46,34 +47,47 @@ class ScheduleController extends GetxController {
   final currentSlots = <Slot>[].obs;
   final weekDates = <DateTime>[].obs;
   final selectedDate = DateTime.now().obs;
-RxInt selectedDayIndex = 0.obs;
+  RxInt selectedDayIndex = 0.obs;
 
   final selectedSlotIndex = (-1).obs;
   final selectedSlotText = ''.obs;
 
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   initializeWeekDates();
-  // }
-
-  // void initializeWeekDates() {
-  //   final today = DateTime.now();
-  //   weekDates.assignAll(
-  //       List.generate(7, (index) => today.add(Duration(days: index))))             ;
-  //   selectedDate.value = weekDates.first;
-  // }
   Future<void> initializeWeekDates() async {
-    final today = DateTime.now();
+    final now = DateTime.now();
+
+    // Normalize to start of the day (00:00)
+    final today = DateTime(now.year, now.month, now.day);
+
     final generatedDates =
         List.generate(7, (index) => today.add(Duration(days: index)));
+
     weekDates.assignAll(generatedDates);
 
-    await Future.delayed(Duration.zero); // Allow build to complete
-    selectedDate.value = generatedDates.first;
+    await Future.delayed(Duration.zero);
 
-    // ✅ Set day index matching selectedDate
+    selectedDate.value = generatedDates.first;
     selectedDayIndex.value = 0;
+  }
+
+  void scheduleMidnightRefresh({
+    required String doctorId,
+    required String hospitalId,
+  }) {
+    final now = DateTime.now();
+    final nextMidnight = DateTime(now.year, now.month, now.day + 1);
+    final durationUntilMidnight = nextMidnight.difference(now);
+
+    Future.delayed(durationUntilMidnight, () async {
+      print("⏰ Refreshing slots after midnight...");
+
+      await initializeWeekDates();
+      final slots =
+          await DoctorSlotService.fetchDoctorSlots(doctorId, hospitalId);
+      filterSlotsForSelectedDate(slots);
+
+      // Schedule again for the next night
+      scheduleMidnightRefresh(doctorId: doctorId, hospitalId: hospitalId);
+    });
   }
 
   @override
@@ -127,23 +141,6 @@ RxInt selectedDayIndex = 0.obs;
     }
   }
 
-  // void selectDate(DateTime date, List<DoctorSlot> allSlots) {
-  //   selectedDate.value = date;
-  //   selectedSlotIndex.value = -1;
-  //   selectedSlotText.value = '';
-  //   _updateSlotsForDate(allSlots, date);
-  // }
-  // void selectDate(DateTime date, List<DoctorSlot> allSlots) {
-  //   final index = weekDates.indexWhere((d) =>
-  //       DateFormat('yyyy-MM-dd').format(d) ==
-  //       DateFormat('yyyy-MM-dd').format(date));
-
-  //   selectedDate.value = date;
-  //   selectedDayIndex.value = index;
-  //   selectedSlotIndex.value = -1;
-  //   selectedSlotText.value = '';
-  //   _updateSlotsForDate(allSlots, date);
-  // }
   void selectDate(DateTime date, List<DoctorSlot> allSlots) {
     selectedDate.value = date;
     selectedSlotIndex.value = -1;

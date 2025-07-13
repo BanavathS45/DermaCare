@@ -18,13 +18,14 @@ class SuccessScreen extends StatefulWidget {
   final PatientModel patient;
   final String paymentId;
   final String mobileNumber;
-  const SuccessScreen({
-    super.key,
-    required this.serviceDetails,
-    required this.paymentId,
-    required this.patient,
-    required this.mobileNumber,
-  });
+  final String paymentType;
+  const SuccessScreen(
+      {super.key,
+      required this.serviceDetails,
+      required this.paymentId,
+      required this.patient,
+      required this.mobileNumber,
+      required this.paymentType});
 
   @override
   State<SuccessScreen> createState() => _SuccessScreenState();
@@ -78,12 +79,15 @@ class _SuccessScreenState extends State<SuccessScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Payment is Successfully',
-                    style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                  Text(
+                    widget.paymentType == 'cash'
+                        ? 'Appointment booked successfully'
+                        : 'Payment is Successfully',
+                    style: const TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
@@ -152,7 +156,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
                                     width: 5,
                                   ),
                                   Text(
-                                    "${widget.patient.serviceDate}, ${widget.patient.servicetime}",
+                                    "${widget.patient.servicetime}",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ],
