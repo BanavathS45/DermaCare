@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Payments/PayUPayment.dart';
+import 'package:cutomer_app/Payments/final_payload.dart';
 import 'package:cutomer_app/PaytmentsUPI/PaymentScreenUPI.dart';
 import 'package:cutomer_app/Screens/BookingSuccess.dart';
 
@@ -23,6 +25,7 @@ import '../Utils/Constant.dart';
 import '../Utils/ScaffoldMessageSnacber.dart';
 import 'ConfirmBookingController.dart';
 import 'ConsultationController.dart';
+import 'package:http/http.dart' as http;
 
 class Confirmbookingdetails extends StatefulWidget {
   final HospitalDoctorModel doctor;
@@ -264,12 +267,11 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   context,
                   MaterialPageRoute(
                     builder: (ctx) => SuccessScreen(
-                      serviceDetails: widget.doctor,
-                      paymentId: "pay_at_hospital",
-                      patient: widget.patient,
-                      mobileNumber: widget.patient.mobileNumber,
-                      paymentType:"cash"
-                    ),
+                        serviceDetails: widget.doctor,
+                        paymentId: "pay_at_hospital",
+                        patient: widget.patient,
+                        mobileNumber: widget.patient.mobileNumber,
+                        paymentType: "cash"),
                   ),
                   (route) => false,
                 );
@@ -281,19 +283,69 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             } else {
               // 💳 GO TO PAYMENT SCREEN
               print('[💳] Navigating to Razorpay...');
+              // void handleNextScreen(BuildContext context, Map<String, dynamic> payload) async {
+              final response = await http.get(Uri.parse(
+                  'https://rainbow.exwyn.com/api/generateTransactionId'));
 
-              Get.to(RazorpaySubscription(
-                context: context,
-                amount: consultationFee.toString(),
-                onPaymentInitiated: () {
-                  showSnackbar("Info", "Payment Initiated", "info");
-                },
-                serviceDetails: widget.doctor,
-                patient: widget.patient,
-                bookingDetails: postBookingPayload,
-                mobileNumber: widget.patient.mobileNumber,
-              ));
+              if (response.statusCode == 200) {
+                final restxnId =
+                    response.body; // assuming plain string or parse accordingly
+                final txnidData = json.decode(restxnId);
+                print("txnidData ${restxnId}");
+
+                // Step 4: Extract the transaction ID
+                final txnId = txnidData['data'];
+                // Map<String, dynamic> json = {
+                //   "PatientName": "John Doe",
+                //   "EmailAddress": "john@example.com",
+                //   "MobileNumber": "9876543210",
+                //   "payment_type": "ONLINE",
+                //   "price": 500.0
+                // };
+
+                var finalPayload = ({
+                      "PatientName": "John",
+                      "EmailAddress": "john@example.com",
+                      "MobileNumber": "9999999999",
+                      "payment_type": "ONLINE",
+                      "price": consultationFee.toString()
+                    }),
+                    payload = FinalPayload.fromJson(finalPayload);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PayUWebViewScreen(
+                      txnId: txnId,
+                      amount: consultationFee.toString(),
+                      payuUrl: "https://test.payu.in/_payment",
+                      serviceDetails: widget.doctor,
+                      mobileNumber: widget.patient.mobileNumber,
+                      context: context,
+                      patient: widget.patient,
+                      bookingDetails: postBookingPayload,
+                      finalPayload: payload, // Use live URL in production
+                    ),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Transaction ID fetch failed')));
+              }
             }
+
+            // Get.to(RazorpaySubscription(
+            //   context: context,
+            //   amount: consultationFee.toString(),
+            //   onPaymentInitiated: () {
+            //     showSnackbar("Info", "Payment Initiated", "info");
+            //   },
+            //   serviceDetails: widget.doctor,
+            //   patient: widget.patient,
+            //   bookingDetails: postBookingPayload,
+            //   mobileNumber: widget.patient.mobileNumber,
+            // ));
+            // }
           },
           child: Obx(() {
             final selectedPayment =

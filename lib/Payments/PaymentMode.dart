@@ -14,7 +14,7 @@ class PaymentModeSelector extends StatelessWidget {
   List<String> getAvailableOptions() {
     final type = consultationType.toLowerCase();
     if (type == 'online consultation' || type == 'video consultation') {
-      return ['Online','Pay at Hospital'];
+      return ['Online'];
     } else {
       return ['Pay at Hospital', 'Online'];
     }
