@@ -3,6 +3,7 @@ import 'package:cutomer_app/ConfirmBooking/Consultations.dart';
 import 'package:cutomer_app/Dashboard/ImagePreview.dart';
 import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
+import 'package:cutomer_app/Screens/RefferalCode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -225,41 +226,45 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ],
               );
             }),
-
-            Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.wallet, color: Colors.white),
-                  onPressed: () {
-                    // ✅ Reset unread count (optional)
-                    // Get.to(() => NotificationScreen());
-                  },
-                ),
-                Positioned(
-                  right: 0,
-                  top: -4,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                        // color: Colors.red,
-                        // shape: BoxShape.circle,
+            GestureDetector(
+              onTap: () {
+                Get.to(() => ReferralWalletPage());
+              },
+              child: Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.wallet, color: Colors.white),
+                    onPressed: () {
+                      // ✅ Reset unread count (optional)
+                      // Get.to(() => NotificationScreen());
+                    },
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                          // color: Colors.red,
+                          // shape: BoxShape.circle,
+                          ),
+                      constraints: const BoxConstraints(
+                        minWidth: 25,
+                        minHeight: 18,
+                      ),
+                      child: Text(
+                        '💰 2000',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
-                    constraints: const BoxConstraints(
-                      minWidth: 25,
-                      minHeight: 18,
-                    ),
-                    child: Text(
-                      '💰 2000',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             // IconButton(
             //   icon: const Icon(Icons.wallet, color: Colors.white),

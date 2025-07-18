@@ -88,7 +88,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
             children: [
               const SizedBox(height: 20),
               CommonCarouselAds(
-                media: dashboardcontroller.carouselImages,
+                media: serviceselectioncontroller.carouselImages,
               ),
               Padding(
                 padding: const EdgeInsets.all(15.0),

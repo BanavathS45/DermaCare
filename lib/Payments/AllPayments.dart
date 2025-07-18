@@ -59,7 +59,7 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
         'contact': '7842259803',
         'email': 'prashanthr803@gmail.com',
       },
-      'order_id': '<GENERATED_ORDER_ID>', // <-- THIS!
+     
     };
 
     // Razorpay event listeners

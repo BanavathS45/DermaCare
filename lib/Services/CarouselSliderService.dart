@@ -44,7 +44,7 @@ class CarouselSliderService {
 
   Future<List<String>> fetchServiceImages() async {
     final url = Uri.parse(
-        '$serverUrl/admin/categoryAdvertisement/getAll'); // Replace with your API endpoint
+        '$serverUrl/admin/ServiceAdvertisement/getAll'); // Replace with your API endpoint
     try {
       final response = await http.get(url);
       print("carouselPicture ${response.body}");
@@ -60,8 +60,8 @@ class CarouselSliderService {
 
         // Loop through the response data to extract 'carouselPicture' from each object
         for (var item in data) {
-          if (item.containsKey('carouselPicture')) {
-            imageUrls.add(item['carouselPicture']);
+          if (item.containsKey('mediaUrlOrImage')) {
+            imageUrls.add(item['mediaUrlOrImage']);
           }
         }
         print("imageUrlsimageUrls lengrt ${imageUrls.length}");

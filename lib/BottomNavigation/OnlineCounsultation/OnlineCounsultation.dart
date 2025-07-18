@@ -90,7 +90,7 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
                   ? ListView(
                       physics: AlwaysScrollableScrollPhysics(),
                       children: [
-                        SizedBox(height: 150),
+                        SizedBox(height: 350),
                         Center(child: Text('No Online Consultations found.')),
                       ],
                     )

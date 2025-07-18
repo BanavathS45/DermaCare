@@ -283,69 +283,61 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             } else {
               // 💳 GO TO PAYMENT SCREEN
               print('[💳] Navigating to Razorpay...');
+
+              Get.to(RazorpaySubscription(
+                context: context,
+                amount: consultationFee.toString(),
+                onPaymentInitiated: () {
+                  showSnackbar("Info", "Payment Initiated", "info");
+                },
+                serviceDetails: widget.doctor,
+                patient: widget.patient,
+                bookingDetails: postBookingPayload,
+                mobileNumber: widget.patient.mobileNumber,
+              ));
+              // }
               // void handleNextScreen(BuildContext context, Map<String, dynamic> payload) async {
-              final response = await http.get(Uri.parse(
-                  'https://rainbow.exwyn.com/api/generateTransactionId'));
+              //   final response = await http.get(Uri.parse(
+              //       'https://rainbow.exwyn.com/api/generateTransactionId'));
 
-              if (response.statusCode == 200) {
-                final restxnId =
-                    response.body; // assuming plain string or parse accordingly
-                final txnidData = json.decode(restxnId);
-                print("txnidData ${restxnId}");
+              //   if (response.statusCode == 200) {
+              //     final restxnId =
+              //         response.body; // assuming plain string or parse accordingly
+              //     final txnidData = json.decode(restxnId);
+              //     print("txnidData ${restxnId}");
 
-                // Step 4: Extract the transaction ID
-                final txnId = txnidData['data'];
-                // Map<String, dynamic> json = {
-                //   "PatientName": "John Doe",
-                //   "EmailAddress": "john@example.com",
-                //   "MobileNumber": "9876543210",
-                //   "payment_type": "ONLINE",
-                //   "price": 500.0
-                // };
+              //     final txnId = txnidData['data'];
 
-                var finalPayload = ({
-                      "PatientName": "John",
-                      "EmailAddress": "john@example.com",
-                      "MobileNumber": "9999999999",
-                      "payment_type": "ONLINE",
-                      "price": consultationFee.toString()
-                    }),
-                    payload = FinalPayload.fromJson(finalPayload);
+              //     var finalPayload = ({
+              //           "PatientName": "John",
+              //           "EmailAddress": "john@example.com",
+              //           "MobileNumber": "9999999999",
+              //           "payment_type": "ONLINE",
+              //           "price": consultationFee.toString()
+              //         }),
+              //         payload = FinalPayload.fromJson(finalPayload);
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => PayUWebViewScreen(
-                      txnId: txnId,
-                      amount: consultationFee.toString(),
-                      payuUrl: "https://test.payu.in/_payment",
-                      serviceDetails: widget.doctor,
-                      mobileNumber: widget.patient.mobileNumber,
-                      context: context,
-                      patient: widget.patient,
-                      bookingDetails: postBookingPayload,
-                      finalPayload: payload, // Use live URL in production
-                    ),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Transaction ID fetch failed')));
-              }
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (_) => PayUWebViewScreen(
+              //           txnId: txnId,
+              //           amount: consultationFee.toString(),
+              //           payuUrl: "https://test.payu.in/_payment",
+              //           serviceDetails: widget.doctor,
+              //           mobileNumber: widget.patient.mobileNumber,
+              //           context: context,
+              //           patient: widget.patient,
+              //           bookingDetails: postBookingPayload,
+              //           finalPayload: payload, // Use live URL in production
+              //         ),
+              //       ),
+              //     );
+              //   } else {
+              //     ScaffoldMessenger.of(context).showSnackBar(
+              //         SnackBar(content: Text('Transaction ID fetch failed')));
+              //   }
             }
-
-            // Get.to(RazorpaySubscription(
-            //   context: context,
-            //   amount: consultationFee.toString(),
-            //   onPaymentInitiated: () {
-            //     showSnackbar("Info", "Payment Initiated", "info");
-            //   },
-            //   serviceDetails: widget.doctor,
-            //   patient: widget.patient,
-            //   bookingDetails: postBookingPayload,
-            //   mobileNumber: widget.patient.mobileNumber,
-            // ));
-            // }
           },
           child: Obx(() {
             final selectedPayment =

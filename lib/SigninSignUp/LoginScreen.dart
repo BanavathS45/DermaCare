@@ -130,7 +130,7 @@ class _LoginscreenState extends State<Loginscreen> {
                                 ),
                               )
                             : const SizedBox.shrink()),
-                    const SizedBox(height: 40.0),
+                    const SizedBox(height: 20.0),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: GradientButton(
@@ -148,6 +148,18 @@ class _LoginscreenState extends State<Loginscreen> {
                     ),
                   ],
                 ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushNamed('/manualscreen');
+              },
+              child: const Text(
+                'App User Manual',
+                style: TextStyle(color: mainColor),
               ),
             ),
           ],

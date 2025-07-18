@@ -28,7 +28,7 @@ class _CommonCarouselAdsState extends State<CommonCarouselAds> {
     if (widget.media.isEmpty) {
       return SizedBox(
         height: widget.height,
-        child: Center(child: CircularProgressIndicator()), // Or a placeholder
+        child: _fallbackImage(), // ✅ Show fallback image instead of spinner
       );
     }
 

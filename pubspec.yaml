@@ -94,6 +94,7 @@ dependencies:
   timezone: ^0.10.1
   flutter_tts: ^4.2.3
   webview_flutter_android: ^3.10.2
+  share_plus: ^7.2.1
 
   # upi_india: ^3.0.1
   # flutter_locrl_notifications: ^16.1.0

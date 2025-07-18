@@ -30,6 +30,7 @@ class Dashboardcontroller extends GetxController {
   final RxList<Getappointmentmodel> allAppointments =
       <Getappointmentmodel>[].obs;
   final RxList<String> carouselImages = <String>[].obs;
+  final RxList<String> carouseServicelImages = <String>[].obs;
   final selectedService = Rxn<Serviceb>();
 
   var selectedSubService = Rxn<Service>();
@@ -77,25 +78,25 @@ class Dashboardcontroller extends GetxController {
     }
   }
 
- 
-void scheduleAlertsForUpcomingVideoCalls(List appointments) {
-  for (var appt in appointments) {
-    final type = appt.consultationType.toLowerCase();
-    final status = appt.status.toLowerCase();
+  void scheduleAlertsForUpcomingVideoCalls(List appointments) {
+    for (var appt in appointments) {
+      final type = appt.consultationType.toLowerCase();
+      final status = appt.status.toLowerCase();
 
-    if ((type == 'video consultation' || type == 'online consultation') &&
-        !['completed', 'cancelled'].contains(status)) {
-      final callTime = DateTime.parse(appt.scheduledTime); // use your real field
-      if (callTime.difference(DateTime.now()) > Duration(minutes: 6)) {
-        scheduleVideoCallNotification(
-          title: 'Doctor Video Call',
-          body: 'Your video call with the doctor starts in 5 minutes.',
-          videoCallTime: callTime,
-        );
+      if ((type == 'video consultation' || type == 'online consultation') &&
+          !['completed', 'cancelled'].contains(status)) {
+        final callTime =
+            DateTime.parse(appt.scheduledTime); // use your real field
+        if (callTime.difference(DateTime.now()) > Duration(minutes: 6)) {
+          scheduleVideoCallNotification(
+            title: 'Doctor Video Call',
+            body: 'Your video call with the doctor starts in 5 minutes.',
+            videoCallTime: callTime,
+          );
+        }
       }
     }
   }
-}
 
   void clearAfterAppointment() async {
     // Clear selected services
@@ -227,7 +228,6 @@ void scheduleAlertsForUpcomingVideoCalls(List appointments) {
 
         // Update reactive list
         allAppointments.assignAll(filtered);
-       
       } else {
         // No appointments found
         allAppointments.clear();
@@ -248,6 +248,17 @@ void scheduleAlertsForUpcomingVideoCalls(List appointments) {
       final images = await carouselSliderService.fetchImages();
       carouselImages.assignAll(images);
       print("imagesimages lengrt ${images.length}");
+    } catch (e) {
+      print("Error fetching images: $e");
+    }
+  }
+
+  /// Fetch service images for carousel
+  Future<void> fetchserviceImages() async {
+    try {
+      final images = await carouselSliderService.fetchServiceImages();
+      carouseServicelImages.assignAll(images);
+      print("imagesimages fetchServiceImages ${images.length}");
     } catch (e) {
       print("Error fetching images: $e");
     }
@@ -322,6 +333,7 @@ void scheduleAlertsForUpcomingVideoCalls(List appointments) {
       // Fetch bookings or other needed data
       await fetchAppointments(mobileNumber);
       await fetchImages();
+      await fetchserviceImages();
       // ✅ Only after data is fetched, stop loading
       isLoading.value = false;
     } catch (e) {

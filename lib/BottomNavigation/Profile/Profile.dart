@@ -5,6 +5,8 @@ import 'package:cutomer_app/BottomNavigation/Profile/ProfileScreens.dart';
 import 'package:cutomer_app/Customers/GetCustomerModel.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
 import 'package:cutomer_app/Dashboard/GetCustomerData.dart';
+import 'package:cutomer_app/UserManuval/AppointmentManual.dart';
+import 'package:cutomer_app/UserManuval/UserManual.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -157,6 +159,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               icon: Icons.logout,
               label: "Logout",
               onTap: () => {showLogout(context)}),
+
+          buildCardItem(
+              icon: Icons.menu_book,
+              label: "App user manual",
+              onTap: () => Get.to(() => AppointmentManualScreen())),
           const SizedBox(height: 30),
         ],
       ),
