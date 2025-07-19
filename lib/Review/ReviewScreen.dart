@@ -8,6 +8,7 @@ import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart'; // Import the rating bar package
+import 'package:get/get.dart';
 
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 
@@ -210,6 +211,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 appointmentId: widget.doctorBookings!.bookingId,
                 hospitalId: widget.doctorBookings!.clinicId);
             print('✅ submitCustomerRating called successfully');
+            // After success
+            Get.back(result: true);
           } catch (e) {
             print('❌ Error in submitCustomerRating: $e');
           }

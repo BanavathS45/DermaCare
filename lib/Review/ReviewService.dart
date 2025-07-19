@@ -32,13 +32,13 @@ Future<void> submitCustomerRating(
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(payload),
     );
-
+    print('✅ Rating submitted successfully: ${payload}');
     if (response.statusCode == 200) {
       showSuccessToast(msg: "Rating submitted successfully ${doctorId}");
       print('✅ Rating submitted successfully: ${response.body}');
 
       // ✅ Close current screen (like .pop())
-      Get.back();
+     
     } else {
       print('❌ Failed to submit rating: ${response.statusCode}');
       print('🔍 Response: ${response.body}');

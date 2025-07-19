@@ -17,12 +17,12 @@ Future<RatingSummary> fetchAndSetRatingSummary(
 
       if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
         final ratingSummary = RatingSummary.fromJson(jsonResponse['data']);
-
+        print('Erfetching ratings: ${ratingSummary.comments.map((e)=>e.customerMobileNumber)}');
         // ✅ Update observables
         doctorController.doctorRatings[doctorId] =
-            ratingSummary.overallDoctorRating ?? 0.0;
+            ratingSummary.overallDoctorRating;
         doctorController.doctorCommentCounts[doctorId] =
-            ratingSummary.comments?.length ?? 0;
+            ratingSummary.comments.length;
 
         return ratingSummary; // ✅ Return actual data
       } else {

@@ -33,6 +33,26 @@ class NotificationController extends GetxController {
     isLoading.value = false;
   }
 
+  void removeNotification(int index) {
+    final removed = notifications[index];
+
+    // Remove the notification
+    notifications.removeAt(index);
+
+    // Update unread count if the removed notification was unread
+    if (!removed.isRead) {
+      unreadCount.value =
+          (unreadCount.value - 1).clamp(0, notifications.length);
+    }
+  }
+
+  void markAllAsRead() {
+    for (var n in notifications) {
+      n.isRead = true;
+    }
+    unreadCount.value = 0;
+  }
+
   void handleNotification(RemoteMessage message) {
     final newNotification = NotificationModel(
       title: message.notification?.title ?? "No Title",

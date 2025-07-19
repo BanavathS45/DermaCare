@@ -288,7 +288,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "₹ ${subServiceDetails!.finalCost}",
+                      "₹ ${subServiceDetails!.finalCost.toStringAsFixed(0)}",
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,

@@ -59,7 +59,6 @@ class Comment {
     required this.appointmentId,
     required this.rated,
     required this.dateAndTimeAtRating,
-    
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -89,9 +88,18 @@ class Comment {
       'dateAndTimeAtRating': dateAndTimeAtRating,
     };
   }
-   DateTime get parsedDateTime {
+
+  DateTime get parsedDateTime {
     try {
-      return DateFormat("yyyy-MM-dd hh:mm a").parse(dateAndTimeAtRating);
+      print("Original string: $dateAndTimeAtRating");
+      print(
+          "Parsed datetime: ${DateFormat("yyyy-MM-dd hh:mm a").parse(dateAndTimeAtRating)}");
+      print(
+          "Local datetime: ${DateFormat("yyyy-MM-dd hh:mm a").parse(dateAndTimeAtRating).toLocal()}");
+
+      return DateFormat("yyyy-MM-dd hh:mm a")
+          .parse(dateAndTimeAtRating)
+          .toLocal(); // 👈 force it to local
     } catch (_) {
       return DateTime.now();
     }

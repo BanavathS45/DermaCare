@@ -270,10 +270,9 @@ class DoctorDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
             // doctordetailscontroller.buildReportContactSection(
             //     context, doctordetailscontroller.moreDetails),
-            buildRatingAndFeedback(
-              context,
-              doctorData,
-              doctorController,
+            RatingAndFeedback(
+              item: doctorData,
+              controller: doctorController,
             ),
           ],
         ),

@@ -207,13 +207,23 @@ class DoctorController extends GetxController {
       //   print(
       //       "✅ Doctor loaded: ${d.doctor.doctorName}, ${d.doctor.qualification}");
       // }
+      List<Future<void>> ratingFutures = [];
       for (var doctorModel in doctors) {
         final dId = doctorModel.doctor.doctorId;
         final hId = doctorModel.hospital.hospitalId;
 
-        // ⚠️ Call rating API here
-        fetchAndSetRatingSummary(hId, dId); // no await — fire and forget
+        // Wrap in a Future<void> to collect them
+        final future = fetchAndSetRatingSummary(hId, dId).then((rating) {
+          doctorRatings[dId] = rating.overallDoctorRating;
+          doctorCommentCounts[dId] = rating.comments.length;
+        }).catchError((e) {
+          print("⚠️ Failed to fetch rating for $dId: $e");
+        });
+
+        ratingFutures.add(future);
       }
+
+      await Future.wait(ratingFutures); // ✅ Wait for all ratings to complete
 
       final cities = doctors.map((d) => d.hospital.city).toSet().toList();
       cityList.value = ['All', ...cities];
@@ -242,6 +252,14 @@ class DoctorController extends GetxController {
 
     if (selectedRecommended.value) {
       filtered = filtered.where((d) => d.hospital.recommended == true).toList();
+    }
+
+    // 🔥 Rating filter
+    if (selectedRating.value > 0.0) {
+      filtered = filtered.where((d) {
+        final rating = doctorRatings[d.doctor.doctorId] ?? 0.0;
+        return rating >= selectedRating.value;
+      }).toList();
     }
 
     if (sortByAZ.value) {

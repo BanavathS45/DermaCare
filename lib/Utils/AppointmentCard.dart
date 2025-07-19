@@ -321,12 +321,16 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           child: TextButton(
                             onPressed: hasReviewed
                                 ? null
-                                : () {
-                                    Get.to(ReviewScreen(
-                                      doctorData: doctor,
-                                      doctorBookings: widget.doctorData,
-                                    ));
-                                  },
+                                : () => Get.to(() => ReviewScreen(
+                                          doctorData: doctor,
+                                          doctorBookings: widget.doctorData,
+                                        ))?.then((result) {
+                                      if (result == true) {
+                                        setState(() async {
+                                          await _fetchRating();
+                                        }); // ✅ this is the right way
+                                      }
+                                    }),
                             child: Text(
                               hasReviewed ? 'Reviewed' : 'Review',
                               style: TextStyle(

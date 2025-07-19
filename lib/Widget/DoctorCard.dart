@@ -104,7 +104,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${doctor.doctorName}, ${doctor.doctorId} ",
+                                      "${doctor.doctorName}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
@@ -374,21 +374,21 @@ Widget buildFilters(DoctorController controller) {
                 controller.applyFilters();
               },
             ),
-            FilterChip(
-              label: Icon(
-                Icons.favorite,
-                color: controller.showFavoritesOnly.value
-                    ? Colors.white
-                    : mainColor,
-              ),
-              selectedColor: mainColor,
-              showCheckmark: false,
-              selected: controller.showFavoritesOnly.value,
-              onSelected: (val) {
-                controller.showFavoritesOnly.value = val;
-                controller.applyFilters();
-              },
-            ),
+            // FilterChip(
+            //   label: Icon(
+            //     Icons.favorite,
+            //     color: controller.showFavoritesOnly.value
+            //         ? Colors.white
+            //         : mainColor,
+            //   ),
+            //   selectedColor: mainColor,
+            //   showCheckmark: false,
+            //   selected: controller.showFavoritesOnly.value,
+            //   onSelected: (val) {
+            //     controller.showFavoritesOnly.value = val;
+            //     controller.applyFilters();
+            //   },
+            // ),
             FilterChip(
               label: Icon(
                 Icons.star,

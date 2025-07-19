@@ -91,8 +91,6 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
       return matchesSearch && shouldShow;
     }).toList();
 
-    
-
     return Scaffold(
       appBar: CommonHeader(
         title: "Hospitals & Services",
@@ -159,6 +157,10 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                           itemCount: filteredCards.length,
                           itemBuilder: (context, index) {
                             final card = filteredCards[index];
+                            String rawValue =
+                                card['cost']; // e.g., "₹6132.240000000001"
+                            double parsedValue =
+                                double.parse(rawValue.replaceAll("₹", ""));
                             return GestureDetector(
                               onTap: () {
                                 if (widget.selectedService != null) {
@@ -168,8 +170,8 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                       builder: (_) => ServiceDetailsPage(
                                           mobileNumber: widget.mobileNumber,
                                           username: widget.username,
-                                          selectedService:
-                                              widget.selectedService!.subServiceId,
+                                          selectedService: widget
+                                              .selectedService!.subServiceId,
                                           hospitalName: card['hospitalName'],
                                           hospitalId: card['hospitalId']),
                                     ),
@@ -229,7 +231,8 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                             Text("Service: " +
                                                 card['serviceName']),
                                             SizedBox(height: 8),
-                                            Text(card['cost'],
+                                            Text(
+                                                "₹${parsedValue.toStringAsFixed(0)}",
                                                 style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,

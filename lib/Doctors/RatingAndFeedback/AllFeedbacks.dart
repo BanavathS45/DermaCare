@@ -1,6 +1,9 @@
+import 'package:cutomer_app/Customers/GetCustomerModel.dart';
+import 'package:cutomer_app/Dashboard/GetCustomerData.dart';
 import 'package:cutomer_app/Doctors/RatingAndFeedback/RatingModal.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
@@ -84,8 +87,7 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
                         const Icon(Icons.star, color: Colors.amber),
                         const SizedBox(width: 6),
                         Text(
-                          widget.rating.overallHospitalRating
-                              .toStringAsFixed(1),
+                          widget.rating.overallDoctorRating.toStringAsFixed(1),
                           style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
@@ -111,93 +113,107 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
 
                   // Comments
                   ...widget.rating.comments.map((comment) {
-                    final userId = comment.customerMobileNumber;
-                    // final commentText = comment.comment;
-                    final createdAt = DateTime.now().subtract(const Duration(
-                        minutes: 1)); // Replace with actual timestamp
+                    return FutureBuilder<GetCustomerModel?>(
+                      future: fetchUserData(comment.customerMobileNumber),
+                      builder: (context, snapshot) {
+                        final customerName = snapshot.hasData
+                            ? capitalizeEachWord(snapshot.data!.fullName)
+                            : "Anonymous";
 
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Avatar with initials
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.grey.shade300,
-                                child: Text(
-                                  "BP",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Avatar
+                                  CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: Colors.grey.shade300,
+                                    child: Text(
+                                      customerName.isNotEmpty
+                                          ? customerName[0].toUpperCase()
+                                          : "?",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
+                                  const SizedBox(width: 10),
 
-                              // Comment and time
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                  // Comment Body
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Expanded(
-                                          child: Text(
-                                            "Banavath Prashanth", // Replace with actual user name if available
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            maxLines: 2,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
+                                        // Name + Rating Row
                                         Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const Icon(Icons.star,
-                                                color: Colors.yellow),
-                                            Text(
-                                              "${comment.doctorRating}",
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Color.fromARGB(
-                                                    228, 41, 40, 40),
-                                                fontWeight: FontWeight.bold,
+                                            Expanded(
+                                              child: Text(
+                                                customerName,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                maxLines: 2,
                                               ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Row(
+                                              children: [
+                                                const Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Text(
+                                                  comment.doctorRating
+                                                      .toStringAsFixed(
+                                                          1), // 1 decimal
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
+
+                                        // Time ago
+                                        Text(
+                                          timeago
+                                              .format(comment.parsedDateTime),
+                                          style: const TextStyle(
+                                              fontSize: 12, color: Colors.grey),
+                                        ),
+
+                                        const SizedBox(height: 4),
+
+                                        // Feedback
+                                        Text(
+                                          comment.feedback,
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
                                       ],
                                     ),
-                                    Text(
-                                      timeago.format(createdAt),
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.grey),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    // Text(
-                                    //   commentText,
-                                    //   style: const TextStyle(fontSize: 14),
-                                    // ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        const Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Color.fromARGB(161, 158, 158, 158),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
+                            ),
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: Color.fromARGB(161, 158, 158, 158),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        );
+                      },
                     );
                   }).toList(),
                 ],

@@ -124,7 +124,7 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
 
                 return CustomDropdownField<Service>(
                   value: isSubServiceAvailable ? selectedSubService : null,
-                  labelText: 'Sub-Service',
+                  labelText: 'Service',
                   items: isSubServiceAvailable
                       ? ServiceList.map((service) {
                           return DropdownMenuItem<Service>(
@@ -135,7 +135,7 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                       : [
                           const DropdownMenuItem<Service>(
                             value: null,
-                            child: Text("No Sub-Services Available"),
+                            child: Text("No Services Available"),
                           ),
                         ],
                   onChanged: (sub) {

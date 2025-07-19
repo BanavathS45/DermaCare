@@ -11,6 +11,9 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.markAllAsRead();
+    });
     return Scaffold(
       appBar: CommonHeader(title: "Notifications"),
       body: Obx(() {
@@ -61,13 +64,26 @@ class NotificationScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            notif.title,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  notif.title,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  controller.removeNotification(index);
+                                },
+                                child: const Icon(Icons.close,
+                                    size: 20, color: Colors.grey),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
