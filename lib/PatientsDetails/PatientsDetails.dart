@@ -1,7 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
+import '../ConfirmBooking/ConsultationController.dart';
 import '../Inputs/CustomInputField.dart';
 import '../Inputs/CustomTextAera.dart';
 import '../Registration/RegisterController.dart';
@@ -10,7 +12,9 @@ import '../Utils/Constant.dart';
 import 'PatientDetailsFormController.dart';
 
 class PatientDetailsForm extends StatefulWidget {
-  const PatientDetailsForm({super.key});
+  const PatientDetailsForm({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<PatientDetailsForm> createState() => _PatientDetailsFormState();
@@ -20,7 +24,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
   final patientdetailsformcontroller = Get.put(Patientdetailsformcontroller());
   final registercontroller = Get.put(Registercontroller());
   SiginSignUpController siginSignUpController = SiginSignUpController();
-
+  final consultationController = Get.find<Consultationcontroller>();
   @override
   void initState() {
     super.initState();
@@ -167,33 +171,43 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
 
           // Notes textarea
           const SizedBox(height: 16),
-          const Text(
-            "Describe your problem",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+          if (consultationController
+                  .selectedConsultation.value!.consultationType
+                  .toLowerCase() ==
+              "services & treatments")
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Describe your problem",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomTextAera(
+                    controller: patientdetailsformcontroller.notesController,
+                    labelText: "Enter Your problem....",
+                    autovalidateMode: AutovalidateMode
+                        .onUserInteraction, // ✅ Real-time validation
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "Please enter Problem";
+                      }
+                      if (value.trim().length < 10) {
+                        return "Problem must be at least 10 characters";
+                      }
+                      return null;
+                    },
+                  ),
+                )
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CustomTextAera(
-              controller: patientdetailsformcontroller.notesController,
-              labelText: "Enter Your problem....",
-              autovalidateMode:
-                  AutovalidateMode.onUserInteraction, // ✅ Real-time validation
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return "Please enter Problem";
-                }
-                if (value.trim().length < 10) {
-                  return "Problem must be at least 10 characters";
-                }
-                return null;
-              },
-            ),
-          )
         ],
       ),
     );

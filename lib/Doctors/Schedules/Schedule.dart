@@ -41,22 +41,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final consultationController = Get.find<Consultationcontroller>();
   final registercontroller = Get.put(Registercontroller());
   bool showAllRows = false;
-
+  
   String? id;
   List<DoctorSlot>? slots;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   //
-  //   // scheduleController.setDoctorSlots(widget.doctorData.doctor);  //TODO:impement pending
-
-  //   //  controller.setDoctorSlots(widget.doctor.slots);
-  //   scheduleController.initializeWeekDates();
-
-  //   id = consultationController.selectedConsultation.value?.consultationId;
-  //   fetchDoctorSlotsOnce();
-  // }
+ 
 
   @override
   void initState() {

@@ -214,6 +214,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'APIs/FetchServices.dart';
 import 'BottomNavigation/Appoinments/AppointmentController.dart';
+import 'Consultations/SymptomsController.dart';
 import 'Controller/CustomerController.dart';
 import 'Dashboard/DashBoardController.dart';
 import 'Doctors/ListOfDoctors/DoctorController.dart';
@@ -280,6 +281,7 @@ Future<void> main() async {
   Get.put(NotificationController());
   Get.put(ServiceFetcher());
   Get.put(CallController());
+  Get.put(SymptomsController());
 
   // ✅ FCM Notification tap handling
   final RemoteMessage? initialMessage =
@@ -370,5 +372,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
- 

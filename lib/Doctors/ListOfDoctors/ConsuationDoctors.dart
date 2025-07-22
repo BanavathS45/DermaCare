@@ -8,23 +8,24 @@ import '../../Widget/DoctorCard.dart';
 class ConsulationDoctorScreen extends StatelessWidget {
   final String mobileNumber;
   final String username;
-  final String subServiceID;
-  final String hospiatlName;
+  // final String subServiceID;
+  // final String hospiatlName;
 
-  ConsulationDoctorScreen(
-      {required this.mobileNumber,
-      required this.username,
-      required this.subServiceID,
-      required this.hospiatlName}) {
+  ConsulationDoctorScreen({
+    required this.mobileNumber,
+    required this.username,
+    // required this.subServiceID,
+    // required this.hospiatlName
+  }) {
     // Trigger fetch after widget builds
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final doctorController = Get.find<DoctorController>();
       final hospitalId = "H_6";
 
-      print("❌ Missing hospitalId or subServiceID ${hospitalId}");
-      print("❌ Missing hospitalId or subServiceID ${subServiceID}");
+      // print("❌ Missing hospitalId or subServiceID ${hospitalId}");
+      // print("❌ Missing hospitalId or subServiceID ${subServiceID}");
 
-      if (hospitalId.isNotEmpty && subServiceID.isNotEmpty) {
+      if (hospitalId.isNotEmpty) {
         doctorController.hospitalId.value = hospitalId;
         doctorController.fetchDoctors(
           hospitalId: "H_9",
@@ -89,7 +90,7 @@ class ConsulationDoctorScreen extends StatelessWidget {
                               ),
                               children: [
                                 TextSpan(
-                                  text: hospiatlName,
+                                  // text: hospiatlName,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -141,7 +142,7 @@ class ConsulationDoctorScreen extends StatelessWidget {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
-                  doctorController.refreshDoctors(subServiceId: subServiceID);
+                  // doctorController.refreshDoctors(subServiceId: subServiceID);
                 },
                 child: doctorController.filteredDoctors.isEmpty
                     ? ListView(

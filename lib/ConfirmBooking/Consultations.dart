@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigation/BottomNavigation.dart';
+import '../Consultations/SymptomsForm.dart';
 import '../Screens/CategoryAndServicesForm.dart';
 import '../Utils/GradientTextWidget .dart';
 import 'ConfirmBookingDetails.dart';
@@ -32,7 +33,9 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   final consultationcontroller = Get.find<Consultationcontroller>();
   List<ConsultationModel> _consultations = [];
   bool loading = true;
+  bool showConsultationOptions = false;
   final dashboardcontroller = Get.put(Dashboardcontroller());
+
   @override
   void initState() {
     super.initState();
@@ -40,18 +43,10 @@ class ConsultationsTypeState extends State<ConsultationsType> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final consultations = await getConsultationDetails();
-      try {
-        if (consultations.isNotEmpty) {
-          setState(() {
-            _consultations = consultations;
-            loading = false;
-          });
-        } else {
-          loading = false;
-        }
-      } catch (e) {
+      setState(() {
+        _consultations = consultations;
         loading = false;
-      }
+      });
     });
   }
 
@@ -70,15 +65,13 @@ class ConsultationsTypeState extends State<ConsultationsType> {
             colors: [Colors.white, secondaryColor, mainColor],
           ),
         ),
-        child: Column(
-          children: [
-            Expanded(
-              child: Column(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 40),
-
-                  // Top Banner
                   Center(
                     child: Column(
                       children: [
@@ -117,7 +110,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.normal,
-                            color: Colors.white, // Fill color
+                            color: Colors.white,
                           ),
                         ),
                         Text(
@@ -132,48 +125,37 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                                 blurRadius: 4,
                                 color: Colors.black45,
                               ),
-                            ], // Placeholder color for ShaderMask
+                            ],
                           ),
                         ),
                         const SizedBox(height: 30),
                       ],
                     ),
                   ),
-
-                  // Buttons Section
                   loading
                       ? Center(child: CircularProgressIndicator())
                       : _consultations.isEmpty
                           ? SizedBox(
                               height: MediaQuery.of(context).size.height * 0.35,
                               child: Center(
-                                  child: Text(
-                                "No service available",
-                                style: TextStyle(color: Colors.white),
-                              )),
+                                child: Text(
+                                  "No service available",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
                             )
                           : Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24.0),
                               child: Column(
-                                children: _consultations.map((consultation) {
-                                  return _serviceButton(
-                                    consultation.consultationType,
-                                    Colors.white,
-                                    consultation.consultationId,
-                                    _getIconForType(
-                                        consultation.consultationType),
-                                    consultation,
-                                  );
-                                }).toList(),
+                                children: _buildFilteredConsultationButtons(),
                               ),
                             ),
-
                   const SizedBox(height: 40),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -185,6 +167,49 @@ class ConsultationsTypeState extends State<ConsultationsType> {
         ),
       ),
     );
+  }
+
+  List<Widget> _buildFilteredConsultationButtons() {
+    List<Widget> buttons = [];
+    List<ConsultationModel> staticOptions = _consultations
+        .where(
+            (e) => e.consultationType.toLowerCase() == "services & treatments")
+        .toList();
+
+    List<ConsultationModel> dynamicOptions = _consultations
+        .where((e) =>
+            e.consultationType.toLowerCase().contains('clinic') ||
+            e.consultationType.toLowerCase().contains('online'))
+        .toList();
+
+    buttons.addAll(staticOptions.map((consultation) => _serviceButton(
+          consultation.consultationType,
+          Colors.white,
+          consultation.consultationId,
+          _getIconForType(consultation.consultationType),
+          consultation,
+        )));
+
+    buttons.add(_serviceButton(
+      'Consultation',
+      Colors.white,
+      'show_more',
+      Icons.expand_more,
+      ConsultationModel(
+          consultationId: 'show_more', consultationType: 'Consultation'),
+    ));
+
+    if (showConsultationOptions) {
+      buttons.addAll(dynamicOptions.map((consultation) => _serviceButton(
+            consultation.consultationType,
+            Colors.white,
+            consultation.consultationId,
+            _getIconForType(consultation.consultationType),
+            consultation,
+          )));
+    }
+
+    return buttons;
   }
 
   IconData _getIconForType(String type) {
@@ -201,15 +226,15 @@ class ConsultationsTypeState extends State<ConsultationsType> {
       IconData icon, ConsultationModel consultation) {
     return GestureDetector(
       onTap: () async {
-        // consultationcontroller.setConsultation(consultation);
+        if (id == 'show_more') {
+          setState(() => showConsultationOptions = !showConsultationOptions);
+          return;
+        }
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
 
         consultationcontroller.setConsultation(consultation);
 
-        // showSnackbar("Selected", "$title [$id]", "success");
-
-        // Save permanently only if not already saved
         if (!prefs.containsKey('firstConsultationId')) {
           await prefs.setString(
               'firstConsultationId', _consultations.first.consultationId);
@@ -217,10 +242,8 @@ class ConsultationsTypeState extends State<ConsultationsType> {
               'firstConsultationType', _consultations.first.consultationType);
         }
 
-        // showSnackbar("Selected", "$title [$id]", "success");
         String firstId = _consultations.first.consultationId;
 
-        // Check if the 'id' matches the first consultationId in any consultation
         if (firstId == id) {
           Get.to(BottomNavController(
             mobileNumber: widget.mobileNumber,
@@ -229,7 +252,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
             index: 0,
           ));
         } else {
-          Get.to(CategoryAndServicesForm(
+          Get.to(SymptomsForm(
             mobileNumber: widget.mobileNumber,
             username: widget.username,
             consulationType: title,
@@ -249,7 +272,6 @@ class ConsultationsTypeState extends State<ConsultationsType> {
           children: [
             Row(
               children: [
-                Icon(icon, color: Colors.white),
                 const SizedBox(width: 10),
                 Text(
                   title,
@@ -261,7 +283,9 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                 ),
               ],
             ),
-            const Icon(Icons.arrow_forward_ios, color: Colors.white),
+            id != 'show_more'
+                ? const Icon(Icons.arrow_forward_ios, color: Colors.white)
+                : Icon(icon, color: Colors.white), // or SizedBox.shrink()
           ],
         ),
       ),

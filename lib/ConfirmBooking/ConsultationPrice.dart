@@ -49,9 +49,9 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
   bool sortByAZ = false;
   String selectedGender = "All"; // "Male", "Female", "All"
   double selectedRating = 0.0; // 4.5 if filtered
-
+  bool isChecked = false;
   List<HospitalDoctorModel> hospitalDoctors = [];
-
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -104,230 +104,310 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
 
       return matchesSearch && isRecommended && matchesGender && matchesRating;
     }).toList();
+    // 🟡 If checkbox is checked, show only one doctor (e.g., the first one)
+
+    final resultData = isChecked
+        ? (filteredData.isNotEmpty ? [filteredData.first] : [])
+        : filteredData;
 
     return Scaffold(
       appBar: CommonHeader(title: "Hospitals & Doctors"),
       backgroundColor: Colors.grey[100],
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            buildFilters(),
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Search hospital or doctor",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+      body: Stack(children: [
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              buildFilters(),
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: "Search hospital or doctor",
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
+                onChanged: (val) => setState(() => searchText = val),
               ),
-              onChanged: (val) => setState(() => searchText = val),
-            ),
-            SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      showRecommendedOnly = !showRecommendedOnly;
-                    });
-                  },
-                  icon: Icon(
-                    showRecommendedOnly
-                        ? Icons.check_circle
-                        : Icons.star_border,
-                    color: showRecommendedOnly ? Colors.white : Colors.teal,
+              SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Your main content
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isChecked,
+                            onChanged: (bool? value) async {
+                              // Only trigger loading if user is checking the box (true)
+                              if (value == true) {
+                                setState(() {
+                                  isChecked = true;
+                                  isLoading = true;
+                                });
+
+                                await Future.delayed(Duration(seconds: 2));
+
+                                setState(() {
+                                  isLoading = false;
+                                });
+
+                                // Optional: show your filtered result here
+                              } else {
+                                // If unchecked, just update the state without loading
+                                setState(() {
+                                  isChecked = false;
+                                });
+                              }
+                            },
+                          ),
+                          SizedBox(width: 2),
+                          Text("Any Doctor"),
+                        ],
+                      ),
+
+                      // Your list content here (doctor cards, etc.)
+                    ],
                   ),
-                  label: Text(
-                    showRecommendedOnly
-                        ? "Showing Recommended"
-                        : "Recommended Only",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        showRecommendedOnly ? Colors.teal : Colors.grey[300],
-                    foregroundColor:
-                        showRecommendedOnly ? Colors.white : Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+
+                  // Show your doctor list or content here
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        showRecommendedOnly = !showRecommendedOnly;
+                      });
+                    },
+                    icon: Icon(
+                      showRecommendedOnly
+                          ? Icons.check_circle
+                          : Icons.star_border,
+                      color: showRecommendedOnly ? Colors.white : Colors.teal,
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    elevation: 2,
+                    label: Text(
+                      showRecommendedOnly
+                          ? "Showing Recommended"
+                          : "Recommended Only",
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          showRecommendedOnly ? Colors.teal : Colors.grey[300],
+                      foregroundColor:
+                          showRecommendedOnly ? Colors.white : Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      elevation: 2,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Expanded(
-              child: filteredData.isEmpty
-                  ? Center(child: Text("No results found."))
-                  : ListView.builder(
-                      itemCount: filteredData.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredData[index];
-                        final hospital = item.hospital;
-                        final doctor = item.doctor;
-                        final isVideo = widget.consulationType.toLowerCase() ==
-                                "video consultation" ||
-                            widget.consulationType.toLowerCase() ==
-                                "online consultation";
-                        print(
-                            "widget.consulationType ${widget.consulationType}");
-                        print("widget.consulationType  isVideo${isVideo}");
-                        final cost = isVideo
-                            ? doctor.doctorFees.vedioConsultationFee
-                            : doctor.doctorFees.inClinicFee;
+                ],
+              ),
+              SizedBox(height: 12),
+              Expanded(
+                child: filteredData.isEmpty
+                    ? Center(child: Text("No results found."))
+                    : ListView.builder(
+                        itemCount: resultData.length,
+                        itemBuilder: (context, index) {
+                          final item = resultData[index];
+                          final hospital = item.hospital;
+                          final doctor = item.doctor;
+                          final isVideo =
+                              widget.consulationType.toLowerCase() ==
+                                      "video consultation" ||
+                                  widget.consulationType.toLowerCase() ==
+                                      "online consultation";
+                          print(
+                              "widget.consulationType ${widget.consulationType}");
+                          print("widget.consulationType  isVideo${isVideo}");
+                          final cost = isVideo
+                              ? doctor.doctorFees.vedioConsultationFee
+                              : doctor.doctorFees.inClinicFee;
 
-                        return InkWell(
-                          onTap: () {
-                            print(item.doctor.doctorAvailabilityStatus);
-                            if (item.doctor.doctorAvailabilityStatus == true) {
-                              Get.to(() => ScheduleScreen(
-                                    doctorData: item,
-                                    mobileNumber: widget.mobileNumber,
-                                  ));
+                          return InkWell(
+                            onTap: () {
+                              print(item.doctor.doctorAvailabilityStatus);
+                              if (item.doctor.doctorAvailabilityStatus ==
+                                  true) {
+                                Get.to(() => ScheduleScreen(
+                                      doctorData: item,
+                                      mobileNumber: widget.mobileNumber,
+                                    ));
 
-                              loadSubService(item.hospital.hospitalId);
-                            } else {
-                              // Optional: Show a snackbar or dialog to inform user
-                              Get.snackbar(
-                                'Unavailable',
-                                'Doctor is not available at the moment.',
-                                snackPosition: SnackPosition.BOTTOM,
-                              );
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            margin: EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                              color:
-                                  item.doctor.doctorAvailabilityStatus == true
-                                      ? Colors.white
-                                      : Colors.grey[300],
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Column(
-                                  children: [
-                                    Text(
-                                      "${item.doctor.doctorAvailabilityStatus == true ? "" : "Not Available"}",
-                                      style: TextStyle(
-                                          color: Colors.redAccent,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(12),
-                                        bottomLeft: Radius.circular(12),
+                                loadSubService(item.hospital.hospitalId);
+                              } else {
+                                // Optional: Show a snackbar or dialog to inform user
+                                Get.snackbar(
+                                  'Unavailable',
+                                  'Doctor is not available at the moment.',
+                                  snackPosition: SnackPosition.BOTTOM,
+                                );
+                              }
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                color:
+                                    item.doctor.doctorAvailabilityStatus == true
+                                        ? Colors.white
+                                        : Colors.grey[300],
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        "${item.doctor.doctorAvailabilityStatus == true ? "" : "Not Available"}",
+                                        style: TextStyle(
+                                            color: Colors.redAccent,
+                                            fontWeight: FontWeight.bold),
                                       ),
-                                      child: doctor.doctorPicture != null &&
-                                              doctor.doctorPicture.isNotEmpty
-                                          ? Image.memory(
-                                              base64Decode(cleanBase64(
-                                                  doctor.doctorPicture)),
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.network(
-                                              "https://via.placeholder.com/100",
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                            ),
-                                    ),
-                                  ],
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          hospital.name,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.teal[800],
-                                          ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(12),
+                                          bottomLeft: Radius.circular(12),
                                         ),
-                                        SizedBox(height: 6),
-                                        Text(
-                                          "${doctor.doctorName}",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text("Service: ${widget.serviceName}"),
-                                        Text(
-                                            "Subservice: ${widget.subserviceName}"),
-                                        SizedBox(height: 6),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              widget.consulationType,
-                                              style: TextStyle(
-                                                  color: Colors.teal,
-                                                  fontWeight: FontWeight.w600),
-                                            ),
-                                            Text(
-                                              "₹${cost ?? 'N/A'}",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.teal[700],
-                                                fontSize: 16,
+                                        child: doctor.doctorPicture != null &&
+                                                doctor.doctorPicture.isNotEmpty
+                                            ? Image.memory(
+                                                base64Decode(cleanBase64(
+                                                    doctor.doctorPicture)),
+                                                width: 100,
+                                                height: 100,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Image.network(
+                                                "https://via.placeholder.com/100",
+                                                width: 100,
+                                                height: 100,
+                                                fit: BoxFit.cover,
                                               ),
+                                      ),
+                                    ],
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            hospital.name,
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.teal[800],
                                             ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.star,
-                                                color: Colors.amber, size: 18),
-                                            SizedBox(width: 4),
+                                          ),
+                                          SizedBox(height: 6),
+                                          Text(
+                                            "${doctor.doctorName}",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                              "Service: ${widget.serviceName}"),
+                                          Text(
+                                              "Subservice: ${widget.subserviceName}"),
+                                          SizedBox(height: 6),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                widget.consulationType,
+                                                style: TextStyle(
+                                                    color: Colors.teal,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ),
+                                              Text(
+                                                "₹${cost ?? 'N/A'}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.teal[700],
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 6),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.star,
+                                                  color: Colors.amber,
+                                                  size: 18),
+                                              SizedBox(width: 4),
 
-                                            Text(
-                                              "${doctor.doctorAverageRating.toStringAsFixed(1)}",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500),
-                                            )
-                                            // Text("4.0") //TODO :do dynamically
-                                          ],
-                                        )
-                                      ],
+                                              Text(
+                                                "${doctor.doctorAverageRating.toStringAsFixed(1)}",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              )
+                                              // Text("4.0") //TODO :do dynamically
+                                            ],
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         ),
-      ),
+        // Fullscreen loader overlay
+        if (isLoading)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.5),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      "We are finding the best doctor for you,\nplease wait...",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+      ]),
     );
   }
 

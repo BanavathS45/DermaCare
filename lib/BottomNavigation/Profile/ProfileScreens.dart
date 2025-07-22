@@ -1,25 +1,22 @@
-import 'dart:convert';
-import 'dart:ffi';
+ 
 
-import 'package:cutomer_app/APIs/BaseUrl.dart';
+ 
 import 'package:cutomer_app/Customers/GetCustomerModel.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
-import 'package:cutomer_app/Dashboard/ImagePreview.dart';
+ 
 
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+ 
 
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import '../../Doctors/ListOfDoctors/DoctorController.dart';
-import '../../Doctors/ListOfDoctors/DoctorModel.dart';
-import '../../Doctors/RatingAndFeedback/RatingAndFeedback.dart';
 
-import 'package:http/http.dart' as http;
+
+ 
 
 // adjust the import to your model path
 

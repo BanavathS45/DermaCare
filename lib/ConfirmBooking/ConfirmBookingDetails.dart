@@ -2,10 +2,9 @@ import 'dart:convert';
 
 import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
+import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
-import 'package:cutomer_app/Payments/PayUPayment.dart';
-import 'package:cutomer_app/Payments/final_payload.dart';
-import 'package:cutomer_app/PaytmentsUPI/PaymentScreenUPI.dart';
+
 import 'package:cutomer_app/Screens/BookingSuccess.dart';
 
 import 'package:cutomer_app/Utils/GradintColor.dart';
@@ -21,11 +20,7 @@ import '../PatientsDetails/PatientModel.dart';
 import '../Payments/AllPayments.dart';
 import '../Payments/PaymentMode.dart';
 import '../Utils/Constant.dart';
-
-import '../Utils/ScaffoldMessageSnacber.dart';
-import 'ConfirmBookingController.dart';
 import 'ConsultationController.dart';
-import 'package:http/http.dart' as http;
 
 class Confirmbookingdetails extends StatefulWidget {
   final HospitalDoctorModel doctor;
@@ -41,6 +36,7 @@ class Confirmbookingdetails extends StatefulWidget {
 class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
+  final SymptomsController symptomsController = Get.put(SymptomsController());
 
   // final confirmbookingcontroller = Get.find<Confirmbookingcontroller>();
   Doctor? doctor;
@@ -163,11 +159,77 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             SizedBox(
               height: 15,
             ),
-            infoColumn("Patient Problem", widget.patient.problem),
+            if (symptomsController.symptoms.value == null)
+              infoColumn("Patient Problem", widget.patient.problem),
 
             SizedBox(
               height: 15,
             ),
+            SizedBox(height: 15),
+
+// Show Symptoms if available
+            if (symptomsController.symptoms.value.isNotEmpty)
+              Obx(() {
+                return infoColumn(
+                    "Symptoms", symptomsController.symptoms.value);
+              }),
+
+            SizedBox(height: 15),
+
+// Show Attachment if available
+            if (symptomsController.attachment.value != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, bottom: 4),
+                    child: Text(
+                      "Attachment",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                  symptomsController.attachment.value!.path
+                          .toLowerCase()
+                          .endsWith('.pdf')
+                      ? Row(
+                          children: [
+                            SizedBox(width: 16),
+                            Icon(Icons.picture_as_pdf, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text(
+                              symptomsController.attachment.value!.path
+                                  .split('/')
+                                  .last,
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Container(
+                            height: 120,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(
+                                symptomsController.attachment.value!,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                  SizedBox(height: 15),
+                ],
+              ),
+
             Divider(
               height: 1,
               color: secondaryColor,
