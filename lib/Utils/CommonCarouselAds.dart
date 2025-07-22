@@ -50,7 +50,7 @@ class _CommonCarouselAdsState extends State<CommonCarouselAds> {
         aspectRatio: 16 / 9,
         viewportFraction: 0.9,
         autoPlayCurve: Curves.fastOutSlowIn,
-        autoPlayAnimationDuration: const Duration(milliseconds: 800),
+        autoPlayAnimationDuration: const Duration(milliseconds: 1000),
       ),
     );
   }
@@ -260,14 +260,33 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           child: CircularProgressIndicator()); // ✅ Show loading spinner
     }
 
+    // return ClipRRect(
+    //   borderRadius: BorderRadius.circular(10),
+    //   child: Container(
+    //     width: double.infinity, // ✅ Full Width
+    //     height: 250, // ✅ Adjust height as needed
+    //     child: Stack(
+    //       children: [
+    //         Chewie(controller: _chewieController!), // ✅ Show Video
+    //         Positioned(
+    //           bottom: 10,
+    //           right: 10,
+    //           child: IconButton(
+    //             icon: Icon(Icons.fullscreen, color: Colors.white, size: 35),
+    //             onPressed: _enterFullScreen,
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Container(
-        width: double.infinity, // ✅ Full Width
-        height: 250, // ✅ Adjust height as needed
+      child: AspectRatio(
+        aspectRatio: _videoController.value.aspectRatio, // ✅ Keeps video scaled
         child: Stack(
           children: [
-            Chewie(controller: _chewieController!), // ✅ Show Video
+            Chewie(controller: _chewieController!),
             Positioned(
               bottom: 10,
               right: 10,

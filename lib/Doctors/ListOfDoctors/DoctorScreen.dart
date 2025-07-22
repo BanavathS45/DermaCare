@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,13 +35,14 @@ class Doctorscreen extends StatelessWidget {
         print("❌ Missing hospitalId or subServiceID");
       }
     });
-     
   }
 
   final DoctorController doctorController = Get.find<DoctorController>();
 
   @override
   Widget build(BuildContext context) {
+    String base64String =
+        doctorController.filteredDoctors.first.hospital.hospitalLogo;
     return Scaffold(
       appBar: CommonHeader(
         title: "Doctors & Hospitals",
@@ -51,7 +54,13 @@ class Doctorscreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(
+              height: 10,
+            ),
             buildFilters(doctorController),
+            SizedBox(
+              height: 10,
+            ),
             Padding(
               padding: EdgeInsets.only(left: 15.0),
               child: Column(
@@ -77,7 +86,13 @@ class Doctorscreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.local_hospital, color: mainColor),
+                        CircleAvatar(
+                          radius: 25,
+                          backgroundImage:
+                              MemoryImage(base64Decode(base64String)),
+                          onBackgroundImageError: (_, __) =>
+                              const Icon(Icons.person),
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: RichText(
@@ -102,6 +117,9 @@ class Doctorscreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+                  SizedBox(
+                    height: 10,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

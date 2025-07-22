@@ -17,8 +17,9 @@ import '../Utils/ElevatedButtonGredint.dart';
 class ReviewScreen extends StatefulWidget {
   final HospitalDoctorModel? doctorData;
   final Getappointmentmodel? doctorBookings;
+  final String mobileNUmber;
   const ReviewScreen(
-      {super.key, required this.doctorData, required this.doctorBookings});
+      {super.key, required this.doctorData, required this.doctorBookings, required this.mobileNUmber});
 
   @override
   State<ReviewScreen> createState() => _ReviewScreenState();
@@ -207,7 +208,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 hospitalRating: _hospitalRating,
                 feedback: _commentController.text,
                 doctorId: widget.doctorBookings!.doctorId,
-                customerMobileNumber: widget.doctorBookings!.mobileNumber,
+                customerMobileNumber: widget.mobileNUmber,
                 appointmentId: widget.doctorBookings!.bookingId,
                 hospitalId: widget.doctorBookings!.clinicId);
             print('✅ submitCustomerRating called successfully');

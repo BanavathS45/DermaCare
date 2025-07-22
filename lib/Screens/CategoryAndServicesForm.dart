@@ -56,7 +56,7 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Image.asset("assets/DermaText.png", height: 100),
+              Image.asset("assets/ic_launcher.png", height: 100),
               SizedBox(height: 20),
               GradientText(
                 "Service Details", // Required text

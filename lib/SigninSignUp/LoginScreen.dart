@@ -36,7 +36,7 @@ class _LoginscreenState extends State<Loginscreen> {
               height: MediaQuery.of(context).size.height * 0.15,
             ),
             Image.asset(
-              'assets/surecare_launcher.png', // Ensure this path is correct
+              'assets/ic_launcher.png', // Ensure this path is correct
               width: 150,
 
               fit: BoxFit.cover,

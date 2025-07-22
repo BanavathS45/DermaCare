@@ -324,6 +324,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                                 : () => Get.to(() => ReviewScreen(
                                           doctorData: doctor,
                                           doctorBookings: widget.doctorData,
+                                          mobileNUmber:
+                                              widget.doctorData.mobileNumber,
                                         ))?.then((result) {
                                       if (result == true) {
                                         setState(() async {

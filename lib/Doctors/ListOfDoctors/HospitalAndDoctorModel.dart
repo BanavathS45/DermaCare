@@ -37,8 +37,9 @@ class Doctor {
   final List<String> languages;
   final List<String> highlights;
   final bool doctorAvailabilityStatus;
+  final double doctorAverageRating;
 
-  Doctor({
+  Doctor( {
     required this.id,
     required this.doctorId,
     required this.hospitalId,
@@ -62,6 +63,7 @@ class Doctor {
     required this.highlights,
     required this.doctorAvailabilityStatus,
     required this.deviceId,
+    required this.doctorAverageRating,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
@@ -69,6 +71,7 @@ class Doctor {
       id: json['id'] ?? '',
       doctorId: json['doctorId'] ?? '',
       hospitalId: json['hospitalId'] ?? '',
+      doctorAverageRating: json['doctorAverageRating'] ?? 0.0,
       doctorName: json['doctorName'] ?? '',
       doctorPicture: json['doctorPicture'] ?? '',
       doctorLicence: json['doctorLicence'] ?? '',

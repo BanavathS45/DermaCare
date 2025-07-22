@@ -183,7 +183,7 @@ class HelpScreen extends StatelessWidget {
             children: [
               Center(
                 child: Image.asset(
-                  "assets/DermaText.png",
+                  "assets/ic_launcher.png",
                   width: 100, // adjust size as needed
                   height: 100,
                   fit: BoxFit.contain,

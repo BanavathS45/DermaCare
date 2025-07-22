@@ -70,6 +70,7 @@ class _RatingAndFeedbackState extends State<RatingAndFeedback> {
 
         final prefs = snapshot.data!;
         final loggedInUserMobile = prefs.getString('mobileNumber');
+        print("dshfhsdhfds${loggedInUserMobile}");
 
         return _buildRatingContent(
             context, widget.item, widget.controller, loggedInUserMobile);
@@ -204,7 +205,7 @@ class _RatingAndFeedbackState extends State<RatingAndFeedback> {
                           bookingDetails = appointmentSnapshot.data;
 
                           return FutureBuilder<GetCustomerModel?>(
-                            future: fetchUserData(comment.customerMobileNumber),
+                            future: fetchUserData(loggedInUserMobile!),
                             builder: (context, userSnapshot) {
                               final customerName = userSnapshot.hasData
                                   ? capitalizeEachWord(
@@ -380,6 +381,7 @@ class _RatingAndFeedbackState extends State<RatingAndFeedback> {
                               : () => Get.to(() => ReviewScreen(
                                         doctorData: item,
                                         doctorBookings: bookingDetails,
+                                        mobileNUmber: loggedInUserMobile!,
                                       ))?.then((result) {
                                     if (result == true) {
                                       setState(() async {

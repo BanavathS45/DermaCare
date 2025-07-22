@@ -128,9 +128,15 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             ),
 
             const SizedBox(height: 20),
-            PaymentModeSelector(
-              consultationType: consultationController
-                  .selectedConsultation.value!.consultationType,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                PaymentModeSelector(
+                  consultationType: consultationController
+                      .selectedConsultation.value!.consultationType,
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Padding(
@@ -674,17 +680,20 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        selectedServicesController
-                            .selectedSubServices.first.subServiceName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: mainColor,
+                      Center(
+                        child: Text(
+                          selectedServicesController
+                              .selectedSubServices.first.subServiceName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: mainColor,
+                          ),
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
                         ),
-                        maxLines: 2,
                       ),
                       Text(
                         "Price: ₹ ${(fee).toStringAsFixed(0)}",
@@ -692,6 +701,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                           fontSize: 16,
                           color: mainColor,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),

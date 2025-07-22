@@ -31,6 +31,8 @@ Future<List<HospitalDoctorModel>> fetchHospitalDoctorBySubServiceId(
           print('Doctors Found: ${item['doctors'].length}');
           for (var doctorJson in item['doctors']) {
             print('Parsing Doctor: ${doctorJson['deviceId']}');
+            print(
+                'Parsing Doctor doctorAvarageRating: ${doctorJson['doctorAverageRating']}');
             Doctor doctor = Doctor.fromJson(doctorJson);
 
             result.add(HospitalDoctorModel(
@@ -44,6 +46,7 @@ Future<List<HospitalDoctorModel>> fetchHospitalDoctorBySubServiceId(
       }
 
       print('Total Hospital-Doctor pairs parsed: ${result.length}');
+
       return result;
     } else {
       print('Invalid data format or success is false');

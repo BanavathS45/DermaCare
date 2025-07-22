@@ -319,15 +319,15 @@ Widget buildFilters(DoctorController controller) {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Sort by",
-          style: TextStyle(
-              color: mainColor, fontSize: 16, fontWeight: FontWeight.bold),
-        ),
         Wrap(
           spacing: 10,
           runSpacing: 10,
           children: [
+            Text(
+              "Sort by",
+              style: TextStyle(
+                  color: mainColor, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             FilterChip(
               label: Text(
                 "A-Z",
@@ -404,67 +404,69 @@ Widget buildFilters(DoctorController controller) {
                 controller.applyFilters();
               },
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        isExpanded: true,
-                        value: controller.selectedCity.value,
-                        onChanged: (value) {
-                          controller.selectedCity.value = value!;
-                          controller.applyFilters();
-                        },
-                        items: controller.cityList
-                            .map(
-                              (city) => DropdownMenuItem<String>(
-                                value: city,
-                                child: Text(
-                                  // city.isEmpty ? city : "No city available",
-                                  city,
-                                  style: TextStyle(color: mainColor),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                // FilterChip(
-                //   label: Padding(
-                //     padding: const EdgeInsets.symmetric(vertical: 6.0),
-                //     child: Text(
-                //       "Our Recommended",
-                //       style: TextStyle(
-                //         color: controller.selectedRecommended.value
-                //             ? Colors.white
-                //             : mainColor,
-                //       ),
-                //     ),
-                //   ),
-                //   selectedColor: mainColor,
-                //   showCheckmark: false,
-                //   selected:
-                //       controller.selectedRecommended.value, // expects a bool
 
-                //   onSelected: (val) {
-                //     controller.selectedRecommended.value = val;
-                //     controller.applyFilters();
-                //   },
-                // ),
-              ],
-            ),
+            //search by city name
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: Container(
+            //         padding: const EdgeInsets.symmetric(horizontal: 12),
+            //         decoration: BoxDecoration(
+            //           color: Colors.white,
+            //           borderRadius: BorderRadius.circular(8),
+            //           border: Border.all(color: Colors.grey),
+            //         ),
+            //         child: DropdownButtonHideUnderline(
+            //           child: DropdownButton<String>(
+            //             isExpanded: true,
+            //             value: controller.selectedCity.value,
+            //             onChanged: (value) {
+            //               controller.selectedCity.value = value!;
+            //               controller.applyFilters();
+            //             },
+            //             items: controller.cityList
+            //                 .map(
+            //                   (city) => DropdownMenuItem<String>(
+            //                     value: city,
+            //                     child: Text(
+            //                       // city.isEmpty ? city : "No city available",
+            //                       city,
+            //                       style: TextStyle(color: mainColor),
+            //                     ),
+            //                   ),
+            //                 )
+            //                 .toList(),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //     SizedBox(
+            //       width: 10,
+            //     ),
+            //     // FilterChip(
+            //     //   label: Padding(
+            //     //     padding: const EdgeInsets.symmetric(vertical: 6.0),
+            //     //     child: Text(
+            //     //       "Our Recommended",
+            //     //       style: TextStyle(
+            //     //         color: controller.selectedRecommended.value
+            //     //             ? Colors.white
+            //     //             : mainColor,
+            //     //       ),
+            //     //     ),
+            //     //   ),
+            //     //   selectedColor: mainColor,
+            //     //   showCheckmark: false,
+            //     //   selected:
+            //     //       controller.selectedRecommended.value, // expects a bool
+
+            //     //   onSelected: (val) {
+            //     //     controller.selectedRecommended.value = val;
+            //     //     controller.applyFilters();
+            //     //   },
+            //     // ),
+            //   ],
+            // ),
           ],
         ),
       ],

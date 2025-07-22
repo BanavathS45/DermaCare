@@ -282,11 +282,13 @@ class Dashboardcontroller extends GetxController {
         throw TimeoutException('Network timeout');
       });
 
-      print("response.statusCoderesponse.statusCode ${response.statusCode}");
+      print("response.statusCoderesponse.statusCode ${response}");
 
+      final responseBody = json.decode(response.body);
       if (response.statusCode == 200) {
         isLoading.value = false;
-        final responseBody = json.decode(response.body);
+        print("response.statusCoderesponse.statusCode ${response}");
+
         if (responseBody['data'] != null && responseBody['data'] is List) {
           final List<dynamic> serviceList = responseBody['data'];
 

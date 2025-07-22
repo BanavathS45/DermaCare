@@ -1,6 +1,7 @@
 import 'package:cutomer_app/ConfirmBooking/Consultations.dart';
 import 'package:cutomer_app/OTP/FireBaseOtp.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -38,9 +39,9 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
             'isAuthenticated', true); // ✅ Store biometric enabled
 
         // ✅ Show success and navigate or close screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Biometric authentication enabled")),
-        );
+
+        showSnackbar("Success", "Biometric authentication enabled", "success");
+
         Get.to(ConsultationsType(
           mobileNumber: widget.mobileNumber,
           username: widget.fullname ?? '',
@@ -99,9 +100,9 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
                         final prefs = await SharedPreferences.getInstance();
                         await prefs.setBool('isFirstLoginDone', true);
                         await prefs.setBool('isAuthenticated', false);
-                        Get.to(OTPLoginScreen(
+                        Get.to(ConsultationsType(
                           mobileNumber: widget.mobileNumber,
-                          fullname: widget.fullname,
+                          username: widget.fullname ?? '',
                         ));
                       },
                       child: Text("Skip", style: TextStyle(color: mainColor)),

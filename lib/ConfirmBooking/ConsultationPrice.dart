@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:cutomer_app/Controller/CustomerController.dart';
+import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorController.dart';
 import 'package:cutomer_app/Doctors/Schedules/Schedule.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:cutomer_app/Services/SubServiceServices.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:cutomer_app/Widget/DoctorCard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -43,6 +46,9 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
   final TextEditingController _searchController = TextEditingController();
   String searchText = '';
   bool showRecommendedOnly = false;
+  bool sortByAZ = false;
+  String selectedGender = "All"; // "Male", "Female", "All"
+  double selectedRating = 0.0; // 4.5 if filtered
 
   List<HospitalDoctorModel> hospitalDoctors = [];
 
@@ -79,7 +85,6 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     final filteredData = hospitalDoctors.where((item) {
       final matchesSearch =
@@ -87,9 +92,17 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
               item.doctor.doctorName
                   .toLowerCase()
                   .contains(searchText.toLowerCase());
+
       final isRecommended =
           !showRecommendedOnly || (item.hospital.recommended ?? false);
-      return matchesSearch && isRecommended;
+
+      final matchesGender = selectedGender == "All" ||
+          item.doctor.gender.toLowerCase() == selectedGender.toLowerCase();
+
+      final matchesRating = item.doctor.doctorAverageRating != null &&
+          item.doctor.doctorAverageRating >= selectedRating;
+
+      return matchesSearch && isRecommended && matchesGender && matchesRating;
     }).toList();
 
     return Scaffold(
@@ -99,6 +112,7 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
+            buildFilters(),
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -157,8 +171,12 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                         final hospital = item.hospital;
                         final doctor = item.doctor;
                         final isVideo = widget.consulationType.toLowerCase() ==
-                                "video" ||
-                            widget.consulationType.toLowerCase() == "online";
+                                "video consultation" ||
+                            widget.consulationType.toLowerCase() ==
+                                "online consultation";
+                        print(
+                            "widget.consulationType ${widget.consulationType}");
+                        print("widget.consulationType  isVideo${isVideo}");
                         final cost = isVideo
                             ? doctor.doctorFees.vedioConsultationFee
                             : doctor.doctorFees.inClinicFee;
@@ -186,7 +204,10 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                           child: Container(
                             margin: EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color:
+                                  item.doctor.doctorAvailabilityStatus == true
+                                      ? Colors.white
+                                      : Colors.grey[300],
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
@@ -198,26 +219,39 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                             ),
                             child: Row(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(12),
-                                    bottomLeft: Radius.circular(12),
-                                  ),
-                                  child: doctor.doctorPicture != null &&
-                                          doctor.doctorPicture.isNotEmpty
-                                      ? Image.memory(
-                                          base64Decode(cleanBase64(
-                                              doctor.doctorPicture)),
-                                          width: 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.network(
-                                          "https://via.placeholder.com/100",
-                                          width: 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
+                                Column(
+                                  children: [
+                                    Text(
+                                      "${item.doctor.doctorAvailabilityStatus == true ? "" : "Not Available"}",
+                                      style: TextStyle(
+                                          color: Colors.redAccent,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(12),
+                                        bottomLeft: Radius.circular(12),
+                                      ),
+                                      child: doctor.doctorPicture != null &&
+                                              doctor.doctorPicture.isNotEmpty
+                                          ? Image.memory(
+                                              base64Decode(cleanBase64(
+                                                  doctor.doctorPicture)),
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.network(
+                                              "https://via.placeholder.com/100",
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.cover,
+                                            ),
+                                    ),
+                                  ],
                                 ),
                                 Expanded(
                                   child: Padding(
@@ -236,7 +270,7 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                         ),
                                         SizedBox(height: 6),
                                         Text(
-                                          "Dr. ${doctor.doctorName}",
+                                          "${doctor.doctorName}",
                                           style: TextStyle(
                                               fontWeight: FontWeight.w500),
                                         ),
@@ -271,14 +305,13 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                             Icon(Icons.star,
                                                 color: Colors.amber, size: 18),
                                             SizedBox(width: 4),
-                                            // Text(
-                                            //   doctor.averageRating
-                                            //           ?.toStringAsFixed(1) ??
-                                            //       "4.0",
-                                            //   style: TextStyle(
-                                            //       fontWeight: FontWeight.w500),
-                                            // )
-                                            Text("4.0") //TODO :do dynamically
+
+                                            Text(
+                                              "${doctor.doctorAverageRating.toStringAsFixed(1)}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w500),
+                                            )
+                                            // Text("4.0") //TODO :do dynamically
                                           ],
                                         )
                                       ],
@@ -294,6 +327,57 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildFilters() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Wrap(
+        spacing: 15,
+        runSpacing: 10,
+        children: [
+          FilterChip(
+            label: Text("A-Z",
+                style: TextStyle(color: sortByAZ ? Colors.white : mainColor)),
+            selectedColor: mainColor,
+            selected: sortByAZ,
+            showCheckmark: false,
+            side: BorderSide(color: mainColor),
+            onSelected: (val) => setState(() => sortByAZ = val),
+          ),
+          FilterChip(
+            label: Icon(Icons.male,
+                color: selectedGender == "Male" ? Colors.white : mainColor),
+            selectedColor: mainColor,
+            selected: selectedGender == "Male",
+            showCheckmark: false,
+            side: BorderSide(color: mainColor),
+            onSelected: (val) =>
+                setState(() => selectedGender = val ? "Male" : "All"),
+          ),
+          FilterChip(
+            label: Icon(Icons.female,
+                color: selectedGender == "Female" ? Colors.white : mainColor),
+            selectedColor: mainColor,
+            selected: selectedGender == "Female",
+            showCheckmark: false,
+            side: BorderSide(color: mainColor),
+            onSelected: (val) =>
+                setState(() => selectedGender = val ? "Female" : "All"),
+          ),
+          FilterChip(
+            label: Icon(Icons.star,
+                color: selectedRating >= 4.5 ? Colors.white : mainColor),
+            selectedColor: mainColor,
+            selected: selectedRating >= 4.5,
+            showCheckmark: false,
+            side: BorderSide(color: mainColor),
+            onSelected: (val) =>
+                setState(() => selectedRating = val ? 4.5 : 0.0),
+          ),
+        ],
       ),
     );
   }

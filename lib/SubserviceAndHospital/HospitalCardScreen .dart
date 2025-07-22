@@ -67,12 +67,9 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
       final subServiceName =
           card['subServiceName']?.toString().toLowerCase() ?? '';
       final hospitalName = card['hospitalName']?.toString().toLowerCase() ?? '';
-      final recommendedRaw = card['recommended'];
-
-      final recommended = recommendedRaw == true ||
-          recommendedRaw == 'true' ||
-          recommendedRaw == 1 ||
-          recommendedRaw?.toString().toLowerCase() == 'yes';
+      final recommendedRaw =
+          card['recommended']?.toString().toLowerCase() ?? '';
+      final recommended = ['true', 'yes', '1'].contains(recommendedRaw);
 
       final matchesSearch = subServiceName.contains(searchText.toLowerCase()) ||
           hospitalName.contains(searchText.toLowerCase());
@@ -152,7 +149,8 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                       ),
                     )
                   : filteredCards.isEmpty
-                      ? Center(child: Text("No results found."))
+                      ? Center(
+                          child: Text("No Doctors found for this subservice."))
                       : ListView.builder(
                           itemCount: filteredCards.length,
                           itemBuilder: (context, index) {
