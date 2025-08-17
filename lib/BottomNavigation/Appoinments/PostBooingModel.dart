@@ -16,6 +16,12 @@ class BookingDetailsModel {
   final String consultationType;
   final double consultationFee;
   final double totalFee;
+  final String consultationExpiration;
+  final String paymentType;
+  final String visitType;
+  final String symptomsDuration;
+
+  final List<String>? attachments; // ✅ optional
 
   BookingDetailsModel({
     required this.categoryName,
@@ -33,12 +39,19 @@ class BookingDetailsModel {
     required this.consultationType,
     required this.consultationFee,
     required this.totalFee,
+    required this.consultationExpiration,
+    required this.paymentType,
+    required this.visitType,
+    required this.symptomsDuration,
+    this.attachments, // ✅ nullable
   });
 
   factory BookingDetailsModel.fromJson(Map<String, dynamic> json) {
     return BookingDetailsModel(
       categoryName: json['categoryName'],
+      // consultationExpiration: json['consultationExpiration'],
       categoryId: json['categoryId'],
+      symptomsDuration: json['symptomsDuration'],
       servicename: json['servicename'],
       serviceId: json['serviceId'],
       subServiceName: json['subServiceName'],
@@ -52,13 +65,21 @@ class BookingDetailsModel {
       consultationType: json['consultationType'],
       consultationFee: (json['consultationFee'] ?? 0).toDouble(),
       totalFee: (json['totalFee'] ?? 0).toDouble(),
+      paymentType: json["paymentType"] ?? "",
+      attachments: json["attachments"] != null
+          ? List<String>.from(json["attachments"])
+          : null,
+      consultationExpiration: json["consultationExpiration"] ?? "",
+      visitType: json["visitType"] ?? "",
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'categoryName': categoryName,
+      // 'consultationExpiration': consultationExpiration,
       'categoryId': categoryId,
+      'symptomsDuration': symptomsDuration,
       'servicename': servicename,
       'serviceId': serviceId,
       'subServiceName': subServiceName,
@@ -72,6 +93,10 @@ class BookingDetailsModel {
       'consultationType': consultationType,
       'consultationFee': consultationFee,
       'totalFee': totalFee,
+      "paymentType": paymentType,
+      "attachments": attachments,
+      "consultationExpiration": consultationExpiration,
+      "visitType": visitType,
     };
   }
 }

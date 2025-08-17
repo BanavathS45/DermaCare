@@ -1,5 +1,5 @@
 // const String wifiUrl = "13.233.9.23:9090";
-const String wifiUrl = "13.233.9.23:9090";
+const String wifiUrl = "13.202.16.119:9090";
 
 // const String serverUrl = "http://${wifiUrl}:9090/api";
 const String serverUrl = "http://${wifiUrl}";

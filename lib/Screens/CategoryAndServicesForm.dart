@@ -227,14 +227,9 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                     Get.to(() => ConsultationPrice(
                           mobileNumber: widget.mobileNumber,
                           username: widget.username,
-                          categoryName: selectedMain.categoryName,
-                          categoryId: selectedMain.categoryId,
-                          serviceId: selectedSub.serviceId,
-                          serviceName: selectedSub.serviceName,
-                          subserviceName: selectedSubService.subServiceName,
-                          subserviceid: selectedSubService.subServiceId,
-                          consulationType:
-                              widget.consulationType, // ✅ send it here
+
+                          consulationType: widget.consulationType,
+                          symptoms: '', // ✅ send it here
                         ));
                     // Get.to(() => ConsulationDoctorScreen(
                     //       mobileNumber: widget.mobileNumber,

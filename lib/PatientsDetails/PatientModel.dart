@@ -1,6 +1,9 @@
 class PatientModel {
-   final String customerDeviceId;
+  final String customerDeviceId;
   final String name;
+  final String relation;
+  final String patientAddress;
+  final String patientMobileNumber;
   final String age;
   final String gender;
   final String bookingFor;
@@ -14,7 +17,7 @@ class PatientModel {
 
   PatientModel(
       {required this.name,
-        required this.customerDeviceId,
+      required this.customerDeviceId,
       required this.monthYear,
       required this.serviceDate,
       required this.servicetime,
@@ -22,6 +25,9 @@ class PatientModel {
       required this.age,
       required this.gender,
       required this.bookingFor,
+      required this.relation,
+      required this.patientMobileNumber,
+      required this.patientAddress,
       this.notes,
       this.reports,
       required this.problem});
@@ -29,7 +35,9 @@ class PatientModel {
   factory PatientModel.fromJson(Map<String, dynamic> json) {
     return PatientModel(
       name: json['name'] ?? '',
-        customerDeviceId: json['customerDeviceId'] ?? '',
+      relation: json['relation'] ?? '',
+      patientMobileNumber: json['patientMobileNumber'] ?? '',
+      customerDeviceId: json['customerDeviceId'] ?? '',
       mobileNumber: json['mobileNumber'] ?? '',
       age: json['age'] ?? 0,
       gender: json['gender'] ?? '',
@@ -44,13 +52,17 @@ class PatientModel {
               json['reports'].map((x) => Report.fromJson(x)),
             )
           : null,
+      patientAddress: json['patientAddress'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-        'customerDeviceId': customerDeviceId,
+      'patientAddress': patientAddress,
+      'relation': relation,
+      'patientMobileNumber': patientMobileNumber,
+      'customerDeviceId': customerDeviceId,
       'mobileNumber': mobileNumber,
       'age': age,
       'gender': gender,

@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
+import 'package:cutomer_app/Inputs/CustomInputField.dart';
+import 'package:cutomer_app/SigninSignUp/LoginController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,7 +30,9 @@ class SymptomsForm extends StatefulWidget {
 class _SymptomsFormState extends State<SymptomsForm> {
   final SymptomsController controller = Get.put(SymptomsController());
   final TextEditingController _textController = TextEditingController();
-
+  final TextEditingController _durationController = TextEditingController();
+  String selectedType = "First Time"; // default value
+  SiginSignUpController siginSignUpController = SiginSignUpController();
   String? errorText;
   int charCount = 0;
 
@@ -50,6 +55,7 @@ class _SymptomsFormState extends State<SymptomsForm> {
 
   void _onSubmit() {
     final text = _textController.text.trim();
+    final duration = _durationController.text.trim();
     final length = text.length;
 
     if (length == 0) {
@@ -67,7 +73,10 @@ class _SymptomsFormState extends State<SymptomsForm> {
 
     // Save and Clear
     controller.updateSymptoms(text);
+    controller.updateDuration(duration);
+    controller.updateVisitType(selectedType);
     print("Symptoms: ${controller.symptoms.value}");
+    print("updateDuration: ${controller.duration.value}");
     print("Attachment: ${controller.attachment.value?.path}");
 
     // controller.clearForm();
@@ -80,12 +89,7 @@ class _SymptomsFormState extends State<SymptomsForm> {
       mobileNumber: widget.mobileNumber,
       username: widget.consulationType,
       consulationType: widget.consulationType,
-      subserviceName: 'PRP Injection Procedure',
-      subserviceid: '687b91e50ce982692fd1aeb2',
-      serviceId: '687b91540ce982692fd1aeb0',
-      categoryId: '687b90d80ce982692fd1aeae',
-      serviceName: 'PRP Therapy',
-      categoryName: 'Hair Treatments',
+      symptoms: controller.symptoms.value,
     ));
     // Get.snackbar("Submitted", "Appointment form submitted successfully");
   }
@@ -112,15 +116,15 @@ class _SymptomsFormState extends State<SymptomsForm> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16.0, horizontal: 20.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       "Selected Consultation Type",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
@@ -129,7 +133,7 @@ class _SymptomsFormState extends State<SymptomsForm> {
                     Text(
                       widget.consulationType,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: secondaryColor,
                       ),
@@ -138,35 +142,111 @@ class _SymptomsFormState extends State<SymptomsForm> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ChoiceChip(
+                    label: Text("First Time"),
+                    selected: selectedType == "First Time",
+                    onSelected: (selected) {
+                      setState(() => selectedType = "First Time");
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  ChoiceChip(
+                    label: Text("Follow Up"),
+                    selected: selectedType == "Follow Up",
+                    onSelected: (selected) {
+                      setState(() => selectedType = "Follow Up");
+                      // Navigate immediately to next screen for Follow Up
+                      // Get.to(ConsultationPrice(
+                      //   mobileNumber: widget.mobileNumber,
+                      //   username: widget.consulationType,
+                      //   consulationType: widget.consulationType,
+                      //   subserviceName: 'PRP Injection Procedure',
+                      //   subserviceid: '687b91e50ce982692fd1aeb2',
+                      //   serviceId: '687b91540ce982692fd1aeb0',
+                      //   categoryId: '687b90d80ce982692fd1aeae',
+                      //   serviceName: 'PRP Therapy',
+                      //   categoryName: 'Hair Treatments',
+                      // ));
+                    },
+                    //  enabled: false,
+                  ),
+                ],
+              ),
+            ),
+            // Text("Selected Type: $selectedType",
+            //     style: TextStyle(fontSize: 14)),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text("Symptoms Duration",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    CustomTextField(
+                      controller: _durationController,
+                      labelText: 'Select Duartion',
+                      keyboardType: TextInputType.number,
+                      autovalidateMode: AutovalidateMode.onUnfocus,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(3),
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      validator: (value) =>
+                          siginSignUpController.validateNumber(
+                        value,
+                        "Duartion",
+                      ),
+                    ),
+                    const SizedBox(height: 25),
                     Text("Enter your symptoms",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-                    TextField(
-                      controller: _textController,
-                      maxLines: 5,
-                      maxLength: 1000,
-                      decoration: InputDecoration(
-                        labelText: "Symptoms",
-                        border: OutlineInputBorder(),
-                        errorText: errorText,
-                        counterText: "${charCount}/1000 characters",
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        controller: _textController,
+                        maxLines: 3,
+                        maxLength: 1000,
+                        decoration: InputDecoration(
+                          labelText: "Symptoms",
+                          border: OutlineInputBorder(),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade300), // light border
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: mainColor,
+                                width: 1.5), // slightly darker on focus
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.red, width: 1.5),
+                          ),
+                          errorText: errorText,
+                          counterText: "$charCount/1000 characters",
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            charCount = val.length;
+                            errorText = null;
+                          });
+                        },
                       ),
-                      onChanged: (val) {
-                        setState(() {
-                          charCount = val.length;
-                          errorText = null;
-                        });
-                      },
                     ),
                     const SizedBox(height: 25),
-                    Text("Attach any document",
+                    Text("Attach any document (if any)",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
@@ -175,18 +255,27 @@ class _SymptomsFormState extends State<SymptomsForm> {
                       children: [
                         ElevatedButton.icon(
                           onPressed: _pickFile,
-                          icon: Icon(Icons.picture_as_pdf, color: Colors.red),
+                          icon: Icon(Icons.picture_as_pdf, color: Colors.white),
                           label: Text("PDF"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: secondaryColor, // Red for PDF
+                          ),
                         ),
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.camera),
-                          icon: Icon(Icons.camera_alt, color: Colors.black),
+                          icon: Icon(Icons.camera_alt, color: Colors.white),
                           label: Text("Camera"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: secondaryColor, // Red for PDF
+                          ),
                         ),
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: Icon(Icons.photo_library, color: Colors.green),
+                          icon: Icon(Icons.photo_library, color: Colors.white),
                           label: Text("Gallery"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: secondaryColor, // Red for PDF
+                          ),
                         ),
                       ],
                     ),
@@ -234,9 +323,9 @@ class _SymptomsFormState extends State<SymptomsForm> {
               child: ElevatedButton(
                 onPressed: _onSubmit,
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size.fromHeight(50),
-                  backgroundColor: Theme.of(context).primaryColor,
-                ),
+                    minimumSize: Size.fromHeight(50), backgroundColor: mainColor
+                    // backgroundColor: Theme.of(context).primaryColor,
+                    ),
                 child: Text("Submit", style: TextStyle(fontSize: 18)),
               ),
             ),

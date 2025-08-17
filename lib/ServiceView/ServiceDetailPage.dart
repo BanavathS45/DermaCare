@@ -313,6 +313,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
             TextButton(
               onPressed: subServiceDetails!.finalCost > 0
                   ? () {
+                   
                       Get.to(() => Doctorscreen(
                             mobileNumber: widget.mobileNumber,
                             username: widget.username,

@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Dashboard/GetCustomerData.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorSlotModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Doctors/Schedules/ScheduleController.dart';
@@ -7,6 +8,7 @@ import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../Consultations/SymptomsController.dart';
 import '../../Controller/CustomerController.dart';
 import '../../PatientsDetails/PatientDetailsFormController.dart';
 import '../../PatientsDetails/PatientModel.dart';
@@ -24,8 +26,12 @@ import 'DoctorSlotService.dart';
 class ScheduleScreen extends StatefulWidget {
   final HospitalDoctorModel doctorData;
   final String mobileNumber;
+  final String username;
   const ScheduleScreen(
-      {super.key, required this.doctorData, required this.mobileNumber});
+      {super.key,
+      required this.doctorData,
+      required this.mobileNumber,
+      required this.username});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -34,45 +40,43 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final ScrollController _dateScrollController = ScrollController();
   // final scheduleController = Get.find<ScheduleController>();
-
+  final SymptomsController symptomsController = Get.put(SymptomsController());
   final scheduleController = Get.find<ScheduleController>();
   final patientdetailsformcontroller = Get.put(Patientdetailsformcontroller());
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final registercontroller = Get.put(Registercontroller());
   bool showAllRows = false;
-  
+
   String? id;
   List<DoctorSlot>? slots;
-
- 
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
+    getUserData();
   }
 
- Future<void> _initialize() async {
-  if (!mounted) return;
+  Future<void> _initialize() async {
+    if (!mounted) return;
 
-  try {
-    await scheduleController.initializeWeekDates();
-    id = consultationController.selectedConsultation.value?.consultationId;
+    try {
+      await scheduleController.initializeWeekDates();
+      id = consultationController.selectedConsultation.value?.consultationId;
 
-    await fetchDoctorSlotsOnce();
+      await fetchDoctorSlotsOnce();
 
-    // ⏰ Schedule refresh after midnight
-    scheduleController.scheduleMidnightRefresh(
-      doctorId: widget.doctorData.doctor.doctorId,
-      hospitalId: widget.doctorData.hospital.hospitalId,
-    );
-  } catch (e) {
-    debugPrint('Initialization error: $e');
+      // ⏰ Schedule refresh after midnight
+      scheduleController.scheduleMidnightRefresh(
+        doctorId: widget.doctorData.doctor.doctorId,
+        hospitalId: widget.doctorData.hospital.hospitalId,
+      );
+    } catch (e) {
+      debugPrint('Initialization error: $e');
+    }
   }
-}
 
-  
   @override
   void dispose() {
     super.dispose();
@@ -87,6 +91,19 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     print("iam calling doctorId ${widget.doctorData.doctor.doctorId}");
     print("iam calling hospitalId ${widget.doctorData.hospital.hospitalId}");
     // scheduleController.initializeWeekDates();
+  }
+
+  String? fullName;
+
+  Future<void> getUserData() async {
+    final userData = await fetchUserData(
+        widget.mobileNumber); // Assuming this returns a Map or model
+    if (userData != null) {
+      setState(() {
+        fullName =
+            userData.fullName; // or userData.fullName depending on structure
+      });
+    }
   }
 
   @override
@@ -139,7 +156,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               languagesKnown(),
               Divider(color: secondaryColor),
 
-              PatientDetailsForm(), // ✅ Add your working form here
+              PatientDetailsForm(
+                mobileNumber: widget.mobileNumber,
+                username: widget.username,
+              ), // ✅ Add your working form here
             ],
           ),
         ),
@@ -153,6 +173,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               onPressed: () async {
                 final prefs = await SharedPreferences.getInstance();
                 var devicedID = prefs.getString('fcm');
+                var patientProblem = consultationController
+                        .selectedConsultation.value!.consultationType
+                        .toLowerCase() ==
+                    "services & treatments";
 
                 print("devicedIDdevicedID${devicedID}");
                 if (patientdetailsformcontroller.formKey.currentState!
@@ -162,18 +186,36 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     String formattedDate = DateFormat('yyyy-MM-dd')
                         .format(scheduleController.selectedDate.value);
                     PatientModel patientmodel = PatientModel(
-                        name: patientdetailsformcontroller.nameController.text,
-                        age: patientdetailsformcontroller.ageController.text,
-                        gender: registercontroller.selectedGender,
-                        bookingFor: patientdetailsformcontroller.selectedFor,
-                        problem:
-                            patientdetailsformcontroller.notesController.text,
-                        monthYear: DateFormat('MMMM dd, yyyy')
-                            .format(scheduleController.selectedDate.value),
-                        serviceDate: formattedDate,
-                        servicetime: scheduleController.selectedSlotText.value,
-                        mobileNumber: widget.mobileNumber,
-                        customerDeviceId: devicedID ?? "");
+                      name: patientdetailsformcontroller.selectedFor == 'Self'
+                          ? (fullName ?? widget.username)
+                          : patientdetailsformcontroller.nameController.text
+                              .trim(),
+                      age: patientdetailsformcontroller.ageController.text,
+                      gender: registercontroller.selectedGender,
+                      bookingFor: patientdetailsformcontroller.selectedFor,
+                      problem: patientProblem
+                          ? patientdetailsformcontroller.notesController.text
+                          : symptomsController.symptoms.value,
+                      monthYear: DateFormat('MMMM dd, yyyy')
+                          .format(scheduleController.selectedDate.value),
+                      serviceDate: formattedDate,
+                      servicetime: scheduleController.selectedSlotText.value,
+                      mobileNumber: widget.mobileNumber,
+                      customerDeviceId: devicedID ?? "",
+                      relation: patientdetailsformcontroller.selectedFor ==
+                              'Self'
+                          ? "Self"
+                          : patientdetailsformcontroller.relationController.text
+                              .trim(),
+                      patientMobileNumber:
+                          patientdetailsformcontroller.selectedFor == 'Self'
+                              ? widget.mobileNumber
+                              : patientdetailsformcontroller
+                                  .patientMobileNumberController.text
+                                  .trim(),
+                      patientAddress:
+                          patientdetailsformcontroller.addressController.text,
+                    );
                     // 'dB4XJQ7xQ1KsY_BLUxo0r-:APA91bE74fgP5hWGuf26QAXAB6pFpimSaB22MWw9ccLK44TkFYPnMHaz7vXI7otlxPkLn28zAzNoU5zRIG_Un5fGebPU9TMSTfPWzpnmLgH7MyFxHlSlA3M'
 
                     print("patientmodel ${patientmodel.toJson()}");

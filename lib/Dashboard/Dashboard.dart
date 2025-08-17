@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cutomer_app/ConfirmBooking/Consultations.dart';
 import 'package:cutomer_app/Dashboard/ImagePreview.dart';
+import 'package:cutomer_app/Dashboard/VisitType.dart';
 import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:cutomer_app/Screens/RefferalCode.dart';
@@ -398,7 +399,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 30,
+                          fontSize: 24,
                           height: 1,
                         ),
                         textAlign: TextAlign.center,
@@ -424,6 +425,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         );
                       },
                     ),
+                    
                   ],
                 ),
               ),

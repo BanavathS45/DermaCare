@@ -18,24 +18,14 @@ class ConsultationPrice extends StatefulWidget {
   final String mobileNumber;
   final String username;
   final String consulationType;
-  final String categoryName;
-  final String categoryId;
-  final String serviceId;
-  final String serviceName;
-  final String subserviceName;
-  final String subserviceid;
+  final String symptoms;
 
   const ConsultationPrice({
     super.key,
-    required this.categoryName,
-    required this.categoryId,
-    required this.serviceId,
-    required this.serviceName,
     required this.mobileNumber,
     required this.username,
-    required this.subserviceName,
-    required this.subserviceid,
     required this.consulationType,
+    required this.symptoms,
   });
 
   @override
@@ -55,7 +45,7 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
   @override
   void initState() {
     super.initState();
-    fetchHospitalDoctorBySubServiceId(widget.subserviceid).then((value) {
+    fetchHospitalDoctor().then((value) {
       setState(() {
         hospitalDoctors = value;
       });
@@ -71,18 +61,18 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
     return base64String;
   }
 
-  SubService? subServiceDetails;
-  void loadSubService(hospitalId) async {
-    print("calling....");
-    final result =
-        await fetchSubServiceDetails(hospitalId, widget.subserviceid);
-    setState(() {
-      subServiceDetails = result;
-      final selectedServicesController = Get.find<SelectedServicesController>();
-      selectedServicesController
-          .updateSelectedSubServices([subServiceDetails!]);
-    });
-  }
+  // SubService? subServiceDetails;
+  // void loadSubService(hospitalId) async {
+  //   print("calling....");
+  //   final result =
+  //       await fetchSubServiceDetails(hospitalId, widget.subserviceid);
+  //   setState(() {
+  //     subServiceDetails = result;
+  //     final selectedServicesController = Get.find<SelectedServicesController>();
+  //     selectedServicesController
+  //         .updateSelectedSubServices([subServiceDetails!]);
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -237,9 +227,10 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                 Get.to(() => ScheduleScreen(
                                       doctorData: item,
                                       mobileNumber: widget.mobileNumber,
+                                      username: widget.username,
                                     ));
 
-                                loadSubService(item.hospital.hospitalId);
+                                // loadSubService(item.hospital.hospitalId);
                               } else {
                                 // Optional: Show a snackbar or dialog to inform user
                                 Get.snackbar(
@@ -321,13 +312,26 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                           Text(
                                             "${doctor.doctorName}",
                                             style: TextStyle(
-                                                fontWeight: FontWeight.w500),
+                                                fontWeight: FontWeight.w600),
                                           ),
-                                          SizedBox(height: 4),
+                                          SizedBox(height: 2),
                                           Text(
-                                              "Service: ${widget.serviceName}"),
+                                            "${doctor.qualification}",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.grey),
+                                          ),
+                                          SizedBox(height: 2),
                                           Text(
-                                              "Subservice: ${widget.subserviceName}"),
+                                            "${doctor.experience} Years",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.grey),
+                                          ),
+                                          // Text(
+                                          //     "Service: ${widget.serviceName}"),
+                                          // Text(
+                                          //     "Subservice: ${widget.subserviceName}"),
                                           SizedBox(height: 6),
                                           Row(
                                             mainAxisAlignment:

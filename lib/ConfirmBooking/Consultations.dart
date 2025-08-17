@@ -1,5 +1,6 @@
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
+import 'package:cutomer_app/Dashboard/VisitType.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/CopyRigths.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -191,7 +192,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
         )));
 
     buttons.add(_serviceButton(
-      'Consultation',
+      'Consultations',
       Colors.white,
       'show_more',
       Icons.expand_more,
@@ -233,24 +234,28 @@ class ConsultationsTypeState extends State<ConsultationsType> {
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        consultationcontroller.setConsultation(consultation);
-
-        if (!prefs.containsKey('firstConsultationId')) {
+        if (_consultations.isNotEmpty &&
+            !prefs.containsKey('firstConsultationId')) {
           await prefs.setString(
               'firstConsultationId', _consultations.first.consultationId);
           await prefs.setString(
               'firstConsultationType', _consultations.first.consultationType);
         }
 
-        String firstId = _consultations.first.consultationId;
+        consultationcontroller.setConsultation(consultation);
 
-        if (firstId == id) {
-          Get.to(BottomNavController(
-            mobileNumber: widget.mobileNumber,
-            username: widget.username,
-            consultation: consultation,
-            index: 0,
-          ));
+        String? firstId = _consultations.isNotEmpty
+            ? _consultations.first.consultationId
+            : null;
+
+        if (firstId != null && firstId == id) {
+          Get.to(VisitType(mobileNumber: widget.mobileNumber, username: widget.username, consulationType: consultation.consultationType,));
+          // Get.to(BottomNavController(
+          //   mobileNumber: widget.mobileNumber,
+          //   username: widget.username,
+          //   consultation: consultation,
+          //   index: 0,
+          // ));
         } else {
           Get.to(SymptomsForm(
             mobileNumber: widget.mobileNumber,

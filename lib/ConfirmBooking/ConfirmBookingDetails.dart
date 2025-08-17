@@ -44,6 +44,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   List<ConsultationModel> _consultations = [];
   int consultationFee = 0;
   int totalFee = 0;
+  // globals.dart
+  String globalServiceId = '';
   @override
   void initState() {
     super.initState();
@@ -54,7 +56,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
       final selectedId =
           consultationController.selectedConsultation.value?.consultationId ??
               "";
-
+      globalServiceId = selectedId;
       final consultations = await getConsultationDetails();
 
       if (consultations.isNotEmpty) {
@@ -90,6 +92,9 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   Widget build(BuildContext context) {
     // totalFee = platformFee + consultationFee;
     totalFee = consultationFee;
+    Widget? consultationWidget;
+    bool loading = false;
+    String? currentConsultationId;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -107,19 +112,28 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             Column(
               children: [
                 profileCard(),
-                FutureBuilder(
-                  future: _getServiceButton(consultationController
-                      .selectedConsultation.value!.consultationId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator(); // or SizedBox.shrink()
-                    } else if (snapshot.hasError) {
-                      return Text("Error: ${snapshot.error}");
-                    } else {
-                      return snapshot.data as Widget; // ✅ Your returned widget
-                    }
-                  },
-                )
+                Obx(() {
+                  final consultationId = consultationController
+                      .selectedConsultation.value?.consultationId;
+                  if (consultationId == null) return SizedBox();
+
+                  print("consultationId: $consultationId");
+
+                  return FutureBuilder(
+                    key: ValueKey(consultationId),
+                    future: _getServiceButton(consultationId),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        print("🔥 Error: ${snapshot.error}");
+                        return Text("Error: ${snapshot.error}");
+                      } else {
+                        return snapshot.data as Widget;
+                      }
+                    },
+                  );
+                })
               ],
             ),
 
@@ -156,10 +170,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               height: 1,
               color: secondaryColor,
             ),
-            SizedBox(
-              height: 15,
-            ),
-            if (symptomsController.symptoms.value == null)
+
+            if (symptomsController.symptoms.value == "")
               infoColumn("Patient Problem", widget.patient.problem),
 
             SizedBox(
@@ -172,6 +184,22 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               Obx(() {
                 return infoColumn(
                     "Symptoms", symptomsController.symptoms.value);
+              }),
+
+            SizedBox(height: 15),
+
+// Show Symptoms if available
+            if (symptomsController.duration.value.isNotEmpty)
+              Obx(() {
+                return infoColumn(
+                    "Duration", "${symptomsController.duration.value} days");
+              }),
+
+            SizedBox(height: 15),
+            if (symptomsController.visitType.value.isNotEmpty)
+              Obx(() {
+                return infoColumn(
+                    "Visit Type", "${symptomsController.visitType.value} ");
               }),
 
             SizedBox(height: 15),
@@ -289,29 +317,47 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             print("Selected Payment: $selectedPayment");
 
             final bookingDetails = BookingDetailsModel(
-              subServiceName: selectedServicesController
-                  .selectedSubServices.first.subServiceName,
-              subServiceId: selectedServicesController
-                  .selectedSubServices.first.subServiceId,
-              doctorId: widget.doctor.doctor.doctorId,
-              consultationType: consultationController
-                  .selectedConsultation.value!.consultationType,
-              consultationFee: consultationFee.toDouble(),
-              totalFee: (consultationFee).toDouble(),
-              clinicId: widget.doctor.hospital.hospitalId,
-              doctorDeviceId: widget.doctor.doctor.deviceId,
-              categoryName: selectedServicesController
-                  .selectedSubServices.first.categoryName,
-              clinicAddress: widget.doctor.hospital.address,
-              categoryId: selectedServicesController
-                  .selectedSubServices.first.categoryId,
-              servicename: selectedServicesController
-                  .selectedSubServices.first.serviceName,
-              serviceId: selectedServicesController
-                  .selectedSubServices.first.serviceID,
-              clinicName: widget.doctor.hospital.name,
-              doctorName: widget.doctor.doctor.doctorName,
-            );
+                subServiceName: globalServiceId == "ST_01"
+                    ? selectedServicesController
+                        .selectedSubServices.first.subServiceName
+                    : "NA",
+                subServiceId: globalServiceId == "ST_01"
+                    ? selectedServicesController
+                        .selectedSubServices.first.subServiceId
+                    : "NA",
+                doctorId: widget.doctor.doctor.doctorId,
+                consultationType: consultationController
+                    .selectedConsultation.value!.consultationType,
+                consultationFee: consultationFee.toDouble(),
+                totalFee: (consultationFee).toDouble(),
+                clinicId: widget.doctor.hospital.hospitalId,
+                doctorDeviceId: widget.doctor.doctor.deviceId,
+                clinicAddress: widget.doctor.hospital.address,
+                categoryName: globalServiceId == "ST_01"
+                    ? selectedServicesController
+                        .selectedSubServices.first.categoryName
+                    : "NA",
+                categoryId: globalServiceId == "ST_01"
+                    ? selectedServicesController
+                        .selectedSubServices.first.categoryId
+                    : "NA",
+                servicename: globalServiceId == "ST_01"
+                    ? selectedServicesController
+                        .selectedSubServices.first.serviceName
+                    : "NA",
+                serviceId: globalServiceId == "ST_01"
+                    ? selectedServicesController
+                        .selectedSubServices.first.serviceID
+                    : "NA",
+                clinicName: widget.doctor.hospital.name,
+                doctorName: widget.doctor.doctor.doctorName,
+                // consultationExpiration:
+                //     widget.doctor.hospital.consultationExpiration,
+                consultationExpiration: "15 days",
+                paymentType: "Pay at Hospital",
+                visitType: 'firsttime',
+                symptomsDuration: "1 week" //TODO:develop in UI
+                );
 
             // 📦 Model ready for API
             final postBookingPayload = PostBookingModel(
@@ -601,33 +647,31 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     Color color = Colors.white;
     int consultationFee = 0;
 
-    // Find the consultation matching the passed 'id' (consultationId)
-
     final consultations = await getConsultationDetails();
-    // Dynamically set the fee based on the consultation type
-    if (consultations[0].consultationId == id) {
-      color = Colors.white;
+
+    // Find consultation by ID safely
+    final matchedConsultation = consultations.firstWhere(
+      (c) => c.consultationId == id,
+      orElse: () => ConsultationModel(
+        consultationId: '',
+        consultationType: 'Unknown',
+      ),
+    );
+
+    consultationType = matchedConsultation.consultationType;
+
+    if (consultationType.toLowerCase().contains('service')) {
       consultationFee = selectedServicesController
           .selectedSubServices.first.finalCost
           .toInt();
-      ;
-
-      consultationType = consultations[0].consultationType;
-    } else if (consultations[1].consultationId == id) {
-      color = Colors.white;
-      consultationFee = doctor!.doctorFees.inClinicFee;
-      consultationType = consultations[1].consultationType;
-    } else if (consultations[2].consultationId == id) {
-      color = Colors.white;
-      consultationFee = doctor!.doctorFees.vedioConsultationFee;
-      consultationType = consultations[2].consultationType;
+    } else if (consultationType.toLowerCase().contains('clinic')) {
+      consultationFee = doctor?.doctorFees.inClinicFee ?? 0;
+    } else if (consultationType.toLowerCase().contains('online')) {
+      consultationFee = doctor?.doctorFees.vedioConsultationFee ?? 0;
     } else {
-      color = Colors.grey;
-      consultationType = "Consultation Fee";
       consultationFee = 0;
+      color = Colors.grey;
     }
-
-    // Set the consultation fee in the controller
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -746,8 +790,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                     children: [
                       Center(
                         child: Text(
-                          selectedServicesController
-                              .selectedSubServices.first.subServiceName,
+                          "${consultationController.selectedConsultation.value?.consultationId == "ST_01" ? selectedServicesController.selectedSubServices.first.subServiceName : ""}",
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

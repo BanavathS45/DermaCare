@@ -200,6 +200,7 @@
 //   }
 // }
 
+import 'package:cutomer_app/Dashboard/VisitController.dart';
 import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:cutomer_app/PushNotification/PushNotification.dart';
@@ -282,6 +283,9 @@ Future<void> main() async {
   Get.put(ServiceFetcher());
   Get.put(CallController());
   Get.put(SymptomsController());
+  Get.put(VisitController());
+
+  
 
   // ✅ FCM Notification tap handling
   final RemoteMessage? initialMessage =

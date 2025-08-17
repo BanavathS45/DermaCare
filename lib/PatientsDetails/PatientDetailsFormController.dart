@@ -10,12 +10,18 @@ class Patientdetailsformcontroller extends GetxController {
   String selectedGender = "Male";
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController patientMobileNumberController =
+      TextEditingController();
+
   final TextEditingController notesController = TextEditingController();
   Registercontroller registercontroller = Registercontroller();
   final Color activeColor = mainColor;
   final Color inactiveColor = Colors.transparent;
   final Color borderColor = mainColor;
   final formKey = GlobalKey<FormState>();
+  final relationController = TextEditingController();
+  final mobileController = TextEditingController();
 
   submitSchedule() {
     // showSnackbar("Success", "Form Validated out side", "success");

@@ -117,9 +117,11 @@ class Getappointmentmodel {
   final String status;
   final double totalFee;
   final String bookedAt;
+  final String? relation;
 
   Getappointmentmodel({
     required this.bookingId,
+    required this.relation,
     required this.bookingFor,
     required this.name,
     required this.age,
@@ -146,29 +148,38 @@ class Getappointmentmodel {
   factory Getappointmentmodel.fromJson(Map<String, dynamic> json) {
     try {
       return Getappointmentmodel(
-        bookingId: json['bookingId'] ?? '',
-        bookingFor: json['bookingFor'] ?? '',
-        name: json['name'] ?? '',
-        age: json['age'] ?? '',
-        gender: json['gender'] ?? '',
-        mobileNumber: json['mobileNumber'] ?? '',
-        problem: json['problem'] ?? '',
-        subServiceName: json['subServiceName'] ?? '',
-        subServiceId: json['subServiceId'] ?? '',
-        doctorId: json['doctorId'] ?? '',
-        clinicId: json['clinicId'] ?? '',
-        serviceDate: json['serviceDate'] ?? '',
-        servicetime: json['servicetime'] ?? '',
-        consultationType: json['consultationType'] ?? '',
-        consultationFee: (json['consultationFee'] ?? 0).toDouble(),
-        channelId: json['channelId'],
-        reasonForCancel: json['reasonForCancel'],
-        notes: json['notes'],
+        bookingId: json['bookingId']?.toString() ?? '',
+        relation: json['relation']?.toString() ?? '',
+        bookingFor: json['bookingFor']?.toString() ?? '',
+        name: json['name']?.toString() ?? '',
+        age: json['age']?.toString() ?? '', // always String
+        gender: json['gender']?.toString() ?? '',
+        mobileNumber: json['mobileNumber']?.toString() ?? '',
+        problem: json['problem']?.toString() ?? '',
+        subServiceName: json['subServiceName']?.toString() ?? '',
+        subServiceId: json['subServiceId']?.toString() ?? '',
+        doctorId: json['doctorId']?.toString() ?? '',
+        clinicId: json['clinicId']?.toString() ?? '',
+        serviceDate: json['serviceDate']?.toString() ?? '',
+        servicetime: json['servicetime']?.toString() ?? '',
+        consultationType: json['consultationType']?.toString() ?? '',
+
+        // 👇 Safely parse doubles
+        consultationFee:
+            double.tryParse(json['consultationFee'].toString()) ?? 0.0,
+
+        channelId: json['channelId']?.toString(),
+        reasonForCancel: json['reasonForCancel']?.toString(),
+        notes: json['notes']?.toString(),
+
         reports:
             json['reports'] != null ? Reports.fromJson(json['reports']) : null,
-        status: json['status'] ?? '',
-        totalFee: (json['totalFee'] ?? 0).toDouble(),
-        bookedAt: (json['bookedAt'] ?? '').toString(),
+        status: json['status']?.toString() ?? '',
+
+        // 👇 Same for totalFee
+        totalFee: double.tryParse(json['totalFee'].toString()) ?? 0.0,
+
+        bookedAt: json['bookedAt']?.toString() ?? '',
       );
     } catch (e) {
       print('❌ Error parsing Getappointmentmodel: $e\nData: $json');

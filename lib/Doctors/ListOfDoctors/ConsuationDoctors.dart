@@ -159,7 +159,7 @@ class ConsulationDoctorScreen extends StatelessWidget {
                               context,
                               doctorController.filteredDoctors[index],
                               doctorController,
-                              mobileNumber);
+                              mobileNumber,username);
                         },
                       ),
               ),

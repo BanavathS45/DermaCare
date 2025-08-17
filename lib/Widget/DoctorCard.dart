@@ -10,7 +10,7 @@ import '../Doctors/Schedules/Schedule.dart';
 import '../Utils/GradintColor.dart';
 
 Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
-    DoctorController controller, String mobileNumber) {
+    DoctorController controller, String mobileNumber, String username) {
   final doctor = doctorModel.doctor;
   final hospital = doctorModel.hospital;
   String base64String = doctor.doctorPicture;
@@ -198,16 +198,17 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                   const Icon(Icons.star, size: 16, color: Colors.white),
                   const SizedBox(width: 4),
                   // Text("${doctor.overallRating}", //TODO : imaplent pending
-                  Obx(() {
-                    final rating =
-                        doctorController.doctorRatings[doctor.doctorId] ?? 0.0;
-                    return Text(
-                      rating.toStringAsFixed(1),
-                      style: TextStyle(color: Colors.white),
-                    );
-                  })
+                  // Obx(() {
+                  //   final rating =
+                  //       doctorController.doctorRatings[doctor.doctorId] ?? 0.0;
+                  //   return Text(
+                  //     rating.toStringAsFixed(1),
+                  //     style: TextStyle(color: Colors.white),
+                  //   );
+                  // })
 
-                  // Text("${doctorController.}", style: const TextStyle(color: Colors.white)),
+                  Text("${doctor.doctorAverageRating}",
+                      style: const TextStyle(color: Colors.white)),
                 ],
               ),
               const SizedBox(width: 12),
@@ -272,6 +273,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                           ? Get.to(() => ScheduleScreen(
                                 doctorData: doctorModel,
                                 mobileNumber: mobileNumber,
+                                username: username,
                               ))
                           : null;
 

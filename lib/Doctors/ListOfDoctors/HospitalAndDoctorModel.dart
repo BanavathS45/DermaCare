@@ -39,7 +39,7 @@ class Doctor {
   final bool doctorAvailabilityStatus;
   final double doctorAverageRating;
 
-  Doctor( {
+  Doctor({
     required this.id,
     required this.doctorId,
     required this.hospitalId,
@@ -120,11 +120,12 @@ class Hospital {
   final String address;
   final String city;
   final String contactNumber;
-  final String hospitalRegistrations;
+  
   final String openingTime;
   final String closingTime;
   final String hospitalLogo;
   final bool recommended;
+  // final String consultationExpiration;
 
   Hospital({
     required this.hospitalId,
@@ -132,11 +133,12 @@ class Hospital {
     required this.address,
     required this.city,
     required this.contactNumber,
-    required this.hospitalRegistrations,
+ 
     required this.openingTime,
     required this.closingTime,
     required this.hospitalLogo,
     required this.recommended,
+    // required this.consultationExpiration,
   });
 
   factory Hospital.fromJson(Map<String, dynamic> json) {
@@ -146,11 +148,12 @@ class Hospital {
       address: json['address'] ?? '',
       city: json['city'] ?? '',
       contactNumber: json['contactNumber'] ?? '',
-      hospitalRegistrations: json['hospitalRegistrations'] ?? '',
+    
       openingTime: json['openingTime'] ?? '',
       closingTime: json['closingTime'] ?? '',
       hospitalLogo: json['hospitalLogo'] ?? '',
       recommended: json['recommended'] ?? false,
+      // consultationExpiration: json['consultationExpiration'],
     );
   }
 }

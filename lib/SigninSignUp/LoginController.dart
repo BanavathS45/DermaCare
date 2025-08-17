@@ -46,6 +46,20 @@ class SiginSignUpController extends GetxController {
     return null; // ✅ Valid input
   }
 
+  String? validateNumber(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      return "Please enter your $fieldName";
+    }
+    if (value.length < 1) {
+      return "$fieldName must be at least 1 day long";
+    }
+    if (value.length > 3) {
+      return "$fieldName must not exceed 2 number";
+    }
+
+    return null; // ✅ Valid input
+  }
+
   String? validateAge(String? value) {
     if (value == null || value.isEmpty) {
       return "Please enter your age";
@@ -133,7 +147,7 @@ class SiginSignUpController extends GetxController {
   void submitForm(BuildContext context) async {
     final fullname = nameController.text.trim();
     final mobileNumber = mobileController.text.trim();
- 
+
     if (formKey.currentState!.validate() && agreeToTerms) {
       getOTPButton.value = "Signing...";
       isLoading.value = true;
@@ -186,14 +200,14 @@ class SiginSignUpController extends GetxController {
 
           // ✅ User is registered
           // if (isAuthenticated && isFirstTimeAuthenticated) {
-            showSnackbar("Success",
-                "OTP has been sent successfully to $mobileNumber", "success");
+          showSnackbar("Success",
+              "OTP has been sent successfully to $mobileNumber", "success");
 
-            Get.offAll(() => OTPLoginScreen(
-                  mobileNumber: mobileNumber,
-                  fullname: fullname,
-                  deviceId: token,
-                ));
+          Get.offAll(() => OTPLoginScreen(
+                mobileNumber: mobileNumber,
+                fullname: fullname,
+                deviceId: token,
+              ));
           // } else {
           //   Get.to(() => EnableBiometricScreen(
           //       mobileNumber: mobileNumber,

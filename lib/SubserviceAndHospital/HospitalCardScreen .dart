@@ -51,6 +51,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
         .then((data) {
       setState(() {
         hospitalCards = data;
+        
         isLoading = false;
       });
     }).catchError((error) {
