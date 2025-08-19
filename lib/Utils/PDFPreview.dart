@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 class PdfPreviewScreen extends StatelessWidget {
   final Uint8List pdfDataFuture;
 
-  PdfPreviewScreen({required this.pdfDataFuture});
+  PdfPreviewScreen(String path, {required this.pdfDataFuture});
 
   @override
   Widget build(BuildContext context) {

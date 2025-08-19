@@ -120,12 +120,12 @@ class Hospital {
   final String address;
   final String city;
   final String contactNumber;
-  
+  final int freeFollowUps;
   final String openingTime;
   final String closingTime;
   final String hospitalLogo;
   final bool recommended;
-  // final String consultationExpiration;
+  // final String? consultationExpiration;
 
   Hospital({
     required this.hospitalId,
@@ -138,7 +138,9 @@ class Hospital {
     required this.closingTime,
     required this.hospitalLogo,
     required this.recommended,
-    // required this.consultationExpiration,
+    required this.freeFollowUps,
+    
+      // this.consultationExpiration,
   });
 
   factory Hospital.fromJson(Map<String, dynamic> json) {
@@ -153,6 +155,7 @@ class Hospital {
       closingTime: json['closingTime'] ?? '',
       hospitalLogo: json['hospitalLogo'] ?? '',
       recommended: json['recommended'] ?? false,
+      freeFollowUps: json['freeFollowUps'] ?? 0,
       // consultationExpiration: json['consultationExpiration'],
     );
   }

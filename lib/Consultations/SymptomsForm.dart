@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_filex/open_filex.dart';
 
 import '../ConfirmBooking/ConsultationPrice.dart';
 import '../Doctors/ListOfDoctors/ConsuationDoctors.dart';
@@ -38,18 +39,38 @@ class _SymptomsFormState extends State<SymptomsForm> {
 
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true, // 👈 allow selecting multiple files
       allowedExtensions: ['pdf'],
       type: FileType.custom,
     );
-    if (result != null && result.files.single.path != null) {
-      controller.updateAttachment(File(result.files.single.path!));
+
+    if (result != null) {
+      for (var file in result.files) {
+        if (file.path != null) {
+          controller
+              .addAttachment(File(file.path!)); // 👈 call controller method
+        }
+      }
     }
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    if (pickedFile != null) {
-      controller.updateAttachment(File(pickedFile.path));
+    final ImagePicker picker = ImagePicker();
+
+    // 👇 allow multiple images only if gallery
+    if (source == ImageSource.gallery) {
+      final List<XFile>? pickedFiles = await picker.pickMultiImage();
+      if (pickedFiles != null) {
+        for (var pickedFile in pickedFiles) {
+          controller.addAttachment(File(pickedFile.path));
+        }
+      }
+    } else {
+      // 👇 single image from camera
+      final XFile? pickedFile = await picker.pickImage(source: source);
+      if (pickedFile != null) {
+        controller.addAttachment(File(pickedFile.path));
+      }
     }
   }
 
@@ -77,7 +98,6 @@ class _SymptomsFormState extends State<SymptomsForm> {
     controller.updateVisitType(selectedType);
     print("Symptoms: ${controller.symptoms.value}");
     print("updateDuration: ${controller.duration.value}");
-    print("Attachment: ${controller.attachment.value?.path}");
 
     // controller.clearForm();
 
@@ -245,7 +265,7 @@ class _SymptomsFormState extends State<SymptomsForm> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 15),
                     Text("Attach any document (if any)",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
@@ -254,66 +274,132 @@ class _SymptomsFormState extends State<SymptomsForm> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: _pickFile,
+                          onPressed: _pickFile, // pick PDF
                           icon: Icon(Icons.picture_as_pdf, color: Colors.white),
                           label: Text("PDF"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: secondaryColor, // Red for PDF
-                          ),
+                              backgroundColor: secondaryColor),
                         ),
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.camera),
                           icon: Icon(Icons.camera_alt, color: Colors.white),
                           label: Text("Camera"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: secondaryColor, // Red for PDF
-                          ),
+                              backgroundColor: secondaryColor),
                         ),
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: Icon(Icons.photo_library, color: Colors.white),
                           label: Text("Gallery"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: secondaryColor, // Red for PDF
-                          ),
+                              backgroundColor: secondaryColor),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    Center(
-                      child: Obx(() {
-                        final file = controller.attachment.value;
-                        if (file == null) return Text("No attachment selected");
 
-                        final isPDF = file.path.toLowerCase().endsWith('.pdf');
-                        return isPDF
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.picture_as_pdf,
-                                      color: Colors.red, size: 30),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    file.path.split('/').last,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w500),
+// Attachments Preview
+                    Obx(() {
+                      final files = controller.attachments;
+                      if (files.isEmpty) {
+                        return Center(child: Text("No attachments selected"));
+                      }
+
+                      return Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: List.generate(files.length, (index) {
+                          final file = files[index];
+                          final isPDF =
+                              file.path.toLowerCase().endsWith('.pdf');
+
+                          return Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  if (isPDF) {
+                                    // Open PDF with external viewer
+                                    await OpenFilex.open(file.path);
+                                  } else {
+                                    // Open Image in Preview Screen
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => Scaffold(
+                                          appBar: CommonHeader(
+                                              title: "Image Preview"),
+                                          body: Center(
+                                            child: InteractiveViewer(
+                                              child: Image.file(file),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: isPDF
+                                    ? Container(
+                                        width: 140,
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[200],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.picture_as_pdf,
+                                                color: Colors.red, size: 30),
+                                            const SizedBox(width: 5),
+                                            Expanded(
+                                              child: Text(
+                                                file.path.split('/').last,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : Container(
+                                        height: 120,
+                                        width: 120,
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.file(file,
+                                              fit: BoxFit.cover),
+                                        ),
+                                      ),
+                              ),
+                              Positioned(
+                                right: -5,
+                                top: -5,
+                                child: InkWell(
+                                  onTap: () =>
+                                      controller.removeAttachment(index),
+                                  child: CircleAvatar(
+                                    radius: 14,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.close,
+                                        size: 16, color: Colors.white),
                                   ),
-                                ],
-                              )
-                            : Container(
-                                height: 150,
-                                width: 150,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.file(file, fit: BoxFit.cover),
-                                ),
-                              );
-                      }),
-                    ),
+                              ),
+                            ],
+                          );
+                        }),
+                      );
+                    }),
                   ],
                 ),
               ),

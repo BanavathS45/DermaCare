@@ -50,8 +50,9 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
         .fetchHospitalCards(widget.selectedService!.subServiceId)
         .then((data) {
       setState(() {
-        hospitalCards = data;
         
+        hospitalCards = data;
+
         isLoading = false;
       });
     }).catchError((error) {

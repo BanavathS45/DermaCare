@@ -33,6 +33,32 @@ class AppointmentService {
     }
   }
 
+  Future<List<Getappointmentmodel>> fetchInprogressAppointments(
+      String mobileNumber) async {
+    final url = '$registerUrl/inprogressAppointments/$mobileNumber';
+    print("🔍 Service – Response url: ${url}");
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      print("🔍 Service – Response code: ${response.statusCode}");
+      print("🔍 Service – Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        final List<dynamic> data = jsonData['data'] ?? [];
+        print("📥 Service – Received ${data.length} booking items");
+
+        return data.map((e) => Getappointmentmodel.fromJson(e)).toList();
+      } else {
+        print("⚠️ Service – HTTP error: ${response.reasonPhrase}");
+        return [];
+      }
+    } catch (e) {
+      print("❌ Service – fetchAppointments Exception: $e");
+      return [];
+    }
+  }
+
   Future<Getappointmentmodel?> fetchAppointmentById(String appID) async {
     final url = '$registerUrl/getBookedService/$appID';
 

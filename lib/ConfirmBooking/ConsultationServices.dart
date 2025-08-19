@@ -12,19 +12,21 @@ import 'ConsultationController.dart';
 Future<List<ConsultationModel>> getConsultationDetails() async {
   try {
     final url = Uri.parse(consultationUrl);
+
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseBody = jsonDecode(response.body);
 
-      if (responseBody['success'] == true && responseBody['data'] != null) {
+      // ✅ Validate success and ensure data is a list
+      if (responseBody['success'] == true &&
+          responseBody['data'] != null &&
+          responseBody['data'] is List) {
         final List<dynamic> dataList = responseBody['data'];
-
-        final List<ConsultationModel> consultations = dataList
+print("ConsultationModel dataList : ${dataList}");
+        return dataList
             .map((jsonItem) => ConsultationModel.fromJson(jsonItem))
             .toList();
-
-        return consultations;
       } else {
         showSnackbar("Error", "No consultation data found", "error");
         return [];
@@ -33,8 +35,9 @@ Future<List<ConsultationModel>> getConsultationDetails() async {
       showSnackbar("Error", "API Failed: ${response.statusCode}", "error");
       return [];
     }
-  } catch (e) {
+  } catch (e, stackTrace) {
     print("API Error: $e");
+    print(stackTrace); // ✅ Debugging help
     showSnackbar("Error", "Something went wrong", "error");
     return [];
   }

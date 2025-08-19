@@ -47,7 +47,7 @@ class PaymentModeSelector extends StatelessWidget {
             style: TextStyle(
               color: mainColor,
               fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -55,18 +55,19 @@ class PaymentModeSelector extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: options.map((option) {
-                  return Obx(() {
+            Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.center, // centers horizontally
+              children: options.map((option) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0), // gap between
+                  child: Obx(() {
                     final isSelected =
                         controller.selectedPayment.value == option;
                     return GestureDetector(
                       onTap: () => controller.setPayment(option),
                       child: Container(
-                        margin: const EdgeInsets.only(right: 12),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 14,
@@ -122,9 +123,9 @@ class PaymentModeSelector extends StatelessWidget {
                         ),
                       ),
                     );
-                  });
-                }).toList(),
-              ),
+                  }),
+                );
+              }).toList(),
             ),
           ],
         ),

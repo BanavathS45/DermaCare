@@ -4,8 +4,11 @@ import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Modals/ServiceModal.dart';
 
 import 'package:cutomer_app/Screens/BookingSuccess.dart';
+import 'package:cutomer_app/Services/SubServiceServices.dart';
+import 'package:cutomer_app/TreatmentAndServices/SubserviceController.dart';
 
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/Header.dart';
@@ -13,6 +16,7 @@ import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:open_filex/open_filex.dart';
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 import '../Controller/CustomerController.dart';
 import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
@@ -37,9 +41,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final SymptomsController symptomsController = Get.put(SymptomsController());
-
+  SubService? subServiceDetails;
   // final confirmbookingcontroller = Get.find<Confirmbookingcontroller>();
   Doctor? doctor;
+  final subServiceController = Get.find<SubServiceController>();
   Hospital? hospital;
   List<ConsultationModel> _consultations = [];
   int consultationFee = 0;
@@ -51,7 +56,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     super.initState();
     doctor = widget.doctor.doctor;
     hospital = widget.doctor.hospital;
-
+    loadSubService();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final selectedId =
           consultationController.selectedConsultation.value?.consultationId ??
@@ -85,6 +90,33 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
           });
         }
       }
+    });
+  }
+
+  void loadSubService() async {
+    print("Calling loadSubService...");
+
+    final hospitalId = widget.doctor.hospital.hospitalId;
+
+    // Get the selected sub-service from controller
+    final selectedSubService = subServiceController.selectedSubService.value;
+
+    if (selectedSubService == null) {
+      print("❌ No sub-service selected");
+      return;
+    }
+
+    print("Hospital ID: $hospitalId");
+    print("Selected Sub-Service ID: ${selectedSubService.subServiceId}");
+
+    // Use subServiceId to fetch the details
+    final result = await fetchSubServiceDetails(
+        hospitalId, selectedSubService.subServiceId);
+
+    print("Fetched Sub-Service Details: $result");
+
+    setState(() {
+      subServiceDetails = result;
     });
   }
 
@@ -156,7 +188,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 style: TextStyle(
                     color: mainColor,
                     fontSize: 20,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.w600),
               ),
             ),
 
@@ -166,97 +198,157 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             infoRow("Patient Age", "${widget.patient.age} Yrs"),
             infoRow("Patient Gender", widget.patient.gender),
 
-            Divider(
-              height: 1,
-              color: secondaryColor,
-            ),
-
-            if (symptomsController.symptoms.value == "")
-              infoColumn("Patient Problem", widget.patient.problem),
-
-            SizedBox(
-              height: 15,
-            ),
-            SizedBox(height: 15),
-
-// Show Symptoms if available
-            if (symptomsController.symptoms.value.isNotEmpty)
-              Obx(() {
-                return infoColumn(
-                    "Symptoms", symptomsController.symptoms.value);
-              }),
-
-            SizedBox(height: 15),
-
 // Show Symptoms if available
             if (symptomsController.duration.value.isNotEmpty)
               Obx(() {
-                return infoColumn(
+                return infoRow(
                     "Duration", "${symptomsController.duration.value} days");
               }),
 
-            SizedBox(height: 15),
             if (symptomsController.visitType.value.isNotEmpty)
               Obx(() {
-                return infoColumn(
+                return infoRow(
                     "Visit Type", "${symptomsController.visitType.value} ");
               }),
+
+            // Show Symptoms if available
+            Obx(() {
+              return infoColumn(
+                symptomsController.symptoms.value.isNotEmpty
+                    ? "Symptoms"
+                    : "Patient Problem",
+                symptomsController.symptoms.value.isNotEmpty
+                    ? symptomsController.symptoms.value
+                    : widget.patient.problem,
+              );
+            }),
 
             SizedBox(height: 15),
 
 // Show Attachment if available
-            if (symptomsController.attachment.value != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16.0, bottom: 4),
-                    child: Text(
-                      "Attachment",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+            if (symptomsController.attachments.value != null)
+              Obx(() {
+                if (symptomsController.attachments.isEmpty) {
+                  return SizedBox.shrink();
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, bottom: 4),
+                      child: Text(
+                        "Attachments",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
-                  ),
-                  symptomsController.attachment.value!.path
-                          .toLowerCase()
-                          .endsWith('.pdf')
-                      ? Row(
-                          children: [
-                            SizedBox(width: 16),
-                            Icon(Icons.picture_as_pdf, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text(
-                              symptomsController.attachment.value!.path
-                                  .split('/')
-                                  .last,
-                              style: TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Container(
-                            height: 120,
-                            width: 120,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                symptomsController.attachment.value!,
-                                fit: BoxFit.cover,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: List.generate(
+                            symptomsController.attachments.length, (index) {
+                          final file = symptomsController.attachments[index];
+                          final isPdf =
+                              file.path.toLowerCase().endsWith('.pdf');
+
+                          final isPDF =
+                              file.path.toLowerCase().endsWith('.pdf');
+                          return Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  if (isPDF) {
+                                    await OpenFilex.open(file.path);
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => Scaffold(
+                                          appBar: CommonHeader(
+                                            title: "Image Preview",
+                                          ),
+                                          body: Center(
+                                            child: InteractiveViewer(
+                                              child: Image.file(file),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: isPDF
+                                    ? Container(
+                                        width: 140,
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey[200],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.picture_as_pdf,
+                                                color: Colors.red, size: 30),
+                                            const SizedBox(width: 5),
+                                            Expanded(
+                                              child: Text(
+                                                file.path.split('/').last,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : Container(
+                                        height: 120,
+                                        width: 120,
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.file(file,
+                                              fit: BoxFit.cover),
+                                        ),
+                                      ),
                               ),
-                            ),
-                          ),
-                        ),
-                  SizedBox(height: 15),
-                ],
-              ),
+                              Positioned(
+                                right: -5,
+                                top: -5,
+                                child: InkWell(
+                                  onTap: () => symptomsController
+                                      .removeAttachment(index),
+                                  child: CircleAvatar(
+                                    radius: 14,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.close,
+                                        size: 16, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                  ],
+                );
+              }),
 
             Divider(
               height: 1,
@@ -273,7 +365,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 style: TextStyle(
                     color: mainColor,
                     fontSize: 20,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.w600),
               ),
             ),
             SizedBox(
@@ -282,7 +374,21 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                infoRow("${consultationType} Fee", "₹ ${consultationFee}"),
+                infoRow("Consultation Fee",
+                    "₹ ${subServiceDetails?.consultationFee.toStringAsFixed(0)}"),
+                infoRow(
+                    "${consultationController.selectedConsultation.value?.consultationType} Fee",
+                    "₹ ${subServiceDetails?.price.toStringAsFixed(0)}"),
+                infoRow("GST (${subServiceDetails?.gst}%)",
+                    "₹ ${subServiceDetails?.gst}"),
+                infoRow(
+                    "Tax (${subServiceDetails?.taxPercentage.toStringAsFixed(0)}%)",
+                    "₹ ${subServiceDetails?.taxAmount.toStringAsFixed(0)}"),
+                infoRow(
+                    "Discounted Amount (${subServiceDetails?.discountPercentage.toStringAsFixed(0)}%)",
+                    "₹ ${subServiceDetails?.discountAmount.toStringAsFixed(0)}"),
+                infoRow("Total Fee",
+                    "₹ ${subServiceDetails?.finalCost.toStringAsFixed(0)}"),
 
                 // infoRow("Platform Fee", "₹ ${platformFee}"),
                 // infoRow("Total Fee", "₹ ${consultationFee}"),
@@ -317,47 +423,51 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             print("Selected Payment: $selectedPayment");
 
             final bookingDetails = BookingDetailsModel(
-                subServiceName: globalServiceId == "ST_01"
-                    ? selectedServicesController
-                        .selectedSubServices.first.subServiceName
-                    : "NA",
-                subServiceId: globalServiceId == "ST_01"
-                    ? selectedServicesController
-                        .selectedSubServices.first.subServiceId
-                    : "NA",
-                doctorId: widget.doctor.doctor.doctorId,
-                consultationType: consultationController
-                    .selectedConsultation.value!.consultationType,
-                consultationFee: consultationFee.toDouble(),
-                totalFee: (consultationFee).toDouble(),
-                clinicId: widget.doctor.hospital.hospitalId,
-                doctorDeviceId: widget.doctor.doctor.deviceId,
-                clinicAddress: widget.doctor.hospital.address,
-                categoryName: globalServiceId == "ST_01"
-                    ? selectedServicesController
-                        .selectedSubServices.first.categoryName
-                    : "NA",
-                categoryId: globalServiceId == "ST_01"
-                    ? selectedServicesController
-                        .selectedSubServices.first.categoryId
-                    : "NA",
-                servicename: globalServiceId == "ST_01"
-                    ? selectedServicesController
-                        .selectedSubServices.first.serviceName
-                    : "NA",
-                serviceId: globalServiceId == "ST_01"
-                    ? selectedServicesController
-                        .selectedSubServices.first.serviceID
-                    : "NA",
-                clinicName: widget.doctor.hospital.name,
-                doctorName: widget.doctor.doctor.doctorName,
-                // consultationExpiration:
-                //     widget.doctor.hospital.consultationExpiration,
-                consultationExpiration: "15 days",
-                paymentType: "Pay at Hospital",
-                visitType: 'firsttime',
-                symptomsDuration: "1 week" //TODO:develop in UI
-                );
+              subServiceName: globalServiceId == "ST_01"
+                  ? selectedServicesController
+                      .selectedSubServices.first.subServiceName
+                  : "NA",
+              subServiceId: globalServiceId == "ST_01"
+                  ? selectedServicesController
+                      .selectedSubServices.first.subServiceId
+                  : "NA",
+              doctorId: widget.doctor.doctor.doctorId,
+              consultationType: consultationController
+                  .selectedConsultation.value!.consultationType,
+              consultationFee: consultationFee.toDouble(),
+              totalFee: (consultationFee).toDouble(),
+              clinicId: widget.doctor.hospital.hospitalId,
+              doctorDeviceId: widget.doctor.doctor.deviceId,
+              clinicAddress: widget.doctor.hospital.address,
+              categoryName: globalServiceId == "ST_01"
+                  ? selectedServicesController
+                      .selectedSubServices.first.categoryName
+                  : "NA",
+              categoryId: globalServiceId == "ST_01"
+                  ? selectedServicesController
+                      .selectedSubServices.first.categoryId
+                  : "NA",
+              servicename: globalServiceId == "ST_01"
+                  ? selectedServicesController
+                      .selectedSubServices.first.serviceName
+                  : "NA",
+              serviceId: globalServiceId == "ST_01"
+                  ? selectedServicesController
+                      .selectedSubServices.first.serviceId
+                  : "NA",
+              clinicName: widget.doctor.hospital.name,
+              doctorName: widget.doctor.doctor.doctorName,
+              // consultationExpiration:
+              //     widget.doctor.hospital.consultationExpiration,
+              consultationExpiration: "15 days",
+              paymentType: "Pay at Hospital",
+              visitType: symptomsController.visitType.value,
+              symptomsDuration:
+                  "${symptomsController.duration.value} Days", //TODO:develop in UI
+
+              attachments: symptomsController.attachments.value,
+              freeFollowUps: widget.doctor.hospital.freeFollowUps,
+            );
 
             // 📦 Model ready for API
             final postBookingPayload = PostBookingModel(
@@ -481,7 +591,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         children: [
           Text(
             "${title} ",
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.w600),
           ),
           Text(info)
         ],
@@ -498,7 +608,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         children: [
           Text(
             "${title}: ",
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.w600),
           ),
           SizedBox(
             height: 10,
@@ -643,13 +753,16 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   }
 
   String consultationType = "";
+
   Future<Widget> _getServiceButton(String id) async {
+    print("Fetching consultation for ID: $id");
     Color color = Colors.white;
     int consultationFee = 0;
+    String consultationType = '';
 
     final consultations = await getConsultationDetails();
 
-    // Find consultation by ID safely
+    // ✅ Search in the list of ConsultationModel
     final matchedConsultation = consultations.firstWhere(
       (c) => c.consultationId == id,
       orElse: () => ConsultationModel(
@@ -659,6 +772,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     );
 
     consultationType = matchedConsultation.consultationType;
+
+    print("consultationType: $consultationType");
 
     if (consultationType.toLowerCase().contains('service')) {
       consultationFee = selectedServicesController
@@ -672,6 +787,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
       consultationFee = 0;
       color = Colors.grey;
     }
+
+    print("consultationFee: $consultationFee");
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -734,9 +851,13 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     print("title __ ${title}");
     print("fee __ ${fee}");
     print("id __ ${id}");
-    final services = selectedServicesController.selectedSubServices;
-    print(
-        "selectedServicesControllersdds __ ${selectedServicesController.selectedSubServices.first.finalCost}");
+    final services;
+    if (title == "Services & Treatments") {
+      services = selectedServicesController.selectedSubServices;
+      print(
+          "selectedServicesControllersdds __ ${selectedServicesController.selectedSubServices.first.finalCost}");
+    }
+
     DateTime date = DateTime.parse(widget.patient.serviceDate);
     String dayName = DateFormat('EEEE').format(date);
     return Padding(
@@ -770,50 +891,77 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             ],
           ),
           const SizedBox(width: 5),
-          Expanded(child: Obx(() {
-            if (services.isEmpty) {
-              return const Text(
-                "No services selected",
-                style: TextStyle(color: Colors.white),
-              );
-            }
+          Expanded(
+            child: Obx(() {
+              // Only show sub-services if ST_01
+              if (consultationController
+                      .selectedConsultation.value?.consultationId ==
+                  "ST_01") {
+                final services = selectedServicesController.selectedSubServices;
+                if (services.isEmpty) {
+                  return const Text(
+                    "No services selected",
+                    style: TextStyle(color: Colors.black),
+                  );
+                }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: services.map((service) {
-                return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Center(
-                        child: Text(
-                          "${consultationController.selectedConsultation.value?.consultationId == "ST_01" ? selectedServicesController.selectedSubServices.first.subServiceName : ""}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: mainColor,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: services.map((service) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 10),
+                      child: Column(
+                        children: [
+                          Text(
+                            service.subServiceName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: mainColor,
+                            ),
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
                           ),
-                          maxLines: 2,
-                          textAlign: TextAlign.center,
-                        ),
+                          Text(
+                            "Price: ₹ ${service.finalCost.toStringAsFixed(0)}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: mainColor,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        "Price: ₹ ${(fee).toStringAsFixed(0)}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: mainColor,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+                    );
+                  }).toList(),
                 );
-              }).toList(),
-            );
-          }))
+              } else {
+                // For other consultation types, show only the consultation fee
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Consultation Fee",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: mainColor,
+                      ),
+                    ),
+                    Text(
+                      "₹ ${fee.toStringAsFixed(0)}",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: mainColor,
+                      ),
+                    )
+                  ],
+                );
+              }
+            }),
+          ),
         ],
       ),
     );

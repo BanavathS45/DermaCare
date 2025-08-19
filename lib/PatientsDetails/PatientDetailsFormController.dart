@@ -15,6 +15,8 @@ class Patientdetailsformcontroller extends GetxController {
       TextEditingController();
 
   final TextEditingController notesController = TextEditingController();
+  final TextEditingController durationController = TextEditingController();
+  
   Registercontroller registercontroller = Registercontroller();
   final Color activeColor = mainColor;
   final Color inactiveColor = Colors.transparent;

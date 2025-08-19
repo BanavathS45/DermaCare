@@ -94,10 +94,14 @@ import 'dart:typed_data';
 //   }
 // ]
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 class SubService {
+  final String hospitalId;
   final String subServiceId;
   final String subServiceName;
-  final String serviceID;
+  final String serviceId;
   final String serviceName;
   final String categoryName;
   final String categoryId;
@@ -105,34 +109,39 @@ class SubService {
   final String viewDescription;
   final String status;
   final Uint8List subServiceImage;
-  final Uint8List viewImage; // Removed this line
   final String minTime;
-  final List<DescriptionQA> descriptionQA;
+  final List<DescriptionQA> preProcedureQA;
+  final List<DescriptionQA> procedureQA;
+  final List<DescriptionQA> postProcedureQA;
   final double price;
   final double discountPercentage;
   final double taxPercentage;
   final double platformFeePercentage;
-  final double discountAmount; // Removed this line
-  final double taxAmount; // Removed this line
-  final double platformFee; // Removed this line
-  final double discountedCost; // Removed this line
-  final double clinicPay; // Removed this line
-  final double finalCost; // Removed this line
+  final double discountAmount;
+  final double taxAmount;
+  final double platformFee;
+  final double discountedCost;
+  final double clinicPay;
+  final double finalCost;
+  final double consultationFee;
+  final int gst;
 
   SubService({
+    required this.hospitalId,
     required this.subServiceId,
-    required this.serviceID,
-    required this.serviceName,
     required this.subServiceName,
+    required this.serviceId,
+    required this.serviceName,
     required this.categoryName,
     required this.categoryId,
     required this.description,
     required this.viewDescription,
     required this.status,
     required this.subServiceImage,
-    required this.viewImage,
     required this.minTime,
-    required this.descriptionQA,
+    required this.preProcedureQA,
+    required this.procedureQA,
+    required this.postProcedureQA,
     required this.price,
     required this.discountPercentage,
     required this.taxPercentage,
@@ -143,14 +152,17 @@ class SubService {
     required this.discountedCost,
     required this.clinicPay,
     required this.finalCost,
+    required this.consultationFee,
+    required this.gst,
   });
 
   factory SubService.fromJson(Map<String, dynamic> json) {
     return SubService(
+      hospitalId: json['hospitalId'] ?? '',
       subServiceId: json['subServiceId'] ?? '',
-      serviceID: json['serviceID'] ?? '',
-      serviceName: json['serviceName'] ?? '',
       subServiceName: json['subServiceName'] ?? '',
+      serviceId: json['serviceId'] ?? '',
+      serviceName: json['serviceName'] ?? '',
       categoryName: json['categoryName'] ?? '',
       categoryId: json['categoryId'] ?? '',
       description: json['description'] ?? '',
@@ -160,11 +172,16 @@ class SubService {
               json['subServiceImage'].isNotEmpty)
           ? base64Decode(json['subServiceImage'])
           : Uint8List(0),
-      viewImage: (json['viewImage'] != null && json['viewImage'].isNotEmpty)
-          ? base64Decode(json['viewImage'])
-          : Uint8List(0),
       minTime: json['minTime'] ?? '',
-      descriptionQA: (json['descriptionQA'] as List<dynamic>?)
+      preProcedureQA: (json['preProcedureQA'] as List<dynamic>?)
+              ?.map((e) => DescriptionQA.fromJson(e))
+              .toList() ??
+          [],
+      procedureQA: (json['procedureQA'] as List<dynamic>?)
+              ?.map((e) => DescriptionQA.fromJson(e))
+              .toList() ??
+          [],
+      postProcedureQA: (json['postProcedureQA'] as List<dynamic>?)
               ?.map((e) => DescriptionQA.fromJson(e))
               .toList() ??
           [],
@@ -178,24 +195,28 @@ class SubService {
       discountedCost: (json['discountedCost'] ?? 0).toDouble(),
       clinicPay: (json['clinicPay'] ?? 0).toDouble(),
       finalCost: (json['finalCost'] ?? 0).toDouble(),
+      consultationFee: (json['consultationFee'] ?? 0).toDouble(),
+      gst: (json['gst'] ?? 0),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'hospitalId': hospitalId,
       'subServiceId': subServiceId,
-      'serviceID': serviceID,
-      'serviceName': subServiceId,
       'subServiceName': subServiceName,
+      'serviceId': serviceId,
+      'serviceName': serviceName,
       'categoryName': categoryName,
       'categoryId': categoryId,
       'description': description,
       'viewDescription': viewDescription,
       'status': status,
-      'subServiceImage': subServiceImage,
-      'viewImage': viewImage,
+      'subServiceImage': base64Encode(subServiceImage),
       'minTime': minTime,
-      'descriptionQA': descriptionQA.map((e) => e.toJson()).toList(),
+      'preProcedureQA': preProcedureQA.map((e) => e.toJson()).toList(),
+      'procedureQA': procedureQA.map((e) => e.toJson()).toList(),
+      'postProcedureQA': postProcedureQA.map((e) => e.toJson()).toList(),
       'price': price,
       'discountPercentage': discountPercentage,
       'taxPercentage': taxPercentage,
@@ -206,6 +227,8 @@ class SubService {
       'discountedCost': discountedCost,
       'clinicPay': clinicPay,
       'finalCost': finalCost,
+      'consultationFee': consultationFee,
+      'gst': gst,
     };
   }
 }
@@ -217,8 +240,12 @@ class DescriptionQA {
 
   factory DescriptionQA.fromJson(Map<String, dynamic> json) {
     return DescriptionQA(
-      qa: Map<String, List<String>>.from(json.map((key, value) =>
-          MapEntry(key, List<String>.from(value.map((e) => e.toString()))))),
+      qa: Map<String, List<String>>.from(
+        json.map((key, value) => MapEntry(
+            key,
+            List<String>.from(
+                (value as List<dynamic>).map((e) => e.toString())))),
+      ),
     );
   }
 

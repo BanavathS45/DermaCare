@@ -24,6 +24,7 @@ class Serviceselectioncontroller extends GetxController {
   final RxList<Service> filteredServices = <Service>[].obs;
 
   final RxBool isLoading = true.obs;
+  
 
   fetchImages() async {
     iamgeloading = true;

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import '../../PatientsDetails/PatientModel.dart';
 
 class BookingDetailsModel {
@@ -21,7 +24,8 @@ class BookingDetailsModel {
   final String visitType;
   final String symptomsDuration;
 
-  final List<String>? attachments; // ✅ optional
+  final List<File>? attachments; // ✅ optional
+  final int freeFollowUps;
 
   BookingDetailsModel({
     required this.categoryName,
@@ -43,6 +47,7 @@ class BookingDetailsModel {
     required this.paymentType,
     required this.visitType,
     required this.symptomsDuration,
+    required this.freeFollowUps,
     this.attachments, // ✅ nullable
   });
 
@@ -64,10 +69,11 @@ class BookingDetailsModel {
       doctorDeviceId: json['doctorDeviceId'],
       consultationType: json['consultationType'],
       consultationFee: (json['consultationFee'] ?? 0).toDouble(),
+      freeFollowUps: (json['freeFollowUps'] ?? 0),
       totalFee: (json['totalFee'] ?? 0).toDouble(),
       paymentType: json["paymentType"] ?? "",
       attachments: json["attachments"] != null
-          ? List<String>.from(json["attachments"])
+          ? List<File>.from(json["attachments"])
           : null,
       consultationExpiration: json["consultationExpiration"] ?? "",
       visitType: json["visitType"] ?? "",
@@ -94,9 +100,15 @@ class BookingDetailsModel {
       'consultationFee': consultationFee,
       'totalFee': totalFee,
       "paymentType": paymentType,
-      "attachments": attachments,
+      "attachments": attachments != null
+          ? attachments!
+              .map((file) =>
+                  base64Encode(file.readAsBytesSync())) // ✅ convert to base64
+              .toList()
+          : [],
       "consultationExpiration": consultationExpiration,
       "visitType": visitType,
+      "freeFollowUps": freeFollowUps,
     };
   }
 }

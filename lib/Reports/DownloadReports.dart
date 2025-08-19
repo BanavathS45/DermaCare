@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart'; // Optional: to open the file directly
+// import 'package:open_file/open_file.dart'; // Optional: to open the file directly
 
 Future<void> downloadAndOpenReport(String base64Str) async {
   try {
@@ -16,7 +17,7 @@ Future<void> downloadAndOpenReport(String base64Str) async {
     await file.writeAsBytes(decodedBytes);
 
     // Optionally open the file using OpenFile plugin
-    await OpenFile.open(file.path);
+    await OpenFilex.open(file.path);
 
     print("✅ File saved and opened: ${file.path}");
   } catch (e) {

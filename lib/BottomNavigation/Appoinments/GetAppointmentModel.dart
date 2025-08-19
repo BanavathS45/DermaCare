@@ -118,37 +118,45 @@ class Getappointmentmodel {
   final double totalFee;
   final String bookedAt;
   final String? relation;
+  final String patientId;
+  final int freeFollowUps;
+  final String clinicName;
+  final String doctorName;
 
-  Getappointmentmodel({
-    required this.bookingId,
-    required this.relation,
-    required this.bookingFor,
-    required this.name,
-    required this.age,
-    required this.gender,
-    required this.mobileNumber,
-    required this.problem,
-    required this.subServiceName,
-    required this.subServiceId,
-    required this.doctorId,
-    required this.clinicId,
-    required this.serviceDate,
-    required this.servicetime,
-    required this.consultationType,
-    required this.consultationFee,
-    this.channelId,
-    this.reasonForCancel,
-    this.notes,
-    this.reports,
-    required this.status,
-    required this.totalFee,
-    required this.bookedAt,
-  });
+  Getappointmentmodel(
+      {required this.bookingId,
+      required this.relation,
+      required this.bookingFor,
+      required this.name,
+      required this.age,
+      required this.gender,
+      required this.mobileNumber,
+      required this.problem,
+      required this.subServiceName,
+      required this.subServiceId,
+      required this.doctorId,
+      required this.clinicId,
+      required this.serviceDate,
+      required this.servicetime,
+      required this.consultationType,
+      required this.consultationFee,
+      this.channelId,
+      this.reasonForCancel,
+      this.notes,
+      this.reports,
+      required this.status,
+      required this.totalFee,
+      required this.bookedAt,
+      required this.patientId,
+      required this.freeFollowUps,
+      required this.clinicName,
+      required this.doctorName});
 
   factory Getappointmentmodel.fromJson(Map<String, dynamic> json) {
     try {
       return Getappointmentmodel(
         bookingId: json['bookingId']?.toString() ?? '',
+        patientId: json['patientId']?.toString() ?? '',
         relation: json['relation']?.toString() ?? '',
         bookingFor: json['bookingFor']?.toString() ?? '',
         name: json['name']?.toString() ?? '',
@@ -163,6 +171,8 @@ class Getappointmentmodel {
         serviceDate: json['serviceDate']?.toString() ?? '',
         servicetime: json['servicetime']?.toString() ?? '',
         consultationType: json['consultationType']?.toString() ?? '',
+        clinicName: json['clinicName']?.toString() ?? '',
+        doctorName: json['doctorName']?.toString() ?? '',
 
         // 👇 Safely parse doubles
         consultationFee:
@@ -175,6 +185,7 @@ class Getappointmentmodel {
         reports:
             json['reports'] != null ? Reports.fromJson(json['reports']) : null,
         status: json['status']?.toString() ?? '',
+        freeFollowUps: json['freeFollowUps'] ?? 0,
 
         // 👇 Same for totalFee
         totalFee: double.tryParse(json['totalFee'].toString()) ?? 0.0,

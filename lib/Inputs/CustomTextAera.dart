@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextAera extends StatelessWidget {
@@ -20,14 +21,25 @@ class CustomTextAera extends StatelessWidget {
     return TextFormField(
       // ✅ Use TextFormField for validation
       controller: controller,
-      maxLines: null,
+      maxLines: 2,
       keyboardType: TextInputType.multiline,
       validator: validator,
       onChanged: onChanged,
+     
       decoration: InputDecoration(
-        labelText: labelText,
+        labelText: "Enter Your problem....",
+        labelStyle: TextStyle(color: Colors.grey[600]),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: mainColor, width: 1.5),
+          borderRadius: BorderRadius.circular(8.0),
         ),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 12, horizontal: 16),

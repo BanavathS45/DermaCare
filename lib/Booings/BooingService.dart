@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cutomer_app/Booings/FollowUpModal.dart';
 import 'package:http/http.dart' as http;
 
 import '../APIs/BaseUrl.dart';
@@ -7,6 +8,35 @@ import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 
 Future<Map<String, dynamic>?> postBookings(
     PostBookingModel bookingDetails) async {
+  final Url = Uri.parse(BookingUrl); // Replace with your endpoint
+  print("response.body Url: ${Url}");
+
+  try {
+    final response = await http.post(
+      Url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(bookingDetails.toJson()),
+    );
+    print("response.body....: ${response.body}");
+    print("response.body....: ${jsonEncode(bookingDetails.toJson())}");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Booking posted successfully!');
+      print("response.body....: ${response.body}");
+      
+      return jsonDecode(response.body); // Return response data
+    } else {
+      print('Failed to post booking. Status code: ${response.statusCode}');
+      return null; // Return null in case of failure
+    }
+  } catch (e) {
+    print("Error posting booking: $e");
+    return null; // Return null in case of error
+  }
+}
+
+Future<Map<String, dynamic>?> followUpBookings(
+    FollowUpModal bookingDetails) async {
   final Url = Uri.parse(BookingUrl); // Replace with your endpoint
   print("response.body Url: ${Url}");
 

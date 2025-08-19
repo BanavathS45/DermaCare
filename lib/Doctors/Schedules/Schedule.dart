@@ -223,7 +223,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     // Get.to(() => Confirmbookingdetails(doctor: doctorData, patient: patientData));
                     print('Doctor 8888: ${widget.doctorData}');
                     print('Patient: $patientmodel');
+                    if (consultationController.selectedConsultation.value?.consultationType == "Services & Treatments") {
+                      symptomsController.updateDuration(
+                          patientdetailsformcontroller.durationController.text);
+                      print(
+                          "patientdetailsformcontroller.durationController.text ${patientdetailsformcontroller.durationController.text}");
+                    }
 
+                    // symptomsController.updateDuration( patientdetailsformcontroller.durationController.text);
                     Get.to(Confirmbookingdetails(
                       doctor: widget.doctorData,
                       patient: patientmodel,

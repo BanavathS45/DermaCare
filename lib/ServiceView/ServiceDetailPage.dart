@@ -41,10 +41,10 @@ class ServiceDetailsPage extends StatefulWidget {
 }
 
 class _ServiceDetailsPageState extends State<ServiceDetailsPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late ApiService apiService;
   SubService? subServiceDetails;
-
+  late TabController _tabController;
   bool isLoading = false;
 
   late AnimationController _animationController;
@@ -58,6 +58,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
   void initState() {
     super.initState();
     print('🔍 hospitalId: ${widget.hospitalId}');
+    _tabController = TabController(length: 3, vsync: this);
 
     apiService = ApiService();
     loadSubService();
@@ -72,6 +73,12 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
       begin: Colors.grey[300],
       end: Colors.grey[100],
     ).animate(_animationController);
+  }
+
+  void _nextTab() {
+    if (_tabController.index < 2) {
+      _tabController.animateTo(_tabController.index + 1);
+    }
   }
 
   @override
@@ -225,45 +232,66 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 ),
               ),
               Text(
-                formatDuration(int.tryParse(subServiceDetails!.minTime)),
+                (subServiceDetails!.minTime),
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
 
               // Description Q&A
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ...subServiceDetails!.descriptionQA.expand((descQA) {
-                    return descQA.qa.entries.map((entry) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              entry.key, // Question
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ...entry.value.map((answer) => Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, bottom: 4.0),
-                                  child: Text(
-                                    "• $answer", // Answer
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                )),
-                          ],
+              if ((subServiceDetails?.preProcedureQA?.isNotEmpty ?? false) ||
+                  (subServiceDetails?.procedureQA?.isNotEmpty ?? false) ||
+                  (subServiceDetails?.postProcedureQA?.isNotEmpty ?? false))
+                Builder(
+                  builder: (context) {
+                    final List<Tab> tabs = [];
+                    final List<Widget> tabViews = [];
+
+                    if (subServiceDetails?.preProcedureQA?.isNotEmpty ??
+                        false) {
+                      tabs.add(const Tab(text: "Pre-Procedure"));
+                      tabViews
+                          .add(buildQAList(subServiceDetails!.preProcedureQA));
+                    }
+
+                    if (subServiceDetails?.procedureQA?.isNotEmpty ?? false) {
+                      tabs.add(const Tab(text: "Procedure"));
+                      tabViews.add(buildQAList(subServiceDetails!.procedureQA));
+                    }
+
+                    if (subServiceDetails?.postProcedureQA?.isNotEmpty ??
+                        false) {
+                      tabs.add(const Tab(text: "Post-Procedure"));
+                      tabViews
+                          .add(buildQAList(subServiceDetails!.postProcedureQA));
+                    }
+
+                    return Column(
+                      children: [
+                        TabBar(
+                          controller: _tabController,
+                          labelColor: mainColor,
+                          unselectedLabelColor: Colors.grey,
+                          indicatorColor: mainColor,
+                          labelStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          labelPadding:
+                              const EdgeInsets.symmetric(horizontal: 2),
+                          tabs: tabs,
                         ),
-                      );
-                    });
-                  }),
-                ],
-              ),
+                        SizedBox(
+                          height: 300,
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: tabViews,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+
               const SizedBox(height: 16),
             ],
           ),
@@ -288,7 +316,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "₹ ${subServiceDetails!.finalCost.toStringAsFixed(0)}",
+                      "₹ ${subServiceDetails?.finalCost.toStringAsFixed(0)}",
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -313,7 +341,6 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
             TextButton(
               onPressed: subServiceDetails!.finalCost > 0
                   ? () {
-                   
                       Get.to(() => Doctorscreen(
                             mobileNumber: widget.mobileNumber,
                             username: widget.username,
@@ -360,6 +387,50 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildQAList(List<DescriptionQA> qaList) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...qaList.expand((descQA) {
+            return descQA.qa.entries.map((entry) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      entry.key,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...entry.value.map((answer) => Padding(
+                          padding:
+                              const EdgeInsets.only(left: 8.0, bottom: 4.0),
+                          child: Text(
+                            "• $answer",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        )),
+                  ],
+                ),
+              );
+            });
+          }),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _nextTab,
+            child: const Text("Next"),
+          ),
+        ],
       ),
     );
   }

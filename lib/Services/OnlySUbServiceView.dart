@@ -1,4 +1,5 @@
 import 'package:cutomer_app/ServiceView/ServiceDetailPage.dart';
+import 'package:cutomer_app/TreatmentAndServices/SubserviceController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
   List<SubServiceAdmin> dynamicSubServices = [];
   bool isSubServiceLoading = false;
   SubServiceAdmin? selectedSubService;
-
+  final subServiceController = Get.put(SubServiceController());
   var suggestion;
   @override
   void initState() {
@@ -404,6 +405,8 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                                 dynamicSubServices.isEmpty)
                             ? null // ❌ disable button
                             : () {
+                                subServiceController
+                                    .setSelectedSubService(selectedSubService!);
                                 Navigator.pop(context);
                                 Navigator.push(
                                   context,

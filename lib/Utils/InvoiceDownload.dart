@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:cutomer_app/Utils/PDFPreview.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:open_file/open_file.dart';
+// import 'package:open_file/open_file.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -376,7 +377,7 @@ class InvoicePage {
           action: SnackBarAction(
             label: "Open",
             onPressed: () async {
-              final result = await OpenFile.open(filePath);
+              final result = await OpenFilex.open(file.path);
               if (result.type != ResultType.done) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

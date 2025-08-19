@@ -41,8 +41,12 @@ class Doctorscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String base64String =
-        doctorController.filteredDoctors.first.hospital.hospitalLogo;
+    String? base64String;
+    if (doctorController.filteredDoctors.isNotEmpty) {
+      base64String =
+          doctorController.filteredDoctors.first.hospital.hospitalLogo;
+    }
+
     return Scaffold(
       appBar: CommonHeader(
         title: "Doctors & Hospitals",
@@ -88,10 +92,11 @@ class Doctorscreen extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 25,
-                          backgroundImage:
-                              MemoryImage(base64Decode(base64String)),
-                          onBackgroundImageError: (_, __) =>
-                              const Icon(Icons.person),
+                          backgroundImage: base64String != null
+                              ? MemoryImage(base64Decode(base64String))
+                              : null,
+                          child:
+                              base64String == null ? Icon(Icons.person) : null,
                         ),
                         const SizedBox(width: 10),
                         Expanded(
@@ -176,7 +181,8 @@ class Doctorscreen extends StatelessWidget {
                               context,
                               doctorController.filteredDoctors[index],
                               doctorController,
-                              mobileNumber,username);
+                              mobileNumber,
+                              username);
                         },
                       ),
               ),

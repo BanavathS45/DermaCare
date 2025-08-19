@@ -206,6 +206,7 @@ import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:cutomer_app/PushNotification/PushNotification.dart';
 import 'package:cutomer_app/Routes/Navigation.dart';
 import 'package:cutomer_app/SubserviceAndHospital/HospitalCardScreen%20.dart';
+import 'package:cutomer_app/TreatmentAndServices/SubserviceController.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -284,6 +285,7 @@ Future<void> main() async {
   Get.put(CallController());
   Get.put(SymptomsController());
   Get.put(VisitController());
+  Get.put(SubServiceController());
 
   
 
