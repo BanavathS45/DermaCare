@@ -50,7 +50,8 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                         ),
                       ),
                       TextSpan(
-                        text: "(${hospital.city})",
+                        text:
+                            "(${(hospital.branch != null && hospital.branch!.isNotEmpty) ? hospital.branch : hospital.city})",
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,

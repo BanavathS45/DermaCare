@@ -5,6 +5,7 @@ import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:cutomer_app/Services/SubServiceServices.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:cutomer_app/ServiceView/FetchViewService.dart';
@@ -52,18 +53,27 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
   final Serviceselectioncontroller serviceselectioncontroller =
       Get.put(Serviceselectioncontroller());
   final serviceFetcher = Get.put(ServiceFetcher());
-  // Replace with your data model.
+  Set<int> visitedTabs = {};
 
+  @override
   @override
   void initState() {
     super.initState();
-    print('🔍 hospitalId: ${widget.hospitalId}');
     _tabController = TabController(length: 3, vsync: this);
+    visitedTabs.add(0);
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging == false) {
+        setState(() {
+          visitedTabs.add(_tabController.index);
+        });
+      }
+    });
 
     apiService = ApiService();
     loadSubService();
 
-    // Initialize animation for skeleton loading
+    // animation for skeleton
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -80,6 +90,8 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
       _tabController.animateTo(_tabController.index + 1);
     }
   }
+
+  late int requiredTabs = 0;
 
   @override
   void dispose() {
@@ -119,6 +131,27 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+    int requiredTabs = 0;
+    if (subServiceDetails?.preProcedureQA?.isNotEmpty ?? false) requiredTabs++;
+    if (subServiceDetails?.procedureQA?.isNotEmpty ?? false) requiredTabs++;
+    if (subServiceDetails?.postProcedureQA?.isNotEmpty ?? false) requiredTabs++;
+
+    // 🔹 Step 2: Figure out availability
+    bool procedureAvailable = requiredTabs > 0;
+
+    // 🔹 Step 3: Check if all tabs are read
+    bool allTabsRead =
+        !procedureAvailable || visitedTabs.length >= requiredTabs;
+
+    // bool procedureAvailable =
+    //     (subServiceDetails?.preProcedureQA?.isNotEmpty ?? false) ||
+    //         (subServiceDetails?.procedureQA?.isNotEmpty ?? false) ||
+    //         (subServiceDetails?.postProcedureQA?.isNotEmpty ?? false);
+
+    // bool allTabsRead = procedureAvailable &&
+    //     requiredTabs > 0 &&
+    //     visitedTabs.length >= requiredTabs;
+
     if (subServiceDetails == null) {
       // Show loading indicator while data is being fetched
       return Scaffold(
@@ -127,7 +160,12 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
           onNotificationPressed: () {},
           onSettingPressed: () {},
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: SpinKitFadingCircle(
+            color: Colors.blue,
+            size: 40.0,
+          ),
+        ),
       );
     }
     return Scaffold(
@@ -211,7 +249,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               const SizedBox(height: 16),
 
               const Text(
-                'Sub Service Name:',
+                'Procedure Name:',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -225,14 +263,14 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               const SizedBox(height: 16),
 
               const Text(
-                'Service Duration:',
+                'Procedure Duration:',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                (subServiceDetails!.minTime),
+                ("${subServiceDetails!.minTime} Min"),
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
@@ -252,18 +290,18 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                       tabViews
                           .add(buildQAList(subServiceDetails!.preProcedureQA));
                     }
-
                     if (subServiceDetails?.procedureQA?.isNotEmpty ?? false) {
                       tabs.add(const Tab(text: "Procedure"));
                       tabViews.add(buildQAList(subServiceDetails!.procedureQA));
                     }
-
                     if (subServiceDetails?.postProcedureQA?.isNotEmpty ??
                         false) {
                       tabs.add(const Tab(text: "Post-Procedure"));
                       tabViews
                           .add(buildQAList(subServiceDetails!.postProcedureQA));
                     }
+
+                    requiredTabs = tabs.length;
 
                     return Column(
                       children: [
@@ -339,7 +377,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               margin: const EdgeInsets.symmetric(horizontal: 16),
             ),
             TextButton(
-              onPressed: subServiceDetails!.finalCost > 0
+              onPressed: allTabsRead
                   ? () {
                       Get.to(() => Doctorscreen(
                             mobileNumber: widget.mobileNumber,
@@ -352,20 +390,10 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                           Get.find<SelectedServicesController>();
                       selectedServicesController
                           .updateSelectedSubServices([subServiceDetails!]);
-                      // WidgetsBinding.instance.addPostFrameCallback((_) {
-                      //   final selectedServicesController =
-                      //       Get.find<SelectedServicesController>();
-                      //   selectedServicesController
-                      //       .setHospitalId(widget.hospitalId);
-
-                      //   // Or any other state update or navigation
-                      //   print("Hospital ID set post build");
-                      // });
-
                       selectedServicesController
                           .setHospitalId(widget.hospitalId);
                     }
-                  : null, // disables the button
+                  : null, // disables button completely
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
                 padding:
@@ -373,15 +401,17 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
-                // backgroundColor: widget.selectedService.price > 0
-                //     ? Colors.blue
-                //     : Colors.grey, // visually show it's disabled
+                // backgroundColor: allTabsRead ? Colors.blue : Colors.grey,
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.only(right: 10.0),
                 child: Text(
                   "CONTINUE",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: allTabsRead ? Colors.white : Colors.grey,
+                  ),
                 ),
               ),
             )
@@ -426,10 +456,10 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
             });
           }),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _nextTab,
-            child: const Text("Next"),
-          ),
+          // ElevatedButton(
+          //   onPressed: _nextTab,
+          //   child: const Text("Next"),
+          // ),
         ],
       ),
     );

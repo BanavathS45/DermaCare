@@ -198,15 +198,15 @@ class DoctorController extends GetxController {
 
       final List<HospitalDoctorModel> doctors =
           await doctorService.fetchDoctorsAndClinic(hospitalId, subServiceId);
-      print("🏥 Using hospitalId doctors: $doctors");
+      print("🏥 Using hospitalId doctors: ${doctors.first.hospital.branch}");
 
       allDoctorsFlat.value = doctors;
       allServices.value = doctors;
 
-      // for (var d in doctors) {
-      //   print(
-      //       "✅ Doctor loaded: ${d.doctor.doctorName}, ${d.doctor.qualification}");
-      // }
+      for (var d in doctors) {
+        print(
+            "✅ Doctor loaded: ${d.doctor.doctorName}, ${d.hospital.recommended},${d.hospital.branch},${d.hospital.consultationExpiration}");
+      }
       List<Future<void>> ratingFutures = [];
       for (var doctorModel in doctors) {
         final dId = doctorModel.doctor.doctorId;
@@ -226,6 +226,8 @@ class DoctorController extends GetxController {
       await Future.wait(ratingFutures); // ✅ Wait for all ratings to complete
 
       final cities = doctors.map((d) => d.hospital.city).toSet().toList();
+      print("🏥 Using hospitalId doctors: ${cities}");
+
       cityList.value = ['All', ...cities];
 
       applyFilters();
@@ -270,10 +272,15 @@ class DoctorController extends GetxController {
     filteredDoctors.value = filtered;
   }
 
-  void refreshDoctors({required String subServiceId}) async {
-    isLoading.value = true;
-    await fetchDoctors(
-        hospitalId: hospitalId.value, subServiceId: subServiceId);
-    isLoading.value = false;
+  Future<void> refreshDoctors({required String subServiceId}) async {
+    try {
+      isLoading.value = true;
+      await fetchDoctors(
+        hospitalId: hospitalId.value,
+        subServiceId: subServiceId,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

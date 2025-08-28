@@ -2,7 +2,7 @@ class FollowUpModal {
   final String visitType;
   final String mobileNumber;
   final String serviceDate;
-  final String serviceTime;
+  final String servicetime;
   final String patientId;
   final String bookingId;
   final String doctorId;
@@ -11,7 +11,7 @@ class FollowUpModal {
     required this.visitType,
     required this.mobileNumber,
     required this.serviceDate,
-    required this.serviceTime,
+    required this.servicetime,
     required this.patientId,
     required this.bookingId,
     required this.doctorId,
@@ -23,7 +23,7 @@ class FollowUpModal {
       visitType: json['visitType'] ?? '',
       mobileNumber: json['mobileNumber'] ?? '',
       serviceDate: json['serviceDate'] ?? '',
-      serviceTime: json['serviceTime'] ?? '',
+      servicetime: json['serviceTime'] ?? '',
       patientId: json['patientId'] ?? '',
       bookingId: json['bookingId'] ?? '',
       doctorId: json['doctorId'] ?? '',
@@ -36,7 +36,7 @@ class FollowUpModal {
       "visitType": visitType,
       "mobileNumber": mobileNumber,
       "serviceDate": serviceDate,
-      "serviceTime": serviceTime,
+      "servicetime": servicetime,
       "patientId": patientId,
       "bookingId": bookingId,
       "doctorId": doctorId,

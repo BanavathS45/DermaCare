@@ -7,11 +7,15 @@ class CustomTextAera extends StatelessWidget {
   final String? Function(String?)? validator;
   final AutovalidateMode? autovalidateMode;
   final void Function(String)? onChanged;
+  final String? hintText;
+  final int maxLines;
   const CustomTextAera({
     super.key,
     required this.controller,
     required this.labelText,
+    this.hintText,
     this.validator,
+    this.maxLines = 2,
     this.autovalidateMode,
     this.onChanged, // <-- add this
   });
@@ -21,13 +25,14 @@ class CustomTextAera extends StatelessWidget {
     return TextFormField(
       // ✅ Use TextFormField for validation
       controller: controller,
-      maxLines: 2,
+      maxLines: maxLines,
       keyboardType: TextInputType.multiline,
       validator: validator,
       onChanged: onChanged,
-     
+
       decoration: InputDecoration(
-        labelText: "Enter Your problem....",
+        hintText: hintText,
+        labelText: labelText,
         labelStyle: TextStyle(color: Colors.grey[600]),
         border: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.grey.shade300),

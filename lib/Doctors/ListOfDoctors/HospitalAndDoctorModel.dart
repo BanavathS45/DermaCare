@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 class HospitalDoctorModel {
   final Doctor doctor;
   final Hospital hospital;
@@ -31,6 +34,7 @@ class Doctor {
   final String availableDays;
   final String availableTimes;
   final String profileDescription;
+
   final String deviceId;
   final DoctorFees doctorFees;
   final List<String> focusAreas;
@@ -38,6 +42,7 @@ class Doctor {
   final List<String> highlights;
   final bool doctorAvailabilityStatus;
   final double doctorAverageRating;
+  final String? doctorSignature;
 
   Doctor({
     required this.id,
@@ -64,9 +69,21 @@ class Doctor {
     required this.doctorAvailabilityStatus,
     required this.deviceId,
     required this.doctorAverageRating,
+    this.doctorSignature,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
+    String? rawSign = json['doctorSignature'];
+
+    // Uint8List? signBytes;
+    // if (rawSign != null && rawSign.isNotEmpty) {
+    //   try {
+    //     final cleaned = rawSign.contains(",") ? rawSign.split(",")[1] : rawSign;
+    //     signBytes = base64Decode(cleaned);
+    //   } catch (e) {
+    //     print("Doctor signature decode error: $e");
+    //   }
+    // }
     return Doctor(
       id: json['id'] ?? '',
       doctorId: json['doctorId'] ?? '',
@@ -110,6 +127,7 @@ class Doctor {
               .toList() ??
           [],
       doctorAvailabilityStatus: json['doctorAvailabilityStatus'] ?? false,
+      doctorSignature: json['doctorSignature'],
     );
   }
 }
@@ -125,22 +143,23 @@ class Hospital {
   final String closingTime;
   final String hospitalLogo;
   final bool recommended;
-  // final String? consultationExpiration;
-
+  final String? consultationExpiration;
+  final String branch;
+  final double hospitalOverallRating;
   Hospital({
     required this.hospitalId,
     required this.name,
     required this.address,
     required this.city,
     required this.contactNumber,
- 
     required this.openingTime,
     required this.closingTime,
     required this.hospitalLogo,
     required this.recommended,
     required this.freeFollowUps,
-    
-      // this.consultationExpiration,
+    required this.branch,
+    this.consultationExpiration,
+    required this.hospitalOverallRating,
   });
 
   factory Hospital.fromJson(Map<String, dynamic> json) {
@@ -150,13 +169,14 @@ class Hospital {
       address: json['address'] ?? '',
       city: json['city'] ?? '',
       contactNumber: json['contactNumber'] ?? '',
-    
       openingTime: json['openingTime'] ?? '',
       closingTime: json['closingTime'] ?? '',
       hospitalLogo: json['hospitalLogo'] ?? '',
       recommended: json['recommended'] ?? false,
       freeFollowUps: json['freeFollowUps'] ?? 0,
-      // consultationExpiration: json['consultationExpiration'],
+      consultationExpiration: json['consultationExpiration'],
+      branch: json['branch'] ?? '',
+      hospitalOverallRating: json['hospitalOverallRating'] ?? 0.0,
     );
   }
 }

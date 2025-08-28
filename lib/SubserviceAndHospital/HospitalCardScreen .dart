@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:cutomer_app/Modals/ServiceModal.dart';
+import 'package:cutomer_app/SubserviceAndHospital/HospitalCardModel.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../ServiceView/ServiceDetailPage.dart';
 import 'HospitalService.dart';
@@ -38,40 +41,49 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
   final TextEditingController _searchController = TextEditingController();
   String searchText = '';
   bool showRecommendedOnly = false;
-  List<Map<String, dynamic>> hospitalCards = [];
+  List<HospitalCardModel> hospitalCards = [];
   bool isLoading = true;
 
   @override
+  @override
   void initState() {
     super.initState();
-    print(
-        "widget.selectedService!.subServiceId ${(widget.selectedService!.subServiceId)}");
-    HospitalService()
-        .fetchHospitalCards(widget.selectedService!.subServiceId)
-        .then((data) {
-      setState(() {
-        
-        hospitalCards = data;
+    fetchHospitalCards();
+  }
 
-        isLoading = false;
-      });
-    }).catchError((error) {
-      print('Error: $error');
-      setState(() {
-        isLoading = false;
-      });
+  void fetchHospitalCards() async {
+    setState(() {
+      isLoading = true; // show loading
     });
+
+    try {
+      final data = await HospitalService()
+          .fetchHospitalCards(widget.selectedService!.subServiceId);
+
+      final cards = data
+          .map<HospitalCardModel>((json) => HospitalCardModel.fromJson(json))
+          .toList();
+
+      setState(() {
+        hospitalCards = cards;
+        // filteredCards = cards; // if filtering is applied later
+        isLoading = false; // hide loading
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false; // hide loading even on error
+      });
+      print("Error fetching hospital cards: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final filteredCards = hospitalCards.where((card) {
-      final subServiceName =
-          card['subServiceName']?.toString().toLowerCase() ?? '';
-      final hospitalName = card['hospitalName']?.toString().toLowerCase() ?? '';
-      final recommendedRaw =
-          card['recommended']?.toString().toLowerCase() ?? '';
-      final recommended = ['true', 'yes', '1'].contains(recommendedRaw);
+      final subServiceName = card.subServiceName.toString().toLowerCase() ?? '';
+      final hospitalName = card.hospitalName.toString().toLowerCase() ?? '';
+      final recommendedRaw = card.recommanded;
+      final recommended = ['true', 'yes', '1', true].contains(recommendedRaw);
 
       final matchesSearch = subServiceName.contains(searchText.toLowerCase()) ||
           hospitalName.contains(searchText.toLowerCase());
@@ -80,7 +92,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
 
       print('=========================');
       print('Hospital: $hospitalName');
-      print('RecommendedRaw: $recommendedRaw (${recommendedRaw.runtimeType})');
+      print('RecommendedRaw: ${card.price} ');
       print('Parsed Recommended: $recommended');
       print('Search Match: $matchesSearch');
       print('Show Recommended Only: $showRecommendedOnly');
@@ -157,10 +169,10 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                           itemCount: filteredCards.length,
                           itemBuilder: (context, index) {
                             final card = filteredCards[index];
-                            String rawValue =
-                                card['cost']; // e.g., "₹6132.240000000001"
-                            double parsedValue =
-                                double.parse(rawValue.replaceAll("₹", ""));
+                            // String rawValue =
+                            //     card.price; // e.g., "₹6132.240000000001"
+                            //   parsedValue =
+                            //      rawValue
                             return GestureDetector(
                               onTap: () {
                                 if (widget.selectedService != null) {
@@ -172,8 +184,8 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                           username: widget.username,
                                           selectedService: widget
                                               .selectedService!.subServiceId,
-                                          hospitalName: card['hospitalName'],
-                                          hospitalId: card['hospitalId']),
+                                          hospitalName: card.hospitalName,
+                                          hospitalId: card.hospitalId),
                                     ),
                                   );
                                 } else {
@@ -199,46 +211,180 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(12.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  child: Column(
                                     children: [
-                                      Image.memory(
-                                        base64Decode(card['hospitalLogo']),
-                                        width: 80,
-                                        height: 80,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Image.asset(
-                                              'assets/images/fallback_logo.png');
-                                        },
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Image.memory(
+                                            base64Decode(card.hospitalLogo),
+                                            width: 80,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.asset(
+                                                  'assets/images/fallback_logo.png');
+                                            },
+                                          ),
+                                          SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(card.hospitalName,
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                                SizedBox(height: 4),
+                                                Text("Sub Service: " +
+                                                    card.subServiceName),
+                                                Text("Service: " +
+                                                    card.serviceName),
+                                                SizedBox(height: 8),
+                                              ],
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(card['hospitalName'],
-                                                style: TextStyle(
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(Icons.star,
+                                                  size: 20,
+                                                  color: Colors.amber),
+                                              Text(
+                                                  "${card.hospitalOverallRating.toStringAsFixed(1)}/5 "),
+                                              // Text("4.5/5 "),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              RichText(
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text:
+                                                          "₹${card.price.toStringAsFixed(0)} ",
+                                                      // "₹900 ", // price
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.red,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          "(${card.discountPercentage.toStringAsFixed(0)}%) ",
+                                                      // "(10%)", // discount percentage
+                                                      style: TextStyle(
+                                                        fontSize:
+                                                            12, // smaller font
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        color: Colors.red,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 20,
+                                              ),
+                                              Text(
+                                                  "₹${card.discountedCost.toStringAsFixed(0)} ",
+                                                  // "₹1000",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.teal)),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              final Uri url =
+                                                  Uri.parse("${card.website}");
+                                              if (await canLaunchUrl(url)) {
+                                                await launchUrl(url,
+                                                    mode: LaunchMode
+                                                        .externalApplication);
+                                              } else {
+                                                throw "Could not launch $url";
+                                              }
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.language,
+                                                    color: mainColor,
+                                                    size:
+                                                        20), // 🌐 website icon
+                                                SizedBox(width: 6),
+                                                Text(
+                                                  "Website",
+                                                  style: TextStyle(
                                                     fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            SizedBox(height: 4),
-                                            Text("Sub Service: " +
-                                                card['subServiceName']),
-                                            Text("Service: " +
-                                                card['serviceName']),
-                                            SizedBox(height: 8),
-                                            Text(
-                                                "₹${parsedValue.toStringAsFixed(0)}",
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.teal)),
-                                          ],
-                                        ),
+                                                    fontWeight: FontWeight.w500,
+                                                    color: mainColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              final Uri url = Uri.parse(
+                                                  "${card.walkthrough}");
+                                              if (await canLaunchUrl(url)) {
+                                                await launchUrl(url,
+                                                    mode: LaunchMode
+                                                        .externalApplication);
+                                              } else {
+                                                throw "Could not launch $url";
+                                              }
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Image.asset(
+                                                    "assets/clinic_tour.png",
+                                                    height: 20,
+                                                    width: 20,
+                                                    color: mainColor),
+                                                SizedBox(width: 6),
+                                                Text("Virtual Clinic Tour",
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: mainColor)),
+                                              ],
+                                            ),
+                                          ),
+                                          // Text(
+                                          //     "${card['discountedCost'] ?? "NA"}"),
+                                        ],
                                       )
                                     ],
                                   ),
@@ -247,7 +393,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                             );
                           },
                         ),
-            )
+            ),
           ],
         ),
       ),

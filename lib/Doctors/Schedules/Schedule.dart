@@ -1,6 +1,7 @@
 import 'package:cutomer_app/Dashboard/GetCustomerData.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorSlotModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Doctors/Schedules/ConsentForm.dart';
 import 'package:cutomer_app/Doctors/Schedules/ScheduleController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
@@ -182,7 +183,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 if (patientdetailsformcontroller.formKey.currentState!
                     .validate()) {
                   if (scheduleController.selectedSlotText.value.isNotEmpty) {
-                    showSnackbar("Success", "Form Validated", "success");
+                    // showSnackbar("Success", "Form Validated", "success");
                     String formattedDate = DateFormat('yyyy-MM-dd')
                         .format(scheduleController.selectedDate.value);
                     PatientModel patientmodel = PatientModel(
@@ -223,18 +224,35 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     // Get.to(() => Confirmbookingdetails(doctor: doctorData, patient: patientData));
                     print('Doctor 8888: ${widget.doctorData}');
                     print('Patient: $patientmodel');
-                    if (consultationController.selectedConsultation.value?.consultationType == "Services & Treatments") {
-                      symptomsController.updateDuration(
-                          patientdetailsformcontroller.durationController.text);
-                      print(
-                          "patientdetailsformcontroller.durationController.text ${patientdetailsformcontroller.durationController.text}");
-                    }
+                    // if (consultationController
+                    //         .selectedConsultation.value?.consultationType ==
+                    //     "Services & Treatments") {
+                    //   symptomsController.updateDuration(
+                    //       patientdetailsformcontroller.durationController.text);
 
-                    // symptomsController.updateDuration( patientdetailsformcontroller.durationController.text);
-                    Get.to(Confirmbookingdetails(
+                    //   Get.to(SkinCareConsentFormScreen(
+                    //     doctor: widget.doctorData,
+                    //     patient: patientmodel,
+                    //   ));
+                    //   print(
+                    //       "patientdetailsformcontroller.durationController.text ${patientdetailsformcontroller.durationController.text}");
+                    // } else {
+                    //   Get.to(() => Confirmbookingdetails(
+                    //         doctor: widget.doctorData,
+                    //         patient: patientmodel,
+                    //         // pass pdf to next screen
+                    //       ));
+                    // }
+                    Get.to(SkinCareConsentFormScreen(
                       doctor: widget.doctorData,
                       patient: patientmodel,
                     ));
+
+                    // symptomsController.updateDuration( patientdetailsformcontroller.durationController.text);
+                    // Get.to(Confirmbookingdetails(
+                    //   doctor: widget.doctorData,
+                    //   patient: patientmodel,
+                    // ));
                   } else {
                     showSnackbar("Warning", "Please Select Slot", "warning");
                   }

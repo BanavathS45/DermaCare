@@ -59,7 +59,6 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
         'contact': '7842259803',
         'email': 'prashanthr803@gmail.com',
       },
-     
     };
 
     // Razorpay event listeners
@@ -193,7 +192,9 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
                 serviceDetails: widget.serviceDetails,
                 paymentId: paymentId.toString(),
                 patient: widget.patient,
-                mobileNumber: widget.mobileNumber,paymentType:"online"),
+                mobileNumber: widget.mobileNumber,
+                paymentType: "online",
+                clinicName: widget.bookingDetails.booking.clinicName),
           ),
           (route) => false);
 

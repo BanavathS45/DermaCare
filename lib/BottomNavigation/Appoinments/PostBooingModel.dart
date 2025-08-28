@@ -26,6 +26,8 @@ class BookingDetailsModel {
 
   final List<File>? attachments; // ✅ optional
   final int freeFollowUps;
+  final String consentFormPdf;
+  final String? doctorRefCode;
 
   BookingDetailsModel({
     required this.categoryName,
@@ -48,6 +50,8 @@ class BookingDetailsModel {
     required this.visitType,
     required this.symptomsDuration,
     required this.freeFollowUps,
+    required this.consentFormPdf,
+    this.doctorRefCode,
     this.attachments, // ✅ nullable
   });
 
@@ -60,11 +64,13 @@ class BookingDetailsModel {
       servicename: json['servicename'],
       serviceId: json['serviceId'],
       subServiceName: json['subServiceName'],
+      doctorRefCode: json['doctorRefCode'],
       subServiceId: json['subServiceId'],
       clinicId: json['clinicId'],
       clinicName: json['clinicName'],
       clinicAddress: json['clinicAddress'],
       doctorId: json['doctorId'],
+      consentFormPdf: json['consentFormPdf'],
       doctorName: json['doctorName'],
       doctorDeviceId: json['doctorDeviceId'],
       consultationType: json['consultationType'],
@@ -100,6 +106,8 @@ class BookingDetailsModel {
       'consultationFee': consultationFee,
       'totalFee': totalFee,
       "paymentType": paymentType,
+      "consentFormPdf": consentFormPdf,
+      "doctorRefCode": doctorRefCode,
       "attachments": attachments != null
           ? attachments!
               .map((file) =>

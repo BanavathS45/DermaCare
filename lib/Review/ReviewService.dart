@@ -13,7 +13,9 @@ Future<void> submitCustomerRating(
     required String doctorId,
     required String customerMobileNumber,
     required String appointmentId,
-    required String hospitalId}) async {
+    required String hospitalId,
+    required String patientId,
+    required String patientName}) async {
   final url = Uri.parse('${registerUrl}/submitCustomerRating');
 
   final Map<String, dynamic> payload = {
@@ -24,6 +26,8 @@ Future<void> submitCustomerRating(
     "customerMobileNumber": customerMobileNumber,
     "appointmentId": appointmentId,
     "hospitalId": hospitalId,
+    "patientId": patientId,
+    "patientName": patientName,
   };
 
   try {
@@ -38,7 +42,6 @@ Future<void> submitCustomerRating(
       print('✅ Rating submitted successfully: ${response.body}');
 
       // ✅ Close current screen (like .pop())
-     
     } else {
       print('❌ Failed to submit rating: ${response.statusCode}');
       print('🔍 Response: ${response.body}');

@@ -22,7 +22,7 @@ class RatingSummary {
       overallDoctorRating: (json['overallDoctorRating'] as num).toDouble(),
       overallHospitalRating: (json['overallHospitalRating'] as num).toDouble(),
       comments: (json['comments'] as List)
-          .map((item) => Comment.fromJson(item))
+          .map((item) => Comment.fromJson(Map<String, dynamic>.from(item)))
           .toList(),
     );
   }

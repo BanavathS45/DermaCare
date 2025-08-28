@@ -23,7 +23,7 @@ Future<Map<String, dynamic>?> postBookings(
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('Booking posted successfully!');
       print("response.body....: ${response.body}");
-      
+
       return jsonDecode(response.body); // Return response data
     } else {
       print('Failed to post booking. Status code: ${response.statusCode}');
@@ -37,30 +37,31 @@ Future<Map<String, dynamic>?> postBookings(
 
 Future<Map<String, dynamic>?> followUpBookings(
     FollowUpModal bookingDetails) async {
-  final Url = Uri.parse(BookingUrl); // Replace with your endpoint
-  print("response.body Url: ${Url}");
+  final url = Uri.parse(BookingUrl);
+  print("request Url: $url");
 
   try {
     final response = await http.post(
-      Url,
+      url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(bookingDetails.toJson()),
     );
+
     print("response.body....: ${response.body}");
-    print("response.body....: ${jsonEncode(bookingDetails.toJson())}");
+    print("request payload....: ${jsonEncode(bookingDetails.toJson())}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('Booking posted successfully!');
-      print("response.body....: ${response.body}");
-      
-      return jsonDecode(response.body); // Return response data
+      // decode body to Map
+      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+      return responseData;
     } else {
       print('Failed to post booking. Status code: ${response.statusCode}');
-      return null; // Return null in case of failure
+      return null;
     }
   } catch (e) {
     print("Error posting booking: $e");
-    return null; // Return null in case of error
+    return null;
   }
 }
 

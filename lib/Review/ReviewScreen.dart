@@ -19,7 +19,10 @@ class ReviewScreen extends StatefulWidget {
   final Getappointmentmodel? doctorBookings;
   final String mobileNUmber;
   const ReviewScreen(
-      {super.key, required this.doctorData, required this.doctorBookings, required this.mobileNUmber});
+      {super.key,
+      required this.doctorData,
+      required this.doctorBookings,
+      required this.mobileNUmber});
 
   @override
   State<ReviewScreen> createState() => _ReviewScreenState();
@@ -210,7 +213,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 doctorId: widget.doctorBookings!.doctorId,
                 customerMobileNumber: widget.mobileNUmber,
                 appointmentId: widget.doctorBookings!.bookingId,
-                hospitalId: widget.doctorBookings!.clinicId);
+                hospitalId: widget.doctorBookings!.clinicId,
+                patientId: widget.doctorBookings!.patientId,
+                patientName: widget.doctorBookings!.name
+                
+                );
             print('✅ submitCustomerRating called successfully');
             // After success
             Get.back(result: true);

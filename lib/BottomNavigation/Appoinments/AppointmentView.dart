@@ -64,7 +64,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
     final hasReports = patient.reports != null;
     return Scaffold(
       appBar: CommonHeader(
-        title: "Booking ID: #${patient.bookingId}",
+        title: "Appointment Details",
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

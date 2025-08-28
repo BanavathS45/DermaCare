@@ -43,13 +43,26 @@ class HospitalService {
           }
 
           result.add({
+            "hospitalId": item['hospitalId'] ?? "",
+            "hospitalName": item['hospitalName'] ?? "",
             "hospitalLogo": base64Logo,
-            "hospitalName": item['hospitalName'],
-            "hospitalId": item['hospitalId'],
-            "serviceName": item['serviceName'],
-            "subServiceName": item['subServiceName'],
-            "cost": "₹${item['subServicePrice']}",
-            "recommended": item['recommandation'] ?? false,
+            "recommanded":
+                item['recommanded'] ?? false, // match backend spelling
+
+            "serviceName": item['serviceName'] ?? "",
+            "subServiceName": item['subServiceName'] ?? "",
+            "subServicePrice": (item['subServicePrice'] ?? 0).toDouble(),
+
+            "price": (item['price'] ?? 0).toDouble(),
+            "discountedCost": (item['discountedCost'] ?? 0).toDouble(),
+            "taxAmount": (item['taxAmount'] ?? 0).toDouble(),
+            "discountPercentage": (item['discountPercentage'] ?? 0).toInt(),
+            "hospitalOverallRating":
+                (item['hospitalOverallRating'] ?? 0).toDouble(),
+
+            "website": item['website'] ?? "",
+            "consultationFee": (item['consultationFee'] ?? 0).toDouble(),
+            "walkthrough": item['walkthrough'] ?? "",
           });
         }
 

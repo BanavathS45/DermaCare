@@ -100,11 +100,13 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
             context,
             MaterialPageRoute(
               builder: (ctx) => SuccessScreen(
-                  serviceDetails: widget.serviceDetails,
-                  paymentId: widget.txnId.toString(),
-                  patient: widget.patient,
-                  mobileNumber: widget.mobileNumber,
-                  paymentType: "online"),
+                serviceDetails: widget.serviceDetails,
+                paymentId: widget.txnId.toString(),
+                patient: widget.patient,
+                mobileNumber: widget.mobileNumber,
+                paymentType: "online",
+                clinicName: widget.bookingDetails.booking.clinicName,
+              ),
             ),
             (route) => false);
 

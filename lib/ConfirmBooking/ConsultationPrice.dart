@@ -7,6 +7,7 @@ import 'package:cutomer_app/Services/SubServiceServices.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Widget/DoctorCard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import '../Doctors/ListOfDoctors/DoctorScreen.dart';
@@ -42,15 +43,22 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
   bool isChecked = false;
   List<HospitalDoctorModel> hospitalDoctors = [];
   bool isLoading = false;
+  bool isfLoading = false;
+  @override
   @override
   void initState() {
     super.initState();
+    setState(() => isfLoading = true); // start loading
+
     fetchHospitalDoctor().then((value) {
       setState(() {
         hospitalDoctors = value;
+        isfLoading = false; // stop loading
+        print("hospitalDoctors length ${hospitalDoctors.length}");
       });
     }).catchError((e) {
-      print("Error: $e");
+      setState(() => isfLoading = false);
+      print("❌ Error: $e");
     });
   }
 
@@ -61,19 +69,6 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
     return base64String;
   }
 
-  // SubService? subServiceDetails;
-  // void loadSubService(hospitalId) async {
-  //   print("calling....");
-  //   final result =
-  //       await fetchSubServiceDetails(hospitalId, widget.subserviceid);
-  //   setState(() {
-  //     subServiceDetails = result;
-  //     final selectedServicesController = Get.find<SelectedServicesController>();
-  //     selectedServicesController
-  //         .updateSelectedSubServices([subServiceDetails!]);
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     final filteredData = hospitalDoctors.where((item) {
@@ -83,8 +78,12 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                   .toLowerCase()
                   .contains(searchText.toLowerCase());
 
-      final isRecommended =
-          !showRecommendedOnly || (item.hospital.recommended ?? false);
+      final isRecommended = !showRecommendedOnly ||
+          (item.hospital.recommended == true ||
+              item.hospital.recommended?.toString().toLowerCase() == "true");
+
+      print("dshfjhfdshj ${isRecommended}");
+      print("dshfjhfdshj ${item.hospital.recommended}");
 
       final matchesGender = selectedGender == "All" ||
           item.doctor.gender.toLowerCase() == selectedGender.toLowerCase();
@@ -158,8 +157,6 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                           Text("Any Doctor"),
                         ],
                       ),
-
-                      // Your list content here (doctor cards, etc.)
                     ],
                   ),
 
@@ -199,188 +196,261 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
               ),
               SizedBox(height: 12),
               Expanded(
-                child: filteredData.isEmpty
-                    ? Center(child: Text("No results found."))
-                    : ListView.builder(
-                        itemCount: resultData.length,
-                        itemBuilder: (context, index) {
-                          final item = resultData[index];
-                          final hospital = item.hospital;
-                          final doctor = item.doctor;
-                          final isVideo =
-                              widget.consulationType.toLowerCase() ==
-                                      "video consultation" ||
-                                  widget.consulationType.toLowerCase() ==
-                                      "online consultation";
-                          print(
-                              "widget.consulationType ${widget.consulationType}");
-                          print("widget.consulationType  isVideo${isVideo}");
-                          final cost = isVideo
-                              ? doctor.doctorFees.vedioConsultationFee
-                              : doctor.doctorFees.inClinicFee;
-
-                          return InkWell(
-                            onTap: () {
-                              print(item.doctor.doctorAvailabilityStatus);
-                              if (item.doctor.doctorAvailabilityStatus ==
-                                  true) {
-                                Get.to(() => ScheduleScreen(
-                                      doctorData: item,
-                                      mobileNumber: widget.mobileNumber,
-                                      username: widget.username,
-                                    ));
-
-                                // loadSubService(item.hospital.hospitalId);
-                              } else {
-                                // Optional: Show a snackbar or dialog to inform user
-                                Get.snackbar(
-                                  'Unavailable',
-                                  'Doctor is not available at the moment.',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                );
-                              }
-                            },
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color:
-                                    item.doctor.doctorAvailabilityStatus == true
-                                        ? Colors.white
-                                        : Colors.grey[300],
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 3),
-                                  ),
-                                ],
+                child: isfLoading
+                    ? const Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SpinKitFadingCircle(
+                              color: Colors.blue,
+                              size: 40.0,
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              "Loading doctors...",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black54,
                               ),
-                              child: Row(
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        "${item.doctor.doctorAvailabilityStatus == true ? "" : "Not Available"}",
-                                        style: TextStyle(
-                                            color: Colors.redAccent,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(12),
-                                          bottomLeft: Radius.circular(12),
-                                        ),
-                                        child: doctor.doctorPicture != null &&
-                                                doctor.doctorPicture.isNotEmpty
-                                            ? Image.memory(
-                                                base64Decode(cleanBase64(
-                                                    doctor.doctorPicture)),
-                                                width: 100,
-                                                height: 100,
-                                                fit: BoxFit.cover,
-                                              )
-                                            : Image.network(
-                                                "https://via.placeholder.com/100",
-                                                width: 100,
-                                                height: 100,
-                                                fit: BoxFit.cover,
-                                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : hospitalDoctors.isEmpty
+                        ? const Center(child: Text("No results found."))
+                        : ListView.builder(
+                            itemCount: resultData.length,
+                            itemBuilder: (context, index) {
+                              final item = resultData[index];
+                              final hospital = item.hospital;
+                              final doctor = item.doctor;
+
+                              print("jshfskdhfdj ${filteredData.length}");
+                              final isVideo =
+                                  widget.consulationType.toLowerCase() ==
+                                          "video consultation" ||
+                                      widget.consulationType.toLowerCase() ==
+                                          "online consultation";
+                              print(
+                                  "widget.consulationType ${widget.consulationType}");
+                              print(
+                                  "widget.consulationType  isVideo${isVideo}");
+                              final cost = isVideo
+                                  ? doctor.doctorFees.vedioConsultationFee
+                                  : doctor.doctorFees.inClinicFee;
+
+                              return InkWell(
+                                onTap: () {
+                                  print(item.doctor.doctorAvailabilityStatus);
+                                  if (item.doctor.doctorAvailabilityStatus ==
+                                      true) {
+                                    Get.to(() => ScheduleScreen(
+                                          doctorData: item,
+                                          mobileNumber: widget.mobileNumber,
+                                          username: widget.username,
+                                        ));
+
+                                    // loadSubService(item.hospital.hospitalId);
+                                  } else {
+                                    // Optional: Show a snackbar or dialog to inform user
+                                    Get.snackbar(
+                                      'Unavailable',
+                                      'Doctor is not available at the moment.',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                    );
+                                  }
+                                },
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        item.doctor.doctorAvailabilityStatus ==
+                                                true
+                                            ? Colors.white
+                                            : Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 6,
+                                        offset: Offset(0, 3),
                                       ),
                                     ],
                                   ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            hospital.name,
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.teal[800],
-                                            ),
-                                          ),
-                                          SizedBox(height: 6),
-                                          Text(
-                                            "${doctor.doctorName}",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                          SizedBox(height: 2),
-                                          Text(
-                                            "${doctor.qualification}",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.grey),
-                                          ),
-                                          SizedBox(height: 2),
-                                          Text(
-                                            "${doctor.experience} Years",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.grey),
-                                          ),
-                                          // Text(
-                                          //     "Service: ${widget.serviceName}"),
-                                          // Text(
-                                          //     "Subservice: ${widget.subserviceName}"),
-                                          SizedBox(height: 6),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // ✅ Clinic Name on Top
+                                      Padding(
+                                        padding: const EdgeInsets.all(6.0),
+                                        child: RichText(
+                                          text: TextSpan(
                                             children: [
-                                              Text(
-                                                widget.consulationType,
+                                              TextSpan(
+                                                text: hospital
+                                                    .name, // main hospital name
                                                 style: TextStyle(
-                                                    color: Colors.teal,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              Text(
-                                                "₹${cost ?? 'N/A'}",
-                                                style: TextStyle(
+                                                  fontSize: 18,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Colors.teal[700],
-                                                  fontSize: 16,
+                                                  color: mainColor,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text:
+                                                    " (${(hospital.branch != null && hospital.branch!.isNotEmpty) ? hospital.branch : hospital.city})",
+                                                style: TextStyle(
+                                                  fontSize: 14, // smaller
+                                                  fontWeight: FontWeight.w400,
+                                                  color: secondaryColor,
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          SizedBox(height: 6),
-                                          Row(
-                                            children: [
-                                              Icon(Icons.star,
-                                                  color: Colors.amber,
-                                                  size: 18),
-                                              SizedBox(width: 4),
-
-                                              Text(
-                                                "${doctor.doctorAverageRating.toStringAsFixed(1)}",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              )
-                                              // Text("4.0") //TODO :do dynamically
-                                            ],
-                                          )
-                                        ],
+                                        ),
                                       ),
-                                    ),
+
+                                      // ✅ Doctor Row (Image Left, Details Right)
+                                      SizedBox(
+                                        height: 110, // Control card height
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            // Doctor Image (takes ~30%)
+                                            Flexible(
+                                              flex: 3,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  child: doctor.doctorPicture !=
+                                                              null &&
+                                                          doctor.doctorPicture
+                                                              .isNotEmpty
+                                                      ? Image.memory(
+                                                          base64Decode(
+                                                              cleanBase64(doctor
+                                                                  .doctorPicture)),
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.network(
+                                                          "https://via.placeholder.com/150",
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            // Doctor Details (takes remaining space)
+                                            Flexible(
+                                              flex: 7,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 12.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          doctor.doctorName,
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.black),
+                                                        ),
+                                                        Text(
+                                                          doctor.qualification,
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black45),
+                                                        ),
+                                                        Text(
+                                                          "${doctor.experience} Years Experience",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black45),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          widget
+                                                              .consulationType,
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.black45,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          "₹${cost ?? 'N/A'}",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.black,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "👨‍⚕️ ${doctor.doctorAverageRating.toStringAsFixed(1)}/5",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: Colors
+                                                                  .black87),
+                                                        ),
+                                                        SizedBox(width: 20),
+                                                        Text(
+                                                          "🏥 ${hospital.hospitalOverallRating}/5",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: Colors
+                                                                  .black87),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                                ),
+                              );
+                            },
+                          ),
               ),
             ],
           ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorController.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import '../../Utils/Constant.dart';
 import '../../Utils/Header.dart';
@@ -162,30 +163,62 @@ class Doctorscreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  doctorController.refreshDoctors(subServiceId: subServiceID);
-                },
-                child: doctorController.filteredDoctors.isEmpty
-                    ? ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        children: [
-                          SizedBox(height: 200),
-                          Center(child: Text("No doctors found")),
-                        ],
-                      )
-                    : ListView.builder(
-                        itemCount: doctorController.filteredDoctors.length,
-                        itemBuilder: (context, index) {
-                          return buildDoctorCard(
-                              context,
-                              doctorController.filteredDoctors[index],
-                              doctorController,
-                              mobileNumber,
-                              username);
-                        },
+              child: Obx(() {
+                if (doctorController.isLoading.value) {
+                  // 🔄 Show loading indicator
+                  return const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Center(
+                      child: SpinKitFadingCircle(
+                        color: Colors.blue,
+                        size: 40.0,
                       ),
-              ),
+                    ),
+                        SizedBox(height: 12),
+                        Text(
+                          "Loading doctors...",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (doctorController.filteredDoctors.isEmpty) {
+                  // ❌ No data
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(height: 200),
+                      Center(child: Text("No doctors found")),
+                    ],
+                  );
+                } else {
+                  // ✅ Show doctors list
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await doctorController.refreshDoctors(
+                          subServiceId: subServiceID);
+                    },
+                    child: ListView.builder(
+                      itemCount: doctorController.filteredDoctors.length,
+                      itemBuilder: (context, index) {
+                        return buildDoctorCard(
+                          context,
+                          doctorController.filteredDoctors[index],
+                          doctorController,
+                          mobileNumber,
+                          username,
+                        );
+                      },
+                    ),
+                  );
+                }
+              }),
             ),
             SizedBox(
               height: 10,

@@ -125,6 +125,7 @@ class SubService {
   final double finalCost;
   final double consultationFee;
   final int gst;
+  final double gstAmount;
 
   SubService({
     required this.hospitalId,
@@ -153,6 +154,7 @@ class SubService {
     required this.clinicPay,
     required this.finalCost,
     required this.consultationFee,
+    required this.gstAmount,
     required this.gst,
   });
 
@@ -197,6 +199,7 @@ class SubService {
       finalCost: (json['finalCost'] ?? 0).toDouble(),
       consultationFee: (json['consultationFee'] ?? 0).toDouble(),
       gst: (json['gst'] ?? 0),
+      gstAmount: (json['gstAmount'] ?? 0.0),
     );
   }
 
@@ -229,6 +232,7 @@ class SubService {
       'finalCost': finalCost,
       'consultationFee': consultationFee,
       'gst': gst,
+      'gstAmount': gstAmount,
     };
   }
 }

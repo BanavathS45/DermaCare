@@ -324,27 +324,12 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
           ),
           // Divider(color: secondaryColor),
 
-          Text("Symptoms Duration",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-          CustomTextField(
-            controller: patientdetailsformcontroller.durationController,
-            labelText: 'Enter Duration (in days)',
-            keyboardType: TextInputType.number,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            inputFormatters: [
-              LengthLimitingTextInputFormatter(3),
-              FilteringTextInputFormatter.digitsOnly,
-            ],
-            validator: (value) =>
-                siginSignUpController.validateNumber(value, "Duration"),
-          ),
-
           /// Problem Section
           if (consultationController
                   .selectedConsultation.value!.consultationType
                   .toLowerCase() ==
               "services & treatments") ...[
-            Text("Describe your problem",
+            Text("Describe your problem / Symptoms",
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -354,27 +339,46 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
                   const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
               child: CustomTextAera(
                 controller: patientdetailsformcontroller.notesController,
-                labelText: "Enter Your problem....",
+                hintText:
+                    "If you have any specific concerns to discuss before the procedure, please mention them here.",
 
                 // Limit to 2 lines
+                maxLines: 3,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Please enter Problem";
-                  }
-                  if (value.trim().length < 10) {
-                    return "Problem must be at least 10 characters";
-                  }
-                  return null;
-                },
+                labelText: 'Enter Symptoms',
+                // validator: (value) {
+                //   if (value == null || value.trim().isEmpty) {
+                //     return "Please enter Problem";
+                //   }
+                //   if (value.trim().length < 10) {
+                //     return "Problem must be at least 10 characters";
+                //   }
+                //   return null;
+                // },
               ),
             ),
 
             const SizedBox(height: 15),
+            Text("Symptoms Duration",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            CustomTextField(
+              controller: patientdetailsformcontroller.durationController,
+              labelText: 'Enter Duration (in days)',
+              keyboardType: TextInputType.number,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(3),
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+            ),
+            const SizedBox(height: 15),
 
             /// Attachments
-            Text("Attach any document (if any)",
+            Text("Attach document (Previous reports if any)",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            SizedBox(
+              height: 10,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [

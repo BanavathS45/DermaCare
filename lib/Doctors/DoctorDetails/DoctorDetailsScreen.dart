@@ -164,6 +164,18 @@ class DoctorDetailScreen extends StatelessWidget {
 
             /// Focus
             const Text(
+              "Doctor's Profile",
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: mainColor, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              doctor.profileDescription,
+              style: const TextStyle(color: mainColor),
+            ),
+
+            const SizedBox(height: 20),
+            const Text(
               "Focus Areas",
               style: TextStyle(
                 fontSize: 16,
@@ -188,18 +200,6 @@ class DoctorDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             /// Profile
-            const Text(
-              "Doctor's Profile",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, color: mainColor, fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              doctor.profileDescription,
-              style: const TextStyle(color: mainColor),
-            ),
-
-            const SizedBox(height: 20),
 
             /// Career Path
             // const Text(
@@ -228,7 +228,7 @@ class DoctorDetailScreen extends StatelessWidget {
 
             /// Highlights
             const Text(
-              "Highlights",
+              "Highlights & Achievements",
               style: TextStyle(
                   fontWeight: FontWeight.bold, color: mainColor, fontSize: 16),
             ),

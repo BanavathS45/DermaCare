@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Inputs/CustomInputField.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 
 import 'package:cutomer_app/Screens/BookingSuccess.dart';
@@ -14,6 +16,7 @@ import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
@@ -29,9 +32,13 @@ import 'ConsultationController.dart';
 class Confirmbookingdetails extends StatefulWidget {
   final HospitalDoctorModel doctor;
   final PatientModel patient;
-
-  Confirmbookingdetails(
-      {super.key, required this.doctor, required this.patient});
+  final Uint8List pdfBytes;
+  Confirmbookingdetails({
+    super.key,
+    required this.doctor,
+    required this.patient,
+    required this.pdfBytes,
+  });
 
   @override
   State<Confirmbookingdetails> createState() => _ConfirmbookingdetailsState();
@@ -41,6 +48,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final SymptomsController symptomsController = Get.put(SymptomsController());
+  final TextEditingController doctorRefController = TextEditingController();
   SubService? subServiceDetails;
   // final confirmbookingcontroller = Get.find<Confirmbookingcontroller>();
   Doctor? doctor;
@@ -128,6 +136,27 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     bool loading = false;
     String? currentConsultationId;
 
+    final double gstRate = 0.18;
+    final double taxRate = 0;
+    final servicePrice = (subServiceDetails!.price);
+    final double gstAmount = servicePrice * gstRate;
+    final double taxAmount = servicePrice * taxRate;
+    final double totalAmount = (servicePrice + gstAmount + taxAmount);
+    final isServiceConsultation =
+        consultationController.selectedConsultation.value?.consultationType ==
+                _consultations[0].consultationType
+            ? true
+            : false;
+
+    final consultationType = consultationController
+        .selectedConsultation.value?.consultationType
+        ?.toLowerCase();
+    // final consultationId =
+    //     consultationController.selectedConsultation.value?.consultationId;
+    final consultationId =
+        consultationController.selectedConsultation.value?.consultationId;
+    // final consultationId =
+    //     consultationController.selectedConsultation.value?.consultationId;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: CommonHeader(
@@ -172,8 +201,24 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             const SizedBox(height: 20),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Doctor Refferal Code (if any)",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                ),
+                CustomTextField(
+                  controller: doctorRefController,
+                  labelText: 'Enter Refferal Code',
+                  keyboardType: TextInputType.text,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(3),
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                ),
                 PaymentModeSelector(
                   consultationType: consultationController
                       .selectedConsultation.value!.consultationType,
@@ -374,24 +419,47 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                infoRow("Consultation Fee",
-                    "₹ ${subServiceDetails?.consultationFee.toStringAsFixed(0)}"),
-                infoRow(
-                    "${consultationController.selectedConsultation.value?.consultationType} Fee",
-                    "₹ ${subServiceDetails?.price.toStringAsFixed(0)}"),
-                infoRow("GST (${subServiceDetails?.gst}%)",
-                    "₹ ${subServiceDetails?.gst}"),
-                infoRow(
-                    "Tax (${subServiceDetails?.taxPercentage.toStringAsFixed(0)}%)",
-                    "₹ ${subServiceDetails?.taxAmount.toStringAsFixed(0)}"),
-                infoRow(
-                    "Discounted Amount (${subServiceDetails?.discountPercentage.toStringAsFixed(0)}%)",
-                    "₹ ${subServiceDetails?.discountAmount.toStringAsFixed(0)}"),
-                infoRow("Total Fee",
-                    "₹ ${subServiceDetails?.finalCost.toStringAsFixed(0)}"),
-
-                // infoRow("Platform Fee", "₹ ${platformFee}"),
-                // infoRow("Total Fee", "₹ ${consultationFee}"),
+                // Text("${consultationId}"),
+                if (_consultations.isNotEmpty) ...[
+                  // Text("${_consultations[0].consultationId}"),
+                  if (consultationId != "ST_01") ...[
+                    // Static fields for Services & Treatments
+                    infoRow("Consultation Fee",
+                        "₹ ${consultationFee?.toStringAsFixed(0) ?? '0'}"),
+                    infoRow("GST (18%)",
+                        "₹ ${(consultationFee * 0.18)?.toStringAsFixed(0) ?? '0'}"),
+                    infoRow("Tax", "₹ ${taxAmount?.toStringAsFixed(0) ?? '0'}"),
+                    infoRow("Total Fee",
+                        "₹ ${(consultationFee + consultationFee * 0.18 + 0)?.toStringAsFixed(0) ?? '0'}"),
+                  ] else ...[
+                    // Normal flow from subServiceDetails
+                    infoRow(
+                      "Consultation Fee",
+                      "₹ ${subServiceDetails?.consultationFee?.toStringAsFixed(0) ?? '0'}",
+                    ),
+                    infoRow(
+                      "${consultationController.selectedConsultation.value?.consultationType ?? 'Consultation'} Fee",
+                      "₹ ${subServiceDetails?.price?.toStringAsFixed(0) ?? '0'}",
+                    ),
+                    infoRow(
+                      "GST (${subServiceDetails?.gst ?? 0}%)",
+                      "₹ ${subServiceDetails?.gstAmount?.toStringAsFixed(0) ?? '0'}",
+                    ),
+                    infoRow(
+                      "Tax (${subServiceDetails?.taxPercentage?.toStringAsFixed(0) ?? '0'}%)",
+                      "₹ ${subServiceDetails?.taxAmount?.toStringAsFixed(0) ?? '0'}",
+                    ),
+                    infoRow(
+                      "Discounted Amount (${subServiceDetails?.discountPercentage?.toStringAsFixed(0) ?? '0'}%)",
+                      "₹ ${subServiceDetails?.discountAmount?.toStringAsFixed(0) ?? '0'}",
+                    ),
+                    infoRow(
+                      "Total Fee",
+                      "₹ ${subServiceDetails?.finalCost?.toStringAsFixed(0) ?? '0'}",
+                    ),
+                  ]
+                ] else
+                  Text("No consultation data available")
               ],
             ),
 
@@ -421,7 +489,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 selectedServicesController.selectedPayment.value;
 
             print("Selected Payment: $selectedPayment");
-
+            String pdfBase64 = base64Encode(widget.pdfBytes!);
             final bookingDetails = BookingDetailsModel(
               subServiceName: globalServiceId == "ST_01"
                   ? selectedServicesController
@@ -459,7 +527,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               doctorName: widget.doctor.doctor.doctorName,
               // consultationExpiration:
               //     widget.doctor.hospital.consultationExpiration,
-              consultationExpiration: "15 days",
+              consultationExpiration:
+                  widget.doctor.hospital.consultationExpiration ?? "10 Days",
               paymentType: "Pay at Hospital",
               visitType: symptomsController.visitType.value,
               symptomsDuration:
@@ -467,7 +536,13 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
               attachments: symptomsController.attachments.value,
               freeFollowUps: widget.doctor.hospital.freeFollowUps,
+              consentFormPdf: pdfBase64 ?? "",
+              // doctorRefCode: doctorRefController.text ?? "",
             );
+            print(
+                '[🏥] Booking via Pay at Hospital ${bookingDetails.toString()}');
+            print(
+                '[🏥] Booking via Pay at Hospital ${bookingDetails.consultationExpiration}');
 
             // 📦 Model ready for API
             final postBookingPayload = PostBookingModel(
@@ -492,6 +567,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   MaterialPageRoute(
                     builder: (ctx) => SuccessScreen(
                         serviceDetails: widget.doctor,
+                        clinicName: widget.doctor.hospital.name,
                         paymentId: "pay_at_hospital",
                         patient: widget.patient,
                         mobileNumber: widget.patient.mobileNumber,
@@ -570,8 +646,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             final isPayAtHospital =
                 selectedPayment.toLowerCase() == 'pay at hospital';
             final buttonText = isPayAtHospital
-                ? "BOOK APPOINTMENT (₹ $consultationFee)"
-                : "BOOK & PAY (₹ $consultationFee)";
+                ? "BOOK APPOINTMENT (₹ ${isServiceConsultation ? subServiceDetails?.finalCost.toStringAsFixed(0) : (consultationFee + consultationFee * 0.18 + 0).toStringAsFixed(0)})"
+                : "BOOK & PAY (₹ ${isServiceConsultation ? subServiceDetails?.finalCost.toStringAsFixed(0) : (consultationFee + consultationFee * 0.18 + 0).toStringAsFixed(0)})";
 
             return Text(
               buttonText,

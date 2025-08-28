@@ -306,7 +306,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                       children: [
                         Expanded(
                           child: Text(
-                            "Select Sub-Service for\n${service.serviceName}",
+                            "Select Procedure for\n${service.serviceName}",
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

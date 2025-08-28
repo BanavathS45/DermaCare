@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/Booings/FollowUpModal.dart';
 import 'package:cutomer_app/BottomNavigation/Appoinments/AppointmentService.dart';
@@ -52,19 +54,32 @@ class _VisitTypeState extends State<VisitType> {
   Getappointmentmodel? selectedBooking;
 
   @override
+  @override
   void initState() {
     super.initState();
     _fetchAppointments();
-    fetchHospitalDoctor().then((value) {
+
+    fetchHospitalDoctor().then((value) async {
       setState(() => hospitalDoctors = value);
+
+      if (hospitalDoctors.isNotEmpty) {
+        final today = scheduleController.weekDates[0]; // first date (today)
+        final doctorId = hospitalDoctors.first.doctor.doctorId;
+        final clinicId = hospitalDoctors.first.hospital.hospitalId;
+
+        final slots =
+            await DoctorSlotService.fetchDoctorSlots(doctorId, clinicId);
+        scheduleController.selectDate(today, slots);
+      }
     });
   }
 
-  void _fetchAppointments() async {
+  Future<void> _fetchAppointments() async {
     try {
       final appointments = await appointmentService
           .fetchInprogressAppointments(widget.mobileNumber);
       visitController.setBookings(appointments);
+      print("jhgjjhjhg L::${appointments.length}");
     } catch (e) {
       print("❌ Error fetching appointments: $e");
     }
@@ -82,7 +97,7 @@ class _VisitTypeState extends State<VisitType> {
   void _handleFollowUp() {
     final screenHeight = MediaQuery.of(context).size.height;
     final appointments = visitController.bookings;
-    if (appointments.isEmpty) {
+    if (appointments.isEmpty || appointments.length == 0) {
       ScaffoldMessageSnackbar.show(
         context: context,
         message: "No Appointments \n You don’t have any past bookings",
@@ -158,7 +173,7 @@ class _VisitTypeState extends State<VisitType> {
                                   const SizedBox(height: 4),
                                   Text("Relation: ${appt.relation ?? "NA"}"),
                                   Text(
-                                      "Clinic: ${selectedHospitalDoctor?.hospital.name ?? "Apollo Clinic"}"),
+                                      "Clinic: ${selectedHospitalDoctor?.hospital.name ?? "NA"}"),
                                   Text(
                                       "Doctor: ${selectedHospitalDoctor?.doctor.doctorName ?? "-"}"),
                                   const SizedBox(height: 6),
@@ -182,7 +197,7 @@ class _VisitTypeState extends State<VisitType> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    "Free Follow-Ups: ${appt.freeFollowUps == null ? appt.freeFollowUps : "0"} ",
+                                    "Free Follow-Ups: ${appt.freeFollowUps != null ? appt.freeFollowUps : "0"} ",
                                     style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.green,
@@ -200,8 +215,13 @@ class _VisitTypeState extends State<VisitType> {
                                   onPressed: () {
                                     selectedBooking = appt;
                                     Get.back();
-                                    if (selectedHospitalDoctor != null &&
-                                        selectedHospitalDoctor!
+                                    final doctor =
+                                        hospitalDoctors.firstWhereOrNull(
+                                      (doc) =>
+                                          doc.doctor.doctorId == appt.doctorId,
+                                    );
+                                    if (doctor != null &&
+                                        doctor
                                             .doctor.doctorAvailabilityStatus) {
                                       Get.bottomSheet(
                                         bottomSlotWidget(
@@ -374,43 +394,52 @@ class _VisitTypeState extends State<VisitType> {
                         .format(scheduleController.selectedDate.value);
 
                     final postBookingPayload = FollowUpModal(
-                        bookingId: selectedBooking?.bookingId ?? "",
-                        doctorId: selectedBooking?.doctorId ?? "",
-                        visitType: selectedType,
-                        mobileNumber: widget.mobileNumber,
-                        serviceDate: formattedDate,
-                        serviceTime: scheduleController.selectedSlotText.value,
-                        patientId: patientId);
+                      bookingId: selectedBooking?.bookingId ?? "",
+                      doctorId: selectedBooking?.doctorId ?? "",
+                      visitType: selectedType,
+                      mobileNumber: widget.mobileNumber, // ✅ always String
+                      serviceDate: formattedDate,
+                      servicetime: scheduleController.selectedSlotText.value,
+                      patientId: patientId,
+                    );
+
                     print(
                         '[DEBUG] Response Data:followUpBookings $postBookingPayload');
 
-                    var responseData =
-                        await followUpBookings(postBookingPayload);
-                    print(
-                        '[DEBUG] Response Data:postBookingPayload  $responseData');
+                    var resData = await followUpBookings(postBookingPayload);
 
-                    if (responseData != null &&
-                        (responseData['statusCode'] == 200 ||
-                            responseData['statusCode'] == 201)) {
+                    if (resData != null &&
+                        (resData['statusCode'] == 200 ||
+                            resData['statusCode'] == 201)) {
                       print('[✅] Booking successful');
+                      await _fetchAppointments();
                       ScaffoldMessageSnackbar.show(
                         context: context,
                         message:
                             "Appointment Booked \n You booked ${DateFormat('dd MMM').format(scheduleController.selectedDate.value)} ",
                         type: SnackbarType.success,
                       );
+                      scheduleController.selectedSlotIndex.value = -1;
+                      scheduleController.currentSlots.clear();
                       Get.to(BottomNavController(
                           mobileNumber: widget.mobileNumber,
                           username: widget.username,
                           index: 1));
                     } else {
                       print(
-                          '[❌] Booking failed or unexpected response: $responseData');
+                          '[❌] Booking failed or unexpected response: $resData');
                       ScaffoldMessageSnackbar.show(
                         context: context,
                         message: "Error \n Booking failed",
                         type: SnackbarType.error,
                       );
+                      if (resData != null && resData['message'] != null) {
+                        ScaffoldMessageSnackbar.show(
+                          context: context,
+                          message: "Error \n ${resData['message']}",
+                          type: SnackbarType.error,
+                        );
+                      }
                     }
                   } else {
                     ScaffoldMessageSnackbar.show(
