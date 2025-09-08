@@ -1,18 +1,29 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cutomer_app/ConfirmBooking/ConfirmBookingDetails.dart';
+import 'package:cutomer_app/Controller/CustomerController.dart';
+import 'package:cutomer_app/Doctors/Schedules/ConsentFormAPI.dart';
+import 'package:cutomer_app/Doctors/Schedules/ConsentFromModal.dart';
+import 'package:cutomer_app/Help/Numbers.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/SavePdfToDownloads.dart';
+import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:signature/signature.dart';
 
 import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class SkinCareConsentFormScreen extends StatefulWidget {
   final HospitalDoctorModel doctor;
@@ -31,50 +42,29 @@ class SkinCareConsentFormScreen extends StatefulWidget {
 class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late final SignatureController _patientSignController;
-
+  // final SignatureController patientSignController = SignatureController();
   DateTime _procedureDate = DateTime.now();
-
+  final selectedServicesController = Get.find<SelectedServicesController>();
   // consent points
 
   final Map<String, bool> _consentPoints = {
-    "I understand the purpose and nature of the dermal filler procedure.":
-        false,
-    "I understand possible risks, side effects, and potential complications.":
-        false,
-    "I understand the expected results are temporary and may vary between individuals.":
-        false,
-    "I consent to photographs for medical records (not for marketing).": false,
-    "I have had the opportunity to ask questions and they were answered.":
-        false,
-    "I understand bruising, swelling, redness, or tenderness may occur and are usually temporary.":
-        false,
-    "I understand rare complications such as vascular occlusion, infection, or allergic reaction may occur.":
-        false,
-    "I have disclosed my full medical history, including medications, allergies, and prior cosmetic procedures.":
-        false,
-    "I understand that results may not be exactly as desired and multiple sessions may be needed.":
-        false,
-    "I understand that touching or massaging the treated area without instruction may affect results.":
-        false,
-    "I agree to follow all pre- and post-procedure instructions given by my provider.":
-        false,
-    "I understand that dermal fillers are not permanent and maintenance treatments are required.":
-        false,
-    "I confirm I am not pregnant or breastfeeding.": false,
-    "I understand that medical emergencies (e.g., severe pain, vision changes, skin blanching) require immediate attention.":
-        false,
-    "I give consent for the provider to perform the dermal filler procedure.":
-        false,
+    "I have read and understand the information": true,
+    "I consent to the procedure": true,
+    "I consent to the use of my data": true,
+    "I agree to receive follow-up communications": true,
   };
 
   bool _agreed = false;
   bool _signatureSaved = false;
   Uint8List? _pdfBytes;
   bool _patientSigned = false;
+  Map<String, dynamic>? consentFormData;
+
   @override
   void initState() {
     super.initState();
     _patientSignController = SignatureController(penStrokeWidth: 2);
+    fetchConsentForm();
   }
 
   @override
@@ -83,70 +73,78 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
     super.dispose();
   }
 
-  Future<void> _openPatientSignSheet() async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Patient Signature",
-                  style: TextStyle(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 12),
-              AspectRatio(
-                aspectRatio: 3.5,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
-                    color: Colors.white,
-                  ),
-                  child: Signature(
-                    controller: _patientSignController,
-                    backgroundColor: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  TextButton(
-                      onPressed: () => _patientSignController.clear(),
-                      child: const Text("Clear")),
-                  const Spacer(),
-                  FilledButton(
-                    onPressed: () async {
-                      final data = await _patientSignController.toPngBytes();
-                      if (data != null) {
-                        final pdf =
-                            await _buildPdf(); // generate PDF immediately
-                        setState(() {
-                          _patientSigned = true;
-                          _signatureSaved = true;
-                          _pdfBytes = pdf;
-                        });
-                        Navigator.pop(context); // close sheet
-                      }
-                    },
-                    child: const Text("Save"),
-                  )
-                ],
-              )
-            ],
-          ),
-        );
-      },
-    );
+  void _openQuestions() {
+    // Navigate to your Questions page or show a dialog
+    print('Questions button clicked');
   }
+
+  // Future<void> _openPatientSignSheet() async {
+  //   await showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     shape: const RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+  //     builder: (ctx) {
+  //       return Padding(
+  //         padding: EdgeInsets.only(
+  //           bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+  //           left: 16,
+  //           right: 16,
+  //           top: 16,
+  //         ),
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(8.0),
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               const Text("Patient Signature",
+  //                   style: TextStyle(fontWeight: FontWeight.w600)),
+  //               const SizedBox(height: 12),
+  //               AspectRatio(
+  //                 aspectRatio: 3.5,
+  //                 child: DecoratedBox(
+  //                   decoration: BoxDecoration(
+  //                     border: Border.all(color: Colors.grey.shade400),
+  //                     color: Colors.white,
+  //                   ),
+  //                   child: Signature(
+  //                     controller: patientSignController,
+  //                     backgroundColor: Colors.white,
+  //                   ),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 12),
+  //               Row(
+  //                 children: [
+  //                   TextButton(
+  //                       onPressed: () => _patientSignController.clear(),
+  //                       child: const Text("Clear")),
+  //                   const Spacer(),
+  //                   FilledButton(
+  //                     onPressed: () async {
+  //                       final data = await _patientSignController.toPngBytes();
+  //                       if (data != null) {
+  //                         final pdf =
+  //                             await _buildPdf(); // generate PDF immediately
+  //                         setState(() {
+  //                           _patientSigned = true;
+  //                           _signatureSaved = true;
+  //                           _pdfBytes = pdf;
+  //                         });
+  //                         Navigator.pop(context); // close sheet
+  //                       }
+  //                     },
+  //                     child: const Text("Save"),
+  //                   )
+  //                 ],
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
 // Utility
   Uint8List? decodeBase64Image(String? base64String) {
@@ -155,6 +153,34 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
     // Remove "data:image/png;base64," if present
     final cleaned = base64String.split(',').last;
     return base64Decode(cleaned);
+  }
+
+  final consentFormService = ConsentFormService();
+
+  void fetchConsentForm() async {
+    final data = await consentFormService.getConsentForm(
+      clinicId: widget.doctor.hospital.hospitalId,
+      subServiceId:
+          selectedServicesController.selectedSubServices.first.subServiceId,
+      procedureId: "1", // 👈 fallback generic form
+    );
+
+    if (data != null) {
+      setState(() {
+        consentFormData = data;
+      });
+
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (_) => ConsentFormScreen(consentFormData: consentFormData!),
+      //   ),
+      // );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No consent form available")),
+      );
+    }
   }
 
   Future<Uint8List> _buildPdf() async {
@@ -202,7 +228,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                       style: pw.TextStyle(
                           fontSize: 20, fontWeight: pw.FontWeight.bold)),
                   pw.Text(
-                      "Branch: ${(widget.doctor.hospital.branch != null && widget.doctor.hospital.branch != "" && widget.doctor.hospital.branch!.isNotEmpty) ? widget.doctor.hospital.branch : widget.doctor.hospital.city}",
+                      "Branch: ${(widget.doctor.hospital.branches != null && widget.doctor.hospital.branches != "" && widget.doctor.hospital.branches!.isNotEmpty) ? widget.doctor.hospital.branches : widget.doctor.hospital.city}",
                       style: pw.TextStyle(fontSize: 12)),
                 ],
               )
@@ -299,10 +325,10 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
   }
 
   void _onSubmit() async {
-    if (!_agreed) {
-      _showSnack("You must agree to proceed");
-      return;
-    }
+    // if (!_agreed) {
+    //   _showSnack("You must agree to proceed");
+    //   return;
+    // }
     if (!_signatureSaved) {
       _showSnack("Please provide your signature");
       return;
@@ -315,32 +341,153 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
     Get.to(() => Confirmbookingdetails(
           doctor: widget.doctor,
           patient: widget.patient,
-          pdfBytes: pdfBytes, // pass pdf to next screen
+          pdfBytes: pdfBytes!, // pass pdf to next screen
         ));
   }
 
   void _showSnack(String m) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
 
+  // Save PDF to app directory and optionally share
+  Future<void> _savePdf() async {
+    final pdfBytes = await _buildPdf();
+
+    Directory dir = await getApplicationDocumentsDirectory();
+    final filePath = "${dir.path}/patient_signature.pdf";
+    final file = File(filePath);
+    await file.writeAsBytes(pdfBytes);
+
+    setState(() {
+      _pdfBytes = pdfBytes;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("PDF saved to: $filePath")),
+    );
+  }
+
+  // Share PDF file
+  Future<void> _sharePdf() async {
+    if (_pdfBytes == null) return;
+
+    Directory dir = await getApplicationDocumentsDirectory();
+    final filePath = "${dir.path}/patient_signature.pdf";
+    final file = File(filePath);
+    await file.writeAsBytes(_pdfBytes!);
+
+    await Share.shareFiles([file.path], text: "Patient Consent Form PDF");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonHeader(title: "Consent Form"),
+      appBar: CommonHeader(title: "Patient Consent Form"),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
           children: [
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Name : ",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        Text("${capitalizeEachWord(widget.patient.name)}"),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Age : ",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        Text("${widget.patient.age} Yrs"),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Mobile Number : ",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        Text("${widget.patient.mobileNumber}"),
+                      ],
+                    ),
+                  ]),
+            ),
             _Section(
-              title: 'Consent Points',
+              title: 'Consent',
               child: Column(
                 children:
                     _consentPoints.keys.toList().asMap().entries.map((entry) {
-                  final index = entry.key + 1; // numbering starts from 1
-                  final point = entry.value;
+                  final index = entry.key; // 0-based index
+                  final point = entry.value; // actual text
 
                   return CheckboxListTile(
-                    title: Text("$index. $point"),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: GestureDetector(
+                      onTap: () {
+                        // ✅ make only specific indexes clickable
+                        if (index == 0) {
+                          if (consentFormData != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ConsentFormScreen(
+                                  consentFormData: consentFormData!,
+                                ),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Consent form not loaded yet")),
+                            );
+                          }
+                        } else if (index == 1) {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (_) => AnotherScreen(),
+                          //   ),
+                          // );
+                        }
+                      },
+                      child: Text(
+                        "${index + 1}. $point", // adds numbering
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.2,
+                          color: (index == 0 || index == 1)
+                              ? Colors.blue
+                              : Colors.black,
+                          decoration: (index == 0 || index == 1)
+                              ? TextDecoration.underline
+                              : TextDecoration.none,
+                        ),
+                      ),
+                    ),
                     value: _consentPoints[point],
                     onChanged: (val) {
                       setState(() {
@@ -352,73 +499,179 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            _Section(
-              title: "Agreement",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CheckboxListTile(
-                    title: const Text("I Agree to the above terms"),
-                    value: _agreed,
-                    onChanged: (val) {
-                      setState(() {
-                        _agreed = val ?? false;
-                      });
-                      if (val == true) {
-                        _openPatientSignSheet(); // open signature pad when agree
-                      }
-                    },
+            Center(
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  text:
+                      'Your data will be kept confidential and used in accordance with our ',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    height: 1.8, // <--- controls line height (default is ~1.5)
                   ),
-
-                  // ✅ Show tick when signature saved
-                  if (_patientSigned)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16.0, top: 8),
-                      child: Row(
-                        children: [
-                          const CircleAvatar(
-                            radius: 14,
-                            backgroundColor: Colors.green,
-                            child: Icon(Icons.check,
-                                color: Colors.white, size: 18),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            "Signature Saved",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
+                  children: [
+                    TextSpan(
+                      text: 'Privacy Policy',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                        height: 1.2, // <--- match parent line height
                       ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () async {
+                          const url = 'https://www.example.com/privacy-policy';
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url));
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
                     ),
-                ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
-            SizedBox(
-              height: 48,
-              child: FilledButton.icon(
-                onPressed: (_signatureSaved && _pdfBytes != null)
-                    ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                PdfPreviewScreen(pdfBytes: _pdfBytes!),
-                          ),
-                        );
-                      }
-                    : null, // disables button if condition not met
-                icon: const Icon(Icons.picture_as_pdf),
-                label: Text(
-                  (_signatureSaved && _pdfBytes != null)
-                      ? "Preview PDF"
-                      : "Complete form to enable", // dynamic label
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Questions Button
+                  ElevatedButton.icon(
+                    onPressed: _openQuestions,
+                    icon: Icon(Icons.question_answer),
+                    label: Text('Questions'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                  SizedBox(width: 20), // spacing between buttons
+
+                  // WhatsApp Button
+                  ElevatedButton.icon(
+                    onPressed: whatsUpChat,
+                    icon: Icon(Icons.whatshot),
+                    label: Text('Help via WhatsApp'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: const Text(
+                "Patient Signature",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              ),
+            ),
+
+            // Signature box
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey, // border color
+                    width: 2, // border thickness
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(8), // optional rounded corners
+                ),
+                child: AspectRatio(
+                  aspectRatio: 3.5,
+                  child: Signature(
+                    controller: _patientSignController,
+                    backgroundColor: Colors.white,
+                  ),
                 ),
               ),
-            )
+            ),
+
+            // Buttons Row
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () => _patientSignController.clear(),
+                  child: const Text("Clear"),
+                ),
+                const Spacer(),
+                FilledButton(
+                  onPressed: () async {
+                    final data = await _patientSignController.toPngBytes();
+                    if (data != null) {
+                      final pdf = await _buildPdf(); // generate PDF
+                      setState(() {
+                        _patientSigned = true;
+                        _signatureSaved = true;
+                        _pdfBytes = pdf;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Signature Saved Successfully ✅"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text("Save"),
+                )
+              ],
+            ),
+
+            // ✅ Saved Indicator
+            if (_patientSigned)
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 8),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 14,
+                      backgroundColor: Colors.green,
+                      child: Icon(Icons.check, color: Colors.white, size: 18),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      "Signature Saved",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const Spacer(),
+
+                    // 👁 Preview PDF
+                    IconButton(
+                      icon: const Icon(Icons.picture_as_pdf, color: Colors.red),
+                      tooltip: "Preview PDF",
+                      onPressed: (_pdfBytes != null)
+                          ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      PdfPreviewScreen(pdfBytes: _pdfBytes!),
+                                ),
+                              );
+                            }
+                          : null,
+                    ),
+
+                    // ⬇️ Download PDF
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: _pdfBytes != null ? _sharePdf : null,
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
@@ -435,11 +688,11 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
             ),
           ),
           onPressed: _onSubmit,
-          icon: const Icon(
-            Icons.check,
-            color: Colors.white,
-            size: 25,
-          ),
+          // icon: const Icon(
+          //   Icons.check,
+          //   color: Colors.white,
+          //   size: 25,
+          // ),
           label: const Text(
             "SUBMIT",
             style: TextStyle(
@@ -460,21 +713,22 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-          child
-        ]),
-      ),
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(title,
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+        ),
+        child
+      ]),
     );
   }
 }
 
 class PdfPreviewScreen extends StatelessWidget {
-  final Uint8List pdfBytes;
+  final Uint8List? pdfBytes;
   const PdfPreviewScreen({super.key, required this.pdfBytes});
 
   @override
@@ -482,7 +736,7 @@ class PdfPreviewScreen extends StatelessWidget {
     return Scaffold(
       appBar: CommonHeader(title: "Consent PDF Preview"),
       body: PdfPreview(
-        build: (format) async => pdfBytes,
+        build: (format) async => pdfBytes!,
         allowPrinting: true,
         allowSharing: true,
       ),

@@ -15,6 +15,7 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp(
       isFirstLoginDone: false,
+      biometricEnabled: false,
     ));
 
     // Verify that our counter starts at 0.

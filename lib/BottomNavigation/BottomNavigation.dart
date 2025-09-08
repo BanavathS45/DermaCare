@@ -50,6 +50,7 @@ class _BottomNavControllerState extends State<BottomNavController> {
       DashboardScreen(
         mobileNumber: widget.mobileNumber,
         username: widget.username,
+        consulationType: widget.consultation!.consultationType,
       ),
       AppointmentPage(
         mobileNumber: widget.mobileNumber,

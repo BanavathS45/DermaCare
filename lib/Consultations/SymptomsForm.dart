@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
+import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:cutomer_app/Inputs/CustomInputField.dart';
 import 'package:cutomer_app/SigninSignUp/LoginController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
@@ -36,7 +37,9 @@ class _SymptomsFormState extends State<SymptomsForm> {
   SiginSignUpController siginSignUpController = SiginSignUpController();
   String? errorText;
   int charCount = 0;
+  String? _selectedDurationType;
 
+  final List<String> durationTypes = ["Hours", "Days", "Months", "Years"];
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true, // 👈 allow selecting multiple files
@@ -83,8 +86,8 @@ class _SymptomsFormState extends State<SymptomsForm> {
       setState(() => errorText = "Symptoms field is required.");
       return;
     }
-    if (length < 20) {
-      setState(() => errorText = "Minimum 20 characters required.");
+    if (length < 10) {
+      setState(() => errorText = "Minimum 10 characters required.");
       return;
     }
     if (length > 1000) {
@@ -94,10 +97,11 @@ class _SymptomsFormState extends State<SymptomsForm> {
 
     // Save and Clear
     controller.updateSymptoms(text);
-    controller.updateDuration(duration);
+    controller.updateDuration("${duration} ${_selectedDurationType}");
     controller.updateVisitType(selectedType);
     print("Symptoms: ${controller.symptoms.value}");
     print("updateDuration: ${controller.duration.value}");
+    print("_selectedDurationType: ${"${duration} ${_selectedDurationType}"}");
 
     // controller.clearForm();
 
@@ -206,25 +210,6 @@ class _SymptomsFormState extends State<SymptomsForm> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Symptoms Duration",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    CustomTextField(
-                      controller: _durationController,
-                      labelText: 'Select Duartion',
-                      keyboardType: TextInputType.number,
-                      autovalidateMode: AutovalidateMode.onUnfocus,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(3),
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      validator: (value) =>
-                          siginSignUpController.validateNumber(
-                        value,
-                        "Duartion",
-                      ),
-                    ),
-                    const SizedBox(height: 25),
                     Text("Enter your symptoms",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
@@ -264,6 +249,73 @@ class _SymptomsFormState extends State<SymptomsForm> {
                           });
                         },
                       ),
+                    ),
+                    const SizedBox(height: 25),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Symptoms Duration",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            // Duration Number
+                            Expanded(
+                              child: TextFormField(
+                                controller: _durationController,
+                                decoration: InputDecoration(
+                                  labelText: "Duration",
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 16),
+                                ),
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(3),
+                                ],
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Enter duration";
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+
+                            // Duration Type Dropdown
+                            Expanded(
+                              child: CustomDropdownField<String>(
+                                value: _selectedDurationType,
+                                labelText: "Select Type",
+                                items: durationTypes
+                                    .map((type) => DropdownMenuItem<String>(
+                                          value: type,
+                                          child: Text(type),
+                                        ))
+                                    .toList(),
+                                onChanged: (val) {
+                                  setState(() {
+                                    _selectedDurationType = val;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Select type";
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 15),
                     Text("Attach any document (if any)",

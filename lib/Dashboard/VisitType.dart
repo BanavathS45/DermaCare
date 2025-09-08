@@ -28,12 +28,13 @@ class VisitType extends StatefulWidget {
   final String mobileNumber;
   final String username;
   final String consulationType;
-
+  final ValueChanged<String> onVisitTypeChanged; // callback
   const VisitType({
     super.key,
     required this.mobileNumber,
     required this.username,
     required this.consulationType,
+    required this.onVisitTypeChanged,
   });
 
   @override
@@ -47,7 +48,7 @@ class _VisitTypeState extends State<VisitType> {
   final appointmentService = Get.put(AppointmentService());
   final visitController = Get.put(VisitController());
   List<HospitalDoctorModel> hospitalDoctors = [];
-  String selectedType = "";
+  String selectedType = "First Time"; // default
   final scheduleController = Get.find<ScheduleController>();
   bool showAllRows = false;
   final ScrollController _dateScrollController = ScrollController();
@@ -58,7 +59,7 @@ class _VisitTypeState extends State<VisitType> {
   void initState() {
     super.initState();
     _fetchAppointments();
-
+    selectedType = "First Time";
     fetchHospitalDoctor().then((value) async {
       setState(() => hospitalDoctors = value);
 
@@ -85,14 +86,14 @@ class _VisitTypeState extends State<VisitType> {
     }
   }
 
-  void _handleFirstTime() {
-    controller.updateVisitType(selectedType);
-    Get.offAll(() => BottomNavController(
-          mobileNumber: widget.mobileNumber,
-          username: widget.username,
-          index: 0,
-        ));
-  }
+  // void _handleFirstTime() {
+  //   controller.updateVisitType(selectedType);
+  //   Get.offAll(() => BottomNavController(
+  //         mobileNumber: widget.mobileNumber,
+  //         username: widget.username,
+  //         index: 0,
+  //       ));
+  // }
 
   void _handleFollowUp() {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -467,36 +468,46 @@ class _VisitTypeState extends State<VisitType> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CommonHeader(title: "Visit Type"),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Choose Visit Type",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ChoiceChip(
-                label: const Text("First Time"),
-                selected: selectedType == "First Time",
-                selectedColor: mainColor.withOpacity(0.2),
-                onSelected: (selected) {
-                  setState(() => selectedType = "First Time");
-                  _handleFirstTime();
-                },
+              Expanded(
+                child: ChoiceChip(
+                  label: const Center(child: Text("First Time")),
+                  selected: selectedType == "First Time",
+                  selectedColor: mainColor.withOpacity(0.2),
+                  onSelected: (_) {
+                    setState(() => selectedType = "First Time");
+                    widget.onVisitTypeChanged(selectedType); // notify parent
+                  },
+                ),
               ),
-              const SizedBox(height: 20),
-              ChoiceChip(
-                label: const Text("Follow-Up"),
-                selected: selectedType == "Follow-Up",
-                selectedColor: mainColor.withOpacity(0.2),
-                onSelected: (selected) {
-                  setState(() => selectedType = "Follow-Up");
-                  _handleFollowUp();
-                },
+              const SizedBox(width: 12),
+              Expanded(
+                child: ChoiceChip(
+                  label: const Center(child: Text("Follow-Up")),
+                  selected: selectedType == "Follow-Up",
+                  selectedColor: mainColor.withOpacity(0.2),
+                  onSelected: (_) {
+                    setState(() => selectedType = "Follow-Up");
+                    widget.onVisitTypeChanged(selectedType); // notify parent
+                    _handleFollowUp();
+                  },
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }

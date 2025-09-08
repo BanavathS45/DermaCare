@@ -224,29 +224,30 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     // Get.to(() => Confirmbookingdetails(doctor: doctorData, patient: patientData));
                     print('Doctor 8888: ${widget.doctorData}');
                     print('Patient: $patientmodel');
-                    // if (consultationController
-                    //         .selectedConsultation.value?.consultationType ==
-                    //     "Services & Treatments") {
-                    //   symptomsController.updateDuration(
-                    //       patientdetailsformcontroller.durationController.text);
+                    if (consultationController
+                            .selectedConsultation.value?.consultationType ==
+                        "Services & Treatments") {
+                      symptomsController.updateDuration(
+                          patientdetailsformcontroller.durationController.text);
 
-                    //   Get.to(SkinCareConsentFormScreen(
-                    //     doctor: widget.doctorData,
-                    //     patient: patientmodel,
-                    //   ));
-                    //   print(
-                    //       "patientdetailsformcontroller.durationController.text ${patientdetailsformcontroller.durationController.text}");
-                    // } else {
-                    //   Get.to(() => Confirmbookingdetails(
-                    //         doctor: widget.doctorData,
-                    //         patient: patientmodel,
-                    //         // pass pdf to next screen
-                    //       ));
-                    // }
-                    Get.to(SkinCareConsentFormScreen(
-                      doctor: widget.doctorData,
-                      patient: patientmodel,
-                    ));
+                      Get.to(SkinCareConsentFormScreen(
+                        doctor: widget.doctorData,
+                        patient: patientmodel,
+                       
+                      ));
+                      print(
+                          "patientdetailsformcontroller.durationController.text ${patientdetailsformcontroller.durationController.text}");
+                    } else {
+                      Get.to(() => Confirmbookingdetails(
+                            doctor: widget.doctorData,
+                            patient: patientmodel,
+                            // pass pdf to next screen
+                          ));
+                    }
+                    // Get.to(SkinCareConsentFormScreen(
+                    //   doctor: widget.doctorData,
+                    //   patient: patientmodel,
+                    // ));
 
                     // symptomsController.updateDuration( patientdetailsformcontroller.durationController.text);
                     // Get.to(Confirmbookingdetails(

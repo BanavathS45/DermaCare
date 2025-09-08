@@ -32,12 +32,12 @@ import 'ConsultationController.dart';
 class Confirmbookingdetails extends StatefulWidget {
   final HospitalDoctorModel doctor;
   final PatientModel patient;
-  final Uint8List pdfBytes;
+  final Uint8List? pdfBytes;
   Confirmbookingdetails({
     super.key,
     required this.doctor,
     required this.patient,
-    required this.pdfBytes,
+    this.pdfBytes,
   });
 
   @override
@@ -138,7 +138,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
     final double gstRate = 0.18;
     final double taxRate = 0;
-    final servicePrice = (subServiceDetails!.price);
+    final double servicePrice = subServiceDetails?.price ?? 0;
     final double gstAmount = servicePrice * gstRate;
     final double taxAmount = servicePrice * taxRate;
     final double totalAmount = (servicePrice + gstAmount + taxAmount);
@@ -214,10 +214,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   labelText: 'Enter Refferal Code',
                   keyboardType: TextInputType.text,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(3),
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
+                  // inputFormatters: [
+                  //   LengthLimitingTextInputFormatter(3),
+                  //   FilteringTextInputFormatter.digitsOnly,
+                  // ],
                 ),
                 PaymentModeSelector(
                   consultationType: consultationController
@@ -247,7 +247,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             if (symptomsController.duration.value.isNotEmpty)
               Obx(() {
                 return infoRow(
-                    "Duration", "${symptomsController.duration.value} days");
+                    "Duration", "${symptomsController.duration.value}");
               }),
 
             if (symptomsController.visitType.value.isNotEmpty)
@@ -425,10 +425,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   if (consultationId != "ST_01") ...[
                     // Static fields for Services & Treatments
                     infoRow("Consultation Fee",
-                        "₹ ${consultationFee?.toStringAsFixed(0) ?? '0'}"),
+                        "₹ ${consultationFee.toStringAsFixed(0) ?? '0'}"),
                     infoRow("GST (18%)",
-                        "₹ ${(consultationFee * 0.18)?.toStringAsFixed(0) ?? '0'}"),
-                    infoRow("Tax", "₹ ${taxAmount?.toStringAsFixed(0) ?? '0'}"),
+                        "₹ ${(consultationFee * 0.18).toStringAsFixed(0) ?? '0'}"),
+                    infoRow("Tax", "₹ ${taxAmount.toStringAsFixed(0) ?? '0'}"),
                     infoRow("Total Fee",
                         "₹ ${(consultationFee + consultationFee * 0.18 + 0)?.toStringAsFixed(0) ?? '0'}"),
                   ] else ...[
@@ -489,7 +489,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 selectedServicesController.selectedPayment.value;
 
             print("Selected Payment: $selectedPayment");
-            String pdfBase64 = base64Encode(widget.pdfBytes!);
+            String? pdfBase64 =
+                widget.pdfBytes != null ? base64Encode(widget.pdfBytes!) : null;
             final bookingDetails = BookingDetailsModel(
               subServiceName: globalServiceId == "ST_01"
                   ? selectedServicesController
@@ -537,7 +538,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               attachments: symptomsController.attachments.value,
               freeFollowUps: widget.doctor.hospital.freeFollowUps,
               consentFormPdf: pdfBase64 ?? "",
-              // doctorRefCode: doctorRefController.text ?? "",
+              doctorRefCode: doctorRefController.text ?? "",
             );
             print(
                 '[🏥] Booking via Pay at Hospital ${bookingDetails.toString()}');
@@ -717,7 +718,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             Column(
               children: [
                 Text(
-                  "${hospital!.name}",
+                  "${hospital?.name}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,

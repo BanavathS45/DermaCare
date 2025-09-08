@@ -36,7 +36,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   bool loading = true;
   bool showConsultationOptions = false;
   final dashboardcontroller = Get.put(Dashboardcontroller());
-
+  String visitType = "First Time"; // default
   @override
   void initState() {
     super.initState();
@@ -249,13 +249,22 @@ class ConsultationsTypeState extends State<ConsultationsType> {
             : null;
 
         if (firstId != null && firstId == id) {
-          Get.to(VisitType(mobileNumber: widget.mobileNumber, username: widget.username, consulationType: consultation.consultationType,));
-          // Get.to(BottomNavController(
-          //   mobileNumber: widget.mobileNumber,
-          //   username: widget.username,
-          //   consultation: consultation,
-          //   index: 0,
-          // ));
+          Get.to(VisitType(
+            mobileNumber: widget.mobileNumber,
+            username: widget.username,
+            consulationType: consultation.consultationType,
+            onVisitTypeChanged: (type) {
+              setState(() {
+                visitType = type;
+              });
+            },
+          ));
+          Get.to(BottomNavController(
+            mobileNumber: widget.mobileNumber,
+            username: widget.username,
+            consultation: consultation,
+            index: 0,
+          ));
         } else {
           Get.to(SymptomsForm(
             mobileNumber: widget.mobileNumber,

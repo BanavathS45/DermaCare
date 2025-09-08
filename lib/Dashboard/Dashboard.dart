@@ -25,11 +25,13 @@ import 'DashBoardController.dart';
 class DashboardScreen extends StatefulWidget {
   final String mobileNumber;
   final String username;
+  final String consulationType;
 
   const DashboardScreen({
     super.key,
     required this.mobileNumber,
     required this.username,
+    required this.consulationType,
   });
 
   @override
@@ -41,7 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   final Dashboardcontroller dashboardcontroller =
       Get.put(Dashboardcontroller());
   final controller = Get.put(AppointmentController());
-
+  String visitType = "First Time"; // default
   late final AnimationController _rotationController;
 
   bool showLabel = false;
@@ -340,6 +342,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                       media: dashboardcontroller.carouselImages,
                       height: 170,
                     ),
+                    VisitType(
+                      mobileNumber: widget.mobileNumber,
+                      username: widget.username,
+                      consulationType: widget.consulationType,
+                      onVisitTypeChanged: (type) {
+                        setState(() {
+                          visitType = type;
+                        });
+                      },
+                    ),
                     const SizedBox(height: 20),
                     if (controller.inProgressBookings.isNotEmpty) ...[
                       Padding(
@@ -406,26 +418,33 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                     ),
                     const SizedBox(height: 10),
-                    GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: dashboardcontroller.services.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 1,
-                        mainAxisSpacing: 5,
+                    IgnorePointer(
+                      ignoring: visitType == "Follow-Up",
+                      child: Opacity(
+                        opacity: visitType == "Follow-Up"
+                            ? 0.5
+                            : 1.0, // visually disabled
+                        child: GridView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: dashboardcontroller.services.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 1,
+                            mainAxisSpacing: 5,
+                          ),
+                          itemBuilder: (context, index) {
+                            final service = dashboardcontroller.services[index];
+                            return ServiceCard(
+                              mobileNumber: widget.mobileNumber,
+                              username: widget.username,
+                              service: service,
+                            );
+                          },
+                        ),
                       ),
-                      itemBuilder: (context, index) {
-                        final service = dashboardcontroller.services[index];
-                        return ServiceCard(
-                          mobileNumber: widget.mobileNumber,
-                          username: widget.username,
-                          service: service,
-                        );
-                      },
                     ),
-                    
                   ],
                 ),
               ),

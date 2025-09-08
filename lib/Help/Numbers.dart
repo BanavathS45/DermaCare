@@ -1,7 +1,7 @@
 import 'package:url_launcher/url_launcher.dart';
 
-String customerNumber = "8985073803";
-String customerWhatsupNumber = "8985073803";
+String customerNumber = "7842259803";
+String customerWhatsupNumber = "7842259803";
 String emailID = "surecare@gmail.com";
 
 customerCare() async {

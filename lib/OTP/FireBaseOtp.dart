@@ -121,57 +121,6 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
     }
   }
 
-  // Future<void> verifyOTP(String otp) async {
-  //   setState(() => isLoading = true);
-
-  //   try {
-  //     PhoneAuthCredential credential = PhoneAuthProvider.credential(
-  //       verificationId: verificationId,
-  //       smsCode: otp,
-  //     );
-
-  //     UserCredential userCredential =
-  //         await _auth.signInWithCredential(credential);
-
-  //     final checkUserResponse = await http.get(
-  //       Uri.parse('$registerUrl/getBasicDetails/${widget.mobileNumber}'),
-  //     );
-
-  //     if (checkUserResponse.statusCode == 200) {
-  //       final data = json.decode(checkUserResponse.body);
-  //       if (data['success'] == true && data['data'] != null) {
-  //         Get.offAll(() => ConsultationsType(
-  //               mobileNumber: widget.mobileNumber,
-  //               username: widget.fullname ?? '',
-  //             ));
-  //       } else {
-  //         Get.to(() => RegisterScreen(
-  //               fullName: widget.fullname!,
-  //               mobileNumber: widget.mobileNumber,
-  //             ));
-  //       }
-  //     } else {
-  //       Get.to(() => RegisterScreen(
-  //             fullName: widget.fullname!,
-  //             mobileNumber: widget.mobileNumber,
-  //           ));
-  //     }
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Login successful")),
-  //     );
-  //   } catch (e) {
-  //     setState(() {
-  //       failedAttempts++;
-  //     });
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Invalid OTP")),
-  //     );
-  //   } finally {
-  //     setState(() => isLoading = false);
-  //   }
-  // }
-
   //verfy oTP
   Future<void> verifyOTP(String otp) async {
     setState(() => isLoading = true);
@@ -198,6 +147,8 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         );
         final prefs = await SharedPreferences.getInstance();
         final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
+        await prefs.setBool('isFirstLoginDone', true);
+
         final token = prefs.getString('fcm');
         if (checkUserResponse.statusCode == 200) {
           final data = json.decode(checkUserResponse.body);

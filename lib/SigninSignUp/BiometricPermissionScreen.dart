@@ -22,6 +22,18 @@ class EnableBiometricScreen extends StatefulWidget {
 class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
   final LocalAuthentication auth = LocalAuthentication();
 
+  // Future<void> enableBiometric() async {
+  //   bool canCheck = await auth.canCheckBiometrics;
+  //   if (canCheck) {
+  //     Get.to(ConsultationsType(
+  //       mobileNumber: widget.mobileNumber,
+  //       username: widget.fullname ?? '',
+  //     ));
+  //   } else {
+  //     Get.snackbar("Error", "Biometric not available");
+  //   }
+  // }
+
   Future<void> _authenticate() async {
     try {
       bool didAuthenticate = await auth.authenticate(

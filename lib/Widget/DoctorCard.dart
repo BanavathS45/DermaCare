@@ -22,6 +22,8 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
   if (base64String.startsWith(prefix)) {
     base64String = base64String.substring(prefix.length);
   }
+
+  print(" doctorModel.hospital.toString() ${doctorModel.hospital.branches}");
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     decoration: BoxDecoration(
@@ -51,7 +53,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                       ),
                       TextSpan(
                         text:
-                            "(${(hospital.branch != null && hospital.branch!.isNotEmpty) ? hospital.branch : hospital.city})",
+                            "(${(hospital.branches != null && hospital.branches!.isNotEmpty) ? hospital.branches : (hospital.city != null && hospital.city!.isNotEmpty) ? hospital.city : "Jubilee Hillss"})",
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
@@ -61,6 +63,18 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                   ),
                 ),
               ),
+
+              Row(
+                children: [
+                  const Icon(Icons.star, size: 16, color: Colors.yellow),
+                  const SizedBox(width: 4),
+                  Text(
+                    hospital.hospitalOverallRating?.toStringAsFixed(1) ?? "0.0",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+
               // IconButton( //TODO:implement pending
               //   icon: Icon(
               //     Icons.thumb_up,
@@ -74,117 +88,109 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
 
           // Doctor details
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundImage: MemoryImage(base64Decode(base64String)),
-                onBackgroundImageError: (_, __) => const Icon(Icons.person),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+              // Doctor Image with Verified + Availability
+              Column(
+                children: [
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      CircleAvatar(
+                        radius: 35,
+                        backgroundImage:
+                            MemoryImage(base64Decode(base64String)),
+                        onBackgroundImageError: (_, __) =>
+                            const Icon(Icons.person, size: 35),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "${doctor.doctorName}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: mainColor),
-                                      maxLines: 2, // Limit to 2 lines
 
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      "(${doctor.qualification})",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: Colors.grey),
-                                      maxLines: 2, // Limit to 2 lines
-
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              SizedBox(
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    // Verified Badge at Top
-                                    Column(
-                                      children: [
-                                        Icon(
-                                          Icons.verified,
-                                          size: 16,
-                                          color: mainColor,
-                                        ),
-                                        Text(
-                                          "Verified",
-                                          style: TextStyle(fontSize: 10),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
+                      // Verified icon bottom-right
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  "${doctor.specialization} ",
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                              // Availability at Bottom
-                              Text(
-                                doctor.doctorAvailabilityStatus
-                                    ? "Available\nNow"
-                                    : "Not\nAvailable",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: doctor.doctorAvailabilityStatus
-                                      ? Colors.green
-                                      : Colors.red,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                          child: const Icon(
+                            Icons.verified,
+                            size: 16,
+                            color: mainColor,
                           ),
-                        ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  // Availability text
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white, // ✅ White background
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        doctor.doctorAvailabilityStatus
+                            ? "Available Now"
+                            : "Not Available",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: doctor.doctorAvailabilityStatus
+                              ? Colors.green // ✅ Green when available
+                              : Colors.red, // ✅ Red when not available
+                        ),
                       ),
                     ),
-                  ],
+                  )
+                ],
+              ),
+              const SizedBox(width: 12),
+
+              // Doctor name + qualification + specialization
+              Expanded(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${doctor.doctorName}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: mainColor),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "(${doctor.qualification})",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.grey),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "${doctor.specialization} ",
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

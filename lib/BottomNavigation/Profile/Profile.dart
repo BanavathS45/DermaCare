@@ -5,6 +5,7 @@ import 'package:cutomer_app/BottomNavigation/Profile/ProfileScreens.dart';
 import 'package:cutomer_app/Customers/GetCustomerModel.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
 import 'package:cutomer_app/Dashboard/GetCustomerData.dart';
+import 'package:cutomer_app/Reports/CostomerReports.dart';
 import 'package:cutomer_app/UserManuval/AppointmentManual.dart';
 import 'package:cutomer_app/UserManuval/UserManual.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
@@ -117,25 +118,27 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 userData = snapshot.data!;
                 print("userData: ${userData!.fullName}"); // Debug print
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text('${capitalizeEachWord(userData!.fullName)}',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: mainColor)),
-                    Text('Customer ID: ${userData!.customerId}'),
-                  ],
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text('${capitalizeEachWord(userData!.fullName)}',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: mainColor)),
+                      Text('Customer ID: ${userData!.customerId}'),
+                    ],
+                  ),
                 );
               }
             },
           ),
           SizedBox(
-            height: 50,
+            height: 20,
           ),
           // Cards List
           buildCardItem(
@@ -149,6 +152,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               icon: Icons.help_outline,
               label: "Privacy Policy",
               onTap: () => Get.to(() => TermsAndConditionsScreen())),
+          buildCardItem(
+              icon: Icons.help_outline,
+              label: "Reports",
+              onTap: () => Get.to(() => CustomerReportsPage())),
           // onTap: () {}),
           buildCardItem(
               icon: Icons.help_outline,

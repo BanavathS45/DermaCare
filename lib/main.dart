@@ -201,6 +201,7 @@
 // }
 
 import 'package:cutomer_app/Dashboard/VisitController.dart';
+import 'package:cutomer_app/Doctors/Schedules/ConsentForm.dart';
 import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:cutomer_app/PushNotification/PushNotification.dart';
@@ -287,8 +288,6 @@ Future<void> main() async {
   Get.put(VisitController());
   Get.put(SubServiceController());
 
-  
-
   // ✅ FCM Notification tap handling
   final RemoteMessage? initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();
@@ -306,21 +305,25 @@ Future<void> main() async {
   // ✅ Check login state
   final prefs = await SharedPreferences.getInstance();
   final isFirstLoginDone = prefs.getBool('isFirstLoginDone') ?? false;
+  final biometricEnabled = prefs.getBool('isAuthenticated') ?? false;
 
   runApp(MyApp(
     isFirstLoginDone: isFirstLoginDone,
+    biometricEnabled: biometricEnabled,
     initialMessage: initialMessage,
   ));
 }
 
 class MyApp extends StatelessWidget {
   final bool isFirstLoginDone;
+  final bool biometricEnabled;
   final RemoteMessage? initialMessage;
 
   const MyApp({
     super.key,
     required this.isFirstLoginDone,
     this.initialMessage,
+    required this.biometricEnabled,
   });
 
   @override
@@ -330,8 +333,12 @@ class MyApp extends StatelessWidget {
 
     if (initialMessage != null) {
       homeScreen = NotificationScreen();
+    } else if (!isFirstLoginDone) {
+      homeScreen = Loginscreen();
+    } else if (biometricEnabled) {
+      homeScreen = BiometricAuthScreen();
     } else {
-      homeScreen = isFirstLoginDone ? BiometricAuthScreen() : Loginscreen();
+      homeScreen = Loginscreen();
     }
 
     return GetMaterialApp(
@@ -339,6 +346,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: _buildAppTheme(),
       home: homeScreen,
+      // home: SkinCareConsentFormScreen(),
+      // SkinCareConsentFormScreen
       onGenerateRoute: onGenerateRoute,
     );
   }
