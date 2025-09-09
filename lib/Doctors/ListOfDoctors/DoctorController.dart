@@ -198,14 +198,18 @@ class DoctorController extends GetxController {
 
       final List<HospitalDoctorModel> doctors =
           await doctorService.fetchDoctorsAndClinic(hospitalId, subServiceId);
-      print("🏥 Using hospitalId doctors: ${doctors.first.hospital.branches}");
+      print("🏥 Using hospitalId doctors: ${doctors.first.hospital.branch}");
 
       allDoctorsFlat.value = doctors;
       allServices.value = doctors;
 
       for (var d in doctors) {
         print(
-            "✅ Doctor loaded: ${d.doctor.doctorName}, ${d.hospital.recommended},${d.hospital.branches},${d.hospital.consultationExpiration}");
+            "✅ Doctor loaded: ${d.doctor.doctorName}, ${d.hospital.recommended},${d.hospital.branch},${d.hospital.consultationExpiration}");
+        print("✅ Doctor signture: ${d.doctor.toString()}");
+        print("✅ Doctor signture: ${d.doctor.doctorSignature}");
+        // print("📝 Full Doctor Data: ${d.doctor.toJson()}");
+        // print("🏥 Full Hospital Data: ${d.hospital.toJson()}");
       }
       List<Future<void>> ratingFutures = [];
       for (var doctorModel in doctors) {

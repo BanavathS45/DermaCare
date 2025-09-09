@@ -47,10 +47,10 @@ class _BottomNavControllerState extends State<BottomNavController> {
 
     // Initialize pages
     _pages = [
-      DashboardScreen(
+      ConsultationsType(
         mobileNumber: widget.mobileNumber,
         username: widget.username,
-        consulationType: widget.consultation!.consultationType,
+        // consulationType: widget.consultation!.consultationType,
       ),
       AppointmentPage(
         mobileNumber: widget.mobileNumber,

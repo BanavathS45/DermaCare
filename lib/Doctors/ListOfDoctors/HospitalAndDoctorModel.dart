@@ -144,7 +144,7 @@ class Hospital {
   final String hospitalLogo;
   final bool recommended;
   final String? consultationExpiration;
-  final String branches;
+  final String branch;
   final double hospitalOverallRating;
   Hospital({
     required this.hospitalId,
@@ -157,7 +157,7 @@ class Hospital {
     required this.hospitalLogo,
     required this.recommended,
     required this.freeFollowUps,
-    required this.branches,
+    required this.branch,
     this.consultationExpiration,
     required this.hospitalOverallRating,
   });
@@ -175,7 +175,7 @@ class Hospital {
       recommended: json['recommended'] ?? false,
       freeFollowUps: json['freeFollowUps'] ?? 0,
       consultationExpiration: json['consultationExpiration'],
-      branches: json['branches'] ?? '',
+      branch: json['branch'] ?? '',
       hospitalOverallRating: json['hospitalOverallRating'] ?? 0.0,
     );
   }

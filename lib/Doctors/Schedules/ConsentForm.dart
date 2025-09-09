@@ -4,6 +4,8 @@ import 'package:cutomer_app/ConfirmBooking/ConfirmBookingDetails.dart';
 import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Doctors/Schedules/ConsentFormAPI.dart';
 import 'package:cutomer_app/Doctors/Schedules/ConsentFromModal.dart';
+import 'package:cutomer_app/Doctors/Schedules/UserDataConsentScreen.dart';
+import 'package:cutomer_app/Doctors/Schedules/consent_form_model.dart';
 import 'package:cutomer_app/Help/Numbers.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
@@ -48,7 +50,6 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
   // consent points
 
   final Map<String, bool> _consentPoints = {
-    "I have read and understand the information": true,
     "I consent to the procedure": true,
     "I consent to the use of my data": true,
     "I agree to receive follow-up communications": true,
@@ -58,13 +59,22 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
   bool _signatureSaved = false;
   Uint8List? _pdfBytes;
   bool _patientSigned = false;
-  Map<String, dynamic>? consentFormData;
+  ConsentForm? consentFormData;
 
+  final String procedure =
+      "I hereby provide my informed consent to undergo the procedure and acknowledge that I have understood the associated pre-procedure, procedure, and post-procedure care and guidelines and the corresponding possible reactions and risks.";
+  String? userData;
   @override
   void initState() {
     super.initState();
     _patientSignController = SignatureController(penStrokeWidth: 2);
     fetchConsentForm();
+
+    print("Doctor signuture ${widget.doctor.doctor.doctorSignature}");
+    setState(() {
+      userData =
+          "I, ${widget.patient.name}, hereby give my voluntary and informed consent for the collection, storage, and use of my medical records, personal health information, and diagnostic images for purposes including research, education, training, and improving medical services. I understand that all information will be handled in accordance with applicable privacy laws and regulations, and that my identity will be protected unless I provide separate written authorization. I acknowledge that participation is voluntary and that I may withdraw my consent at any time, without affecting the medical care I receive.";
+    });
   }
 
   @override
@@ -176,6 +186,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
       //     builder: (_) => ConsentFormScreen(consentFormData: consentFormData!),
       //   ),
       // );
+      print("ConsentFormData: ${consentFormData!.hospitalId}");
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("No consent form available")),
@@ -228,7 +239,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                       style: pw.TextStyle(
                           fontSize: 20, fontWeight: pw.FontWeight.bold)),
                   pw.Text(
-                      "Branch: ${(widget.doctor.hospital.branches != null && widget.doctor.hospital.branches != "" && widget.doctor.hospital.branches!.isNotEmpty) ? widget.doctor.hospital.branches : widget.doctor.hospital.city}",
+                      "Branch: ${(widget.doctor.hospital.branch != null && widget.doctor.hospital.branch != "" && widget.doctor.hospital.branch!.isNotEmpty) ? widget.doctor.hospital.branch : widget.doctor.hospital.city}",
                       style: pw.TextStyle(fontSize: 12)),
                 ],
               )
@@ -269,16 +280,69 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
           pw.SizedBox(height: 12),
 
           // ✅ Consent Points
-          pw.Text("Agreed Consent Points:",
+          // pw.Text("Agreed Consent Points:",
+          //     style:
+          //         pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+          // pw.SizedBox(height: 6),
+          // ..._consentPoints.entries
+          //     .where((e) => e.value)
+          //     .map((e) => pw.Bullet(text: e.key))
+          //     .toList(),
+          // pw.SizedBox(height: 20),
+          // ✅ Dynamic Consent Points from API
+          // ✅ Static Consent Points
+          pw.Text("General Consent Points:",
               style:
                   pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
           pw.SizedBox(height: 6),
-          ..._consentPoints.entries
-              .where((e) => e.value)
-              .map((e) => pw.Bullet(text: e.key))
-              .toList(),
-          pw.SizedBox(height: 20),
+          ..._consentPoints.entries.map((e) {
+            return pw.Bullet(
+              text: "${e.key} : ${e.value ? 'Yes' : 'No'}",
+              style: pw.TextStyle(fontSize: 12),
+            );
+          }).toList(),
+          pw.SizedBox(height: 12),
 
+// ✅ Dynamic Consent Points from API
+          // ✅ Dynamic Consent Points from API
+          if (consentFormData != null &&
+              consentFormData!.sections.isNotEmpty) ...[
+            pw.Text("Additional Consent Points (from API):",
+                style:
+                    pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 6),
+            ...consentFormData!.sections.map((section) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(section.heading,
+                      style: pw.TextStyle(
+                          fontSize: 13, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(height: 4),
+                  ...section.questions.map((q) {
+                    return pw.Bullet(
+                      text: "${q.question} : ${q.answer ? 'Yes' : 'No'}",
+                      style: pw.TextStyle(fontSize: 12),
+                    );
+                  }).toList(),
+                  pw.SizedBox(height: 8),
+                ],
+              );
+            }).toList(),
+          ],
+
+          pw.Text("I consent to the procedure",
+              style:
+                  pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 6),
+          pw.Text(procedure),
+          pw.SizedBox(height: 12),
+          pw.Text("I consent to the use of my data",
+              style:
+                  pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 6),
+          pw.Text(userData!),
+          pw.SizedBox(height: 30),
           // 🖊 Signatures Section
           pw.Row(children: [
             pw.Expanded(
@@ -296,6 +360,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                       pw.Text("No signature available"),
                   ]),
             ),
+            pw.SizedBox(height: 30),
             pw.Expanded(
               child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -466,16 +531,17 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                             );
                           }
                         } else if (index == 1) {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (_) => AnotherScreen(),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => UserDataConsentScreen(
+                                  patientname: widget.patient.name),
+                            ),
+                          );
                         }
                       },
                       child: Text(
-                        "${index + 1}. $point", // adds numbering
+                        "$point", // adds numbering
                         style: TextStyle(
                           fontSize: 16,
                           height: 1.2,
@@ -489,11 +555,12 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                       ),
                     ),
                     value: _consentPoints[point],
-                    onChanged: (val) {
-                      setState(() {
-                        _consentPoints[point] = val ?? false;
-                      });
-                    },
+                    onChanged: null,
+                    // onChanged: (val) {
+                    //   setState(() {
+                    //     _consentPoints[point] = val ?? false;
+                    //   });
+                    // },
                   );
                 }).toList(),
               ),
@@ -614,9 +681,22 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                         _pdfBytes = pdf;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Signature Saved Successfully ✅"),
+                        SnackBar(
+                          content: const Text(
+                            "Signature Saved Successfully ✅",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
                           backgroundColor: Colors.green,
+                          behavior:
+                              SnackBarBehavior.floating, // 👈 Makes it float
+                          margin: const EdgeInsets.only(
+                            top: 20, // 👈 Distance from top
+                            left: 16,
+                            right: 16,
+                          ),
+                          duration: const Duration(seconds: 2),
                         ),
                       );
                     }

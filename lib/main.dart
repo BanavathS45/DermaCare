@@ -206,6 +206,7 @@ import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:cutomer_app/PushNotification/PushNotification.dart';
 import 'package:cutomer_app/Routes/Navigation.dart';
+import 'package:cutomer_app/Screens/splashScreen.dart';
 import 'package:cutomer_app/SubserviceAndHospital/HospitalCardScreen%20.dart';
 import 'package:cutomer_app/TreatmentAndServices/SubserviceController.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -334,7 +335,7 @@ class MyApp extends StatelessWidget {
     if (initialMessage != null) {
       homeScreen = NotificationScreen();
     } else if (!isFirstLoginDone) {
-      homeScreen = Loginscreen();
+      homeScreen = SplashScreen();
     } else if (biometricEnabled) {
       homeScreen = BiometricAuthScreen();
     } else {

@@ -60,6 +60,8 @@ class _VisitTypeState extends State<VisitType> {
     super.initState();
     _fetchAppointments();
     selectedType = "First Time";
+    controller.updateVisitType("First Time");
+
     fetchHospitalDoctor().then((value) async {
       setState(() => hospitalDoctors = value);
 
@@ -86,14 +88,14 @@ class _VisitTypeState extends State<VisitType> {
     }
   }
 
-  // void _handleFirstTime() {
-  //   controller.updateVisitType(selectedType);
-  //   Get.offAll(() => BottomNavController(
-  //         mobileNumber: widget.mobileNumber,
-  //         username: widget.username,
-  //         index: 0,
-  //       ));
-  // }
+  void _handleFirstTime() {
+    controller.updateVisitType(selectedType);
+    // Get.offAll(() => BottomNavController(
+    //       mobileNumber: widget.mobileNumber,
+    //       username: widget.username,
+    //       index: 0,
+    //     ));
+  }
 
   void _handleFollowUp() {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -104,7 +106,7 @@ class _VisitTypeState extends State<VisitType> {
         message: "No Appointments \n You don’t have any past bookings",
         type: SnackbarType.warning,
       );
-
+      controller.updateVisitType(selectedType);
       return;
     }
 
@@ -489,6 +491,7 @@ class _VisitTypeState extends State<VisitType> {
                   onSelected: (_) {
                     setState(() => selectedType = "First Time");
                     widget.onVisitTypeChanged(selectedType); // notify parent
+                    _handleFirstTime();
                   },
                 ),
               ),

@@ -253,7 +253,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             if (symptomsController.visitType.value.isNotEmpty)
               Obx(() {
                 return infoRow(
-                    "Visit Type", "${symptomsController.visitType.value} ");
+                    "Visit Type", "${symptomsController.visitType.value}");
               }),
 
             // Show Symptoms if available

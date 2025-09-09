@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:cutomer_app/BottomNavigation/BottomNavigation.dart';
 import 'package:cutomer_app/Registration/RegisterScreen.dart';
 import 'package:cutomer_app/SigninSignUp/BiometricPermissionScreen.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -162,9 +163,9 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
                   "OTP has been sent successfully to $widget.mobileNumber",
                   "success");
 
-              Get.offAll(() => ConsultationsType(
+              Get.offAll(() => BottomNavController(
                     mobileNumber: widget.mobileNumber,
-                    username: widget.fullname ?? '',
+                    username: widget.fullname ?? '', index: 0,
                   ));
             } else {
               Get.to(() => EnableBiometricScreen(

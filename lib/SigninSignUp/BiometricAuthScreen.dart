@@ -80,7 +80,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
         final deviceId = prefs.getString('fcm');
 
         print("deviceIddeviceIddeviceId : ${deviceId}");
-        
+
         // Call login/sign-up API
         // final loginData = await _loginApiService.sendUserDataWithFCMToken(
         //     username, mobileNumber, deviceId ?? '');
@@ -95,9 +95,10 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
         if (checkUserResponse.statusCode == 200) {
           final data = json.decode(checkUserResponse.body);
           if (data['success'] == true && data['data'] != null) {
-            Get.offAll(() => ConsultationsType(
+            Get.offAll(() => BottomNavController(
                   mobileNumber: mobileNumber,
                   username: username,
+                  index: 0,
                 ));
             print("🚀 Login successful. Navigating to ConsultationsType.");
           } else {

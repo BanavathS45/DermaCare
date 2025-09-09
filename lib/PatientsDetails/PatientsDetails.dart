@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
 
 import '../Consultations/SymptomsController.dart';
@@ -40,6 +41,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
       Get.put(SiginSignUpController());
 
   String? fullName;
+  String? age;
 
   @override
   void initState() {
@@ -48,12 +50,42 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
   }
 
   Future<void> getUserData() async {
+    print("getUserData called");
+
     final userData = await fetchUserData(widget.mobileNumber);
-    if (userData != null) {
-      setState(() {
-        fullName = userData.fullName;
-      });
+    print("Fetched userData: $userData");
+
+    if (userData != null && userData.dateOfBirth != null) {
+      try {
+        print("DOB exists: ${userData.dateOfBirth}");
+
+        // Parse using custom format
+        DateFormat formatter = DateFormat("dd-MM-yyyy");
+        DateTime dob = formatter.parse(userData.dateOfBirth!);
+
+        int calculatedAge = _calculateAge(dob);
+        print("Calculated Age: $calculatedAge");
+
+        setState(() {
+          fullName = userData.fullName;
+          age = calculatedAge.toString();
+        });
+      } catch (e) {
+        print("Error parsing DOB: $e");
+      }
+    } else {
+      print("No DOB available or userData is null");
     }
+  }
+
+  int _calculateAge(DateTime dob) {
+    DateTime today = DateTime.now();
+    int age = today.year - dob.year;
+    if (today.month < dob.month ||
+        (today.month == dob.month && today.day < dob.day)) {
+      age--;
+    }
+    return age;
   }
 
   /// Pick PDF files
@@ -242,17 +274,27 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
                 ),
 
           /// Age Field
-          CustomTextField(
-            controller: patientdetailsformcontroller.ageController,
-            labelText: 'Enter Age',
-            keyboardType: TextInputType.number,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            inputFormatters: [
-              LengthLimitingTextInputFormatter(3),
-              FilteringTextInputFormatter.digitsOnly,
-            ],
-            validator: (value) => siginSignUpController.validateAge(value),
-          ),
+          patientdetailsformcontroller.selectedFor == "Self"
+              ? CustomTextField(
+                  suffixText: "Yrs",
+                  controller: TextEditingController(text: age),
+                  labelText: 'Age (Self)',
+                  readOnly: true,
+                  enabled: false,
+                )
+              : CustomTextField(
+                  suffixText: "Yrs",
+                  controller: patientdetailsformcontroller.ageController,
+                  labelText: 'Enter Age',
+                  keyboardType: TextInputType.number,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(3),
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  validator: (value) =>
+                      siginSignUpController.validateAge(value),
+                ),
 
           /// Address
           CustomTextField(

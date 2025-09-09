@@ -225,7 +225,9 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                             errorBuilder:
                                                 (context, error, stackTrace) {
                                               return Image.asset(
-                                                  'assets/images/fallback_logo.png');
+                                                  width: 80,
+                                                  height: 80,
+                                                  'assets/ic_launcher.png');
                                             },
                                           ),
                                           SizedBox(width: 12),

@@ -23,7 +23,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
     base64String = base64String.substring(prefix.length);
   }
 
-  print(" doctorModel.hospital.toString() ${doctorModel.hospital.branches}");
+  print(" doctorModel.hospital.toString() ${doctorModel.hospital.branch}");
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     decoration: BoxDecoration(
@@ -53,7 +53,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                       ),
                       TextSpan(
                         text:
-                            "(${(hospital.branches != null && hospital.branches!.isNotEmpty) ? hospital.branches : (hospital.city != null && hospital.city!.isNotEmpty) ? hospital.city : "Jubilee Hillss"})",
+                            "(${(hospital.branch != null && hospital.branch!.isNotEmpty) ? hospital.branch : (hospital.city != null && hospital.city!.isNotEmpty) ? hospital.city : "Jubilee Hillss"})",
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,

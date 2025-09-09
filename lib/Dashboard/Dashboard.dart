@@ -5,6 +5,7 @@ import 'package:cutomer_app/Dashboard/VisitType.dart';
 import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:cutomer_app/Screens/RefferalCode.dart';
+import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -25,7 +26,7 @@ import 'DashBoardController.dart';
 class DashboardScreen extends StatefulWidget {
   final String mobileNumber;
   final String username;
-  final String consulationType;
+  final String? consulationType;
 
   const DashboardScreen({
     super.key,
@@ -128,359 +129,214 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(gradient: appGradient()),
-          ),
-          title: Row(children: [
-            // Obx(() {
-            //   final image = dashboardcontroller.imageFile.value;
-            //   return GestureDetector(
-            //     onTap: () =>
-            //         dashboardcontroller.showImagePickerOptions(context),
-            //     child: CircleAvatar(
-            //       radius: 20,
-            //       backgroundColor: Colors.grey[200],
-            //       backgroundImage: image != null
-            //           ? FileImage(image)
-            //           : const AssetImage('assets/surecare_launcher.png')
-            //               as ImageProvider,
-            //     ),
-            //   );
-            // }),
-            Obx(() {
-              final image = dashboardcontroller.imageFile.value;
+      appBar: CommonHeader(
+        title: "Services & Treatments",
+      ),
 
-              return GestureDetector(
-                onTap: () {
-                  if (image != null) {
-                    Get.to(ImagePreviewScreen(imagePath: image.path));
-                  } else {
-                    dashboardcontroller.showImagePickerOptions(context, image);
-                  }
-                },
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage: image != null
-                      ? FileImage(image)
-                      : const AssetImage('assets/ic_launcher.png')
-                          as ImageProvider,
-                ),
-              );
-            }),
-
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: Obx(() {
+        if (dashboardcontroller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (dashboardcontroller.services.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Hi, Welcome Back",
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 16)),
-                const SizedBox(height: 5),
+                Image.asset(
+                  "assets/nonetwork.jpg",
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text(
+                      'Image failed to load',
+                      style: TextStyle(color: Colors.red),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
                 Text(
-                  capitalizeFirstLetter(widget.username),
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  dashboardcontroller.statusMessage,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 20),
+                FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.green,
+                  onPressed: () async {
+                    _rotationController.repeat(); // Start spinning
+                    await dashboardcontroller.onRefresh(widget.mobileNumber);
+                    _rotationController.reset(); // Stop spinning
+                  },
+                  tooltip: 'Refresh',
+                  child: AnimatedBuilder(
+                    animation: _rotationController,
+                    builder: (context, child) {
+                      return Transform.rotate(
+                        angle: _rotationController.value * 2 * pi,
+                        child: child,
+                      );
+                    },
+                    child: const Icon(Icons.refresh),
+                  ),
                 ),
               ],
             ),
-            const Spacer(),
-            Obx(() {
-              final count =
-                  Get.find<NotificationController>().unreadCount.value;
-
-              return Stack(
+          );
+        } else {
+          return RefreshIndicator(
+            onRefresh: () => dashboardcontroller.onRefresh(widget.mobileNumber),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.notifications, color: Colors.white),
-                    onPressed: () {
-                      // ✅ Reset unread count (optional)
-                      Get.to(() => NotificationScreen());
+                  const SizedBox(height: 10),
+                  // CommonCarouselAds(
+                  //   media: dashboardcontroller.carouselImages,
+                  //   height: 170,
+                  // ),
+                  VisitType(
+                    mobileNumber: widget.mobileNumber,
+                    username: widget.username,
+                    consulationType: widget.consulationType!,
+                    onVisitTypeChanged: (type) {
+                      setState(() {
+                        visitType = type;
+                      });
                     },
                   ),
-                  if (count > 0)
-                    Positioned(
-                      right: 6,
-                      top: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 18,
-                          minHeight: 18,
-                        ),
-                        child: Text(
-                          '$count',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+
+                  if (controller.inProgressBookings.isNotEmpty) ...[
+                    Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Active Appointments",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                        ),
+                          Text("${controller.inProgressBookings.length}")
+                        ],
                       ),
                     ),
-                ],
-              );
-            }),
-            GestureDetector(
-              onTap: () {
-                Get.to(() => ReferralWalletPage());
-              },
-              child: Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.wallet, color: Colors.white),
-                    onPressed: () {
-                      // ✅ Reset unread count (optional)
-                      // Get.to(() => NotificationScreen());
-                    },
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: -4,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                          // color: Colors.red,
-                          // shape: BoxShape.circle,
+                    Obx(() {
+                      print(
+                          'In-progress bookings count: ${controller.inProgressBookings.length}');
+
+                      if (controller.inProgressBookings.isEmpty) {
+                        // 👈 Fix here
+                        return const Center(
+                            child: Text('No in-progress appointments'));
+                      }
+
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: List.generate(
+                            min(3, controller.inProgressBookings.length),
+                            (index) {
+                              final appointment =
+                                  controller.inProgressBookings[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.95,
+                                  child:
+                                      AppointmentCard(doctorData: appointment),
+                                ),
+                              );
+                            },
                           ),
-                      constraints: const BoxConstraints(
-                        minWidth: 25,
-                        minHeight: 18,
-                      ),
-                      child: Text(
-                        '💰 2000',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
                         ),
+                      );
+                    }),
+                  ],
+                  const SizedBox(height: 10),
+                  Center(
+                    child: GradientText(
+                      'Derma Services And Treatments',
+                      gradient: const LinearGradient(
+                        colors: [mainColor, secondaryColor],
+                      ),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        height: 1,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  IgnorePointer(
+                    ignoring: visitType == "Follow-Up",
+                    child: Opacity(
+                      opacity: visitType == "Follow-Up"
+                          ? 0.5
+                          : 1.0, // visually disabled
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: dashboardcontroller.services.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 1,
+                          mainAxisSpacing: 5,
+                        ),
+                        itemBuilder: (context, index) {
+                          final service = dashboardcontroller.services[index];
+                          return ServiceCard(
+                            mobileNumber: widget.mobileNumber,
+                            username: widget.username,
+                            service: service,
+                          );
+                        },
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            // IconButton(
-            //   icon: const Icon(Icons.wallet, color: Colors.white),
-            //   onPressed: () async {
-            //     await whatsUpChat();
-            //   },
-            // )
-          ]),
-        ),
-        body: Obx(() {
-          if (dashboardcontroller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (dashboardcontroller.services.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    "assets/nonetwork.jpg",
-                    fit: BoxFit.cover,
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Text(
-                        'Image failed to load',
-                        style: TextStyle(color: Colors.red),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    dashboardcontroller.statusMessage,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 20),
-                  FloatingActionButton(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.green,
-                    onPressed: () async {
-                      _rotationController.repeat(); // Start spinning
-                      await dashboardcontroller.onRefresh(widget.mobileNumber);
-                      _rotationController.reset(); // Stop spinning
-                    },
-                    tooltip: 'Refresh',
-                    child: AnimatedBuilder(
-                      animation: _rotationController,
-                      builder: (context, child) {
-                        return Transform.rotate(
-                          angle: _rotationController.value * 2 * pi,
-                          child: child,
-                        );
-                      },
-                      child: const Icon(Icons.refresh),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            return RefreshIndicator(
-              onRefresh: () =>
-                  dashboardcontroller.onRefresh(widget.mobileNumber),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _scrollController,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    CommonCarouselAds(
-                      media: dashboardcontroller.carouselImages,
-                      height: 170,
-                    ),
-                    VisitType(
-                      mobileNumber: widget.mobileNumber,
-                      username: widget.username,
-                      consulationType: widget.consulationType,
-                      onVisitTypeChanged: (type) {
-                        setState(() {
-                          visitType = type;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    if (controller.inProgressBookings.isNotEmpty) ...[
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Active Appointments",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            Text("${controller.inProgressBookings.length}")
-                          ],
-                        ),
-                      ),
-                      Obx(() {
-                        print(
-                            'In-progress bookings count: ${controller.inProgressBookings.length}');
-
-                        if (controller.inProgressBookings.isEmpty) {
-                          // 👈 Fix here
-                          return const Center(
-                              child: Text('No in-progress appointments'));
-                        }
-
-                        return SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: List.generate(
-                              min(3, controller.inProgressBookings.length),
-                              (index) {
-                                final appointment =
-                                    controller.inProgressBookings[index];
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.95,
-                                    child: AppointmentCard(
-                                        doctorData: appointment),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      }),
-                    ],
-                    const SizedBox(height: 10),
-                    Center(
-                      child: GradientText(
-                        'Derma Services And Treatments',
-                        gradient: const LinearGradient(
-                          colors: [mainColor, secondaryColor],
-                        ),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                          height: 1,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    IgnorePointer(
-                      ignoring: visitType == "Follow-Up",
-                      child: Opacity(
-                        opacity: visitType == "Follow-Up"
-                            ? 0.5
-                            : 1.0, // visually disabled
-                        child: GridView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: dashboardcontroller.services.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 1,
-                            mainAxisSpacing: 5,
-                          ),
-                          itemBuilder: (context, index) {
-                            final service = dashboardcontroller.services[index];
-                            return ServiceCard(
-                              mobileNumber: widget.mobileNumber,
-                              username: widget.username,
-                              service: service,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-        }),
-        floatingActionButton: isFabVisible
-            ? AnimatedOpacity(
-                duration: Duration(milliseconds: 300),
-                opacity: isOpaque ? 1.0 : 0.4,
-                child: FloatingActionButton.extended(
-                  onPressed: () {
-                    if (!showLabel) {
-                      setState(() {
-                        showLabel = true;
-                        isOpaque = true;
-                      });
-                    } else {
-                      // Navigator.pop(context); // or your logic
-                      Get.to(ConsultationsType(
-                        mobileNumber: widget.mobileNumber,
-                        username: widget.username,
-                      ));
-                    }
-                  },
-                  icon: Icon(Icons.arrow_back_ios_new_rounded),
-                  label: AnimatedSwitcher(
-                    duration: Duration(milliseconds: 300),
-                    transitionBuilder: (child, animation) =>
-                        ScaleTransition(scale: animation, child: child),
-                    child: showLabel
-                        ? Text("Consultations", key: ValueKey("label"))
-                        : SizedBox.shrink(key: ValueKey("empty")),
-                  ),
-                ),
-              )
-            : null);
+          );
+        }
+      }),
+      // floatingActionButton: isFabVisible
+      //     ? AnimatedOpacity(
+      //         duration: Duration(milliseconds: 300),
+      //         opacity: isOpaque ? 1.0 : 0.4,
+      //         child: FloatingActionButton.extended(
+      //           onPressed: () {
+      //             if (!showLabel) {
+      //               setState(() {
+      //                 showLabel = true;
+      //                 isOpaque = true;
+      //               });
+      //             } else {
+      //               // Navigator.pop(context); // or your logic
+      //               Get.to(BottomNavController(
+      //                 mobileNumber: widget.mobileNumber,
+      //                 username: widget.username,
+      //               ));
+      //             }
+      //           },
+      //           icon: Icon(Icons.arrow_back_ios_new_rounded),
+      //           label: AnimatedSwitcher(
+      //             duration: Duration(milliseconds: 300),
+      //             transitionBuilder: (child, animation) =>
+      //                 ScaleTransition(scale: animation, child: child),
+      //             child: showLabel
+      //                 ? Text("Consultations", key: ValueKey("label"))
+      //                 : SizedBox.shrink(key: ValueKey("empty")),
+      //           ),
+      //         ),
+      //       )
+      //     : null
+    );
   }
 }
