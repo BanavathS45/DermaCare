@@ -59,7 +59,7 @@ class ScheduleController extends GetxController {
     final today = DateTime(now.year, now.month, now.day);
 
     final generatedDates =
-        List.generate(7, (index) => today.add(Duration(days: index)));
+        List.generate(15, (index) => today.add(Duration(days: index)));
 
     weekDates.assignAll(generatedDates);
 

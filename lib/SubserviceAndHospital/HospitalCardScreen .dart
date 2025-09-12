@@ -51,6 +51,12 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
     fetchHospitalCards();
   }
 
+  final List<String> branches = [
+    "Panjagutta",
+    "Kokapet",
+    "Jubilee Hills",
+  ];
+
   void fetchHospitalCards() async {
     setState(() {
       isLoading = true; // show loading
@@ -173,6 +179,9 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                             //     card.price; // e.g., "₹6132.240000000001"
                             //   parsedValue =
                             //      rawValue
+
+                            final branchName =
+                                branches[index % branches.length];
                             return GestureDetector(
                               onTap: () {
                                 if (widget.selectedService != null) {
@@ -241,6 +250,10 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                                         fontSize: 16,
                                                         fontWeight:
                                                             FontWeight.bold)),
+                                                Text(branchName,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                    )),
                                                 SizedBox(height: 4),
                                                 Text("Sub Service: " +
                                                     card.subServiceName),

@@ -3,6 +3,18 @@ import 'package:get/get.dart';
 
 class Consultationcontroller extends GetxController {
   Rx<ConsultationModel?> selectedConsultation = Rx<ConsultationModel?>(null);
+  // var consultations = <ConsultationModel>[].obs;
+  // var loading = false.obs;
+
+  // Future<void> fetchConsultations() async {
+  //   try {
+  //     loading.value = true;
+  //     final data = await getConsultationDetails();
+  //     consultations.assignAll(data);
+  //   } finally {
+  //     loading.value = false;
+  //   }
+  // }
 
   void setConsultation(ConsultationModel consultation) {
     selectedConsultation.value = consultation;

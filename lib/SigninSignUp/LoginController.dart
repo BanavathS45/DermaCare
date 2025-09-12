@@ -136,7 +136,7 @@ class SiginSignUpController extends GetxController {
           print("isFirstTimeAuthenticated ${isFirstTimeAuthenticated}");
 
           // ✅ User is registered
-          if (!isFirstTimeAuthenticated) {
+          if (isFirstTimeAuthenticated) {
             showSnackbar("Success",
                 "OTP has been sent successfully to $mobileNumber", "success");
 

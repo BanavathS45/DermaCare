@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
+import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -39,14 +40,17 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
   final consultationController = Get.find<Consultationcontroller>();
   final SiginSignUpController siginSignUpController =
       Get.put(SiginSignUpController());
-
+  final TextEditingController _durationController = TextEditingController();
   String? fullName;
   String? age;
-
+  String? _selectedDurationType;
+  final List<String> durationTypes = ["Hours", "Days", "Months", "Years"];
   @override
   void initState() {
     super.initState();
     getUserData();
+    controller
+        .updateDuration("${_durationController.text} ${_selectedDurationType}");
   }
 
   Future<void> getUserData() async {
@@ -61,7 +65,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
 
         // Parse using custom format
         DateFormat formatter = DateFormat("dd-MM-yyyy");
-        DateTime dob = formatter.parse(userData.dateOfBirth!);
+        DateTime dob = formatter.parse(userData.dateOfBirth);
 
         int calculatedAge = _calculateAge(dob);
         print("Calculated Age: $calculatedAge");
@@ -69,6 +73,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
         setState(() {
           fullName = userData.fullName;
           age = calculatedAge.toString();
+          patientdetailsformcontroller.setAge(age ?? "0");
         });
       } catch (e) {
         print("Error parsing DOB: $e");
@@ -367,10 +372,11 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
           // Divider(color: secondaryColor),
 
           /// Problem Section
-          if (consultationController
-                  .selectedConsultation.value!.consultationType
-                  .toLowerCase() ==
-              "services & treatments") ...[
+          if (consultationController.selectedConsultation.value != null &&
+              consultationController
+                      .selectedConsultation.value!.consultationType
+                      .toLowerCase() ==
+                  "services & treatments") ...[
             Text("Describe your problem / Symptoms",
                 style: TextStyle(
                     fontSize: 16,
@@ -403,16 +409,62 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
             const SizedBox(height: 15),
             Text("Symptoms Duration",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-            CustomTextField(
-              controller: patientdetailsformcontroller.durationController,
-              labelText: 'Enter Duration (in days)',
-              keyboardType: TextInputType.number,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(3),
-                FilteringTextInputFormatter.digitsOnly,
+            Row(
+              children: [
+                // Duration Number
+                Expanded(
+                  child: TextFormField(
+                    controller: _durationController,
+                    decoration: InputDecoration(
+                      labelText: "Duration",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 16),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(3),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                // Duration Type Dropdown
+                Expanded(
+                  child: CustomDropdownField<String>(
+                    value: _selectedDurationType,
+                    labelText: "Select Type",
+                    items: durationTypes
+                        .map((type) => DropdownMenuItem<String>(
+                              value: type,
+                              child: Text(type),
+                            ))
+                        .toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        _selectedDurationType = val;
+                        controller.updateDuration(
+                            "${_durationController.text} ${_selectedDurationType}");
+                      });
+                    },
+                  ),
+                ),
               ],
             ),
+
+            // CustomTextField(
+            //   controller: patientdetailsformcontroller.durationController,
+            //   labelText: 'Enter Duration (in days)',
+            //   keyboardType: TextInputType.number,
+            //   autovalidateMode: AutovalidateMode.onUserInteraction,
+            //   inputFormatters: [
+            //     LengthLimitingTextInputFormatter(3),
+            //     FilteringTextInputFormatter.digitsOnly,
+            //   ],
+            // ),
             const SizedBox(height: 15),
 
             /// Attachments

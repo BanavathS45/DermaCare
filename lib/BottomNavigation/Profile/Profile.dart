@@ -51,130 +51,138 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         title: "Profile",
         automaticallyImplyLeading: false,
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
 
-          Obx(() {
-            final image = dashboardcontroller.imageFile.value;
-            return GestureDetector(
-              onTap: () =>
-                  dashboardcontroller.showImagePickerOptions(context, image),
-              child: CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: image != null
-                    ? FileImage(image)
-                    : const AssetImage('assets/ic_launcher.png')
-                        as ImageProvider,
-              ),
-            );
-          }),
+            Obx(() {
+              final image = dashboardcontroller.imageFile.value;
+              return GestureDetector(
+                onTap: () =>
+                    dashboardcontroller.showImagePickerOptions(context, image),
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.grey[200],
+                  backgroundImage: image != null
+                      ? FileImage(image)
+                      : const AssetImage('assets/ic_launcher.png')
+                          as ImageProvider,
+                ),
+              );
+            }),
 
-          //  Obx(() {
-          //     final image = dashboardcontroller.imageFile.value;
+            //  Obx(() {
+            //     final image = dashboardcontroller.imageFile.value;
 
-          //     return GestureDetector(
-          //       onTap: () {
-          //         if (image != null) {
-          //           Get.to(ImagePreviewScreen(imagePath: image.path));
-          //         } else {
-          //           dashboardcontroller.showImagePickerOptions(context,image);
-          //         }
-          //       },
-          //       child: CircleAvatar(
-          //         radius: 20,
-          //         backgroundColor: Colors.grey[200],
-          //         backgroundImage: image != null
-          //             ? FileImage(image)
-          //             : const AssetImage('assets/surecare_launcher.png')
-          //                 as ImageProvider,
-          //       ),
-          //     );
-          //   }),
-          // CircleAvatar(
-          //   radius: 40,
-          //   child: ClipOval(
-          //     child: Image.asset(
-          //       "assets/DermaText.png",
-          //       width: 100, // adjust size as needed
-          //       height: 100,
-          //       fit: BoxFit.contain,
-          //     ),
-          //   ),
-          // ),
+            //     return GestureDetector(
+            //       onTap: () {
+            //         if (image != null) {
+            //           Get.to(ImagePreviewScreen(imagePath: image.path));
+            //         } else {
+            //           dashboardcontroller.showImagePickerOptions(context,image);
+            //         }
+            //       },
+            //       child: CircleAvatar(
+            //         radius: 20,
+            //         backgroundColor: Colors.grey[200],
+            //         backgroundImage: image != null
+            //             ? FileImage(image)
+            //             : const AssetImage('assets/surecare_launcher.png')
+            //                 as ImageProvider,
+            //       ),
+            //     );
+            //   }),
+            // CircleAvatar(
+            //   radius: 40,
+            //   child: ClipOval(
+            //     child: Image.asset(
+            //       "assets/DermaText.png",
+            //       width: 100, // adjust size as needed
+            //       height: 100,
+            //       fit: BoxFit.contain,
+            //     ),
+            //   ),
+            // ),
 
-          FutureBuilder<GetCustomerModel>(
-            future:
-                fetchUserData(widget.mobileNumber), // Mobile number passed here
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error: ${snapshot.error}"));
-              } else if (!snapshot.hasData) {
-                return const Center(child: Text("No data available."));
-              } else {
-                userData = snapshot.data!;
-                print("userData: ${userData!.fullName}"); // Debug print
+            FutureBuilder<GetCustomerModel>(
+              future: fetchUserData(
+                  widget.mobileNumber), // Mobile number passed here
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData) {
+                  return const Center(child: Text("No data available."));
+                } else {
+                  userData = snapshot.data!;
+                  print("userData: ${userData!.fullName}"); // Debug print
 
-                return Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text('${capitalizeEachWord(userData!.fullName)}',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: mainColor)),
-                      Text('Customer ID: ${userData!.customerId}'),
-                    ],
-                  ),
-                );
-              }
-            },
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          // Cards List
-          buildCardItem(
-              icon: Icons.person,
-              label: "Profile",
-              onTap: () =>
-                  Get.to(() => ProfileDetailScreen(cusData: userData!))),
-          // Get.to(() => ProfileDetailScreen())),
+                  return Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text('${capitalizeEachWord(userData!.fullName)}',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: mainColor)),
+                        Text('Customer ID: ${userData!.customerId}'),
+                      ],
+                    ),
+                  );
+                }
+              },
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            // Cards List
+            buildCardItem(
+                icon: Icons.person,
+                label: "Profile",
+                onTap: () =>
+                    Get.to(() => ProfileDetailScreen(cusData: userData!))),
+            // Get.to(() => ProfileDetailScreen())),
 
-          buildCardItem(
-              icon: Icons.help_outline,
-              label: "Privacy Policy",
-              onTap: () => Get.to(() => TermsAndConditionsScreen())),
-          buildCardItem(
-              icon: Icons.help_outline,
-              label: "Reports",
-              onTap: () => Get.to(() => CustomerReportsPage())),
-          // onTap: () {}),
-          buildCardItem(
-              icon: Icons.help_outline,
-              label: "Help",
-              onTap: () => Get.to(() => HelpScreen())),
-          // onTap: () {}),
-          buildCardItem(
-              icon: Icons.logout,
-              label: "Logout",
-              onTap: () => {showLogout(context)}),
+            buildCardItem(
+                icon: Icons.help_outline,
+                label: "Privacy Policy",
+                onTap: () => Get.to(() => TermsAndConditionsScreen())),
+            buildCardItem(
+                icon: Icons.help_outline,
+                label: "Reports",
+                onTap: () => Get.to(() => CustomerReportsPage())),
+            buildCardItem(
+                icon: Icons.help_outline,
+                label: "About Clinic",
+                onTap: () => Get.to(() => CustomerReportsPage())),
+            // onTap: () {}),
+            buildCardItem(
+                icon: Icons.help_outline,
+                label: "Help",
+                onTap: () => Get.to(() => HelpScreen())),
+            // onTap: () {}),
 
-          buildCardItem(
-              icon: Icons.menu_book,
-              label: "App user manual",
-              onTap: () => Get.to(() => AppointmentManualScreen())),
-          const SizedBox(height: 30),
-        ],
+            buildCardItem(
+                icon: Icons.menu_book,
+                label: "App user manual",
+                onTap: () => Get.to(() => AppointmentManualScreen())),
+
+            buildCardItem(
+                icon: Icons.logout,
+                label: "Logout",
+                onTap: () => {showLogout(context)}),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomAppBar(
+        height: 45,
         color: Colors.white,
         child: Center(
             child: Text(

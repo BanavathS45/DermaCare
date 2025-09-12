@@ -81,7 +81,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         if (selectedId == consultations[0].consultationId) {
           setState(() {
             consultationFee = selectedServicesController
-                .selectedSubServices.first.finalCost
+                .selectedSubServices.first.consultationFee
                 .toInt();
           });
         } else if (selectedId == consultations[1].consultationId) {
@@ -130,8 +130,6 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
   @override
   Widget build(BuildContext context) {
-    // totalFee = platformFee + consultationFee;
-    totalFee = consultationFee;
     Widget? consultationWidget;
     bool loading = false;
     String? currentConsultationId;
@@ -178,7 +176,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                       .selectedConsultation.value?.consultationId;
                   if (consultationId == null) return SizedBox();
 
-                  print("consultationId: $consultationId");
+                  print("consultationId sdsadsad: $consultationId");
 
                   return FutureBuilder(
                     key: ValueKey(consultationId),
@@ -240,14 +238,17 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             const SizedBox(height: 10),
             infoRow("Booking For", widget.patient.bookingFor),
             infoRow("Patient Name", widget.patient.name),
-            infoRow("Patient Age", "${widget.patient.age} Yrs"),
+            infoRow("Patient Age", "${widget.patient.age} "),
             infoRow("Patient Gender", widget.patient.gender),
 
 // Show Symptoms if available
             if (symptomsController.duration.value.isNotEmpty)
               Obx(() {
+                final duration = symptomsController.duration.value;
                 return infoRow(
-                    "Duration", "${symptomsController.duration.value}");
+                  "Duration",
+                  duration != null && duration.isNotEmpty ? duration : "0 days",
+                );
               }),
 
             if (symptomsController.visitType.value.isNotEmpty)
@@ -504,7 +505,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               consultationType: consultationController
                   .selectedConsultation.value!.consultationType,
               consultationFee: consultationFee.toDouble(),
-              totalFee: (consultationFee).toDouble(),
+              totalFee: globalServiceId == "ST_01"
+                  ? selectedServicesController
+                      .selectedSubServices.first.finalCost
+                  : consultationFee + (consultationFee * 0.18) + 0,
               clinicId: widget.doctor.hospital.hospitalId,
               doctorDeviceId: widget.doctor.doctor.deviceId,
               clinicAddress: widget.doctor.hospital.address,
@@ -533,7 +537,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               paymentType: "Pay at Hospital",
               visitType: symptomsController.visitType.value,
               symptomsDuration:
-                  "${symptomsController.duration.value} Days", //TODO:develop in UI
+                  "${symptomsController.duration.value}", //TODO:develop in UI
 
               attachments: symptomsController.attachments.value,
               freeFollowUps: widget.doctor.hospital.freeFollowUps,
@@ -543,7 +547,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             print(
                 '[🏥] Booking via Pay at Hospital ${bookingDetails.toString()}');
             print(
-                '[🏥] Booking via Pay at Hospital ${bookingDetails.consultationExpiration}');
+                '[🏥] Booking via Pay at Hospital ${bookingDetails.paymentType}');
 
             // 📦 Model ready for API
             final postBookingPayload = PostBookingModel(

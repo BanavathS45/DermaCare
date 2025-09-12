@@ -1,3 +1,4 @@
+import 'package:cutomer_app/BottomNavigation/BottomNavigation.dart';
 import 'package:cutomer_app/ConfirmBooking/Consultations.dart';
 import 'package:cutomer_app/OTP/FireBaseOtp.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
@@ -54,10 +55,11 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
 
         showSnackbar("Success", "Biometric authentication enabled", "success");
 
-        Get.to(ConsultationsType(
-          mobileNumber: widget.mobileNumber,
-          username: widget.fullname ?? '',
-        ));
+        Get.offAll(() => BottomNavController(
+              mobileNumber: widget.mobileNumber,
+              username: widget.fullname,
+              index: 0,
+            ));
         // Navigator.pop(context); // Or navigate to home/dashboard
       }
     } catch (e) {

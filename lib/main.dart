@@ -335,7 +335,7 @@ class MyApp extends StatelessWidget {
     if (initialMessage != null) {
       homeScreen = NotificationScreen();
     } else if (!isFirstLoginDone) {
-      homeScreen = SplashScreen();
+      homeScreen = Loginscreen();
     } else if (biometricEnabled) {
       homeScreen = BiometricAuthScreen();
     } else {

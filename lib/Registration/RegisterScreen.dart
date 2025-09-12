@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               const SizedBox(height: 30),
               Image.asset(
-                'assets/DermaText.png',
+                'assets/ic_launcher.png',
                 width: 120,
                 fit: BoxFit.cover,
               ),

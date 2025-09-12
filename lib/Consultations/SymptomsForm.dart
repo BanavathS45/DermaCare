@@ -315,6 +315,7 @@ class _SymptomsFormState extends State<SymptomsForm> {
                             ),
                           ],
                         ),
+                      
                       ],
                     ),
                     const SizedBox(height: 15),

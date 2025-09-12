@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
@@ -66,8 +67,9 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
 
               Row(
                 children: [
-                  const Icon(Icons.star, size: 16, color: Colors.yellow),
-                  const SizedBox(width: 4),
+                  const Icon(FontAwesomeIcons.hospital,
+                      size: 14, color: Colors.yellow),
+                  const SizedBox(width: 8),
                   Text(
                     hospital.hospitalOverallRating?.toStringAsFixed(1) ?? "0.0",
                     style: const TextStyle(color: Colors.white),
@@ -202,7 +204,9 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.star, size: 16, color: Colors.white),
+                  const Icon(FontAwesomeIcons.userDoctor,
+                      size: 14, color: Colors.white),
+
                   const SizedBox(width: 4),
                   // Text("${doctor.overallRating}", //TODO : imaplent pending
                   // Obx(() {

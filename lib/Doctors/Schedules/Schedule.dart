@@ -61,6 +61,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   Future<void> _initialize() async {
     if (!mounted) return;
+  
 
     try {
       await scheduleController.initializeWeekDates();
@@ -191,7 +192,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           ? (fullName ?? widget.username)
                           : patientdetailsformcontroller.nameController.text
                               .trim(),
-                      age: patientdetailsformcontroller.ageController.text,
+                      age: patientdetailsformcontroller.selectedFor == 'Self'
+                          ? "${patientdetailsformcontroller.age} Yrs"
+                          : "${patientdetailsformcontroller.ageController.text} Yrs",
                       gender: registercontroller.selectedGender,
                       bookingFor: patientdetailsformcontroller.selectedFor,
                       problem: patientProblem
@@ -224,16 +227,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     // Get.to(() => Confirmbookingdetails(doctor: doctorData, patient: patientData));
                     print('Doctor 8888: ${widget.doctorData}');
                     print('Patient: $patientmodel');
-                    if (consultationController
-                            .selectedConsultation.value?.consultationType ==
-                        "Services & Treatments") {
+                    if (consultationController.selectedConsultation.value !=
+                            null &&
+                        consultationController
+                                .selectedConsultation.value!.consultationType
+                                .toLowerCase() ==
+                            "services & treatments") {
                       symptomsController.updateDuration(
                           patientdetailsformcontroller.durationController.text);
 
                       Get.to(SkinCareConsentFormScreen(
                         doctor: widget.doctorData,
                         patient: patientmodel,
-                       
                       ));
                       print(
                           "patientdetailsformcontroller.durationController.text ${patientdetailsformcontroller.durationController.text}");
