@@ -736,8 +736,10 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      PdfPreviewScreen(pdfBytes: _pdfBytes!),
+                                  builder: (_) => PdfPreviewScreen(
+                                    pdfBytes: _pdfBytes!,
+                                    pdfUrl: '',
+                                  ),
                                 ),
                               );
                             }
@@ -809,7 +811,8 @@ class _Section extends StatelessWidget {
 
 class PdfPreviewScreen extends StatelessWidget {
   final Uint8List? pdfBytes;
-  const PdfPreviewScreen({super.key, required this.pdfBytes});
+  const PdfPreviewScreen(
+      {super.key, required this.pdfBytes, required String pdfUrl});
 
   @override
   Widget build(BuildContext context) {

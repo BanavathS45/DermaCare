@@ -61,7 +61,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   Future<void> _initialize() async {
     if (!mounted) return;
-  
 
     try {
       await scheduleController.initializeWeekDates();
@@ -240,8 +239,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         doctor: widget.doctorData,
                         patient: patientmodel,
                       ));
-                      print(
-                          "patientdetailsformcontroller.durationController.text ${patientdetailsformcontroller.durationController.text}");
+                      // print(
+                      //     "patientdetailsformcontroller.durationController.text ${symptomsController.duration}");
                     } else {
                       Get.to(() => Confirmbookingdetails(
                             doctor: widget.doctorData,
@@ -254,7 +253,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     //   patient: patientmodel,
                     // ));
 
-                    // symptomsController.updateDuration( patientdetailsformcontroller.durationController.text);
+                    // symptomsController.updateDuration(
+                    //     patientdetailsformcontroller.durationController.text);
                     // Get.to(Confirmbookingdetails(
                     //   doctor: widget.doctorData,
                     //   patient: patientmodel,

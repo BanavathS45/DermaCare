@@ -99,6 +99,7 @@ dependencies:
   open_filex: ^4.3.0
   signature: ^5.5.0
   device_calendar: ^4.3.3
+  # flutter_image_compress: ^2.3.0
   # open_filex: ^4.7.0
 
   # upi_india: ^3.0.1

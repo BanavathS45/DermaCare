@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Doctors/Schedules/ConsentForm.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/MapOnGoogle.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../Doctors/DoctorDetails/DoctorDetailsController.dart';
 import '../../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 
@@ -205,20 +207,47 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               ],
             ),
             if (widget.doctorBookings.status.toLowerCase() == "completed")
-              if (patient.notes != null && patient.notes!.isNotEmpty)
+              if (patient.priscriptionPdf != null &&
+                  patient.priscriptionPdf!.isNotEmpty)
                 _sectionCard(
-                  icon: Icons.payment_outlined,
-                  title: "Patient Notes",
+                  icon: Icons.picture_as_pdf_outlined,
+                  title: "Patient Prescription",
                   children: [
-                    _infoRow("📝🩺", patient.notes!),
+                    // PDF Preview Button
+                    TextButton.icon(
+                      icon: const Icon(Icons.visibility, color: Colors.blue),
+                      label: const Text("View Prescription"),
+                      onPressed: () {
+                        // Navigate to a PDF preview screen
+                        Get.to(() => PdfPreviewScreen(
+                              pdfUrl: patient.priscriptionPdf!,
+                              pdfBytes: null,
+                            ));
+                      },
+                    ),
+                    // Download Button
+                    TextButton.icon(
+                      icon: const Icon(Icons.download, color: Colors.green),
+                      label: const Text("Download Prescription"),
+                      onPressed: () async {
+                        // Simple download logic using url_launcher
+                        final url = patient.priscriptionPdf!;
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(Uri.parse(url),
+                              mode: LaunchMode.externalApplication);
+                        } else {
+                          Get.snackbar("Error", "Could not open PDF link");
+                        }
+                      },
+                    ),
                   ],
                 )
               else
                 _sectionCard(
-                  icon: Icons.payment_outlined,
-                  title: "Patient Notes",
+                  icon: Icons.picture_as_pdf_outlined,
+                  title: "Patient Prescription",
                   children: [
-                    _infoRow("📝🩺", "No Patient Notes Provided"),
+                    _infoRow("📝🩺", "No Patient Prescription Provided"),
                   ],
                 ),
             _sectionCard(
@@ -244,7 +273,8 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                         final reports = widget.doctorBookings.reports;
 
                         if (reports != null && reports.reportsList.isNotEmpty) {
-                          showReportDownloadSheet(context, reports.reportsList!);
+                          showReportDownloadSheet(
+                              context, reports.reportsList!);
                         } else {
                           showSnackbar("Error", "No report found.", "error");
                         }

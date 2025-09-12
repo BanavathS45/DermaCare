@@ -14,12 +14,15 @@ class Doctorscreen extends StatelessWidget {
   final String username;
   final String subServiceID;
   final String? hospiatlName;
+  // final String? Branch;
 
-  Doctorscreen(
-      {required this.mobileNumber,
-      required this.username,
-      required this.subServiceID,
-      this.hospiatlName}) {
+  Doctorscreen({
+    required this.mobileNumber,
+    required this.username,
+    required this.subServiceID,
+    this.hospiatlName,
+    //  this.Branch
+  }) {
     // Trigger fetch after widget builds
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final doctorController = Get.find<DoctorController>();
@@ -117,6 +120,14 @@ class Doctorscreen extends StatelessWidget {
                                     color: mainColor,
                                   ),
                                 ),
+                                // TextSpan(
+                                //   text: hospiatlName,
+                                //   style: TextStyle(
+                                //     fontSize: 16,
+                                //     fontWeight: FontWeight.bold,
+                                //     color: mainColor,
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -171,11 +182,11 @@ class Doctorscreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Center(
-                      child: SpinKitFadingCircle(
-                        color: Colors.blue,
-                        size: 40.0,
-                      ),
-                    ),
+                          child: SpinKitFadingCircle(
+                            color: Colors.blue,
+                            size: 40.0,
+                          ),
+                        ),
                         SizedBox(height: 12),
                         Text(
                           "Loading doctors...",

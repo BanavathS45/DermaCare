@@ -93,7 +93,8 @@ class Doctordetailscontroller extends GetxController {
                       SizedBox(height: 4),
                       Text(
                         "Closed",
-                        style: TextStyle(color: Colors.redAccent),
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 255, 255, 255)),
                       ),
                     ],
                   ),

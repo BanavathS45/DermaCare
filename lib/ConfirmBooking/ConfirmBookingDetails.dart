@@ -48,6 +48,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final SymptomsController symptomsController = Get.put(SymptomsController());
+
   final TextEditingController doctorRefController = TextEditingController();
   SubService? subServiceDetails;
   // final confirmbookingcontroller = Get.find<Confirmbookingcontroller>();
@@ -244,10 +245,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 // Show Symptoms if available
             if (symptomsController.duration.value.isNotEmpty)
               Obx(() {
-                final duration = symptomsController.duration.value;
+                // final duration = symptomsController.duration.value;
                 return infoRow(
                   "Duration",
-                  duration != null && duration.isNotEmpty ? duration : "0 days",
+                  "${symptomsController.duration.value}",
                 );
               }),
 

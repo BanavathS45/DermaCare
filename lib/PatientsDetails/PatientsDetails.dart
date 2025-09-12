@@ -49,8 +49,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
   void initState() {
     super.initState();
     getUserData();
-    controller
-        .updateDuration("${_durationController.text} ${_selectedDurationType}");
+
   }
 
   Future<void> getUserData() async {

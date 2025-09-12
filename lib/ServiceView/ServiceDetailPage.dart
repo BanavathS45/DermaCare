@@ -377,23 +377,35 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
               margin: const EdgeInsets.symmetric(horizontal: 16),
             ),
             TextButton(
-              onPressed: allTabsRead
-                  ? () {
-                      Get.to(() => Doctorscreen(
-                            mobileNumber: widget.mobileNumber,
-                            username: widget.username,
-                            subServiceID: subServiceDetails!.subServiceId,
-                            hospiatlName: widget.hospitalName,
-                          ));
+              onPressed: () {
+                if (allTabsRead) {
+                  // ✅ User has read everything, proceed
+                  Get.to(() => Doctorscreen(
+                        mobileNumber: widget.mobileNumber,
+                        username: widget.username,
+                        subServiceID: subServiceDetails!.subServiceId,
+                        hospiatlName: widget.hospitalName,
+                      ));
 
-                      final selectedServicesController =
-                          Get.find<SelectedServicesController>();
-                      selectedServicesController
-                          .updateSelectedSubServices([subServiceDetails!]);
-                      selectedServicesController
-                          .setHospitalId(widget.hospitalId);
-                    }
-                  : null, // disables button completely
+                  final selectedServicesController =
+                      Get.find<SelectedServicesController>();
+                  selectedServicesController
+                      .updateSelectedSubServices([subServiceDetails!]);
+                  selectedServicesController.setHospitalId(widget.hospitalId);
+                } else {
+                  // ❌ User has NOT read, show alert
+                  Get.defaultDialog(
+                    title: "Please Read First",
+                    middleText:
+                        "Kindly read the procedure details, pre-care, and post-care instructions before continuing.",
+                    textConfirm: "OK",
+                    confirmTextColor: Colors.white,
+                    onConfirm: () {
+                      Get.back();
+                    },
+                  );
+                }
+              },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
                 padding:
@@ -401,17 +413,17 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
-                // backgroundColor: allTabsRead ? Colors.blue : Colors.grey,
               ),
               child: Padding(
-                padding: EdgeInsets.only(right: 10.0),
+                padding: const EdgeInsets.only(right: 10.0),
                 child: Text(
                   "CONTINUE",
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: allTabsRead ? Colors.white : Colors.grey,
-                  ),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: allTabsRead
+                          ? Colors.white
+                          : const Color.fromARGB(255, 219, 203, 203)),
                 ),
               ),
             )

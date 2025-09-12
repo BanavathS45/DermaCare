@@ -110,7 +110,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
 
     return Scaffold(
       appBar: CommonHeader(
-        title: "Hospitals & Services",
+        title: "Hospitals & Branches",
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -119,43 +119,43 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
             // Search + Recommended Toggle
             Row(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: "Search hospital ",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onChanged: (val) => setState(() => searchText = val),
-                  ),
-                ),
+                // Expanded( //TODO: City Name with searach
+                //   child: TextField(
+                //     controller: _searchController,
+                //     decoration: InputDecoration(
+                //       hintText: "Search hospital ",
+                //       prefixIcon: Icon(Icons.search),
+                //       border: OutlineInputBorder(
+                //         borderRadius: BorderRadius.circular(12),
+                //       ),
+                //     ),
+                //     onChanged: (val) => setState(() => searchText = val),
+                //   ),
+                // ),
                 SizedBox(width: 8),
               ],
             ),
             SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: Icon(Icons.star,
-                  color: showRecommendedOnly ? Colors.white : Colors.teal),
-              label: Text(" Click Here For Recommended Hospitals"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    showRecommendedOnly ? Colors.teal : Colors.grey[300],
-                foregroundColor:
-                    showRecommendedOnly ? Colors.white : Colors.black,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () {
-                setState(() {
-                  showRecommendedOnly = !showRecommendedOnly;
-                  print("Recommended Filter Toggled: $showRecommendedOnly");
-                });
-              },
-            ),
+            // ElevatedButton.icon(
+            //   icon: Icon(Icons.star,
+            //       color: showRecommendedOnly ? Colors.white : Colors.teal),
+            //   label: Text(" Click Here For Recommended Hospitals"),
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor:
+            //         showRecommendedOnly ? Colors.teal : Colors.grey[300],
+            //     foregroundColor:
+            //         showRecommendedOnly ? Colors.white : Colors.black,
+            //     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(12)),
+            //   ),
+            //   onPressed: () {
+            //     setState(() {
+            //       showRecommendedOnly = !showRecommendedOnly;
+            //       print("Recommended Filter Toggled: $showRecommendedOnly");
+            //     });
+            //   },
+            // ),
             SizedBox(
               height: 10,
             ),

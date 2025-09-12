@@ -30,6 +30,6 @@ class SymptomsController extends GetxController {
   void clearForm() {
     symptoms.value = '';
     duration.value = '';
-    attachments.value = [];
+    attachments.clear(); // ✅ Proper way to clear RxList
   }
 }

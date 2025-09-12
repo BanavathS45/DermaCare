@@ -116,6 +116,10 @@ class Registercontroller extends GetxController {
           //     "${response['message'] ?? "Failed to register. Please try again."}",
           //     "errror");
         }
+        if (response['status'] == 409) {
+          // context.loaderOverlay.hide(); // Hide loading overlay
+          showSnackbar("Error", "${response['message']}", "error");
+        }
       } catch (e) {
         context.loaderOverlay.hide(); // Hide loading overlay on error
         showSnackbar("Error",
