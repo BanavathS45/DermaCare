@@ -33,7 +33,7 @@
 
     
     <application
-        android:label="Pragna Clinic"
+        android:label="Derma Care"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true"
