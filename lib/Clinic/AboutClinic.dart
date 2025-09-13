@@ -3,9 +3,21 @@ import 'package:cutomer_app/Clinic/AboutClinicController.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ClinicScreen extends StatelessWidget {
   final controller = Get.put(ClinicController());
+
+  Future<void> _openLink(String url) async {
+    if (url.isEmpty) return;
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint("Could not open $url");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,38 +65,21 @@ class ClinicScreen extends StatelessWidget {
               Text("City: ${clinic.city}"),
               Text("Rating: ⭐ ${clinic.hospitalOverallRating}"),
               Text("Contact: ${clinic.contactNumber}"),
-              if (clinic.emailAddress != null &&
-                  clinic.emailAddress!.isNotEmpty)
-                Text("Email: ${clinic.emailAddress}"),
+
               if (clinic.website != null && clinic.website!.isNotEmpty)
-                Text("Website: ${clinic.website}"),
-              if (clinic.licenseNumber != null &&
-                  clinic.licenseNumber!.isNotEmpty)
-                Text("License: ${clinic.licenseNumber}"),
-              if (clinic.issuingAuthority != null &&
-                  clinic.issuingAuthority!.isNotEmpty)
-                Text("Issuing Authority: ${clinic.issuingAuthority}"),
-              Text("Hours: ${clinic.openingTime} - ${clinic.closingTime}"),
-
-              if (clinic.subscription != null)
-                Text("Subscription: ${clinic.subscription}"),
-
-              if (clinic.freeFollowUps != null)
-                Text("Free Follow-ups: ${clinic.freeFollowUps}"),
-
-              if (clinic.twitterHandle != null && clinic.twitterHandle != "")
-                Text("Twitter: ${clinic.twitterHandle}"),
-
-              if (clinic.facebookHandle != null && clinic.facebookHandle != "")
-                Text("Facebook: ${clinic.facebookHandle}"),
-
-              if (clinic.instagramHandle != null &&
-                  clinic.instagramHandle != "")
-                Text("Instagram: ${clinic.instagramHandle}"),
+                GestureDetector(
+                  onTap: () => _openLink(clinic.website!),
+                  child: Text(
+                    "Website: ${clinic.website}",
+                    style: const TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline),
+                  ),
+                ),
 
               const Divider(height: 30),
 
-              /// ✅ Show Branches if available
+              /// ✅ Branches with Map
               if (clinic.branches != null && clinic.branches!.isNotEmpty) ...[
                 Text("Branches",
                     style: Theme.of(context).textTheme.titleMedium),
@@ -95,35 +90,78 @@ class ClinicScreen extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     final branch = clinic.branches![index];
+
+                    double? lat = double.tryParse(branch.latitude);
+                    double? lng = double.tryParse(branch.longitude);
+
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
-                      child: ListTile(
-                        // leading: const Icon(Icons.business, size: 32),
-                        title: Text(branch.branchName),
-                        subtitle: Column(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text(branch.branchName,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                             Text(branch.address),
                             Text("City: ${branch.city}"),
                             Text("Contact: ${branch.contactNumber}"),
-                            Text("Email: ${branch.email}"),
-                            Text(
-                                "virtual Clinic Tour: ${branch.virtualClinicTour}"),
+
+                            /// Virtual Clinic Tour Link
+                            if (branch.virtualClinicTour.isNotEmpty)
+                              GestureDetector(
+                                onTap: () =>
+                                    _openLink(branch.virtualClinicTour),
+                                child: const Text(
+                                  "🔗 Virtual Clinic Tour",
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+
+                            const SizedBox(height: 10),
+
+                            /// ✅ Show Map if Lat/Lng present
+                            if (lat != null && lng != null)
+                              SizedBox(
+                                height: 200,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: GoogleMap(
+                                    initialCameraPosition: CameraPosition(
+                                      target: LatLng(lat, lng),
+                                      zoom: 15,
+                                    ),
+                                    markers: {
+                                      Marker(
+                                        markerId: MarkerId(branch.branchId),
+                                        position: LatLng(lat, lng),
+                                        infoWindow: InfoWindow(
+                                          title: branch.branchName,
+                                          snippet: branch.address,
+                                        ),
+                                      ),
+                                    },
+                                    zoomControlsEnabled: false,
+                                    myLocationButtonEnabled: false,
+                                  ),
+                                ),
+                              )
+                            else
+                              const Text("📍 Location not available"),
                           ],
                         ),
-                        onTap: () {
-                          // ✅ Optionally open branch location or details page
-                        },
                       ),
                     );
                   },
                 ),
               ] else
                 const Text("No branches available"),
-
-              const Divider(height: 30),
             ],
           ),
         );

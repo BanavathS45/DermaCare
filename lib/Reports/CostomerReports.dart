@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class CustomerReportsPage extends StatelessWidget {
   CustomerReportsPage({super.key});
+
   final List<Patient> patientReports = [
     Patient(
       patientId: "P001",
@@ -18,6 +19,12 @@ class CustomerReportsPage extends StatelessWidget {
       prescriptions: [
         Prescription(fileUrl: "https://example.com/john_prescription.pdf"),
       ],
+      abImages: [
+        AbImages(
+            fileUrl:
+                "https://i.pinimg.com/originals/7a/70/d6/7a70d66837d5888b9d3e0a0a861e9127.jpg"),
+        AbImages(fileUrl: "https://picsum.photos/300/300"),
+      ],
     ),
     Patient(
       patientId: "P002",
@@ -28,6 +35,11 @@ class CustomerReportsPage extends StatelessWidget {
       ],
       prescriptions: [
         Prescription(fileUrl: "https://example.com/jane_prescription.pdf"),
+      ],
+      abImages: [
+        AbImages(
+            fileUrl:
+                "https://tse1.explicit.bing.net/th/id/OIP.62Z1nqyliooNDHMTCF7yogHaHa?pid=ImgDet&w=207&h=207&c=7&dpr=1.5&o=7&rm=3"),
       ],
     ),
   ];
@@ -41,12 +53,19 @@ class CustomerReportsPage extends StatelessWidget {
     }
   }
 
+  Future<void> _openImage(String url) async {
+    final Uri imageUri = Uri.parse(url);
+    if (await canLaunchUrl(imageUri)) {
+      await launchUrl(imageUri, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not open $url";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonHeader(
-        title: "Customer Reports",
-      ),
+      appBar: CommonHeader(title: "Customer Reports"),
       body: ListView.builder(
         itemCount: patientReports.length,
         itemBuilder: (context, index) {
@@ -91,6 +110,47 @@ class CustomerReportsPage extends StatelessWidget {
                     );
                   }).toList(),
                 ),
+                // Images with preview + download button
+                ExpansionTile(
+                  title: const Text("Images"),
+                  children: patient.abImages.map((img) {
+                    return Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            img.fileUrl,
+                            height: 150,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text("Image failed to load"),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.download),
+                          label: const Text("View / Download"),
+                          onPressed: () => _openImage(img.fileUrl),
+                        ),
+                        const Divider(),
+                      ],
+                    );
+                  }).toList(),
+                ),
               ],
             ),
           );
@@ -113,12 +173,19 @@ class Prescription {
   Prescription({required this.fileUrl});
 }
 
+class AbImages {
+  final String fileUrl;
+
+  AbImages({required this.fileUrl});
+}
+
 class Patient {
   final String patientId;
   final String name;
   final String date;
   final List<Report> pastReports;
   final List<Prescription> prescriptions;
+  final List<AbImages> abImages;
 
   Patient({
     required this.patientId,
@@ -126,5 +193,6 @@ class Patient {
     required this.date,
     required this.pastReports,
     required this.prescriptions,
+    required this.abImages,
   });
 }
