@@ -7,6 +7,7 @@ import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:cutomer_app/Inputs/CustomInputField.dart';
+import 'package:cutomer_app/Loading/FullScreeenLoader.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 
 import 'package:cutomer_app/Screens/BookingSuccess.dart';
@@ -80,17 +81,22 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         });
 
         // Now execute based on matched ID
-        if (selectedId == consultations[0].consultationId) {
+        if (consultations.length > 0 &&
+            selectedId == consultations[0].consultationId) {
           setState(() {
             consultationFee = selectedServicesController
                 .selectedSubServices.first.consultationFee
                 .toInt();
           });
-        } else if (selectedId == consultations[1].consultationId) {
+        }
+        if (consultations.length > 1 &&
+            selectedId == consultations[1].consultationId) {
           setState(() {
             consultationFee = doctor?.doctorFees.inClinicFee ?? 0;
           });
-        } else if (selectedId == consultations[2].consultationId) {
+        }
+        if (consultations.length > 2 &&
+            selectedId == consultations[2].consultationId) {
           setState(() {
             consultationFee = doctor?.doctorFees.vedioConsultationFee ?? 0;
           });
@@ -164,6 +170,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     //     consultationController.selectedConsultation.value?.consultationId;
     final consultationId =
         consultationController.selectedConsultation.value?.consultationId;
+    final backeEndCOnsulationID = _consultations[0].consultationId;
     // final consultationId =
     //     consultationController.selectedConsultation.value?.consultationId;
     return Scaffold(
@@ -191,7 +198,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
                   return FutureBuilder(
                     key: ValueKey(consultationId),
-                    future: _getServiceButton(consultationId),
+                    future: _getServiceButton(
+                        consultationId, backeEndCOnsulationID),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -449,7 +457,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                         "₹ ${consultationFee.toStringAsFixed(0) ?? '0'}"),
                     infoRow("GST (18%)",
                         "₹ ${(consultationFee * 0.18).toStringAsFixed(0) ?? '0'}"),
-                    infoRow("Tax", "₹ ${taxAmount.toStringAsFixed(0) ?? '0'}"),
+                    infoRow("Other Tax",
+                        "₹ ${taxAmount.toStringAsFixed(0) ?? '0'}"),
                     infoRow("Total Fee",
                         "₹ ${(consultationFee + consultationFee * 0.18 + 0)?.toStringAsFixed(0) ?? '0'}"),
                   ] else ...[
@@ -467,7 +476,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                       "₹ ${subServiceDetails?.gstAmount?.toStringAsFixed(0) ?? '0'}",
                     ),
                     infoRow(
-                      "Tax (${subServiceDetails?.taxPercentage?.toStringAsFixed(0) ?? '0'}%)",
+                      "Other Tax (${subServiceDetails?.taxPercentage?.toStringAsFixed(0) ?? '0'}%)",
                       "₹ ${subServiceDetails?.taxAmount?.toStringAsFixed(0) ?? '0'}",
                     ),
                     infoRow(
@@ -513,11 +522,11 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             String? pdfBase64 =
                 widget.pdfBytes != null ? base64Encode(widget.pdfBytes!) : null;
             final bookingDetails = BookingDetailsModel(
-              subServiceName: globalServiceId == "ST_01"
+              subServiceName: globalServiceId == backeEndCOnsulationID
                   ? selectedServicesController
                       .selectedSubServices.first.subServiceName
                   : "NA",
-              subServiceId: globalServiceId == "ST_01"
+              subServiceId: globalServiceId == backeEndCOnsulationID
                   ? selectedServicesController
                       .selectedSubServices.first.subServiceId
                   : "NA",
@@ -525,26 +534,26 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               consultationType: consultationController
                   .selectedConsultation.value!.consultationType,
               consultationFee: consultationFee.toDouble(),
-              totalFee: globalServiceId == "ST_01"
+              totalFee: globalServiceId == backeEndCOnsulationID
                   ? selectedServicesController
                       .selectedSubServices.first.finalCost
                   : consultationFee + (consultationFee * 0.18) + 0,
               clinicId: widget.doctor.hospital.hospitalId,
               doctorDeviceId: widget.doctor.doctor.deviceId,
               clinicAddress: widget.doctor.hospital.address,
-              categoryName: globalServiceId == "ST_01"
+              categoryName: globalServiceId == backeEndCOnsulationID
                   ? selectedServicesController
                       .selectedSubServices.first.categoryName
                   : "NA",
-              categoryId: globalServiceId == "ST_01"
+              categoryId: globalServiceId == backeEndCOnsulationID
                   ? selectedServicesController
                       .selectedSubServices.first.categoryId
                   : "NA",
-              servicename: globalServiceId == "ST_01"
+              servicename: globalServiceId == backeEndCOnsulationID
                   ? selectedServicesController
                       .selectedSubServices.first.serviceName
                   : "NA",
-              serviceId: globalServiceId == "ST_01"
+              serviceId: globalServiceId == backeEndCOnsulationID
                   ? selectedServicesController
                       .selectedSubServices.first.serviceId
                   : "NA",
@@ -578,6 +587,15 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             if (selectedPayment == "Pay at Hospital") {
               // 🏥 DIRECTLY POST BOOKING
               print('[🏥] Booking via Pay at Hospital');
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Prevent closing
+                builder: (_) => FullscreenLoader(
+                  message: "Processing Booking...",
+                  logoPath:
+                      "assets/ic_launcher.png", // Provide your app logo path
+                ),
+              );
 
               var responseData = await postBookings(postBookingPayload);
               print('[DEBUG] Response Data: $responseData');
@@ -855,7 +873,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
   String consultationType = "";
 
-  Future<Widget> _getServiceButton(String id) async {
+  Future<Widget> _getServiceButton(
+      String id, String backeEndCOnsulationID) async {
     print("Fetching consultation for ID: $id");
     Color color = Colors.white;
     int consultationFee = 0;
@@ -895,7 +914,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _serviceButton(consultationType, color, id, consultationFee),
-        SlotBookingAndConsltation(consultationType, consultationFee, id),
+        SlotBookingAndConsltation(
+            consultationType, consultationFee, id, backeEndCOnsulationID),
       ],
     );
   }
@@ -948,7 +968,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     );
   }
 
-  Widget SlotBookingAndConsltation(String title, int fee, String id) {
+  Widget SlotBookingAndConsltation(
+      String title, int fee, String id, String backeEndCOnsulationID) {
     print("title __ ${title}");
     print("fee __ ${fee}");
     print("id __ ${id}");
@@ -997,7 +1018,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               // Only show sub-services if ST_01
               if (consultationController
                       .selectedConsultation.value?.consultationId ==
-                  "ST_01") {
+                  backeEndCOnsulationID) {
                 final services = selectedServicesController.selectedSubServices;
                 if (services.isEmpty) {
                   return const Text(

@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
-import 'package:cutomer_app/Notification/LocalNotification.dart';
-
+import 'package:cutomer_app/Loading/FullScreeenLoader.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
@@ -87,83 +86,17 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
     );
   }
 
-//   void handleBookAppoint() async {
-//     setState(() {
-//       _isLoading = false;
-//     });
-
-//     // showSnackbar(
-//     //     "Success", "Payment Successful: ${response.paymentId}", "success");
-//     // paymentId = response.paymentId;
-//     // print("Payment Successful: ${response.paymentId}");
-//     // print("Payment Successful: ${response.orderId}");
-//     // print("Payment Successful: ${response.data}");
-//     // print("Payment Successful: ${response.signature}");
-
-//     print("Booking Payload: ${jsonEncode(widget.bookingDetails)}");
-
-//     var responseData = await postBookings(widget.bookingDetails);
-
-//     print('[DEBUG] Response Data: $responseData');
-
-//     if (responseData!['statusCode'] == 201 && responseData['data'] != null) {
-//       print('[DEBUG] Inside if block');
-
-//       Navigator.pushAndRemoveUntil(
-//           context,
-//           MaterialPageRoute(
-//             builder: (ctx) => SuccessScreen(
-//                 serviceDetails: widget.serviceDetails,
-//                 paymentId: "paymentId.toString()",
-//                 patient: widget.patient,
-//                 mobileNumber: widget.mobileNumber),
-//           ),
-//           (route) => false);
-
-//       //Testing
-//       final testVideoCallTime = DateTime.now().add(Duration(minutes: 6));
-
-//       //original
-//       // Assume these are coming from your bookingDetails or responseData
-//       final serviceDate =
-//           widget.bookingDetails.patient.serviceDate; // e.g., "2025-06-29"
-//       final serviceTime =
-//           widget.bookingDetails.patient.servicetime; // e.g., "08:00 PM"
-
-// // Combine and parse to DateTime
-//       final String combinedDateTimeStr = '$serviceDate $serviceTime';
-//       print('[📅] Combined Date & Time string: $combinedDateTimeStr');
-
-//       final DateTime videoCallTime =
-//           DateFormat('yyyy-MM-dd hh:mm a').parse(combinedDateTimeStr);
-//       print('[✅] Parsed video call DateTime: $videoCallTime');
-
-//       print('[📞] Scheduling alert at: $testVideoCallTime');
-
-//       try {
-//         print('[🧪] Before scheduling');
-//         // await scheduleVideoCallNotification(
-//         //   title: 'Doctor Video Call',
-//         //   body: 'Your video call with the doctor starts in 1 minutes.',
-//         //   videoCallTime: testVideoCallTime,
-//         // );
-//         await scheduleVideoCallNotification(
-//           title: 'Doctor Video Call',
-//           body: 'Your video call with the doctor starts in 5 minutes.',
-//           videoCallTime: videoCallTime,
-//         );
-//         print('[✅] After scheduling');
-//       } catch (e) {
-//         print('[❌] Failed to schedule video call: $e');
-//       }
-
-//       print('[DEBUG] Notification scheduled. Navigating to success screen...');
-//     } else {
-//       print('[❌] Booking failed or unexpected response: $responseData');
-//     }
-//   }
+ 
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing
+      builder: (_) => FullscreenLoader(
+        message: "Processing Booking...",
+        logoPath: "assets/ic_launcher.png", // Provide your app logo path
+      ),
+    );
     setState(() {
       _isLoading = false;
     });

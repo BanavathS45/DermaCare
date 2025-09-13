@@ -399,7 +399,12 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
     //   return;
     // }
     if (!_signatureSaved) {
-      _showSnack("Please provide your signature");
+      ScaffoldMessageSnackbar.show(
+        context: context,
+        message: "Please provide your signature and save",
+        type: SnackbarType.warning,
+      );
+
       return;
     }
 
@@ -410,7 +415,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
     Get.to(() => Confirmbookingdetails(
           doctor: widget.doctor,
           patient: widget.patient,
-          pdfBytes: pdfBytes!, // pass pdf to next screen
+          pdfBytes: pdfBytes, // pass pdf to next screen
         ));
   }
 
@@ -775,7 +780,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
-          onPressed: _patientSigned ? _onSubmit : null,
+          onPressed: _onSubmit,
           // icon: const Icon(
           //   Icons.check,
           //   color: Colors.white,
