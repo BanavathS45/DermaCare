@@ -1,8 +1,9 @@
+import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomerReportsPage extends StatelessWidget {
-    CustomerReportsPage({super.key});
+  CustomerReportsPage({super.key});
   final List<Patient> patientReports = [
     Patient(
       patientId: "P001",
@@ -43,7 +44,9 @@ class CustomerReportsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Customer Reports")),
+      appBar: CommonHeader(
+        title: "Customer Reports",
+      ),
       body: ListView.builder(
         itemCount: patientReports.length,
         itemBuilder: (context, index) {

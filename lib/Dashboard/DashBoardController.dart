@@ -100,8 +100,8 @@ class Dashboardcontroller extends GetxController {
 
   void clearAfterAppointment() async {
     // Clear selected services
-    Get.snackbar("Success", "Appointment booked and form reset!",
-        snackPosition: SnackPosition.BOTTOM);
+    // Get.snackbar("Success", "Appointment booked and form reset!",
+    //     snackPosition: SnackPosition.BOTTOM);
 
     selectedService.value = null;
     selectedSubService.value = null;

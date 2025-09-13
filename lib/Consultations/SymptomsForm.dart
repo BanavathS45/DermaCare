@@ -166,42 +166,43 @@ class _SymptomsFormState extends State<SymptomsForm> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ChoiceChip(
-                    label: Text("First Time"),
-                    selected: selectedType == "First Time",
-                    onSelected: (selected) {
-                      setState(() => selectedType = "First Time");
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  ChoiceChip(
-                    label: Text("Follow Up"),
-                    selected: selectedType == "Follow Up",
-                    onSelected: (selected) {
-                      setState(() => selectedType = "Follow Up");
-                      // Navigate immediately to next screen for Follow Up
-                      // Get.to(ConsultationPrice(
-                      //   mobileNumber: widget.mobileNumber,
-                      //   username: widget.consulationType,
-                      //   consulationType: widget.consulationType,
-                      //   subserviceName: 'PRP Injection Procedure',
-                      //   subserviceid: '687b91e50ce982692fd1aeb2',
-                      //   serviceId: '687b91540ce982692fd1aeb0',
-                      //   categoryId: '687b90d80ce982692fd1aeae',
-                      //   serviceName: 'PRP Therapy',
-                      //   categoryName: 'Hair Treatments',
-                      // ));
-                    },
-                    //  enabled: false,
-                  ),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(vertical: 8.0),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       ChoiceChip(
+            //         label: Text("First Time"),
+            //         selected: selectedType == "First Time",
+            //         onSelected: (selected) {
+            //           setState(() => selectedType = "First Time");
+            //         },
+            //       ),
+            //       const SizedBox(width: 10),
+            //       ChoiceChip(
+            //         label: Text("Follow Up"),
+            //         selected: selectedType == "Follow Up",
+            //         onSelected: (selected) {
+            //           setState(() => selectedType = "Follow Up");
+            //           // Navigate immediately to next screen for Follow Up
+            //           // Get.to(ConsultationPrice(
+            //           //   mobileNumber: widget.mobileNumber,
+            //           //   username: widget.consulationType,
+            //           //   consulationType: widget.consulationType,
+            //           //   subserviceName: 'PRP Injection Procedure',
+            //           //   subserviceid: '687b91e50ce982692fd1aeb2',
+            //           //   serviceId: '687b91540ce982692fd1aeb0',
+            //           //   categoryId: '687b90d80ce982692fd1aeae',
+            //           //   serviceName: 'PRP Therapy',
+            //           //   categoryName: 'Hair Treatments',
+            //           // ));
+            //         },
+            //         //  enabled: false,
+            //       ),
+            //     ],
+            //   ),
+            // ),
+
             // Text("Selected Type: $selectedType",
             //     style: TextStyle(fontSize: 14)),
             Expanded(
@@ -315,7 +316,6 @@ class _SymptomsFormState extends State<SymptomsForm> {
                             ),
                           ],
                         ),
-                      
                       ],
                     ),
                     const SizedBox(height: 15),

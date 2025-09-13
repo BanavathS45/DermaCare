@@ -200,6 +200,7 @@
 //   }
 // }
 
+import 'package:cutomer_app/Clinic/AboutClinicController.dart';
 import 'package:cutomer_app/Dashboard/VisitController.dart';
 import 'package:cutomer_app/Doctors/Schedules/ConsentForm.dart';
 import 'package:cutomer_app/Notification/NotificationController.dart';
@@ -288,6 +289,7 @@ Future<void> main() async {
   Get.put(SymptomsController());
   Get.put(VisitController());
   Get.put(SubServiceController());
+  Get.put(ClinicController());
 
   // ✅ FCM Notification tap handling
   final RemoteMessage? initialMessage =

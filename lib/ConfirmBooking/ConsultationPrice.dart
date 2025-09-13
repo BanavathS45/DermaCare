@@ -202,7 +202,7 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             SpinKitFadingCircle(
-                              color: Colors.blue,
+                              color: mainColor,
                               size: 40.0,
                             ),
                             SizedBox(height: 12),

@@ -162,7 +162,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
         ),
         body: Center(
           child: SpinKitFadingCircle(
-            color: Colors.blue,
+            color: mainColor,
             size: 40.0,
           ),
         ),

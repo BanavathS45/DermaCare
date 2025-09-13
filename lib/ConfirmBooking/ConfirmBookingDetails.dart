@@ -5,6 +5,7 @@ import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:cutomer_app/Inputs/CustomInputField.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 
@@ -48,7 +49,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final SymptomsController symptomsController = Get.put(SymptomsController());
-
+  final TextEditingController controller = TextEditingController();
   final TextEditingController doctorRefController = TextEditingController();
   SubService? subServiceDetails;
   // final confirmbookingcontroller = Get.find<Confirmbookingcontroller>();
@@ -129,6 +130,15 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     });
   }
 
+  String? selectedDoctor;
+  // doctor_data.dart
+  final List<Map<String, String>> dummyDoctors = [
+    {"name": "Dr. John Doe", "refId": "REF123"},
+    {"name": "Dr. Smith Adams", "refId": "REF456"},
+    {"name": "Dr. Priya Sharma", "refId": "REF789"},
+    {"name": "Dr. Rahul Verma", "refId": "REF987"},
+  ];
+
   @override
   Widget build(BuildContext context) {
     Widget? consultationWidget;
@@ -208,16 +218,25 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                 ),
-                CustomTextField(
-                  controller: doctorRefController,
-                  labelText: 'Enter Refferal Code',
-                  keyboardType: TextInputType.text,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  // inputFormatters: [
-                  //   LengthLimitingTextInputFormatter(3),
-                  //   FilteringTextInputFormatter.digitsOnly,
-                  // ],
+                // Replace your CustomTextField with this widget
+                CustomDropdownField<String>(
+                  value: selectedDoctor,
+                  labelText: "Select Referring Doctor",
+                  icon: Icons.person,
+                  items: dummyDoctors.map((doctor) {
+                    return DropdownMenuItem<String>(
+                      value: doctor['refId'],
+                      child: Text("${doctor['name']} (${doctor['refId']})"),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedDoctor = value;
+                      controller.text = value ?? '';
+                    });
+                  },
                 ),
+
                 PaymentModeSelector(
                   consultationType: consultationController
                       .selectedConsultation.value!.consultationType,

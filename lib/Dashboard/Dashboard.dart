@@ -5,6 +5,7 @@ import 'package:cutomer_app/Dashboard/VisitType.dart';
 import 'package:cutomer_app/Notification/NotificationController.dart';
 import 'package:cutomer_app/Notification/Notifications.dart';
 import 'package:cutomer_app/Screens/RefferalCode.dart';
+import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -30,6 +31,7 @@ class DashboardScreen extends StatefulWidget {
     super.key,
     required this.mobileNumber,
     required this.username,
+    required String consulationType,
   });
 
   @override
@@ -126,154 +128,8 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(gradient: appGradient()),
-          ),
-          title: Row(children: [
-            // Obx(() {
-            //   final image = dashboardcontroller.imageFile.value;
-            //   return GestureDetector(
-            //     onTap: () =>
-            //         dashboardcontroller.showImagePickerOptions(context),
-            //     child: CircleAvatar(
-            //       radius: 20,
-            //       backgroundColor: Colors.grey[200],
-            //       backgroundImage: image != null
-            //           ? FileImage(image)
-            //           : const AssetImage('assets/surecare_launcher.png')
-            //               as ImageProvider,
-            //     ),
-            //   );
-            // }),
-            Obx(() {
-              final image = dashboardcontroller.imageFile.value;
-
-              return GestureDetector(
-                onTap: () {
-                  if (image != null) {
-                    Get.to(ImagePreviewScreen(imagePath: image.path));
-                  } else {
-                    dashboardcontroller.showImagePickerOptions(context, image);
-                  }
-                },
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage: image != null
-                      ? FileImage(image)
-                      : const AssetImage('assets/ic_launcher.png')
-                          as ImageProvider,
-                ),
-              );
-            }),
-
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Hi, Welcome Back",
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 16)),
-                const SizedBox(height: 5),
-                Text(
-                  capitalizeFirstLetter(widget.username),
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ],
-            ),
-            const Spacer(),
-            Obx(() {
-              final count =
-                  Get.find<NotificationController>().unreadCount.value;
-
-              return Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.notifications, color: Colors.white),
-                    onPressed: () {
-                      // ✅ Reset unread count (optional)
-                      Get.to(() => NotificationScreen());
-                    },
-                  ),
-                  if (count > 0)
-                    Positioned(
-                      right: 6,
-                      top: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 18,
-                          minHeight: 18,
-                        ),
-                        child: Text(
-                          '$count',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            }),
-            GestureDetector(
-              onTap: () {
-                Get.to(() => ReferralWalletPage());
-              },
-              child: Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.wallet, color: Colors.white),
-                    onPressed: () {
-                      // ✅ Reset unread count (optional)
-                      // Get.to(() => NotificationScreen());
-                    },
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: -4,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                          // color: Colors.red,
-                          // shape: BoxShape.circle,
-                          ),
-                      constraints: const BoxConstraints(
-                        minWidth: 25,
-                        minHeight: 18,
-                      ),
-                      child: Text(
-                        '💰 2000',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // IconButton(
-            //   icon: const Icon(Icons.wallet, color: Colors.white),
-            //   onPressed: () async {
-            //     await whatsUpChat();
-            //   },
-            // )
-          ]),
+        appBar: CommonHeader(
+          title: "Services & Treatments",
         ),
         body: Obx(() {
           if (dashboardcontroller.isLoading.value) {
@@ -335,11 +191,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
-                    CommonCarouselAds(
-                      media: dashboardcontroller.carouselImages,
-                      height: 170,
-                    ),
+                    // const SizedBox(height: 20),
+                    // CommonCarouselAds(
+                    //   media: dashboardcontroller.carouselImages,
+                    //   height: 170,
+                    // ),
                     const SizedBox(height: 20),
                     if (controller.inProgressBookings.isNotEmpty) ...[
                       Padding(
@@ -425,7 +281,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                         );
                       },
                     ),
-                    
                   ],
                 ),
               ),

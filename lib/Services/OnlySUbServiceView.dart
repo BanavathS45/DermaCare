@@ -4,6 +4,7 @@ import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import '../APIs/FetchServices.dart';
 import '../Dashboard/DashBoardController.dart';
@@ -266,22 +267,9 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
     );
   }
 
-  void _showOptionBottomSheet(BuildContext context, Service service) async {
-    setState(() {
-      isSubServiceLoading = true;
-    });
-
-    // Fetch subservices using the serviceId
-    final subservices =
-        await serviceFetcher.fetchsubServices(service.serviceId);
-
-    setState(() {
-      dynamicSubServices = subservices;
-      isSubServiceLoading = false;
-    });
-
-    String? selectedOption;
-
+  void _showOptionBottomSheet(BuildContext context, Service service) {
+    selectedSubService = null;
+    dynamicSubServices = [];
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -289,8 +277,20 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
+        // Use StatefulBuilder to update loading/subservices
         return StatefulBuilder(
           builder: (context, setState) {
+            // Fetch subservices after bottom sheet is built
+            if (dynamicSubServices.isEmpty && !isSubServiceLoading) {
+              setState(() => isSubServiceLoading = true);
+              serviceFetcher.fetchsubServices(service.serviceId).then((subs) {
+                setState(() {
+                  dynamicSubServices = subs;
+                  isSubServiceLoading = false;
+                });
+              });
+            }
+
             return Padding(
               padding: EdgeInsets.only(
                 left: 16,
@@ -308,9 +308,7 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                           child: Text(
                             "Select Procedure for\n${service.serviceName}",
                             style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         ),
                         IconButton(
@@ -321,7 +319,12 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                     ),
                     const SizedBox(height: 12),
                     if (isSubServiceLoading)
-                      const Center(child: CircularProgressIndicator())
+                      Center(
+                        child: SpinKitFadingCircle(
+                          color: mainColor,
+                          size: 40.0,
+                        ),
+                      )
                     else if (dynamicSubServices.isEmpty)
                       const Text("No Sub-Services Available")
                     else
@@ -397,13 +400,12 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
                           ),
                           backgroundColor: (selectedSubService == null ||
                                   dynamicSubServices.isEmpty)
-                              ? Colors.grey // ❌ disabled color
-                              : Theme.of(context)
-                                  .primaryColor, // ✅ enabled color
+                              ? Colors.grey
+                              : Theme.of(context).primaryColor,
                         ),
                         onPressed: (selectedSubService == null ||
                                 dynamicSubServices.isEmpty)
-                            ? null // ❌ disable button
+                            ? null
                             : () {
                                 subServiceController
                                     .setSelectedSubService(selectedSubService!);

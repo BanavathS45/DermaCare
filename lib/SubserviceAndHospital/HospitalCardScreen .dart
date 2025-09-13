@@ -164,7 +164,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
               child: isLoading
                   ? Center(
                       child: SpinKitFadingCircle(
-                        color: Colors.blue,
+                        color: mainColor,
                         size: 40.0,
                       ),
                     )

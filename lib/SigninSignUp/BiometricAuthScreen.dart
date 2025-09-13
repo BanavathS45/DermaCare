@@ -89,9 +89,10 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
         if (checkUserResponse.statusCode == 200) {
           final data = json.decode(checkUserResponse.body);
           if (data['success'] == true && data['data'] != null) {
-            Get.offAll(ConsultationsType(
+            Get.offAll(BottomNavController(
               mobileNumber: mobileNumber,
               username: username,
+              index: 0,
             ));
             print("🚀 Login successful. Navigating to ConsultationsType.");
           } else {

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:cutomer_app/BottomNavigation/Profile/ProfileScreens.dart';
+import 'package:cutomer_app/Clinic/AboutClinic.dart';
 import 'package:cutomer_app/Customers/GetCustomerModel.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
 import 'package:cutomer_app/Dashboard/GetCustomerData.dart';
@@ -160,7 +161,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             buildCardItem(
                 icon: Icons.help_outline,
                 label: "About Clinic",
-                onTap: () => Get.to(() => CustomerReportsPage())),
+                onTap: () => Get.to(() => ClinicScreen())),
             // onTap: () {}),
             buildCardItem(
                 icon: Icons.help_outline,

@@ -10,6 +10,7 @@ import 'package:cutomer_app/Help/Numbers.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/SavePdfToDownloads.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
   Uint8List? _pdfBytes;
   bool _patientSigned = false;
   ConsentForm? consentFormData;
-
+  String? procedureName;
   final String procedure =
       "I hereby provide my informed consent to undergo the procedure and acknowledge that I have understood the associated pre-procedure, procedure, and post-procedure care and guidelines and the corresponding possible reactions and risks.";
   String? userData;
@@ -178,6 +179,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
     if (data != null) {
       setState(() {
         consentFormData = data;
+        procedureName = data.subServiceName;
       });
 
       // Navigator.push(
@@ -188,8 +190,10 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
       // );
       print("ConsentFormData: ${consentFormData!.hospitalId}");
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No consent form available")),
+      ScaffoldMessageSnackbar.show(
+        context: context,
+        message: "No consent form available",
+        type: SnackbarType.warning,
       );
     }
   }
@@ -249,7 +253,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
           pw.SizedBox(height: 16),
 
           pw.Center(
-            child: pw.Text("Consent for Skin Care Procedure",
+            child: pw.Text("Consent for ${procedureName} Procedure",
                 style:
                     pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
           ),
@@ -426,8 +430,10 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
       _pdfBytes = pdfBytes;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("PDF saved to: $filePath")),
+    ScaffoldMessageSnackbar.show(
+      context: context,
+      message: "PDF saved to: $filePath",
+      type: SnackbarType.success,
     );
   }
 
@@ -480,7 +486,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                           "Age : ",
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
-                        Text("${widget.patient.age} Yrs"),
+                        Text("${widget.patient.age}"),
                       ],
                     ),
                     SizedBox(
@@ -525,9 +531,10 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                               ),
                             );
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Consent form not loaded yet")),
+                            ScaffoldMessageSnackbar.show(
+                              context: context,
+                              message: "Consent form not loaded yet",
+                              type: SnackbarType.warning,
                             );
                           }
                         } else if (index == 1) {
@@ -607,10 +614,13 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                   // Questions Button
                   ElevatedButton.icon(
                     onPressed: _openQuestions,
-                    icon: Icon(Icons.question_answer),
-                    label: Text('Questions'),
+                    icon: Icon(
+                      Icons.question_answer,
+                      color: Colors.white,
+                    ),
+                    label: Text('Questions Book'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
+                      backgroundColor: mainColor,
                       padding:
                           EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
@@ -620,10 +630,13 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                   // WhatsApp Button
                   ElevatedButton.icon(
                     onPressed: whatsUpChat,
-                    icon: Icon(Icons.whatshot),
+                    icon: Icon(
+                      Icons.whatshot,
+                      color: Colors.white,
+                    ),
                     label: Text('Help via WhatsApp'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: secondaryColor,
                       padding:
                           EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
@@ -632,81 +645,6 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: const Text(
-                "Patient Signature",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-              ),
-            ),
-
-            // Signature box
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.grey, // border color
-                    width: 2, // border thickness
-                  ),
-                  borderRadius:
-                      BorderRadius.circular(8), // optional rounded corners
-                ),
-                child: AspectRatio(
-                  aspectRatio: 3.5,
-                  child: Signature(
-                    controller: _patientSignController,
-                    backgroundColor: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-
-            // Buttons Row
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () => _patientSignController.clear(),
-                  child: const Text("Clear"),
-                ),
-                const Spacer(),
-                FilledButton(
-                  onPressed: () async {
-                    final data = await _patientSignController.toPngBytes();
-                    if (data != null) {
-                      final pdf = await _buildPdf(); // generate PDF
-                      setState(() {
-                        _patientSigned = true;
-                        _signatureSaved = true;
-                        _pdfBytes = pdf;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            "Signature Saved Successfully ✅",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          backgroundColor: Colors.green,
-                          behavior:
-                              SnackBarBehavior.floating, // 👈 Makes it float
-                          margin: const EdgeInsets.only(
-                            top: 20, // 👈 Distance from top
-                            left: 16,
-                            right: 16,
-                          ),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text("Save"),
-                )
-              ],
-            ),
-
-            // ✅ Saved Indicator
             if (_patientSigned)
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, top: 8),
@@ -754,6 +692,74 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                   ],
                 ),
               ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: const Text(
+                    "Patient Signature",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => _patientSignController.clear(),
+                  child: const Text("Clear"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final data = await _patientSignController.toPngBytes();
+                    if (data != null) {
+                      final pdf = await _buildPdf(); // generate PDF
+                      setState(() {
+                        _patientSigned = true;
+                        _signatureSaved = true;
+                        _pdfBytes = pdf;
+                      });
+                      ScaffoldMessageSnackbar.show(
+                        context: context,
+                        message: "Signature Saved Successfully",
+                        type: SnackbarType.success,
+                      );
+                    } else {
+                      ScaffoldMessageSnackbar.show(
+                        context: context,
+                        message: "Please signature to Save",
+                        type: SnackbarType.error,
+                      );
+                    }
+                  },
+                  child: const Text("Save"),
+                ),
+              ],
+            ),
+
+            // Signature box
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey, // border color
+                    width: 2, // border thickness
+                  ),
+                  borderRadius:
+                      BorderRadius.circular(8), // optional rounded corners
+                ),
+                child: AspectRatio(
+                  aspectRatio: 3.5,
+                  child: Signature(
+                    controller: _patientSignController,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+
+            // Buttons Row
+
+            // ✅ Saved Indicator
           ],
         ),
       ),
@@ -769,16 +775,16 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
-          onPressed: _onSubmit,
+          onPressed: _patientSigned ? _onSubmit : null,
           // icon: const Icon(
           //   Icons.check,
           //   color: Colors.white,
           //   size: 25,
           // ),
-          label: const Text(
+          label: Text(
             "SUBMIT",
             style: TextStyle(
-              color: Colors.white,
+              color: _patientSigned ? Colors.white : Colors.grey,
               fontSize: 22,
             ),
           ),

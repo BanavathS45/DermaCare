@@ -1,19 +1,20 @@
+import 'dart:math';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
+import 'package:cutomer_app/Dashboard/Dashboard.dart';
+import 'package:cutomer_app/Dashboard/ImagePreview.dart';
 import 'package:cutomer_app/Dashboard/VisitType.dart';
+import 'package:cutomer_app/Notification/NotificationController.dart';
+import 'package:cutomer_app/Notification/Notifications.dart';
+import 'package:cutomer_app/Screens/RefferalCode.dart';
+import 'package:cutomer_app/Utils/CommonCarouselAds.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/CopyRigths.dart';
-import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../BottomNavigation/BottomNavigation.dart';
 import '../Consultations/SymptomsForm.dart';
-import '../Screens/CategoryAndServicesForm.dart';
-import '../Utils/GradientTextWidget .dart';
-import 'ConfirmBookingDetails.dart';
 import 'ConsultationController.dart';
 
 class ConsultationsType extends StatefulWidget {
@@ -32,272 +33,305 @@ class ConsultationsType extends StatefulWidget {
 
 class ConsultationsTypeState extends State<ConsultationsType> {
   final consultationcontroller = Get.find<Consultationcontroller>();
+  final dashboardcontroller = Get.put(Dashboardcontroller());
   List<ConsultationModel> _consultations = [];
   bool loading = true;
-  bool showConsultationOptions = false;
-  final dashboardcontroller = Get.put(Dashboardcontroller());
 
   @override
   void initState() {
     super.initState();
     dashboardcontroller.setMobileNumber(widget.mobileNumber);
+    _loadConsultations();
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final consultations = await getConsultationDetails();
-      setState(() {
-        _consultations = consultations;
-        loading = false;
-      });
+  Future<void> _loadConsultations() async {
+    setState(() => loading = true);
+    final consultations = await getConsultationDetails();
+    setState(() {
+      _consultations = consultations;
+      loading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: _buildAppBar(),
       extendBody: true,
       backgroundColor: Colors.transparent,
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.white, secondaryColor, mainColor],
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 40),
-                  Center(
+        child: loading
+            ? const Center(child: CircularProgressIndicator())
+            : _consultations.isEmpty
+                ? Center(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.05),
-                        Container(
-                          height: 120,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(30),
-                            child: Image.asset(
-                              'assets/ic_launcher.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                        const Text("No service available",
+                            style: TextStyle(color: mainColor)),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: _loadConsultations,
+                          child: const Text("Refresh"),
                         ),
-                        const SizedBox(height: 10),
-                        const SizedBox(height: 16),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: Text(
-                            "Daily skincare is essential to maintain healthy, glowing skin and prevent premature aging.",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: 26),
-                        Text(
-                          "Hi, Welcome",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          "${capitalizeEachWord(widget.username)}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 28,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                offset: Offset(2, 2),
-                                blurRadius: 4,
-                                color: Colors.black45,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 30),
                       ],
                     ),
-                  ),
-                  loading
-                      ? Center(child: CircularProgressIndicator())
-                      : _consultations.isEmpty
-                          ? SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.35,
-                              child: Center(
-                                child: Text(
-                                  "No service available",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            )
-                          : Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 24.0),
-                              child: Column(
-                                children: _buildFilteredConsultationButtons(),
-                              ),
+                  )
+                : Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CommonCarouselAds(
+                          media: dashboardcontroller.carouselImages,
+                          height: 170,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      VisitType(
+                        consulationType: _consultations.first.consultationType,
+                        mobileNumber: widget.mobileNumber,
+                        username: widget.username,
+                        onVisitTypeChanged: (String value) {},
+                      ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.9,
+                          children: [
+                            _mainCard(
+                              "Services & Treatments",
+                              "assets/treat.jpg",
+                              () {
+                                Get.to(DashboardScreen(
+                                  mobileNumber: widget.mobileNumber,
+                                  username: widget.username,
+                                  consulationType: "Services & Treatments",
+                                ));
+                              },
                             ),
-                  const SizedBox(height: 40),
-                ],
-              ),
-            ],
-          ),
-        ),
+                            _mainCard(
+                              "Consultations",
+                              "assets/consult.jpg",
+                              () => _showConsultationOptions(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
       ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.transparent,
         elevation: 0,
         child: Copyrights(
-          color: Colors.white,
+          color: mainColor,
           padding: EdgeInsets.all(0),
         ),
       ),
     );
   }
 
-  List<Widget> _buildFilteredConsultationButtons() {
-    List<Widget> buttons = [];
-    List<ConsultationModel> staticOptions = _consultations
-        .where(
-            (e) => e.consultationType.toLowerCase() == "services & treatments")
-        .toList();
-
-    List<ConsultationModel> dynamicOptions = _consultations
-        .where((e) =>
-            e.consultationType.toLowerCase().contains('clinic') ||
-            e.consultationType.toLowerCase().contains('online'))
-        .toList();
-
-    buttons.addAll(staticOptions.map((consultation) => _serviceButton(
-          consultation.consultationType,
-          Colors.white,
-          consultation.consultationId,
-          _getIconForType(consultation.consultationType),
-          consultation,
-        )));
-
-    buttons.add(_serviceButton(
-      'Consultations',
-      Colors.white,
-      'show_more',
-      Icons.expand_more,
-      ConsultationModel(
-          consultationId: 'show_more', consultationType: 'Consultation'),
-    ));
-
-    if (showConsultationOptions) {
-      buttons.addAll(dynamicOptions.map((consultation) => _serviceButton(
-            consultation.consultationType,
-            Colors.white,
-            consultation.consultationId,
-            _getIconForType(consultation.consultationType),
-            consultation,
-          )));
-    }
-
-    return buttons;
-  }
-
-  IconData _getIconForType(String type) {
-    if (type.toLowerCase().contains("clinic")) {
-      return Icons.local_hospital_outlined;
-    } else if (type.toLowerCase().contains("online")) {
-      return Icons.video_call_outlined;
-    } else {
-      return Icons.medical_services_outlined;
-    }
-  }
-
-  Widget _serviceButton(String title, Color backgroundColor, String id,
-      IconData icon, ConsultationModel consultation) {
-    return GestureDetector(
-      onTap: () async {
-        if (id == 'show_more') {
-          setState(() => showConsultationOptions = !showConsultationOptions);
-          return;
-        }
-
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-        if (_consultations.isNotEmpty &&
-            !prefs.containsKey('firstConsultationId')) {
-          await prefs.setString(
-              'firstConsultationId', _consultations.first.consultationId);
-          await prefs.setString(
-              'firstConsultationType', _consultations.first.consultationType);
-        }
-
-        consultationcontroller.setConsultation(consultation);
-
-        String? firstId = _consultations.isNotEmpty
-            ? _consultations.first.consultationId
-            : null;
-
-        if (firstId != null && firstId == id) {
-          Get.to(VisitType(
-            mobileNumber: widget.mobileNumber,
-            username: widget.username,
-            consulationType: consultation.consultationType,
-          ));
-          // Get.to(BottomNavController(
-          //   mobileNumber: widget.mobileNumber,
-          //   username: widget.username,
-          //   consultation: consultation,
-          //   index: 0,
-          // ));
-        } else {
-          Get.to(SymptomsForm(
-            mobileNumber: widget.mobileNumber,
-            username: widget.username,
-            consulationType: title,
-          ));
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          border: Border.all(color: Colors.white),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      flexibleSpace:
+          Container(decoration: BoxDecoration(gradient: appGradient())),
+      title: Row(children: [
+        Obx(() {
+          final image = dashboardcontroller.imageFile.value;
+          return GestureDetector(
+            onTap: () {
+              if (image != null) {
+                Get.to(ImagePreviewScreen(imagePath: image.path));
+              } else {
+                dashboardcontroller.showImagePickerOptions(context, image);
+              }
+            },
+            child: CircleAvatar(
+              radius: 20,
+              backgroundColor: Colors.grey[200],
+              backgroundImage: image != null
+                  ? FileImage(image)
+                  : const AssetImage('assets/ic_launcher.png') as ImageProvider,
+            ),
+          );
+        }),
+        const SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+            const Text("Hi, Welcome Back",
+                style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16)),
+            const SizedBox(height: 5),
+            Text(
+              capitalizeFirstLetter(widget.username),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
+        ),
+        const Spacer(),
+        Obx(() {
+          final count = Get.find<NotificationController>().unreadCount.value;
+          return Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications, color: Colors.white),
+                onPressed: () => Get.to(() => NotificationScreen()),
+              ),
+              if (count > 0)
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
+                    child: Text(
+                      '$count',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ],
+            ],
+          );
+        }),
+        GestureDetector(
+          onTap: () => Get.to(() => ReferralWalletPage()),
+          child: Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.wallet, color: Colors.white),
+                onPressed: () {},
+              ),
+              const Positioned(
+                right: 0,
+                top: -2,
+                child: Text('💰 2000',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _mainCard(String title, String imagePath, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: mainColor),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              blurRadius: 6,
+              spreadRadius: 2,
             ),
-            id != 'show_more'
-                ? const Icon(Icons.arrow_forward_ios, color: Colors.white)
-                : Icon(icon, color: Colors.white), // or SizedBox.shrink()
+          ],
+        ),
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                imagePath,
+                width: double.infinity,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: mainColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600)),
           ],
         ),
       ),
+    );
+  }
+
+  void _showConsultationOptions() {
+    final clinicOptions = _consultations
+        .where((e) => e.consultationType.toLowerCase().contains('clinic'))
+        .toList();
+    final onlineOptions = _consultations
+        .where((e) => e.consultationType.toLowerCase().contains('online'))
+        .toList();
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (clinicOptions.isNotEmpty)
+                ...clinicOptions.map((c) => ListTile(
+                      leading:
+                          const Icon(Icons.local_hospital, color: mainColor),
+                      title: Text(c.consultationType),
+                      onTap: () {
+                        Navigator.pop(context);
+                        consultationcontroller.setConsultation(c);
+                        Get.to(() => SymptomsForm(
+                              mobileNumber: widget.mobileNumber,
+                              username: widget.username,
+                              consulationType: c.consultationType,
+                            ));
+                      },
+                    )),
+              if (onlineOptions.isNotEmpty)
+                ...onlineOptions.map((c) => ListTile(
+                      leading: const Icon(Icons.video_call, color: mainColor),
+                      title: Text(c.consultationType),
+                      onTap: () {
+                        Navigator.pop(context);
+                        consultationcontroller.setConsultation(c);
+                        Get.to(() => SymptomsForm(
+                              mobileNumber: widget.mobileNumber,
+                              username: widget.username,
+                              consulationType: c.consultationType,
+                            ));
+                      },
+                    )),
+            ],
+          ),
+        );
+      },
     );
   }
 }

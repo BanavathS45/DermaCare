@@ -232,8 +232,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                 .selectedConsultation.value!.consultationType
                                 .toLowerCase() ==
                             "services & treatments") {
-                      symptomsController.updateDuration(
-                          patientdetailsformcontroller.durationController.text);
+                      // symptomsController.updateDuration(
+                      //     patientdetailsformcontroller.durationController.text);
 
                       Get.to(SkinCareConsentFormScreen(
                         doctor: widget.doctorData,

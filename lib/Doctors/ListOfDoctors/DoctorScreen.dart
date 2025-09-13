@@ -183,7 +183,7 @@ class Doctorscreen extends StatelessWidget {
                       children: [
                         Center(
                           child: SpinKitFadingCircle(
-                            color: Colors.blue,
+                            color: mainColor,
                             size: 40.0,
                           ),
                         ),

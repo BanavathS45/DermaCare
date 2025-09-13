@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/Booings/FollowUpModal.dart';
 import 'package:cutomer_app/BottomNavigation/Appoinments/AppointmentService.dart';
@@ -15,6 +17,7 @@ import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:cutomer_app/Widget/Bottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,12 +29,13 @@ class VisitType extends StatefulWidget {
   final String mobileNumber;
   final String username;
   final String consulationType;
-
+  final ValueChanged<String> onVisitTypeChanged; // callback
   const VisitType({
     super.key,
     required this.mobileNumber,
     required this.username,
     required this.consulationType,
+    required this.onVisitTypeChanged,
   });
 
   @override
@@ -45,26 +49,41 @@ class _VisitTypeState extends State<VisitType> {
   final appointmentService = Get.put(AppointmentService());
   final visitController = Get.put(VisitController());
   List<HospitalDoctorModel> hospitalDoctors = [];
-  String selectedType = "";
+  String selectedType = "First Time"; // default
   final scheduleController = Get.find<ScheduleController>();
   bool showAllRows = false;
   final ScrollController _dateScrollController = ScrollController();
   Getappointmentmodel? selectedBooking;
 
   @override
+  @override
   void initState() {
     super.initState();
     _fetchAppointments();
-    fetchHospitalDoctor().then((value) {
+    selectedType = "First Time";
+    controller.updateVisitType("First Time");
+
+    fetchHospitalDoctor().then((value) async {
       setState(() => hospitalDoctors = value);
+
+      if (hospitalDoctors.isNotEmpty) {
+        final today = scheduleController.weekDates[0]; // first date (today)
+        final doctorId = hospitalDoctors.first.doctor.doctorId;
+        final clinicId = hospitalDoctors.first.hospital.hospitalId;
+
+        final slots =
+            await DoctorSlotService.fetchDoctorSlots(doctorId, clinicId);
+        scheduleController.selectDate(today, slots);
+      }
     });
   }
 
-  void _fetchAppointments() async {
+  Future<void> _fetchAppointments() async {
     try {
       final appointments = await appointmentService
           .fetchInprogressAppointments(widget.mobileNumber);
       visitController.setBookings(appointments);
+      print("jhgjjhjhg L::${appointments.length}");
     } catch (e) {
       print("❌ Error fetching appointments: $e");
     }
@@ -72,23 +91,23 @@ class _VisitTypeState extends State<VisitType> {
 
   void _handleFirstTime() {
     controller.updateVisitType(selectedType);
-    Get.offAll(() => BottomNavController(
-          mobileNumber: widget.mobileNumber,
-          username: widget.username,
-          index: 0,
-        ));
+    // Get.offAll(() => BottomNavController(
+    //       mobileNumber: widget.mobileNumber,
+    //       username: widget.username,
+    //       index: 0,
+    //     ));
   }
 
   void _handleFollowUp() {
     final screenHeight = MediaQuery.of(context).size.height;
     final appointments = visitController.bookings;
-    if (appointments.isEmpty) {
+    if (appointments.isEmpty || appointments.length == 0) {
       ScaffoldMessageSnackbar.show(
         context: context,
         message: "No Appointments \n You don’t have any past bookings",
         type: SnackbarType.warning,
       );
-
+      controller.updateVisitType(selectedType);
       return;
     }
 
@@ -150,7 +169,7 @@ class _VisitTypeState extends State<VisitType> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    appt.name ?? "Unknown Patient",
+                                    "${capitalizeEachWord(appt.name) ?? "Unknown Patient"}",
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16),
@@ -158,7 +177,7 @@ class _VisitTypeState extends State<VisitType> {
                                   const SizedBox(height: 4),
                                   Text("Relation: ${appt.relation ?? "NA"}"),
                                   Text(
-                                      "Clinic: ${selectedHospitalDoctor?.hospital.name ?? "Apollo Clinic"}"),
+                                      "Clinic: ${selectedHospitalDoctor?.hospital.name ?? "NA"}"),
                                   Text(
                                       "Doctor: ${selectedHospitalDoctor?.doctor.doctorName ?? "-"}"),
                                   const SizedBox(height: 6),
@@ -182,7 +201,7 @@ class _VisitTypeState extends State<VisitType> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    "Free Follow-Ups: ${appt.freeFollowUps == null ? appt.freeFollowUps : "0"} ",
+                                    "Free Follow-Ups: ${appt.freeFollowUps != null ? appt.freeFollowUps : "0"} ",
                                     style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.green,
@@ -200,8 +219,13 @@ class _VisitTypeState extends State<VisitType> {
                                   onPressed: () {
                                     selectedBooking = appt;
                                     Get.back();
-                                    if (selectedHospitalDoctor != null &&
-                                        selectedHospitalDoctor!
+                                    final doctor =
+                                        hospitalDoctors.firstWhereOrNull(
+                                      (doc) =>
+                                          doc.doctor.doctorId == appt.doctorId,
+                                    );
+                                    if (doctor != null &&
+                                        doctor
                                             .doctor.doctorAvailabilityStatus) {
                                       Get.bottomSheet(
                                         bottomSlotWidget(
@@ -374,43 +398,52 @@ class _VisitTypeState extends State<VisitType> {
                         .format(scheduleController.selectedDate.value);
 
                     final postBookingPayload = FollowUpModal(
-                        bookingId: selectedBooking?.bookingId ?? "",
-                        doctorId: selectedBooking?.doctorId ?? "",
-                        visitType: selectedType,
-                        mobileNumber: widget.mobileNumber,
-                        serviceDate: formattedDate,
-                        servicetime: scheduleController.selectedSlotText.value,
-                        patientId: patientId);
+                      bookingId: selectedBooking?.bookingId ?? "",
+                      doctorId: selectedBooking?.doctorId ?? "",
+                      visitType: selectedType,
+                      mobileNumber: widget.mobileNumber, // ✅ always String
+                      serviceDate: formattedDate,
+                      servicetime: scheduleController.selectedSlotText.value,
+                      patientId: patientId,
+                    );
+
                     print(
                         '[DEBUG] Response Data:followUpBookings $postBookingPayload');
 
-                    var responseData =
-                        await followUpBookings(postBookingPayload);
-                    print(
-                        '[DEBUG] Response Data:postBookingPayload  $responseData');
+                    var resData = await followUpBookings(postBookingPayload);
 
-                    if (responseData != null &&
-                        (responseData['statusCode'] == 200 ||
-                            responseData['statusCode'] == 201)) {
+                    if (resData != null &&
+                        (resData['statusCode'] == 200 ||
+                            resData['statusCode'] == 201)) {
                       print('[✅] Booking successful');
+                      await _fetchAppointments();
                       ScaffoldMessageSnackbar.show(
                         context: context,
                         message:
                             "Appointment Booked \n You booked ${DateFormat('dd MMM').format(scheduleController.selectedDate.value)} ",
                         type: SnackbarType.success,
                       );
+                      scheduleController.selectedSlotIndex.value = -1;
+                      scheduleController.currentSlots.clear();
                       Get.to(BottomNavController(
                           mobileNumber: widget.mobileNumber,
                           username: widget.username,
                           index: 1));
                     } else {
                       print(
-                          '[❌] Booking failed or unexpected response: $responseData');
+                          '[❌] Booking failed or unexpected response: $resData');
                       ScaffoldMessageSnackbar.show(
                         context: context,
                         message: "Error \n Booking failed",
                         type: SnackbarType.error,
                       );
+                      if (resData != null && resData['message'] != null) {
+                        ScaffoldMessageSnackbar.show(
+                          context: context,
+                          message: "Error \n ${resData['message']}",
+                          type: SnackbarType.error,
+                        );
+                      }
                     }
                   } else {
                     ScaffoldMessageSnackbar.show(
@@ -438,36 +471,47 @@ class _VisitTypeState extends State<VisitType> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CommonHeader(title: "Visit Type"),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Choose Visit Type",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ChoiceChip(
-                label: const Text("First Time"),
-                selected: selectedType == "First Time",
-                selectedColor: mainColor.withOpacity(0.2),
-                onSelected: (selected) {
-                  setState(() => selectedType = "First Time");
-                  _handleFirstTime();
-                },
+              Expanded(
+                child: ChoiceChip(
+                  label: const Center(child: Text("First Time")),
+                  selected: selectedType == "First Time",
+                  selectedColor: mainColor.withOpacity(0.2),
+                  onSelected: (_) {
+                    setState(() => selectedType = "First Time");
+                    widget.onVisitTypeChanged(selectedType); // notify parent
+                    _handleFirstTime();
+                  },
+                ),
               ),
-              const SizedBox(height: 20),
-              ChoiceChip(
-                label: const Text("Follow-Up"),
-                selected: selectedType == "Follow-Up",
-                selectedColor: mainColor.withOpacity(0.2),
-                onSelected: (selected) {
-                  setState(() => selectedType = "Follow-Up");
-                  _handleFollowUp();
-                },
+              const SizedBox(width: 12),
+              Expanded(
+                child: ChoiceChip(
+                  label: const Center(child: Text("Follow-Up")),
+                  selected: selectedType == "Follow-Up",
+                  selectedColor: mainColor.withOpacity(0.2),
+                  onSelected: (_) {
+                    setState(() => selectedType = "Follow-Up");
+                    widget.onVisitTypeChanged(selectedType); // notify parent
+                    _handleFollowUp();
+                  },
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
