@@ -1,158 +1,106 @@
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class CustomerReportsPage extends StatelessWidget {
-  CustomerReportsPage({super.key});
+class PatientReportScreen extends StatefulWidget {
+  final String mobileNumber;
+  const PatientReportScreen({super.key, required this.mobileNumber});
 
-  final List<Patient> patientReports = [
-    Patient(
-      patientId: "P001",
-      name: "John Doe",
-      date: "2025-08-20",
-      pastReports: [
-        Report(
-            title: "Blood Test",
-            fileUrl: "https://example.com/bloodtest_john.pdf"),
-        Report(title: "X-Ray", fileUrl: "https://example.com/xray_john.pdf"),
-      ],
-      prescriptions: [
-        Prescription(fileUrl: "https://example.com/john_prescription.pdf"),
-      ],
-      abImages: [
-        AbImages(
-            fileUrl:
-                "https://i.pinimg.com/originals/7a/70/d6/7a70d66837d5888b9d3e0a0a861e9127.jpg"),
-        AbImages(fileUrl: "https://picsum.photos/300/300"),
-      ],
-    ),
-    Patient(
-      patientId: "P002",
-      name: "Jane Roe",
-      date: "2025-08-15",
-      pastReports: [
-        Report(title: "MRI Scan", fileUrl: "https://example.com/mri_jane.pdf"),
-      ],
-      prescriptions: [
-        Prescription(fileUrl: "https://example.com/jane_prescription.pdf"),
-      ],
-      abImages: [
-        AbImages(
-            fileUrl:
-                "https://tse1.explicit.bing.net/th/id/OIP.62Z1nqyliooNDHMTCF7yogHaHa?pid=ImgDet&w=207&h=207&c=7&dpr=1.5&o=7&rm=3"),
-      ],
-    ),
-  ];
+  @override
+  State<PatientReportScreen> createState() => _PatientReportScreenState();
+}
 
-  Future<void> _openPdf(String url) async {
-    final Uri pdfUri = Uri.parse(url);
-    if (await canLaunchUrl(pdfUri)) {
-      await launchUrl(pdfUri, mode: LaunchMode.externalApplication);
-    } else {
-      throw "Could not open $url";
-    }
+class _PatientReportScreenState extends State<PatientReportScreen> {
+  bool loading = true;
+  Map<String, dynamic>? customerData;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
   }
 
-  Future<void> _openImage(String url) async {
-    final Uri imageUri = Uri.parse(url);
-    if (await canLaunchUrl(imageUri)) {
-      await launchUrl(imageUri, mode: LaunchMode.externalApplication);
-    } else {
-      throw "Could not open $url";
-    }
+  Future<void> fetchData() async {
+    await Future.delayed(const Duration(seconds: 1));
+
+    // 🔹 Dummy API response
+    customerData = {
+      "customerMobile": widget.mobileNumber,
+      "patients": [
+        {
+          "patientId": "P001",
+          "name": "John",
+          "visits": [
+            {
+              "visitId": "V001",
+              "date": "2025-09-01",
+              "reports": [
+                "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
+                "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+              ],
+              "prescriptionPdf":
+                  "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
+              "beforeImages": [
+                "https://picsum.photos/200/300",
+                "https://picsum.photos/201/300"
+              ],
+              "afterImages": [
+                "https://picsum.photos/202/300",
+                "https://picsum.photos/203/300"
+              ]
+            }
+          ]
+        },
+        {
+          "patientId": "P002",
+          "name": "Jane",
+          "visits": [
+            {
+              "visitId": "V002",
+              "date": "2025-09-05",
+              "reports": [
+                "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+              ],
+              "prescriptionPdf":
+                  "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
+              "beforeImages": [
+                "https://picsum.photos/204/300",
+                "https://picsum.photos/205/300"
+              ],
+              "afterImages": [
+                "https://picsum.photos/206/300",
+                "https://picsum.photos/207/300"
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    setState(() => loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (loading) return const Center(child: CircularProgressIndicator());
+
+    final patients = customerData!["patients"] as List;
+
     return Scaffold(
-      appBar: CommonHeader(title: "Customer Reports"),
+      appBar: CommonHeader(
+        title: "Patient Reports",
+      ),
       body: ListView.builder(
-        itemCount: patientReports.length,
+        itemCount: patients.length,
         itemBuilder: (context, index) {
-          final patient = patientReports[index];
-          return Card(
-            margin: const EdgeInsets.all(8),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 3,
-            child: ExpansionTile(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("${patient.patientId} - ${patient.name}",
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(patient.date,
-                      style: const TextStyle(color: Colors.grey)),
-                ],
-              ),
-              children: [
-                // Past Reports
-                ExpansionTile(
-                  title: const Text("Past Reports"),
-                  children: patient.pastReports.map((report) {
-                    return ListTile(
-                      title: Text(report.title),
-                      trailing:
-                          const Icon(Icons.picture_as_pdf, color: Colors.red),
-                      onTap: () => _openPdf(report.fileUrl),
-                    );
-                  }).toList(),
-                ),
-                // Prescriptions
-                ExpansionTile(
-                  title: const Text("Prescriptions"),
-                  children: patient.prescriptions.map((pres) {
-                    return ListTile(
-                      title: const Text("Download Prescription"),
-                      trailing:
-                          const Icon(Icons.picture_as_pdf, color: Colors.blue),
-                      onTap: () => _openPdf(pres.fileUrl),
-                    );
-                  }).toList(),
-                ),
-                // Images with preview + download button
-                ExpansionTile(
-                  title: const Text("Images"),
-                  children: patient.abImages.map((img) {
-                    return Column(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            img.fileUrl,
-                            height: 150,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, progress) {
-                              if (progress == null) return child;
-                              return const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text("Image failed to load"),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.download),
-                          label: const Text("View / Download"),
-                          onPressed: () => _openImage(img.fileUrl),
-                        ),
-                        const Divider(),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
+          final patient = patients[index];
+          final visits = patient["visits"] as List;
+
+          return ExpansionTile(
+            title:
+                Text("Patient: ${patient["name"]} (${patient["patientId"]})"),
+            children: visits.map((visit) => VisitCard(visit: visit)).toList(),
           );
         },
       ),
@@ -160,39 +108,179 @@ class CustomerReportsPage extends StatelessWidget {
   }
 }
 
-class Report {
-  final String title;
-  final String fileUrl;
+class VisitCard extends StatelessWidget {
+  final Map<String, dynamic> visit;
+  const VisitCard({super.key, required this.visit});
 
-  Report({required this.title, required this.fileUrl});
+  Future<void> _openFile(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  void _previewPdf(BuildContext context, String url) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PdfPreviewScreen(pdfUrl: url),
+      ),
+    );
+  }
+
+  void _previewImage(BuildContext context, String url) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImagePreviewScreen(imageUrl: url),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(10),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Visit Date: ${visit["date"]}",
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+
+            const SizedBox(height: 10),
+
+            // Reports (Multiple PDFs)
+            const Text("Reports",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            ...(visit["reports"] as List).map((pdfUrl) => Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => _previewPdf(context, pdfUrl),
+                      icon: const Icon(Icons.picture_as_pdf),
+                      label: const Text("Preview Report"),
+                    ),
+                    const SizedBox(width: 10),
+                    OutlinedButton.icon(
+                      onPressed: () => _openFile(pdfUrl),
+                      icon: const Icon(Icons.download),
+                      label: const Text("Download"),
+                    ),
+                  ],
+                )),
+
+            const SizedBox(height: 10),
+
+            // Prescription PDF (Single)
+            const Text("Prescription",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () =>
+                      _previewPdf(context, visit["prescriptionPdf"]),
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: const Text("Preview Prescription"),
+                ),
+                const SizedBox(width: 10),
+                OutlinedButton.icon(
+                  onPressed: () => _openFile(visit["prescriptionPdf"]),
+                  icon: const Icon(Icons.download),
+                  label: const Text("Download"),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 10),
+
+            // Before Images
+            const Text("Before Images",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: (visit["beforeImages"] as List).length,
+                itemBuilder: (context, i) {
+                  final imgUrl = visit["beforeImages"][i];
+                  return GestureDetector(
+                    onTap: () => _previewImage(context, imgUrl),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Image.network(
+                        imgUrl,
+                        height: 120,
+                        width: 120,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // After Images
+            const Text("After Images",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: (visit["afterImages"] as List).length,
+                itemBuilder: (context, i) {
+                  final imgUrl = visit["afterImages"][i];
+                  return GestureDetector(
+                    onTap: () => _previewImage(context, imgUrl),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Image.network(
+                        imgUrl,
+                        height: 120,
+                        width: 120,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class Prescription {
-  final String fileUrl;
+class PdfPreviewScreen extends StatelessWidget {
+  final String pdfUrl;
+  const PdfPreviewScreen({super.key, required this.pdfUrl});
 
-  Prescription({required this.fileUrl});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("PDF Preview")),
+      // body: SfPdfViewer.network(pdfUrl),
+    );
+  }
 }
 
-class AbImages {
-  final String fileUrl;
+class ImagePreviewScreen extends StatelessWidget {
+  final String imageUrl;
+  const ImagePreviewScreen({super.key, required this.imageUrl});
 
-  AbImages({required this.fileUrl});
-}
-
-class Patient {
-  final String patientId;
-  final String name;
-  final String date;
-  final List<Report> pastReports;
-  final List<Prescription> prescriptions;
-  final List<AbImages> abImages;
-
-  Patient({
-    required this.patientId,
-    required this.name,
-    required this.date,
-    required this.pastReports,
-    required this.prescriptions,
-    required this.abImages,
-  });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Image Preview")),
+      body: Center(
+        child: PhotoView(
+          imageProvider: NetworkImage(imageUrl),
+        ),
+      ),
+    );
+  }
 }

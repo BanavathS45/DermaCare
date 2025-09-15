@@ -14,6 +14,7 @@ import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Consultations/SymptomsForm.dart';
 import 'ConsultationController.dart';
 
@@ -36,10 +37,13 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   final dashboardcontroller = Get.put(Dashboardcontroller());
   List<ConsultationModel> _consultations = [];
   bool loading = true;
-
+  String? cityName;
+  double? latitude;
+  double? longitude;
   @override
   void initState() {
     super.initState();
+    _loadLocation();
     dashboardcontroller.setMobileNumber(widget.mobileNumber);
     _loadConsultations();
   }
@@ -53,52 +57,91 @@ class ConsultationsTypeState extends State<ConsultationsType> {
     });
   }
 
+  Future<void> _loadLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      cityName = prefs.getString('cityName');
+      latitude = prefs.getDouble('latitude');
+      longitude = prefs.getDouble('longitude');
+    });
+
+    print("City loaded: $cityName");
+    print("Lat: $latitude, Lng: $longitude");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
       extendBody: true,
       backgroundColor: Colors.transparent,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: loading
-            ? const Center(child: CircularProgressIndicator())
-            : _consultations.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text("No service available",
-                            style: TextStyle(color: mainColor)),
-                        const SizedBox(height: 12),
-                        ElevatedButton(
-                          onPressed: _loadConsultations,
-                          child: const Text("Refresh"),
-                        ),
-                      ],
-                    ),
-                  )
-                : Column(
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : _consultations.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CommonCarouselAds(
+                      const Text("No service available",
+                          style: TextStyle(color: mainColor)),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: _loadConsultations,
+                        child: const Text("Refresh"),
+                      ),
+                    ],
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        CommonCarouselAds(
                           media: dashboardcontroller.carouselImages,
                           height: 170,
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      VisitType(
-                        consulationType: _consultations.first.consultationType,
-                        mobileNumber: widget.mobileNumber,
-                        username: widget.username,
-                        onVisitTypeChanged: (String value) {},
-                      ),
-                      const SizedBox(height: 20),
-                      Center(
-                        child: GridView.count(
+                        const SizedBox(height: 10),
+                        if (cityName != null)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 6),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  width: 2,
+                                  color: secondaryColor.withAlpha(45)),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.location_on,
+                                    color: mainColor, size: 16),
+                                const SizedBox(width: 8),
+                                Text(
+                                  "You're in : $cityName",
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: mainColor),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+                        VisitType(
+                          consulationType:
+                              _consultations.first.consultationType,
+                          mobileNumber: widget.mobileNumber,
+                          username: widget.username,
+                          onVisitTypeChanged: (String value) {},
+                        ),
+                        const SizedBox(height: 20),
+                        GridView.count(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           crossAxisCount: 2,
@@ -122,18 +165,16 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.transparent,
-        elevation: 0,
-        child: Copyrights(
-          color: mainColor,
-          padding: EdgeInsets.all(0),
-        ),
-      ),
+                ),
+
+      // bottomNavigationBar: BottomAppBar(
+      //   color: Colors.transparent,
+      //   elevation: 0,
+      //   child:
+      // ),
     );
   }
 
@@ -243,7 +284,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: mainColor),

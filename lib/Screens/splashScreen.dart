@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cutomer_app/SigninSignUp/BiometricAuthScreen.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../SigninSignUp/LoginScreen.dart';
 
@@ -63,10 +66,16 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  void _onFadeComplete() {
+  void _onFadeComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isFirstLoginDone = prefs.getBool('isFirstLoginDone') ?? false;
+    final biometricEnabled = prefs.getBool('isAuthenticated') ?? false;
     // Navigate only after fade completes
-    if (!_noInternet) {
+    if (!_noInternet && !biometricEnabled) {
       Get.offAll(() => Loginscreen());
+    }
+    if (biometricEnabled) {
+      Get.offAll(() => BiometricAuthScreen());
     }
   }
 
@@ -86,9 +95,8 @@ class _SplashScreenState extends State<SplashScreen> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF679B75),
-                    Color(0xFF84D8C1),
-                    Color(0xFFCFAF96),
+                    Color.fromARGB(255, 238, 221, 214),
+                    Color.fromARGB(255, 192, 99, 82),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -113,7 +121,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 curve: Curves.easeOut,
                 onEnd: _onFadeComplete,
                 child: Image.asset(
-                  'assets/surecare_launcher.png',
+                  'assets/ic_launcher.png',
                   height: 150,
                 ),
               ),

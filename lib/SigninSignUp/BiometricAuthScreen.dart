@@ -5,6 +5,7 @@ import 'package:cutomer_app/Firebase/RequestNotificationPermissions.dart';
 import 'package:cutomer_app/SigninSignUp/LoginController.dart';
 import 'package:cutomer_app/SigninSignUp/LoginService.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:cutomer_app/Utils/LocationService.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +81,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
           username != null &&
           mobileNumber != null) {
         final deviceId = prefs.getString('fcm');
-        print("deviceIddeviceIddeviceId : ${deviceId}");
+        print("deviceIddeviceIddeviceId : $deviceId");
 
         final checkUserResponse = await http.get(
           Uri.parse('$registerUrl/getBasicDetails/$mobileNumber'),
@@ -88,13 +89,44 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
 
         if (checkUserResponse.statusCode == 200) {
           final data = json.decode(checkUserResponse.body);
+
           if (data['success'] == true && data['data'] != null) {
+            // ✅ Show loading dialog for location
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => const AlertDialog(
+                content: Row(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        "Fetching your current location...",
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+
+            try {
+              // ✅ Fetch and save location before navigating
+              await LocationService.fetchAndStoreLocation();
+            } catch (e) {
+              print("⚠️ Location fetch failed: $e");
+            } finally {
+              Navigator.pop(context); // Close loading dialog
+            }
+
+            // ✅ Navigate to bottom navigation
             Get.offAll(BottomNavController(
               mobileNumber: mobileNumber,
               username: username,
               index: 0,
             ));
-            print("🚀 Login successful. Navigating to ConsultationsType.");
+            print("🚀 Login successful. Navigating to BottomNavController.");
           } else {
             showSnackbar(
               "Warning",

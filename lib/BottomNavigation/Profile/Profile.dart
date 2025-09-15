@@ -157,7 +157,9 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             buildCardItem(
                 icon: Icons.help_outline,
                 label: "Reports",
-                onTap: () => Get.to(() => CustomerReportsPage())),
+                onTap: () => Get.to(() => PatientReportScreen(
+                      mobileNumber: widget.mobileNumber,
+                    ))),
             buildCardItem(
                 icon: Icons.help_outline,
                 label: "About Clinic",

@@ -72,6 +72,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
       final selectedId =
           consultationController.selectedConsultation.value?.consultationId ??
               "";
+
+      print("selectedId Consulation : ${selectedId}");
       globalServiceId = selectedId;
       final consultations = await getConsultationDetails();
 
@@ -83,6 +85,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         // Now execute based on matched ID
         if (consultations.length > 0 &&
             selectedId == consultations[0].consultationId) {
+          print(
+              "selectedId Consulation : ${selectedId} , ${consultations[0].consultationId}");
           setState(() {
             consultationFee = selectedServicesController
                 .selectedSubServices.first.consultationFee

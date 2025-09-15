@@ -476,10 +476,10 @@ class _VisitTypeState extends State<VisitType> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Choose Visit Type",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          // const Text(
+          //   "Choose Visit Type",
+          //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          // ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

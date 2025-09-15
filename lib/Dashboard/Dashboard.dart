@@ -59,10 +59,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
+
+
   @override
   void initState() {
     super.initState();
-
+   
     _rotationController = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
@@ -88,6 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     // Now call async logic separately
     loadInitialData();
   }
+
 
   void loadInitialData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

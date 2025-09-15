@@ -1,10 +1,14 @@
+import 'package:cutomer_app/BottomNavigation/BottomNavigation.dart';
 import 'package:cutomer_app/OTP/FireBaseOtp.dart';
 import 'package:cutomer_app/SigninSignUp/BiometricAuthScreen.dart';
 import 'package:cutomer_app/SigninSignUp/BiometricPermissionScreen.dart';
+import 'package:cutomer_app/Utils/LocationService.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'LoginService.dart';
@@ -92,77 +96,82 @@ class SiginSignUpController extends GetxController {
     final fullname = nameController.text.trim();
     final mobileNumber = mobileController.text.trim();
 
-    if (formKey.currentState!.validate() && agreeToTerms) {
-      getOTPButton.value = "Signing...";
-      isLoading.value = true;
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      try {
-        String? token = await FirebaseMessaging.instance.getToken();
-
-        final id = await FirebaseInstallations.instance.getId();
-        final deviceid = await FirebaseInstallations.instance.getToken();
-        print('Installation ID: $id');
-        // FCM Token (used for sending push notifications)
-        final fcmToken = await FirebaseMessaging.instance.getToken();
-
-        print('FCM Token1: $fcmToken');
-        print("FCM Token: $token");
-        print("FCM deviceid: $deviceid");
-
-        // Optional: Listen for token refresh
-        FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-          print("Token refreshed: $newToken");
-          // You could resend the token here if needed
-        });
-        final response = await _loginapiService.sendUserDataWithFCMToken(
-            fullname, mobileNumber, token ?? "");
-
-        if (response['status'] == 200) {
-          getOTPButton.value = "SIGN IN";
-
-          final prefs = await SharedPreferences.getInstance();
-
-          await prefs.setString('username', fullname);
-          await prefs.setString('mobileNumber', mobileNumber);
-          await prefs.setString('fcm', token ?? "");
-
-          print("funmnmndhjshdhsa $token");
-          final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
-          final isFirstTimeAuthenticated =
-              prefs.getBool('isFirstLoginDone') ?? true;
-
-          print("isFirstTimeAuthenticated ${isFirstTimeAuthenticated}");
-
-          // ✅ User is registered
-          if (isFirstTimeAuthenticated) {
-            showSnackbar("Success",
-                "OTP has been sent successfully to $mobileNumber", "success");
-
-            Get.offAll(() => OTPLoginScreen(
-                  mobileNumber: mobileNumber,
-                  fullname: fullname,
-                  deviceId: token,
-                ));
-          } else {
-            Get.to(() => EnableBiometricScreen(
-                  mobileNumber: mobileNumber,
-                  fullname: fullname,
-                ));
-          }
-        }
-      } catch (e) {
-        print("Error during login: $e");
-        getOTPButton.value = "SIGN IN";
-      } finally {
-        isLoading.value = false;
-        getOTPButton.value = "SIGN IN";
-      }
-    }
-
+    if (!formKey.currentState!.validate()) return;
     if (!agreeToTerms) {
       errorMessage.value = "Please agree to terms and conditions";
+      return;
+    }
+
+    getOTPButton.value = "Signing...";
+    isLoading.value = true;
+
+    try {
+      String? token = await FirebaseMessaging.instance.getToken();
+      final id = await FirebaseInstallations.instance.getId();
+      final deviceid = await FirebaseInstallations.instance.getToken();
+
+      final response = await _loginapiService.sendUserDataWithFCMToken(
+        fullname,
+        mobileNumber,
+        token ?? "",
+      );
+
+      if (response['status'] == 200) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', fullname);
+        await prefs.setString('mobileNumber', mobileNumber);
+        await prefs.setString('fcm', token ?? "");
+
+        final isFirstTimeAuthenticated =
+            prefs.getBool('isFirstLoginDone') ?? true;
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    "Please wait, fetching your location...",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        // ✅ NEW: Fetch & Store Location
+        await LocationService.fetchAndStoreLocation();
+
+        Navigator.pop(context); // Close loading dialog
+
+        // ✅ Navigate after location is stored
+        if (isFirstTimeAuthenticated) {
+          Get.offAll(() => BottomNavController(
+                mobileNumber: mobileNumber,
+                username: fullname,
+                index: 0,
+              ));
+        } else {
+          Get.to(() => EnableBiometricScreen(
+                mobileNumber: mobileNumber,
+                fullname: fullname,
+              ));
+        }
+      }
+    } catch (e) {
+      print("Error during login: $e");
+      Navigator.pop(context); // Close dialog if error occurs
+      showSnackbar("Error", "Login failed. Please try again.", "error");
+    } finally {
+      isLoading.value = false;
+      getOTPButton.value = "SIGN IN";
     }
   }
+
+  /// ✅ Request Location Permission & Get Current Location
 }

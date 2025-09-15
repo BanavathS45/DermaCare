@@ -42,7 +42,7 @@ class _LoginscreenState extends State<Loginscreen> {
               fit: BoxFit.cover,
             ),
             SizedBox(
-              height: 50,
+              height: 30,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -54,7 +54,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     const Align(
                       alignment: Alignment.center,
                       child: Text(
-                        'Sign In / Sign Up',
+                        'User Login',
                         style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
@@ -62,16 +62,16 @@ class _LoginscreenState extends State<Loginscreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 40.0),
+                    const SizedBox(height: 30.0),
                     CustomTextField(
                       controller: siginSignUpController.nameController,
-                      labelText: 'Enter Full Name',
+                      labelText: 'Enter Patient Id',
                       autovalidateMode: AutovalidateMode.onUnfocus,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
-                      ],
+                      // inputFormatters: [
+                      //   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
+                      // ],
                       validator: (value) => siginSignUpController.validatedata(
-                          value, "Full Name"),
+                          value, "Patient Id"),
                     ),
                     SizedBox(
                       height: 10,
@@ -165,8 +165,11 @@ class _LoginscreenState extends State<Loginscreen> {
           ],
         ),
       ),
-      bottomNavigationBar:
-          BottomAppBar(color: Colors.white, child: Copyrights()),
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Copyrights(
+            color: mainColor,
+          )),
     );
   }
 }
