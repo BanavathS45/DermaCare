@@ -1,19 +1,26 @@
 import 'dart:convert';
-
-import 'package:cutomer_app/Modals/ServiceModal.dart';
-import 'package:cutomer_app/SubserviceAndHospital/HospitalCardModel.dart';
-import 'package:cutomer_app/Utils/Constant.dart';
-import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../Consultations/SymptomsController.dart';
+import '../Modals/ServiceModal.dart';
+import '../SubserviceAndHospital/HospitalCardModel.dart';
+import '../Utils/Constant.dart';
+import '../Utils/Header.dart';
 import '../ServiceView/ServiceDetailPage.dart';
 import 'HospitalService.dart';
 
 class HospitalCardScreen extends StatefulWidget {
   final String mobileNumber;
   final String username;
+  final String categoryName;
+  final String categoryId;
+  final String serviceId;
+  final String serviceName;
+  final SubServiceAdmin? selectedService;
+  final Service services;
 
   const HospitalCardScreen({
     super.key,
@@ -26,13 +33,7 @@ class HospitalCardScreen extends StatefulWidget {
     required this.selectedService,
     required this.services,
   });
-  final String categoryName;
-  final String categoryId;
-  final String serviceId;
-  final String serviceName;
 
-  final SubServiceAdmin? selectedService;
-  final Service services;
   @override
   _HospitalCardScreenState createState() => _HospitalCardScreenState();
 }
@@ -40,371 +41,494 @@ class HospitalCardScreen extends StatefulWidget {
 class _HospitalCardScreenState extends State<HospitalCardScreen> {
   final TextEditingController _searchController = TextEditingController();
   String searchText = '';
-  bool showRecommendedOnly = false;
+  String? selectedCity;
+  Branch? selectedBranch;
   List<HospitalCardModel> hospitalCards = [];
   bool isLoading = true;
 
-  @override
   @override
   void initState() {
     super.initState();
     fetchHospitalCards();
   }
 
-  final List<String> branches = [
-    "Panjagutta",
-    "Kokapet",
-    "Jubilee Hills",
-  ];
-
   void fetchHospitalCards() async {
-    setState(() {
-      isLoading = true; // show loading
-    });
+    setState(() => isLoading = true);
 
+    final prefs = await SharedPreferences.getInstance();
+
+    final double? lat = prefs.getDouble('latitude');
+    final double? long = prefs.getDouble('longitude');
     try {
-      final data = await HospitalService()
-          .fetchHospitalCards(widget.selectedService!.subServiceId);
-
-      final cards = data
-          .map<HospitalCardModel>((json) => HospitalCardModel.fromJson(json))
-          .toList();
-
+      final data = await HospitalService().fetchHospitalCards(
+          "H_1", widget.selectedService!.subServiceId, lat!, long!);
       setState(() {
-        hospitalCards = cards;
-        // filteredCards = cards; // if filtering is applied later
-        isLoading = false; // hide loading
+        hospitalCards = data;
+        isLoading = false;
       });
-    } catch (e) {
-      setState(() {
-        isLoading = false; // hide loading even on error
-      });
-      print("Error fetching hospital cards: $e");
+    } catch (e, stacktrace) {
+      setState(() => isLoading = false);
+      print("Error fetching hospital cards: $e\n$stacktrace");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Filtered hospital cards based on search, city, and branch
     final filteredCards = hospitalCards.where((card) {
-      final subServiceName = card.subServiceName.toString().toLowerCase() ?? '';
-      final hospitalName = card.hospitalName.toString().toLowerCase() ?? '';
-      final recommendedRaw = card.recommanded;
-      final recommended = ['true', 'yes', '1', true].contains(recommendedRaw);
+      final matchesSearch = searchText.isEmpty ||
+          card.hospitalName.toLowerCase().contains(searchText.toLowerCase()) ||
+          card.subServiceName
+              .toLowerCase()
+              .contains(searchText.toLowerCase()) ||
+          card.branches.any((branch) =>
+              branch.branchName
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase()) ||
+              branch.city.toLowerCase().contains(searchText.toLowerCase()));
 
-      final matchesSearch = subServiceName.contains(searchText.toLowerCase()) ||
-          hospitalName.contains(searchText.toLowerCase());
+      final matchesCity = selectedCity == null ||
+          card.branches.any((branch) => branch.city == selectedCity);
 
-      final shouldShow = showRecommendedOnly ? recommended : true;
+      final matchesBranch = selectedBranch == null ||
+          card.branches
+              .any((branch) => branch.branchId == selectedBranch!.branchId);
 
-      print('=========================');
-      print('Hospital: $hospitalName');
-      print('RecommendedRaw: ${card.price} ');
-      print('Parsed Recommended: $recommended');
-      print('Search Match: $matchesSearch');
-      print('Show Recommended Only: $showRecommendedOnly');
-      print('Included in List: ${matchesSearch && shouldShow}');
-      print('=========================');
-
-      return matchesSearch && shouldShow;
+      return matchesSearch && matchesCity && matchesBranch;
     }).toList();
 
+    // Unique cities for dropdown
+    final cities = hospitalCards
+        .expand((card) => card.branches.map((b) => b.city))
+        .toSet()
+        .toList();
+
+    // Branches for selected city dropdown
+    final filteredBranches = selectedCity == null
+        ? []
+        : hospitalCards
+            .expand((card) => card.branches)
+            .where((b) => b.city == selectedCity)
+            .toSet()
+            .toList();
+
     return Scaffold(
-      appBar: CommonHeader(
-        title: "Hospitals & Branches",
-      ),
+      appBar: CommonHeader(title: "Hospitals & Branches"),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            // Search + Recommended Toggle
-            Row(
-              children: [
-                // Expanded( //TODO: City Name with searach
-                //   child: TextField(
-                //     controller: _searchController,
-                //     decoration: InputDecoration(
-                //       hintText: "Search hospital ",
-                //       prefixIcon: Icon(Icons.search),
-                //       border: OutlineInputBorder(
-                //         borderRadius: BorderRadius.circular(12),
-                //       ),
-                //     ),
-                //     onChanged: (val) => setState(() => searchText = val),
-                //   ),
-                // ),
-                SizedBox(width: 8),
-              ],
+            // Search field
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Search Hospital / City / Branch",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onChanged: (val) => setState(() => searchText = val),
             ),
-            SizedBox(height: 16),
-            // ElevatedButton.icon(
-            //   icon: Icon(Icons.star,
-            //       color: showRecommendedOnly ? Colors.white : Colors.teal),
-            //   label: Text(" Click Here For Recommended Hospitals"),
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor:
-            //         showRecommendedOnly ? Colors.teal : Colors.grey[300],
-            //     foregroundColor:
-            //         showRecommendedOnly ? Colors.white : Colors.black,
-            //     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            //     shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(12)),
-            //   ),
-            //   onPressed: () {
-            //     setState(() {
-            //       showRecommendedOnly = !showRecommendedOnly;
-            //       print("Recommended Filter Toggled: $showRecommendedOnly");
-            //     });
-            //   },
-            // ),
-            SizedBox(
-              height: 10,
-            ),
-            // Cards
+            const SizedBox(height: 12),
+
+            // City Dropdown
+            if (cities.isNotEmpty)
+              DropdownButtonFormField<String>(
+                value: selectedCity,
+                decoration: InputDecoration(
+                  labelText: "Select City",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                items: cities
+                    .map((city) => DropdownMenuItem(
+                          value: city,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.location_city,
+                                  color: Colors.teal),
+                              const SizedBox(width: 8),
+                              Text(city),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedCity = value;
+                    selectedBranch = null; // reset branch on city change
+                  });
+                },
+              ),
+
+            const SizedBox(height: 8),
+
+            // Branch Dropdown
+            if (filteredBranches.isNotEmpty)
+              DropdownButtonFormField<Branch>(
+                value: selectedBranch,
+                decoration: InputDecoration(
+                  labelText: "Select Branch",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                items: filteredBranches.map((branch) {
+                  return DropdownMenuItem<Branch>(
+                    value: branch,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.location_on, color: Colors.teal),
+                        const SizedBox(width: 8),
+                        Text(branch.branchName),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() => selectedBranch = value);
+                  if (value != null)
+                    Get.find<SymptomsController>().updateBranch(value);
+                },
+              ),
+
+            const SizedBox(height: 10),
+
+            // Hospital Cards
             Expanded(
               child: isLoading
-                  ? Center(
-                      child: SpinKitFadingCircle(
-                        color: mainColor,
-                        size: 40.0,
-                      ),
-                    )
+                  ? const Center(
+                      child: SpinKitFadingCircle(color: mainColor, size: 40))
                   : filteredCards.isEmpty
-                      ? Center(
-                          child: Text("No Doctors found for this subservice."))
+                      ? const Center(child: Text("No hospitals found."))
                       : ListView.builder(
+                          padding: const EdgeInsets.all(12),
                           itemCount: filteredCards.length,
                           itemBuilder: (context, index) {
                             final card = filteredCards[index];
-                            // String rawValue =
-                            //     card.price; // e.g., "₹6132.240000000001"
-                            //   parsedValue =
-                            //      rawValue
 
-                            final branchName =
-                                branches[index % branches.length];
-                            return GestureDetector(
-                              onTap: () {
-                                if (widget.selectedService != null) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ServiceDetailsPage(
-                                          mobileNumber: widget.mobileNumber,
-                                          username: widget.username,
-                                          selectedService: widget
-                                              .selectedService!.subServiceId,
-                                          hospitalName: card.hospitalName,
-                                          hospitalId: card.hospitalId),
-                                    ),
-                                  );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            'Please select a service first')),
-                                  );
-                                }
-                              },
-                              child: Container(
-                                margin: EdgeInsets.symmetric(vertical: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
+                            // Filter branches for display inside this card
+                            final displayedBranches =
+                                card.branches.where((branch) {
+                              final matchesSearchBranch = searchText.isEmpty ||
+                                  branch.branchName
+                                      .toLowerCase()
+                                      .contains(searchText.toLowerCase()) ||
+                                  branch.city
+                                      .toLowerCase()
+                                      .contains(searchText.toLowerCase());
+                              final matchesCityBranch = selectedCity == null ||
+                                  branch.city == selectedCity;
+                              return matchesSearchBranch && matchesCityBranch;
+                            }).toList();
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Hospital Header (always navigable)
+                                GestureDetector(
+                                  // onTap: () {
+                                  //   Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //       builder: (_) => ServiceDetailsPage(
+                                  //         mobileNumber: widget.mobileNumber,
+                                  //         username: widget.username,
+                                  //         selectedService:
+                                  //             widget.selectedService!.serviceId,
+                                  //         hospitalName: card.hospitalName,
+                                  //         hospitalId: card.hospitalId,
+                                  //       ),
+                                  //     ),
+                                  //   );
+                                  // },
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Image.memory(
-                                            base64Decode(card.hospitalLogo),
-                                            width: 80,
-                                            height: 80,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.asset(
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.memory(
+                                          base64Decode(card.hospitalLogo),
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, _, __) =>
+                                              Image.asset(
+                                                  'assets/ic_launcher.png',
                                                   width: 80,
-                                                  height: 80,
-                                                  'assets/ic_launcher.png');
-                                            },
-                                          ),
-                                          SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                  height: 80),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(card.hospitalName,
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            Row(
                                               children: [
-                                                Text(card.hospitalName,
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                                Text(branchName,
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                    )),
-                                                SizedBox(height: 4),
-                                                Text("Sub Service: " +
-                                                    card.subServiceName),
-                                                Text("Service: " +
-                                                    card.serviceName),
-                                                SizedBox(height: 8),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Icon(Icons.star,
-                                                  size: 20,
-                                                  color: Colors.amber),
-                                              Text(
-                                                  "${card.hospitalOverallRating.toStringAsFixed(1)}/5 "),
-                                              // Text("4.5/5 "),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              RichText(
-                                                text: TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text:
-                                                          "₹${card.price.toStringAsFixed(0)} ",
-                                                      // "₹900 ", // price
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.red,
-                                                        decoration:
-                                                            TextDecoration
-                                                                .lineThrough,
-                                                      ),
-                                                    ),
-                                                    TextSpan(
-                                                      text:
-                                                          "(${card.discountPercentage.toStringAsFixed(0)}%) ",
-                                                      // "(10%)", // discount percentage
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            12, // smaller font
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                        color: Colors.red,
-                                                        decoration:
-                                                            TextDecoration
-                                                                .lineThrough,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 20,
-                                              ),
-                                              Text(
-                                                  "₹${card.discountedCost.toStringAsFixed(0)} ",
-                                                  // "₹1000",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.teal)),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 20,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () async {
-                                              final Uri url =
-                                                  Uri.parse("${card.website}");
-                                              if (await canLaunchUrl(url)) {
-                                                await launchUrl(url,
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              } else {
-                                                throw "Could not launch $url";
-                                              }
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.language,
-                                                    color: mainColor,
-                                                    size:
-                                                        20), // 🌐 website icon
-                                                SizedBox(width: 6),
+                                                const Icon(Icons.star,
+                                                    color: Colors.amber,
+                                                    size: 18),
+                                                const SizedBox(width: 4),
                                                 Text(
-                                                  "Website",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: mainColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () async {
-                                              final Uri url = Uri.parse(
-                                                  "${card.walkthrough}");
-                                              if (await canLaunchUrl(url)) {
-                                                await launchUrl(url,
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              } else {
-                                                throw "Could not launch $url";
-                                              }
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Image.asset(
-                                                    "assets/clinic_tour.png",
-                                                    height: 20,
-                                                    width: 20,
-                                                    color: mainColor),
-                                                SizedBox(width: 6),
-                                                Text("Virtual Clinic Tour",
-                                                    style: TextStyle(
-                                                        fontSize: 16,
+                                                    "${card.hospitalOverallRating.toStringAsFixed(1)}/5",
+                                                    style: const TextStyle(
                                                         fontWeight:
-                                                            FontWeight.w500,
-                                                        color: mainColor)),
+                                                            FontWeight.w500)),
                                               ],
                                             ),
-                                          ),
-                                          // Text(
-                                          //     "${card['discountedCost'] ?? "NA"}"),
-                                        ],
-                                      )
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
-                              ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.miscellaneous_services,
+                                            color: Colors.amber, size: 18),
+                                        const SizedBox(width: 4),
+                                        Text("${card.serviceName}",
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w500)),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.biotech,
+                                            color: Colors.amber, size: 18),
+                                        const SizedBox(width: 4),
+                                        Text("${card.subServiceName}",
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w500)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton.icon(
+                                      onPressed: () async {
+                                        final Uri url = Uri.parse(card.website);
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url,
+                                              mode: LaunchMode
+                                                  .externalApplication);
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      "Could not launch ${card.website}")));
+                                        }
+                                      },
+                                      icon: const Icon(Icons.language,
+                                          color: mainColor),
+                                      label: const Text(
+                                        "Visit Website",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: mainColor),
+                                      ),
+                                    ),
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                              text:
+                                                  "₹${card.price.toStringAsFixed(0)} ",
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.red,
+                                                  decoration: TextDecoration
+                                                      .lineThrough)),
+                                          TextSpan(
+                                              text:
+                                                  "(${card.discountPercentage.toStringAsFixed(0)}% OFF)",
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.w500)),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      "₹${card.discountedCost.toStringAsFixed(0)}",
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.teal),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                // Branches
+                                // Branches
+                                ...displayedBranches.map((branch) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Navigate to ServiceDetailsPage with this branch's hospital info
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => ServiceDetailsPage(
+                                            mobileNumber: widget.mobileNumber,
+                                            username: widget.username,
+                                            selectedService: widget
+                                                .selectedService!.subServiceId,
+                                            hospitalName: card.hospitalName,
+                                            hospitalId: card.hospitalId,
+                                            branchId: branch
+                                                .branchId, // Pass branchId if needed
+                                            branchName: branch.branchName,
+                                          ),
+                                        ),
+                                      );
+
+                                      // Update selected branch in controller
+                                      Get.find<SymptomsController>()
+                                          .updateBranch(branch);
+                                      setState(() => selectedBranch = branch);
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 6),
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey),
+                                        color: const Color.fromARGB(
+                                            255, 240, 239, 239),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(branch.branchName,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: mainColor)),
+                                              if (displayedBranches
+                                                      .indexOf(branch) ==
+                                                  0)
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2),
+                                                  decoration: BoxDecoration(
+                                                      color:
+                                                          Colors.green.shade100,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8)),
+                                                  child: const Text(
+                                                      "Main Branch",
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.green)),
+                                                ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(branch.address),
+                                          const SizedBox(height: 2),
+                                          Text("City: ${branch.city}"),
+                                          const SizedBox(height: 2),
+                                          Text("📞 : ${branch.contactNumber}"),
+                                          const SizedBox(height: 2),
+                                          Text("✉️ ${branch.email}"),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextButton.icon(
+                                                onPressed: () async {
+                                                  final Uri url = Uri.parse(
+                                                      branch.virtualClinicTour);
+                                                  if (await canLaunchUrl(url)) {
+                                                    await launchUrl(url,
+                                                        mode: LaunchMode
+                                                            .externalApplication);
+                                                  } else {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(SnackBar(
+                                                            content: Text(
+                                                                "Could not launch ${card.website}")));
+                                                  }
+                                                },
+                                                icon: const Icon(
+                                                    Icons.video_camera_front,
+                                                    color: mainColor),
+                                                label: const Text(
+                                                  "Virtual Clinic Tour",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: mainColor),
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Icon(Icons.location_on,
+                                                      size: 16,
+                                                      color:
+                                                          mainColor), // 📍 Location icon
+                                                  SizedBox(
+                                                      width:
+                                                          4), // small spacing
+                                                  Text(
+                                                    "${branch.kms}",
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: mainColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+
+                                const SizedBox(height: 10),
+
+                                // Price & Discount
+
+                                const SizedBox(height: 8),
+
+                                // Website
+
+                                const Divider(height: 20),
+                              ],
                             );
                           },
                         ),

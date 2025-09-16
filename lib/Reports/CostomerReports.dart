@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/PDFPreview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -42,8 +48,9 @@ class _PatientReportScreenState extends State<PatientReportScreen> {
               "prescriptionPdf":
                   "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
               "beforeImages": [
-                "https://picsum.photos/200/300",
-                "https://picsum.photos/201/300"
+                "https://img.freepik.com/premium-photo/model-with-natural-look_14117-24000.jpg",
+
+                // "https://picsum.photos/201/300"
               ],
               "afterImages": [
                 "https://picsum.photos/202/300",
@@ -65,8 +72,9 @@ class _PatientReportScreenState extends State<PatientReportScreen> {
               "prescriptionPdf":
                   "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
               "beforeImages": [
-                "https://picsum.photos/204/300",
-                "https://picsum.photos/205/300"
+                "https://images.huffingtonpost.com/2011-06-20-LETHA_before_after.jpg"
+                // "https://picsum.photos/204/300",
+                // "https://picsum.photos/205/300"
               ],
               "afterImages": [
                 "https://picsum.photos/206/300",
@@ -123,7 +131,7 @@ class VisitCard extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PdfPreviewScreen(pdfUrl: url),
+        builder: (context) => PdfViewerScreen(pdfUrl: url),
       ),
     );
   }
@@ -140,6 +148,7 @@ class VisitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       margin: const EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -160,7 +169,7 @@ class VisitCard extends StatelessWidget {
                     ElevatedButton.icon(
                       onPressed: () => _previewPdf(context, pdfUrl),
                       icon: const Icon(Icons.picture_as_pdf),
-                      label: const Text("Preview Report"),
+                      label: const Text("Preview"),
                     ),
                     const SizedBox(width: 10),
                     OutlinedButton.icon(
@@ -182,7 +191,7 @@ class VisitCard extends StatelessWidget {
                   onPressed: () =>
                       _previewPdf(context, visit["prescriptionPdf"]),
                   icon: const Icon(Icons.picture_as_pdf),
-                  label: const Text("Preview Prescription"),
+                  label: const Text("Preview"),
                 ),
                 const SizedBox(width: 10),
                 OutlinedButton.icon(
@@ -196,7 +205,7 @@ class VisitCard extends StatelessWidget {
             const SizedBox(height: 10),
 
             // Before Images
-            const Text("Before Images",
+            const Text("Before/After Images",
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(
               height: 120,
@@ -224,30 +233,30 @@ class VisitCard extends StatelessWidget {
             const SizedBox(height: 10),
 
             // After Images
-            const Text("After Images",
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(
-              height: 120,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: (visit["afterImages"] as List).length,
-                itemBuilder: (context, i) {
-                  final imgUrl = visit["afterImages"][i];
-                  return GestureDetector(
-                    onTap: () => _previewImage(context, imgUrl),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Image.network(
-                        imgUrl,
-                        height: 120,
-                        width: 120,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            // const Text("After Images",
+            //     style: TextStyle(fontWeight: FontWeight.bold)),
+            // SizedBox(
+            //   height: 120,
+            //   child: ListView.builder(
+            //     scrollDirection: Axis.horizontal,
+            //     itemCount: (visit["afterImages"] as List).length,
+            //     itemBuilder: (context, i) {
+            //       final imgUrl = visit["afterImages"][i];
+            //       return GestureDetector(
+            //         onTap: () => _previewImage(context, imgUrl),
+            //         child: Padding(
+            //           padding: const EdgeInsets.all(4.0),
+            //           child: Image.network(
+            //             imgUrl,
+            //             height: 120,
+            //             width: 120,
+            //             fit: BoxFit.cover,
+            //           ),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -255,15 +264,61 @@ class VisitCard extends StatelessWidget {
   }
 }
 
-class PdfPreviewScreen extends StatelessWidget {
+class PdfViewerScreen extends StatefulWidget {
   final String pdfUrl;
-  const PdfPreviewScreen({super.key, required this.pdfUrl});
+  const PdfViewerScreen({super.key, required this.pdfUrl});
+
+  @override
+  State<PdfViewerScreen> createState() => _PdfViewerScreenState();
+}
+
+class _PdfViewerScreenState extends State<PdfViewerScreen> {
+  String? localPath;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _downloadAndSavePdf();
+  }
+
+  Future<void> _downloadAndSavePdf() async {
+    try {
+      final response = await http.get(Uri.parse(widget.pdfUrl));
+      final bytes = response.bodyBytes;
+
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/temp.pdf');
+      await file.writeAsBytes(bytes, flush: true);
+
+      setState(() {
+        localPath = file.path;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Error loading PDF: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("PDF Preview")),
-      // body: SfPdfViewer.network(pdfUrl),
+      appBar: CommonHeader(
+        title: "PDF Viewer",
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : localPath != null
+              ? PDFView(
+                  filePath: localPath!,
+                  swipeHorizontal: false,
+                  autoSpacing: true,
+                  pageSnap: true,
+                )
+              : const Center(child: Text("Failed to load PDF")),
     );
   }
 }
@@ -275,7 +330,9 @@ class ImagePreviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Image Preview")),
+      appBar: CommonHeader(
+        title: "Image Preview",
+      ),
       body: Center(
         child: PhotoView(
           imageProvider: NetworkImage(imageUrl),

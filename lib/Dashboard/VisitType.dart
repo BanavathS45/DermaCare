@@ -99,14 +99,23 @@ class _VisitTypeState extends State<VisitType> {
   }
 
   void _handleFollowUp() {
+    print("_handleFollowUp calling");
     final screenHeight = MediaQuery.of(context).size.height;
     final appointments = visitController.bookings;
-    if (appointments.isEmpty || appointments.length == 0) {
-      ScaffoldMessageSnackbar.show(
-        context: context,
-        message: "No Appointments \n You don’t have any past bookings",
-        type: SnackbarType.warning,
+    if (appointments == null || appointments.isEmpty) {
+      print("No appointments found");
+
+      Get.snackbar(
+        "No Appointments",
+        "You don’t have any past bookings",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color.fromARGB(255, 66, 119, 235),
+        colorText: const Color.fromARGB(255, 255, 255, 255),
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.all(12),
+        borderRadius: 10,
       );
+
       controller.updateVisitType(selectedType);
       return;
     }

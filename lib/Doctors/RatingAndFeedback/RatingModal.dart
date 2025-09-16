@@ -5,6 +5,7 @@ class RatingSummary {
   final String hospitalId;
   final double overallDoctorRating;
   final double overallHospitalRating;
+
   final List<Comment> comments;
 
   RatingSummary({
@@ -47,6 +48,8 @@ class Comment {
   final String customerMobileNumber;
   final String appointmentId;
   final bool rated;
+  final String patientId;
+  final String patientNamme;
   final String dateAndTimeAtRating;
 
   Comment({
@@ -59,6 +62,8 @@ class Comment {
     required this.appointmentId,
     required this.rated,
     required this.dateAndTimeAtRating,
+    required this.patientId,
+    required this.patientNamme,
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -72,6 +77,8 @@ class Comment {
       appointmentId: json['appointmentId'],
       rated: json['rated'],
       dateAndTimeAtRating: json['dateAndTimeAtRating'] ?? '',
+      patientId: (json['patientId']),
+      patientNamme: (json['patientNamme']),
     );
   }
 
@@ -86,6 +93,8 @@ class Comment {
       'appointmentId': appointmentId,
       'rated': rated,
       'dateAndTimeAtRating': dateAndTimeAtRating,
+      'patientId': patientId,
+      'patientNamme': patientNamme,
     };
   }
 

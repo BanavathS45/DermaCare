@@ -161,37 +161,37 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                   ),
 
                   // Show your doctor list or content here
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        showRecommendedOnly = !showRecommendedOnly;
-                      });
-                    },
-                    icon: Icon(
-                      showRecommendedOnly
-                          ? Icons.check_circle
-                          : Icons.star_border,
-                      color: showRecommendedOnly ? Colors.white : Colors.teal,
-                    ),
-                    label: Text(
-                      showRecommendedOnly
-                          ? "Showing Recommended"
-                          : "Recommended Only",
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          showRecommendedOnly ? Colors.teal : Colors.grey[300],
-                      foregroundColor:
-                          showRecommendedOnly ? Colors.white : Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      elevation: 2,
-                    ),
-                  ),
+                  // ElevatedButton.icon(
+                  //   onPressed: () {
+                  //     setState(() {
+                  //       showRecommendedOnly = !showRecommendedOnly;
+                  //     });
+                  //   },
+                  //   icon: Icon(
+                  //     showRecommendedOnly
+                  //         ? Icons.check_circle
+                  //         : Icons.star_border,
+                  //     color: showRecommendedOnly ? Colors.white : Colors.teal,
+                  //   ),
+                  //   label: Text(
+                  //     showRecommendedOnly
+                  //         ? "Showing Recommended"
+                  //         : "Recommended Only",
+                  //     style: TextStyle(fontWeight: FontWeight.w500),
+                  //   ),
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor:
+                  //         showRecommendedOnly ? Colors.teal : Colors.grey[300],
+                  //     foregroundColor:
+                  //         showRecommendedOnly ? Colors.white : Colors.black,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(12),
+                  //     ),
+                  //     padding:
+                  //         EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  //     elevation: 2,
+                  //   ),
+                  // ),
                 ],
               ),
               SizedBox(height: 12),

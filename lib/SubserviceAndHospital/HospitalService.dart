@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'package:cutomer_app/SubserviceAndHospital/HospitalCardModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:cutomer_app/APIs/BaseUrl.dart';
 
 class HospitalService {
-  Future<List<Map<String, dynamic>>> fetchHospitalCards(subServiceId) async {
-    final url = Uri.parse('$registerUrl/getSubServiceInfo/$subServiceId');
+  Future<List<HospitalCardModel>> fetchHospitalCards(
+      String hospitalID, String subServiceId, double lat, double long) async {
+    final url = Uri.parse(
+        '$registerUrl/getBranchesInfoBySubServiceId/$hospitalID/$subServiceId/$lat/$long');
     print('📤 Sending GET request to: $url');
 
     try {
@@ -12,18 +15,20 @@ class HospitalService {
       print('📥 Response status: ${response.statusCode}');
 
       final decoded = json.decode(response.body);
-      print('🔓 Decoded response: $decoded');
+      print('🔓 Full Decoded Response Type: ${decoded.runtimeType}');
+      print('🔓 Full Decoded Response Content: $decoded');
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = decoded['data'];
-        print('📦 Data list contains ${decoded.length} items');
+        // ✅ Your API returns `data` as a Map, not a List
+        if (decoded is Map && decoded.containsKey('data')) {
+          final Map<String, dynamic> data = decoded['data'];
+          print('📦 Single hospital object found');
 
-        List<Map<String, dynamic>> result = [];
+          List<HospitalCardModel> result = [];
 
-        for (var item in data) {
           String base64Logo = '';
           try {
-            final logo = item['hospitalLogo'] ?? '';
+            final logo = data['hospitalLogo'] ?? '';
             if (logo.startsWith('http')) {
               final imageResponse = await http.get(Uri.parse(logo));
               final contentType = imageResponse.headers['content-type'] ?? '';
@@ -42,32 +47,27 @@ class HospitalService {
             print('❌ Error handling logo: $imgErr');
           }
 
-          result.add({
-            "hospitalId": item['hospitalId'] ?? "",
-            "hospitalName": item['hospitalName'] ?? "",
+          // Print hospital info for debugging
+          print("🏥 Hospital Name: ${data['hospitalName']}");
+          print("📍 Branch Count: ${(data['branches'] as List?)?.length ?? 0}");
+          if (data['branches'] != null) {
+            for (var branch in data['branches']) {
+              print("  🔗 Branch Name: ${branch['branchName']}");
+              print("  🌐 Virtual Tour: ${branch['virtualClinicTour']}");
+            }
+          }
+
+          // ✅ Build HospitalCardModel using your model
+          result.add(HospitalCardModel.fromJson({
+            ...data,
             "hospitalLogo": base64Logo,
-            "recommanded":
-                item['recommanded'] ?? false, // match backend spelling
+          }));
 
-            "serviceName": item['serviceName'] ?? "",
-            "subServiceName": item['subServiceName'] ?? "",
-            "subServicePrice": (item['subServicePrice'] ?? 0).toDouble(),
-
-            "price": (item['price'] ?? 0).toDouble(),
-            "discountedCost": (item['discountedCost'] ?? 0).toDouble(),
-            "taxAmount": (item['taxAmount'] ?? 0).toDouble(),
-            "discountPercentage": (item['discountPercentage'] ?? 0).toInt(),
-            "hospitalOverallRating":
-                (item['hospitalOverallRating'] ?? 0).toDouble(),
-
-            "website": item['website'] ?? "",
-            "consultationFee": (item['consultationFee'] ?? 0).toDouble(),
-            "walkthrough": item['walkthrough'] ?? "",
-          });
+          return result;
+        } else {
+          print('⚠️ API response does not have a valid "data" object.');
+          throw Exception('Unexpected API response format: $decoded');
         }
-
-        // ✅ Fix: Return result here
-        return result;
       } else {
         final errorMsg = decoded['message'] ?? 'Failed to load hospital data.';
         print('❌ Backend message: $errorMsg');

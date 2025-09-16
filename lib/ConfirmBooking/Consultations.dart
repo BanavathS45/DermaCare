@@ -151,6 +151,8 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                               "Services & Treatments",
                               "assets/treat.jpg",
                               () {
+                                consultationcontroller
+                                    .setConsultation(_consultations.first);
                                 Get.to(DashboardScreen(
                                   mobileNumber: widget.mobileNumber,
                                   username: widget.username,

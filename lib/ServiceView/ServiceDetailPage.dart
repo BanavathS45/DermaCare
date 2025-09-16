@@ -25,6 +25,8 @@ class ServiceDetailsPage extends StatefulWidget {
   final String username;
   final String hospitalName;
   final String hospitalId;
+  final String branchId;
+  final String branchName;
 
   const ServiceDetailsPage({
     super.key,
@@ -33,6 +35,8 @@ class ServiceDetailsPage extends StatefulWidget {
     required this.selectedService,
     required this.hospitalName,
     required this.hospitalId,
+    required this.branchId,
+    required this.branchName,
   });
 
   final String selectedService;
@@ -190,12 +194,13 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.hospitalName,
+                      "${widget.hospitalName} (${widget.branchName})",
                       style: TextStyle(
                         color: mainColor,
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
                       ),
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

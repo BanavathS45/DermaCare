@@ -34,7 +34,6 @@ class Doctor {
   final String availableDays;
   final String availableTimes;
   final String profileDescription;
-
   final String deviceId;
   final DoctorFees doctorFees;
   final List<String> focusAreas;

@@ -207,11 +207,6 @@ class _RatingAndFeedbackState extends State<RatingAndFeedback> {
                           return FutureBuilder<GetCustomerModel?>(
                             future: fetchUserData(loggedInUserMobile!),
                             builder: (context, userSnapshot) {
-                              final customerName = userSnapshot.hasData
-                                  ? capitalizeEachWord(
-                                      userSnapshot.data!.fullName)
-                                  : 'Loading...';
-
                               return Column(
                                 children: [
                                   Padding(
@@ -224,9 +219,8 @@ class _RatingAndFeedbackState extends State<RatingAndFeedback> {
                                           radius: 20,
                                           backgroundColor: Colors.grey.shade300,
                                           child: Text(
-                                            customerName.isNotEmpty
-                                                ? customerName[0].toUpperCase()
-                                                : "?",
+                                            comment.patientNamme[0]
+                                                .toUpperCase(),
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black,
@@ -246,7 +240,7 @@ class _RatingAndFeedbackState extends State<RatingAndFeedback> {
                                                 children: [
                                                   Expanded(
                                                     child: Text(
-                                                      customerName,
+                                                      "${capitalizeEachWord(comment.patientNamme)}",
                                                       style: const TextStyle(
                                                         fontSize: 16,
                                                         color: Colors.black,

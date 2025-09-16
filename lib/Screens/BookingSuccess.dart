@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
@@ -46,6 +47,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
   DoctorService service = DoctorService();
   final doctorController = Get.put(DoctorController());
   final doctordetailscontroller = Doctordetailscontroller();
+  final scontroller = SymptomsController();
   final Dashboardcontroller controller = Dashboardcontroller();
   final consultationController = Get.put(Consultationcontroller());
   final selectedServicesController = Get.find<SelectedServicesController>();
@@ -302,6 +304,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
         decoration: BoxDecoration(gradient: appGradient()),
         child: TextButton(
           onPressed: () {
+            scontroller.clearForm();
             showDialog(
               context: context,
               builder: (context) {

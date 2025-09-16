@@ -1,3 +1,70 @@
+class Branch {
+  final String clinicId;
+  final String branchId;
+  final String branchName;
+  final String address;
+  final String city;
+  final String contactNumber;
+  final String email;
+  final String latitude;
+  final String longitude;
+  final String virtualClinicTour;
+  final String kms;
+
+  Branch(
+      {required this.clinicId,
+      required this.branchId,
+      required this.branchName,
+      required this.address,
+      required this.city,
+      required this.contactNumber,
+      required this.email,
+      required this.latitude,
+      required this.longitude,
+      required this.virtualClinicTour,
+      required this.kms});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Branch && branchId == other.branchId;
+
+  @override
+  int get hashCode => branchId.hashCode;
+
+  @override
+  String toString() => branchName;
+
+  factory Branch.fromJson(Map<String, dynamic> json) {
+    return Branch(
+      clinicId: json['clinicId'] ?? "",
+      branchId: json['branchId'] ?? "",
+      branchName: json['branchName'] ?? "",
+      address: json['address'] ?? "",
+      city: json['city'] ?? "",
+      contactNumber: json['contactNumber'] ?? "",
+      email: json['email'] ?? "",
+      latitude: json['latitude'] ?? "",
+      longitude: json['longitude'] ?? "",
+      virtualClinicTour: json['virtualClinicTour'] ?? "",
+      kms: json['kms'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        "clinicId": clinicId,
+        "branchId": branchId,
+        "branchName": branchName,
+        "address": address,
+        "city": city,
+        "contactNumber": contactNumber,
+        "email": email,
+        "latitude": latitude,
+        "longitude": longitude,
+        "virtualClinicTour": virtualClinicTour,
+        "kms": kms,
+      };
+}
+
 class HospitalCardModel {
   final String hospitalId;
   final String hospitalName;
@@ -13,7 +80,7 @@ class HospitalCardModel {
   final double hospitalOverallRating;
   final String website;
   final double consultationFee;
-  final String walkthrough;
+  final List<Branch> branches; // 🔹 Added
 
   HospitalCardModel({
     required this.hospitalId,
@@ -30,7 +97,7 @@ class HospitalCardModel {
     required this.hospitalOverallRating,
     required this.website,
     required this.consultationFee,
-    required this.walkthrough,
+    required this.branches, // 🔹 Added
   });
 
   factory HospitalCardModel.fromJson(Map<String, dynamic> json) {
@@ -49,7 +116,10 @@ class HospitalCardModel {
       hospitalOverallRating: (json['hospitalOverallRating'] ?? 0).toDouble(),
       website: json['website'] ?? "",
       consultationFee: (json['consultationFee'] ?? 0).toDouble(),
-      walkthrough: json['walkthrough'] ?? "",
+      branches: (json['branches'] as List<dynamic>?)
+              ?.map((b) => Branch.fromJson(b))
+              .toList() ??
+          [],
     );
   }
 
@@ -57,7 +127,7 @@ class HospitalCardModel {
         "hospitalId": hospitalId,
         "hospitalName": hospitalName,
         "hospitalLogo": hospitalLogo,
-        "recommanded": recommanded, // 👈 keep same spelling as backend
+        "recommanded": recommanded,
         "serviceName": serviceName,
         "subServiceName": subServiceName,
         "subServicePrice": subServicePrice,
@@ -68,6 +138,6 @@ class HospitalCardModel {
         "hospitalOverallRating": hospitalOverallRating,
         "website": website,
         "consultationFee": consultationFee,
-        "walkthrough": walkthrough,
+        "branches": branches.map((b) => b.toJson()).toList(),
       };
 }

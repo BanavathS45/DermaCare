@@ -1,22 +1,14 @@
- 
-
- 
 import 'package:cutomer_app/Customers/GetCustomerModel.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
- 
 
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
- 
 
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-
-
- 
 
 // adjust the import to your model path
 
@@ -148,7 +140,7 @@ class HelpScreen extends StatelessWidget {
     super.key,
   });
 
-  final String phone = "+91 7842259803";
+  final String phone = "+91 9912758542";
   final String email = "support@uditcometech.com";
   final String address =
       "Pakricorn Technology, Road Number 10, Hyderabad, Telangana 500097";
@@ -191,7 +183,10 @@ class HelpScreen extends StatelessWidget {
               ),
               Text(
                 "Need assistance? Reach out to Udit Cometech for support.",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: mainColor),
                 textAlign: TextAlign.center,
               ),
               SizedBox(
@@ -240,10 +235,18 @@ class HelpScreen extends StatelessWidget {
   }) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 10),
-      leading: Icon(icon, size: 28, color: Colors.blue),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right),
+      leading: Icon(icon, size: 28, color: mainColor),
+      title: Text(title,
+          style:
+              const TextStyle(fontWeight: FontWeight.bold, color: mainColor)),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(color: mainColor),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right,
+        color: mainColor,
+      ),
       onTap: onTap,
     );
   }

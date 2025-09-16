@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cutomer_app/SubserviceAndHospital/HospitalCardModel.dart';
 import 'package:get/get.dart';
 
 class SymptomsController extends GetxController {
@@ -6,6 +7,7 @@ class SymptomsController extends GetxController {
   var duration = ''.obs;
   var visitType = ''.obs;
   var attachments = <File>[].obs;
+  var selectedBranch = Rxn<Branch>();
 
   void updateSymptoms(String value) {
     symptoms.value = value;
@@ -19,6 +21,11 @@ class SymptomsController extends GetxController {
     visitType.value = value;
   }
 
+  void updateBranch(Branch branch) {
+    selectedBranch.value = branch;
+    print("Controller Branch Updated: ${branch.branchName}");
+  }
+
   void addAttachment(File file) {
     attachments.add(file);
   }
@@ -27,9 +34,12 @@ class SymptomsController extends GetxController {
     attachments.removeAt(index);
   }
 
+ 
+
   void clearForm() {
     symptoms.value = '';
     duration.value = '';
     attachments.clear(); // ✅ Proper way to clear RxList
+    selectedBranch.value = null;
   }
 }

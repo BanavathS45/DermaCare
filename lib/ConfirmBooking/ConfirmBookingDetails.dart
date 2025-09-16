@@ -83,8 +83,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         });
 
         // Now execute based on matched ID
-        if (consultations.length > 0 &&
-            selectedId == consultations[0].consultationId) {
+        if (selectedId == consultations[0].consultationId) {
           print(
               "selectedId Consulation : ${selectedId} , ${consultations[0].consultationId}");
           setState(() {
@@ -92,15 +91,11 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 .selectedSubServices.first.consultationFee
                 .toInt();
           });
-        }
-        if (consultations.length > 1 &&
-            selectedId == consultations[1].consultationId) {
+        } else if (selectedId == consultations[1].consultationId) {
           setState(() {
             consultationFee = doctor?.doctorFees.inClinicFee ?? 0;
           });
-        }
-        if (consultations.length > 2 &&
-            selectedId == consultations[2].consultationId) {
+        } else if (selectedId == consultations[2].consultationId) {
           setState(() {
             consultationFee = doctor?.doctorFees.vedioConsultationFee ?? 0;
           });

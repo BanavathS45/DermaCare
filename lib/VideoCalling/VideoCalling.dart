@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Icon(Icons.local_hospital, size: 64, color: themeColor),
                   const SizedBox(height: 16),
                   Text(
-                    "Welcome to DermaCare Video Consultation",
+                    "Welcome to Pragna Clinic Video Consultation",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 22,

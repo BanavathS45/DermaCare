@@ -2,8 +2,11 @@
 import 'dart:io';
 
 import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
+import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -44,12 +47,17 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
   String? fullName;
   String? age;
   String? _selectedDurationType;
-  final List<String> durationTypes = ["Hours", "Days", "Months", "Years"];
+  final List<String> durationTypes = [
+    "Hours",
+    "Days",
+    "Weeks",
+    "Months",
+    "Years"
+  ];
   @override
   void initState() {
     super.initState();
     getUserData();
-
   }
 
   Future<void> getUserData() async {
@@ -92,8 +100,13 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
     return age;
   }
 
-  /// Pick PDF files
   Future<void> _pickFile() async {
+    int currentCount = controller.attachments.length;
+    if (currentCount >= 6) {
+      _showMessage(context, "You can only upload a maximum of 6 items.");
+      return;
+    }
+
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       allowedExtensions: ['pdf'],
@@ -103,28 +116,129 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
     if (result != null) {
       for (var file in result.files) {
         if (file.path != null) {
-          controller.addAttachment(File(file.path!));
+          // Check total count
+          if (controller.attachments.length >= 6) {
+            _showMessage(
+                context, "Limit reached (6 items). Extra files skipped.");
+            break;
+          }
+
+          // ✅ Check file size (200 KB limit)
+          final selectedFile = File(file.path!);
+          final sizeKB = selectedFile.lengthSync() / 1024;
+          if (sizeKB > 200) {
+            _showMessage(context,
+                "❌ ${file.name} is too large (${sizeKB.toStringAsFixed(2)} KB). Max allowed: 200 KB.");
+            continue;
+          }
+
+          controller.addAttachment(selectedFile);
         }
       }
     }
   }
 
-  /// Pick images (camera or gallery)
   Future<void> _pickImage(ImageSource source) async {
+    int currentCount = controller.attachments.length;
+    if (currentCount >= 6) {
+      _showMessage(context, "You can only upload a maximum of 6 items.");
+      return;
+    }
+
     final ImagePicker picker = ImagePicker();
+
     if (source == ImageSource.gallery) {
       final List<XFile>? pickedFiles = await picker.pickMultiImage();
+
       if (pickedFiles != null) {
         for (var pickedFile in pickedFiles) {
-          controller.addAttachment(File(pickedFile.path));
+          if (controller.attachments.length >= 6) {
+            _showMessage(
+                context, "Limit reached (6 items). Extra images skipped.");
+            break;
+          }
+
+          final file = File(pickedFile.path);
+          print(
+              "📷 Original Image Size: ${(file.lengthSync() / 1024).toStringAsFixed(2)} KB");
+
+          final compressedFile = await _compressImage(file);
+          controller.addAttachment(compressedFile);
         }
       }
     } else {
       final XFile? pickedFile = await picker.pickImage(source: source);
+
       if (pickedFile != null) {
-        controller.addAttachment(File(pickedFile.path));
+        if (controller.attachments.length >= 6) {
+          _showMessage(context, "Limit reached (6 items). Cannot add more.");
+          return;
+        }
+
+        final file = File(pickedFile.path);
+        print(
+            "📷 Original Image Size: ${(file.lengthSync() / 1024).toStringAsFixed(2)} KB");
+
+        final compressedFile = await _compressImage(file);
+        controller.addAttachment(compressedFile);
       }
     }
+  }
+
+  Future<File> _compressImage(File file) async {
+    final targetPath =
+        "${file.parent.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+    final compressedBytes = await FlutterImageCompress.compressWithFile(
+      file.path,
+      minWidth: 800,
+      minHeight: 800,
+      quality: 80,
+    );
+
+    final compressedFile = File(targetPath);
+    await compressedFile.writeAsBytes(compressedBytes!);
+
+    final compressedSizeKB = compressedFile.lengthSync() / 1024;
+    print(
+        "📷 Compressed Image Size: ${compressedSizeKB.toStringAsFixed(2)} KB");
+
+    if (compressedFile.lengthSync() > 100 * 1024) {
+      print("⚠️ Image still > 100KB, applying smaller compression...");
+      return await _compressImageSmaller(compressedFile);
+    }
+
+    return compressedFile;
+  }
+
+  Future<File> _compressImageSmaller(File file) async {
+    final targetPath =
+        "${file.parent.path}/compressed_small_${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+    final compressedBytes = await FlutterImageCompress.compressWithFile(
+      file.path,
+      minWidth: 600,
+      minHeight: 600,
+      quality: 60,
+    );
+
+    final smallerFile = File(targetPath);
+    await smallerFile.writeAsBytes(compressedBytes!);
+
+    final fileSizeKB = smallerFile.lengthSync() / 1024;
+    print("📷 Final Small Image Size: ${fileSizeKB.toStringAsFixed(2)} KB");
+
+    return smallerFile;
+  }
+
+  /// ✅ Show Snackbar message
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessageSnackbar.show(
+      context: context,
+      message: "${message}",
+      type: SnackbarType.warning,
+    );
   }
 
   @override
@@ -525,7 +639,9 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => Scaffold(
-                                  appBar: AppBar(title: Text("Image Preview")),
+                                  appBar: CommonHeader(
+                                    title: "Image Preview",
+                                  ),
                                   body: Center(
                                     child: InteractiveViewer(
                                       child: Image.file(file),

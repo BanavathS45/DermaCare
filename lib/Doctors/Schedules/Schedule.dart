@@ -172,13 +172,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
           child: TextButton(
               onPressed: () async {
+                print(
+                    "devicedIDdevicedID${consultationController.selectedConsultation.value!.consultationType}");
+
                 final prefs = await SharedPreferences.getInstance();
                 var devicedID = prefs.getString('fcm');
                 var patientProblem = consultationController
                         .selectedConsultation.value!.consultationType
                         .toLowerCase() ==
                     "services & treatments";
-
                 print("devicedIDdevicedID${devicedID}");
                 if (patientdetailsformcontroller.formKey.currentState!
                     .validate()) {
@@ -194,6 +196,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       age: patientdetailsformcontroller.selectedFor == 'Self'
                           ? "${patientdetailsformcontroller.age} Yrs"
                           : "${patientdetailsformcontroller.ageController.text} Yrs",
+                      // age: "20",
                       gender: registercontroller.selectedGender,
                       bookingFor: patientdetailsformcontroller.selectedFor,
                       problem: patientProblem

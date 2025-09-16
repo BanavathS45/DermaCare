@@ -21,7 +21,7 @@ class ClinicScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    controller.fetchClinic("H_2");
+    controller.fetchClinic("H_1");
 
     return Scaffold(
       appBar: CommonHeader(title: "Clinic Details"),
