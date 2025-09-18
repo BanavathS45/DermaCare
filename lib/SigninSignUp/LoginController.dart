@@ -1,14 +1,13 @@
 import 'package:cutomer_app/BottomNavigation/BottomNavigation.dart';
-import 'package:cutomer_app/OTP/FireBaseOtp.dart';
-import 'package:cutomer_app/SigninSignUp/BiometricAuthScreen.dart';
+
 import 'package:cutomer_app/SigninSignUp/BiometricPermissionScreen.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/LocationService.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'LoginService.dart';
@@ -36,10 +35,10 @@ class SiginSignUpController extends GetxController {
       return "$fieldName must not exceed 20 characters";
     }
 
-    final alphabetRegex = RegExp(r"^[a-zA-Z\s]+$"); // Only letters & spaces
-    if (!alphabetRegex.hasMatch(value)) {
-      return "Only alphabets are allowed in $fieldName";
-    }
+    // final alphabetRegex = RegExp(r"^[a-zA-Z\s]+$"); // Only letters & spaces
+    // if (!alphabetRegex.hasMatch(value)) {
+    //   return "Only alphabets are allowed in $fieldName";
+    // }
     return null; // ✅ Valid input
   }
 
@@ -118,36 +117,26 @@ class SiginSignUpController extends GetxController {
 
       if (response['status'] == 200) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('username', fullname);
-        await prefs.setString('mobileNumber', mobileNumber);
+
+        final data = response['data'];
+
+        await prefs.setString('userName', data['userName'] ?? "");
+        await prefs.setString('customerName', data['customerName'] ?? "");
+        await prefs.setString('customerId', data['customerId'] ?? "");
+        await prefs.setString('patientId', data['patientId'] ?? "");
+        await prefs.setString('deviceId', data['deviceId'] ?? "");
+        await prefs.setString('hospitalName', data['hospitalName'] ?? "");
+        await prefs.setString('hospitalId', data['hospitalId'] ?? "");
+        await prefs.setString('branchId', data['branchId'] ?? "");
         await prefs.setString('fcm', token ?? "");
 
         final isFirstTimeAuthenticated =
             prefs.getBool('isFirstLoginDone') ?? true;
 
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const AlertDialog(
-            content: Row(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    "Please wait, fetching your location...",
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-
         // ✅ NEW: Fetch & Store Location
+        showFetchingLocationDialog(context);
         await LocationService.fetchAndStoreLocation();
-
-        Navigator.pop(context); // Close loading dialog
+        Navigator.pop(context);
 
         // ✅ Navigate after location is stored
         if (isFirstTimeAuthenticated) {
@@ -171,6 +160,63 @@ class SiginSignUpController extends GetxController {
       isLoading.value = false;
       getOTPButton.value = "SIGN IN";
     }
+  }
+
+  void showFetchingLocationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return WillPopScope(
+          onWillPop: () async => false, // prevent closing dialog
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                    strokeWidth: 4,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Fetching your location...",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Please ensure location services are enabled",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   /// ✅ Request Location Permission & Get Current Location

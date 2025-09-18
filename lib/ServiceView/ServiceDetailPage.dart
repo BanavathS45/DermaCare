@@ -390,6 +390,7 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                         username: widget.username,
                         subServiceID: subServiceDetails!.subServiceId,
                         hospiatlName: widget.hospitalName,
+                        branchName: widget.branchName,
                       ));
 
                   final selectedServicesController =

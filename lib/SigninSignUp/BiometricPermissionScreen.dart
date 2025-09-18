@@ -54,9 +54,9 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
         // ✅ Show success and navigate or close screen
 
         showSnackbar("Success", "Biometric authentication enabled", "success");
-        Get.offAll(ConsultationsType(
+        Get.offAll(BottomNavController(
           mobileNumber: widget.mobileNumber,
-          username: widget.fullname,
+          username: widget.fullname, index: 0,
         ));
 
         // Navigator.pop(context); // Or navigate to home/dashboard

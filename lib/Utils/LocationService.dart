@@ -62,6 +62,8 @@ class LocationService {
       await prefs.setDouble('longitude', position.longitude);
       await prefs.setString('cityName', cityName);
 
+      
+
       print("📍 Location saved: ${position.latitude}, ${position.longitude}");
       print("🏙 City saved: $cityName");
     } catch (e) {

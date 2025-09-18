@@ -495,28 +495,13 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.black)),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-              child: CustomTextAera(
-                controller: patientdetailsformcontroller.notesController,
-                hintText:
-                    "If you have any specific concerns to discuss before the procedure, please mention them here.",
-
-                // Limit to 2 lines
-                maxLines: 3,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                labelText: 'Enter Symptoms',
-                // validator: (value) {
-                //   if (value == null || value.trim().isEmpty) {
-                //     return "Please enter Problem";
-                //   }
-                //   if (value.trim().length < 10) {
-                //     return "Problem must be at least 10 characters";
-                //   }
-                //   return null;
-                // },
-              ),
+            CustomTextAera(
+              controller: patientdetailsformcontroller.notesController,
+              labelText: "Enter Symptoms",
+              hintText:
+                  "If you have any specific concerns to discuss before the procedure, please mention them here.",
+              maxLines: 3,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
             ),
 
             const SizedBox(height: 15),

@@ -17,6 +17,7 @@ class Loginscreen extends StatefulWidget {
 
 class _LoginscreenState extends State<Loginscreen> {
   SiginSignUpController siginSignUpController = SiginSignUpController();
+
   @override
   void dispose() {
     NetworkService().dispose();
@@ -80,13 +81,17 @@ class _LoginscreenState extends State<Loginscreen> {
                       controller: siginSignUpController.mobileController,
                       labelText: 'Enter Mobile Number',
                       keyboardType: TextInputType.number,
-                      autovalidateMode: AutovalidateMode.onUnfocus,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       inputFormatters: [
                         LengthLimitingTextInputFormatter(10),
                         FilteringTextInputFormatter.digitsOnly,
                       ],
                       validator: (value) =>
                           siginSignUpController.validateMobileNumber(value),
+                      onChanged: (_) {
+                        // Revalidate the form when typing
+                        siginSignUpController.formKey.currentState?.validate();
+                      },
                     ),
                     const SizedBox(height: 20.0),
                     Padding(

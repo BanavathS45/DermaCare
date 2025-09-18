@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
+import 'package:cutomer_app/Inputs/CustomInputField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -46,6 +48,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
   List<HospitalCardModel> hospitalCards = [];
   bool isLoading = true;
 
+  String? branchId;
   @override
   void initState() {
     super.initState();
@@ -59,9 +62,13 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
 
     final double? lat = prefs.getDouble('latitude');
     final double? long = prefs.getDouble('longitude');
+    branchId = await prefs.getString('branchId');
+    // await prefs.setString('hospitalId', data['hospitalId'] ?? "");
+    final clinicId = await prefs.getString('hospitalId');
+
     try {
       final data = await HospitalService().fetchHospitalCards(
-          "H_1", widget.selectedService!.subServiceId, lat!, long!);
+          clinicId!, widget.selectedService!.subServiceId, lat!, long!);
       setState(() {
         hospitalCards = data;
         isLoading = false;
@@ -75,6 +82,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
   @override
   Widget build(BuildContext context) {
     // Filtered hospital cards based on search, city, and branch
+
     final filteredCards = hospitalCards.where((card) {
       final matchesSearch = searchText.isEmpty ||
           card.hospitalName.toLowerCase().contains(searchText.toLowerCase()) ||
@@ -87,12 +95,13 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                   .contains(searchText.toLowerCase()) ||
               branch.city.toLowerCase().contains(searchText.toLowerCase()));
 
-      final matchesCity = selectedCity == null ||
+      final matchesCity = selectedCity == null || // ✅ null means "All Cities"
           card.branches.any((branch) => branch.city == selectedCity);
 
-      final matchesBranch = selectedBranch == null ||
-          card.branches
-              .any((branch) => branch.branchId == selectedBranch!.branchId);
+      final matchesBranch =
+          selectedBranch == null || // ✅ null means "All Branches"
+              card.branches
+                  .any((branch) => branch.branchId == selectedBranch!.branchId);
 
       return matchesSearch && matchesCity && matchesBranch;
     }).toList();
@@ -119,76 +128,77 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
         child: Column(
           children: [
             // Search field
-            TextField(
+
+            CustomTextField(
               controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Search Hospital / City / Branch",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+              labelText: "Search Hospital / City / Branch",
+              prefixIcon: const Icon(Icons.search),
+              showClearIcon: true,
               onChanged: (val) => setState(() => searchText = val),
+              onClear: () => setState(() => searchText = ""),
             ),
-            const SizedBox(height: 12),
+
+            // TextField(
+            //   controller: _searchController,
+            //   decoration: InputDecoration(
+            //     hintText: "Search Hospital / City / Branch",
+            //     prefixIcon: Icon(Icons.search),
+            //     border: OutlineInputBorder(
+            //       borderRadius: BorderRadius.circular(12),
+            //     ),
+            //   ),
+            // ),
 
             // City Dropdown
             if (cities.isNotEmpty)
-              DropdownButtonFormField<String>(
+              CustomDropdownField<String>(
                 value: selectedCity,
-                decoration: InputDecoration(
-                  labelText: "Select City",
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                items: cities
-                    .map((city) => DropdownMenuItem(
-                          value: city,
-                          child: Row(
-                            children: [
-                              const Icon(Icons.location_city,
-                                  color: Colors.teal),
-                              const SizedBox(width: 8),
-                              Text(city),
-                            ],
-                          ),
-                        ))
-                    .toList(),
+                labelText: "Select City",
+                icon: Icons.location_city,
+                items: [
+                  const DropdownMenuItem<String>(
+                    value: null, // ✅ Represents "Show All"
+                    child: Text("All Cities"),
+                  ),
+                  ...cities.map((city) => DropdownMenuItem(
+                        value: city,
+                        child: Text(city),
+                      ))
+                ],
                 onChanged: (value) {
                   setState(() {
-                    selectedCity = value;
-                    selectedBranch = null; // reset branch on city change
+                    selectedCity =
+                        value; // ✅ value will be null if "All Cities" selected
+                    selectedBranch = null; // Reset branch when city changes
                   });
                 },
               ),
-
-            const SizedBox(height: 8),
-
-            // Branch Dropdown
+// Branch Dropdown
             if (filteredBranches.isNotEmpty)
-              DropdownButtonFormField<Branch>(
+              CustomDropdownField<Branch>(
                 value: selectedBranch,
-                decoration: InputDecoration(
-                  labelText: "Select Branch",
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                items: filteredBranches.map((branch) {
-                  return DropdownMenuItem<Branch>(
-                    value: branch,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.teal),
-                        const SizedBox(width: 8),
-                        Text(branch.branchName),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                labelText: "Select Branch",
+                icon: Icons.location_on,
+                items: [
+                  const DropdownMenuItem<Branch>(
+                    value: null, // ✅ Represents "Show All"
+                    child: Text("All Branches"),
+                  ),
+                  ...filteredBranches.map((branch) {
+                    return DropdownMenuItem<Branch>(
+                      value: branch,
+                      child: Text(branch.branchName),
+                    );
+                  }).toList()
+                ],
                 onChanged: (value) {
-                  setState(() => selectedBranch = value);
-                  if (value != null)
+                  setState(() {
+                    selectedBranch =
+                        value; // ✅ value will be null if "All Branches" selected
+                  });
+                  if (value != null) {
                     Get.find<SymptomsController>().updateBranch(value);
+                  }
                 },
               ),
 
@@ -208,6 +218,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                             final card = filteredCards[index];
 
                             // Filter branches for display inside this card
+                            // Inside ListView.builder
                             final displayedBranches =
                                 card.branches.where((branch) {
                               final matchesSearchBranch = searchText.isEmpty ||
@@ -217,9 +228,17 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                   branch.city
                                       .toLowerCase()
                                       .contains(searchText.toLowerCase());
+
                               final matchesCityBranch = selectedCity == null ||
                                   branch.city == selectedCity;
-                              return matchesSearchBranch && matchesCityBranch;
+
+                              final matchesSelectedBranch = selectedBranch ==
+                                      null ||
+                                  branch.branchId == selectedBranch!.branchId;
+
+                              return matchesSearchBranch &&
+                                  matchesCityBranch &&
+                                  matchesSelectedBranch;
                             }).toList();
 
                             return Column(
@@ -428,9 +447,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: mainColor)),
-                                              if (displayedBranches
-                                                      .indexOf(branch) ==
-                                                  0)
+                                              if (branch.branchId == branchId)
                                                 Container(
                                                   padding: const EdgeInsets
                                                       .symmetric(

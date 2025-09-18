@@ -38,55 +38,55 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header row
-          Row(
-            children: [
-              Expanded(
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "${hospital.name} ",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                      TextSpan(
-                        text:
-                            "(${(hospital.branch != null && hospital.branch!.isNotEmpty) ? hospital.branch : (hospital.city != null && hospital.city!.isNotEmpty) ? hospital.city : "Jubilee Hillss"})",
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: RichText(
+          //         text: TextSpan(
+          //           children: [
+          //             TextSpan(
+          //               text: "${hospital.name} ",
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.bold,
+          //                 color: Colors.white,
+          //                 fontSize: 16,
+          //               ),
+          //             ),
+          //             TextSpan(
+          //               text:
+          //                   "(${(hospital.branch != null && hospital.branch!.isNotEmpty) ? hospital.branch : (hospital.city != null && hospital.city!.isNotEmpty) ? hospital.city : "Jubilee Hillss"})",
+          //               style: const TextStyle(
+          //                 color: Colors.white70,
+          //                 fontSize: 14,
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
 
-              Row(
-                children: [
-                  const Icon(FontAwesomeIcons.hospital,
-                      size: 14, color: Colors.yellow),
-                  const SizedBox(width: 8),
-                  Text(
-                    hospital.hospitalOverallRating?.toStringAsFixed(1) ?? "0.0",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
+          //     Row(
+          //       children: [
+          //         const Icon(FontAwesomeIcons.hospital,
+          //             size: 14, color: Colors.yellow),
+          //         const SizedBox(width: 8),
+          //         Text(
+          //           hospital.hospitalOverallRating?.toStringAsFixed(1) ?? "0.0",
+          //           style: const TextStyle(color: Colors.white),
+          //         ),
+          //       ],
+          //     ),
 
-              // IconButton( //TODO:implement pending
-              //   icon: Icon(
-              //     Icons.thumb_up,
-              //     color: doctor.favorites ? Colors.yellow : Colors.white60,
-              //   ),
-              //   onPressed: () => controller.toggleFavorite(doctorModel),
-              // ),
-            ],
-          ),
-          const SizedBox(height: 8),
+          //     // IconButton( //TODO:implement pending
+          //     //   icon: Icon(
+          //     //     Icons.thumb_up,
+          //     //     color: doctor.favorites ? Colors.yellow : Colors.white60,
+          //     //   ),
+          //     //   onPressed: () => controller.toggleFavorite(doctorModel),
+          //     // ),
+          //   ],
+          // ),
+          // const SizedBox(height: 8),
 
           // Doctor details
           Row(
@@ -218,7 +218,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                   //   );
                   // })
 
-                  Text("${doctor.doctorAverageRating}",
+                  Text("${doctor.doctorAverageRating}/5",
                       style: const TextStyle(color: Colors.white)),
                 ],
               ),

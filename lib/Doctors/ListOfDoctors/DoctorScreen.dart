@@ -14,15 +14,14 @@ class Doctorscreen extends StatelessWidget {
   final String username;
   final String subServiceID;
   final String? hospiatlName;
-  // final String? Branch;
+  final String branchName;
 
-  Doctorscreen({
-    required this.mobileNumber,
-    required this.username,
-    required this.subServiceID,
-    this.hospiatlName,
-    //  this.Branch
-  }) {
+  Doctorscreen(
+      {required this.mobileNumber,
+      required this.username,
+      required this.subServiceID,
+      this.hospiatlName,
+      required this.branchName}) {
     // Trigger fetch after widget builds
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final doctorController = Get.find<DoctorController>();
@@ -53,7 +52,7 @@ class Doctorscreen extends StatelessWidget {
 
     return Scaffold(
       appBar: CommonHeader(
-        title: "Doctors & Hospitals",
+        title: "Doctors",
         onNotificationPressed: () {},
         onSettingPressed: () {},
       ),
@@ -106,14 +105,14 @@ class Doctorscreen extends StatelessWidget {
                         Expanded(
                           child: RichText(
                             text: TextSpan(
-                              text: "Selected Hospital: ",
+                              text: "Selected Branch: ",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,
                               ),
                               children: [
                                 TextSpan(
-                                  text: hospiatlName,
+                                  text: "${branchName}",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,

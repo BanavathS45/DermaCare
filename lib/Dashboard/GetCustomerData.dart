@@ -10,13 +10,16 @@ Future<GetCustomerModel> fetchUserData(String mobileNumber) async {
     final response = await http.get(
       Uri.parse('${registerUrl}/getBasicDetails/$mobileNumber'),
     );
+    print("Response Data statusCode: ${response.statusCode}");
+    print(
+        "Response Data url: ${registerUrl}/getBasicDetails/$mobileNumber");
 
     if (response.statusCode == 200) {
       // Decode the response body
       final responseData = json.decode(response.body);
 
       // Print the entire response data for debugging
-      print("Response Data: $responseData");
+      print("Response Data useradat: $responseData");
 
       // Return the decoded data as a GetCustomerModel instance
       return GetCustomerModel.fromJson(responseData);

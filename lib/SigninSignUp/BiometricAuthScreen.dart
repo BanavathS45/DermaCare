@@ -84,35 +84,23 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
         print("deviceIddeviceIddeviceId : $deviceId");
 
         final checkUserResponse = await http.get(
+          //TODO:after check getting customer details
           Uri.parse('$registerUrl/getBasicDetails/$mobileNumber'),
         );
 
+        print("checkUserResponse.statusCode : ${checkUserResponse.statusCode}");
+
         if (checkUserResponse.statusCode == 200) {
           final data = json.decode(checkUserResponse.body);
+          print("checkUserResponse.statusCode : ${data.toString()}");
 
-          if (data['success'] == true && data['data'] != null) {
+          // if (data['success'] == true && data['data'] != null) {
+          if (data['success'] == true) {
             // ✅ Show loading dialog for location
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) => const AlertDialog(
-                content: Row(
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        "Fetching your current location...",
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
 
             try {
               // ✅ Fetch and save location before navigating
+              showFetchingLocationDialog(context);
               await LocationService.fetchAndStoreLocation();
             } catch (e) {
               print("⚠️ Location fetch failed: $e");
@@ -145,6 +133,63 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
     } finally {
       setState(() => _isLoading = false); // hide loading
     }
+  }
+
+  void showFetchingLocationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return WillPopScope(
+          onWillPop: () async => false, // prevent closing dialog
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                    strokeWidth: 4,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Fetching your location...",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Please ensure location services are enabled",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override

@@ -42,7 +42,7 @@ class Doctor {
   final bool doctorAvailabilityStatus;
   final double doctorAverageRating;
   final String? doctorSignature;
-
+  final List<Branch> branches;
   Doctor({
     required this.id,
     required this.doctorId,
@@ -69,6 +69,7 @@ class Doctor {
     required this.deviceId,
     required this.doctorAverageRating,
     this.doctorSignature,
+    this.branches = const [], // default empty list
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
@@ -127,6 +128,10 @@ class Doctor {
           [],
       doctorAvailabilityStatus: json['doctorAvailabilityStatus'] ?? false,
       doctorSignature: json['doctorSignature'],
+      branches: (json['branches'] as List<dynamic>?)
+              ?.map((e) => Branch.fromJson(e))
+              .toList() ??
+          [],
     );
   }
 }
@@ -235,6 +240,20 @@ class SubServices {
     return SubServices(
       subServiceId: json['subServiceId'] ?? '',
       subServiceName: json['subServiceName'] ?? '',
+    );
+  }
+}
+
+class Branch {
+  final String branchId;
+  final String branchName;
+
+  Branch({required this.branchId, required this.branchName});
+
+  factory Branch.fromJson(Map<String, dynamic> json) {
+    return Branch(
+      branchId: json['branchId'] ?? '',
+      branchName: json['branchName'] ?? '',
     );
   }
 }

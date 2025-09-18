@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:cutomer_app/Inputs/CustomInputField.dart';
+import 'package:cutomer_app/Inputs/CustomTextAera.dart';
 import 'package:cutomer_app/SigninSignUp/LoginController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
@@ -41,7 +42,13 @@ class _SymptomsFormState extends State<SymptomsForm> {
   int charCount = 0;
   String? _selectedDurationType;
 
-  final List<String> durationTypes = ["Hours", "Days","Weeks","Months", "Years"];
+  final List<String> durationTypes = [
+    "Hours",
+    "Days",
+    "Weeks",
+    "Months",
+    "Years"
+  ];
 
   Future<void> _pickFile() async {
     int currentCount = controller.attachments.length;
@@ -322,42 +329,53 @@ class _SymptomsFormState extends State<SymptomsForm> {
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        controller: _textController,
-                        maxLines: 3,
-                        maxLength: 1000,
-                        decoration: InputDecoration(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomTextAera(
+                          controller: _textController,
                           labelText: "Symptoms",
-                          border: OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.grey.shade300), // light border
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: mainColor,
-                                width: 1.5), // slightly darker on focus
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.red, width: 1.5),
-                          ),
-                          errorText: errorText,
-                          counterText: "$charCount/1000 characters",
+                          hintText: "Describe your symptoms here...",
+                          maxLines: 3,
+                          onChanged: (val) {
+                            setState(() {
+                              charCount = val.length;
+                              errorText = null;
+                            });
+                          },
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return "Please enter symptoms";
+                            }
+                            return null;
+                          },
                         ),
-                        onChanged: (val) {
-                          setState(() {
-                            charCount = val.length;
-                            errorText = null;
-                          });
-                        },
-                      ),
+
+                        // ✅ Show error below field if needed
+                        if (errorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              errorText!,
+                              style: const TextStyle(
+                                  color: Colors.red, fontSize: 12),
+                            ),
+                          ),
+
+                        // ✅ Show character counter
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "$charCount/1000 characters",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+
                     const SizedBox(height: 25),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

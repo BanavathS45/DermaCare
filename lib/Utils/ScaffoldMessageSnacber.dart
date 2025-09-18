@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 
 class ScaffoldMessageSnackbar {
@@ -5,7 +6,6 @@ class ScaffoldMessageSnackbar {
 
   // Generic method to show a snackbar with an optional left-side image
   static void show({
-
     required BuildContext context,
     required String message,
     required SnackbarType type,
@@ -24,19 +24,21 @@ class ScaffoldMessageSnackbar {
     // Define styles based on snackbar type
     switch (type) {
       case SnackbarType.success:
-        backgroundColor = Colors.green.shade600;
+        backgroundColor = mainColor;
         textColor = Colors.white;
         iconColor = Colors.white;
         icon = Icons.check_circle;
         break;
       case SnackbarType.error:
-        backgroundColor = Colors.red.shade700;
+        backgroundColor = backgroundColor = mainColor;
+        ;
         textColor = Colors.white;
         iconColor = Colors.white;
         icon = Icons.error;
         break;
       case SnackbarType.warning:
-        backgroundColor = Colors.blue.shade700;
+        backgroundColor = backgroundColor = mainColor;
+        ;
         textColor = Colors.white;
         iconColor = Colors.white;
         icon = Icons.warning;
