@@ -13,7 +13,6 @@ import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigation/BottomNavigation.dart';
-import '../ConfirmBooking/Consultations.dart';
 import '../SigninSignUp/LoginScreen.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,11 +23,11 @@ class BiometricAuthScreen extends StatefulWidget {
 
 class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
   final LocalAuthentication auth = LocalAuthentication();
-  SiginSignUpController siginSignUpController = SiginSignUpController();
+  final SiginSignUpController siginSignUpController = SiginSignUpController();
   final LoginApiService _loginApiService = LoginApiService();
   final DoctorService _doctorService = DoctorService();
 
-  bool _isLoading = false; // 🔑 Loading state
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -38,25 +37,35 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
     getFCMToken();
   }
 
+  /// ✅ Navigate safely to login screen
+  void _goToLogin() {
+    if (Navigator.canPop(context))
+      Navigator.pop(context); // close dialogs if open
+    Get.offAll(() => Loginscreen());
+  }
+
   Future<void> _checkBiometrics() async {
-    setState(() => _isLoading = true); // show loading
+    setState(() => _isLoading = true);
     try {
-      bool canCheckBiometrics = await auth.canCheckBiometrics;
+      final canCheckBiometrics = await auth.canCheckBiometrics;
       if (canCheckBiometrics) {
         await _authenticate();
       } else {
-        print("❌ Device doesn't support biometrics. Redirecting to login.");
-        Get.offAll(() => Loginscreen());
+        debugPrint("❌ Device doesn't support biometrics.");
+        _goToLogin();
       }
+    } catch (e) {
+      debugPrint("❌ Error checking biometrics: $e");
+      _goToLogin();
     } finally {
-      setState(() => _isLoading = false); // hide loading
+      setState(() => _isLoading = false);
     }
   }
 
   Future<void> _authenticate() async {
-    setState(() => _isLoading = true); // show loading
+    setState(() => _isLoading = true);
     try {
-      bool isAuthenticated = await auth.authenticate(
+      final isAuthenticated = await auth.authenticate(
         localizedReason: 'Please authenticate to proceed',
         options: const AuthenticationOptions(
           useErrorDialogs: true,
@@ -64,74 +73,75 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
         ),
       );
 
+      if (!isAuthenticated) {
+        debugPrint("❌ Authentication failed.");
+        _goToLogin();
+        return;
+      }
+
       final prefs = await SharedPreferences.getInstance();
       final username = prefs.getString('username');
       final mobileNumber = prefs.getString('mobileNumber');
       final isAuthenticate = prefs.getBool('isAuthenticated') ?? false;
       final isFirstLoginDone = prefs.getBool('isFirstLoginDone') ?? false;
 
-      print("🔐 Biometric Authenticated: $isAuthenticated");
-      print("📦 Stored Username: $username");
-      print("📦 Stored Mobile Number: $mobileNumber");
-      print("✅ First Login Completed: $isFirstLoginDone");
+      debugPrint("🔐 Biometric Authenticated: $isAuthenticated");
+      debugPrint("📦 Username: $username");
+      debugPrint("📦 Mobile Number: $mobileNumber");
+      debugPrint("✅ First Login Completed: $isFirstLoginDone");
 
-      if (isAuthenticated &&
-          isAuthenticate &&
-          isFirstLoginDone &&
-          username != null &&
-          mobileNumber != null) {
-        final deviceId = prefs.getString('fcm');
-        print("deviceIddeviceIddeviceId : $deviceId");
-
-        final checkUserResponse = await http.get(
-          //TODO:after check getting customer details
-          Uri.parse('$registerUrl/getBasicDetails/$mobileNumber'),
-        );
-
-        print("checkUserResponse.statusCode : ${checkUserResponse.statusCode}");
-
-        if (checkUserResponse.statusCode == 200) {
-          final data = json.decode(checkUserResponse.body);
-          print("checkUserResponse.statusCode : ${data.toString()}");
-
-          // if (data['success'] == true && data['data'] != null) {
-          if (data['success'] == true) {
-            // ✅ Show loading dialog for location
-
-            try {
-              // ✅ Fetch and save location before navigating
-              showFetchingLocationDialog(context);
-              await LocationService.fetchAndStoreLocation();
-            } catch (e) {
-              print("⚠️ Location fetch failed: $e");
-            } finally {
-              Navigator.pop(context); // Close loading dialog
-            }
-
-            // ✅ Navigate to bottom navigation
-            Get.offAll(BottomNavController(
-              mobileNumber: mobileNumber,
-              username: username,
-              index: 0,
-            ));
-            print("🚀 Login successful. Navigating to BottomNavController.");
-          } else {
-            showSnackbar(
-              "Warning",
-              "No user data found for this biometric. Please log in again.",
-              "warning",
-            );
-            Get.offAll(() => Loginscreen());
-          }
-        } else {
-          Get.offAll(() => Loginscreen());
-        }
+      // ✅ Validate stored data
+      if (!isAuthenticate ||
+          !isFirstLoginDone ||
+          username == null ||
+          mobileNumber == null) {
+        debugPrint("❌ Missing user data. Redirecting to login.");
+        _goToLogin();
+        return;
       }
+
+      // ✅ Fetch user details from backend
+      final checkUserResponse = await http.get(
+        Uri.parse('$registerUrl/getBasicDetails/$mobileNumber'),
+      );
+
+      if (checkUserResponse.statusCode != 200) {
+        debugPrint("❌ Server Error: ${checkUserResponse.statusCode}");
+        _goToLogin();
+        return;
+      }
+
+      final data = json.decode(checkUserResponse.body);
+      debugPrint("✅ API Response: $data");
+
+      if (data['success'] != true) {
+        showSnackbar(
+            "Warning", "No user data found. Please log in again.", "warning");
+        _goToLogin();
+        return;
+      }
+
+      // ✅ Show loading dialog and fetch location
+      showFetchingLocationDialog(context);
+      try {
+        await LocationService.fetchAndStoreLocation();
+      } catch (e) {
+        debugPrint("⚠️ Location fetch failed: $e");
+      } finally {
+        Navigator.pop(context); // close dialog safely
+      }
+
+      // ✅ Navigate to bottom navigation
+      Get.offAll(() => BottomNavController(
+            mobileNumber: mobileNumber,
+            username: username,
+            index: 0,
+          ));
     } catch (e) {
-      print("❌ Biometric authentication error: $e");
-      Get.offAll(() => Loginscreen());
+      debugPrint("❌ Biometric authentication error: $e");
+      _goToLogin();
     } finally {
-      setState(() => _isLoading = false); // hide loading
+      setState(() => _isLoading = false);
     }
   }
 
@@ -141,7 +151,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
       barrierDismissible: false,
       builder: (_) {
         return WillPopScope(
-          onWillPop: () async => false, // prevent closing dialog
+          onWillPop: () async => false,
           child: Dialog(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -166,22 +176,15 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
                     strokeWidth: 4,
                   ),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     "Fetching your location...",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     "Please ensure location services are enabled",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
                 ],
               ),
@@ -213,10 +216,8 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                     SizedBox(height: 20),
-                    Text(
-                      "Authenticating...",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
+                    Text("Authenticating...",
+                        style: TextStyle(color: Colors.white, fontSize: 18)),
                   ],
                 )
               : Column(
@@ -225,18 +226,14 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
                     const Icon(Icons.lock_outline_rounded,
                         size: 80, color: Colors.white),
                     const SizedBox(height: 20),
-                    const Text(
-                      "Secure Access",
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
+                    const Text("Secure Access",
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
                     const SizedBox(height: 10),
-                    const Text(
-                      "Authenticate to continue",
-                      style: TextStyle(fontSize: 16, color: Colors.white70),
-                    ),
+                    const Text("Authenticate to continue",
+                        style: TextStyle(fontSize: 16, color: Colors.white70)),
                     const SizedBox(height: 30),
                     ElevatedButton.icon(
                       onPressed: _isLoading ? null : _authenticate,

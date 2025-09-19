@@ -122,7 +122,13 @@ class Getappointmentmodel {
   final int freeFollowUps;
   final String clinicName;
   final String doctorName;
-  final String priscriptionPdf;
+  final String? priscriptionPdf;
+  final int freeFollowUpsLeft;
+  // final String customerId;
+  final String? branchname;
+  final String? branchId;
+  final String? consentFormPdf;
+  final String? doctorRefCode;
 
   Getappointmentmodel(
       {required this.bookingId,
@@ -150,9 +156,15 @@ class Getappointmentmodel {
       required this.bookedAt,
       required this.patientId,
       required this.freeFollowUps,
+      required this.freeFollowUpsLeft,
       required this.clinicName,
       required this.doctorName,
-      required this.priscriptionPdf});
+      // required this.customerId,
+      this.branchname,
+      this.consentFormPdf,
+      this.doctorRefCode,
+      this.branchId,
+      this.priscriptionPdf});
 
   factory Getappointmentmodel.fromJson(Map<String, dynamic> json) {
     try {
@@ -175,6 +187,11 @@ class Getappointmentmodel {
         consultationType: json['consultationType']?.toString() ?? '',
         clinicName: json['clinicName']?.toString() ?? '',
         doctorName: json['doctorName']?.toString() ?? '',
+        // customerId: json['customerId'],
+        branchname: json['branchname'],
+        branchId: json['branchId'],
+        consentFormPdf: json['consentFormPdf'],
+        doctorRefCode: json['doctorRefCode'],
         priscriptionPdf: json['priscriptionPdf']?.toString() ?? '',
 
         // 👇 Safely parse doubles
@@ -189,6 +206,7 @@ class Getappointmentmodel {
             json['reports'] != null ? Reports.fromJson(json['reports']) : null,
         status: json['status']?.toString() ?? '',
         freeFollowUps: json['freeFollowUps'] ?? 0,
+        freeFollowUpsLeft: json['freeFollowUpsLeft'] ?? 0,
 
         // 👇 Same for totalFee
         totalFee: double.tryParse(json['totalFee'].toString()) ?? 0.0,

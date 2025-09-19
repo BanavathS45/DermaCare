@@ -11,6 +11,9 @@ class Patientdetailsformcontroller extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  String? selectedTitle;
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
   final TextEditingController patientMobileNumberController =
       TextEditingController();
 
@@ -28,6 +31,20 @@ class Patientdetailsformcontroller extends GetxController {
 
   void setAge(String value) {
     age = value;
+  }
+
+  void updateFullName() {
+    final title = selectedTitle ?? '';
+    final first = firstNameController.text.trim();
+    final last = lastNameController.text.trim();
+
+    final fullName = [
+      if (title.isNotEmpty) title,
+      if (first.isNotEmpty) first,
+      if (last.isNotEmpty) last,
+    ].join(' ');
+
+    nameController.text = fullName;
   }
 
   submitSchedule() {

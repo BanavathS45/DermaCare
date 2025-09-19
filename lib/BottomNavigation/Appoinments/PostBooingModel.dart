@@ -23,11 +23,13 @@ class BookingDetailsModel {
   final String paymentType;
   final String visitType;
   final String symptomsDuration;
-
   final List<File>? attachments; // ✅ optional
   final int freeFollowUps;
   final String consentFormPdf;
   final String? doctorRefCode;
+  // final String customerId;
+  final String branchname;
+  final String branchId;
 
   BookingDetailsModel({
     required this.categoryName,
@@ -52,6 +54,9 @@ class BookingDetailsModel {
     required this.freeFollowUps,
     required this.consentFormPdf,
     this.doctorRefCode,
+    // required this.customerId,
+    required this.branchname,
+    required this.branchId,
     this.attachments, // ✅ nullable
   });
 
@@ -72,6 +77,9 @@ class BookingDetailsModel {
       doctorId: json['doctorId'],
       consentFormPdf: json['consentFormPdf'],
       doctorName: json['doctorName'],
+      // customerId: json['customerId'],
+      branchname: json['branchname'],
+      branchId: json['branchId'],
       doctorDeviceId: json['doctorDeviceId'],
       consultationType: json['consultationType'],
       consultationFee: (json['consultationFee'] ?? 0).toDouble(),
@@ -107,6 +115,9 @@ class BookingDetailsModel {
       'totalFee': totalFee,
       "paymentType": paymentType,
       "consentFormPdf": consentFormPdf,
+      // "customerId": customerId,
+      "branchname": branchname,
+      "branchId": branchId,
       "doctorRefCode": doctorRefCode,
       "attachments": attachments != null
           ? attachments!

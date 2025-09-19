@@ -217,6 +217,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 patientId: widget.doctorBookings!.patientId,
                 patientName: widget.doctorBookings!.name
                 
+                
                 );
             print('✅ submitCustomerRating called successfully');
             // After success

@@ -40,6 +40,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   String? cityName;
   double? latitude;
   double? longitude;
+  String selectedVisitType = "First Time"; // 👈 store visit type here
   @override
   void initState() {
     super.initState();
@@ -138,7 +139,11 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                               _consultations.first.consultationType,
                           mobileNumber: widget.mobileNumber,
                           username: widget.username,
-                          onVisitTypeChanged: (String value) {},
+                          onVisitTypeChanged: (String value) {
+                            setState(() {
+                              selectedVisitType = value;
+                            });
+                          },
                         ),
                         const SizedBox(height: 20),
                         GridView.count(
@@ -282,42 +287,47 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   }
 
   Widget _mainCard(String title, String imagePath, VoidCallback onTap) {
+    final isDisabled = selectedVisitType == "Follow-Up"; // 👈 check visit type
+
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: mainColor),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.15),
-              blurRadius: 6,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                imagePath,
-                width: double.infinity,
-                height: 100,
-                fit: BoxFit.cover,
+      onTap: isDisabled ? null : onTap, // 👈 disable tap
+      child: Opacity(
+        opacity: isDisabled ? 0.4 : 1.0, // 👈 visually show it's disabled
+        child: Container(
+          margin: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: mainColor),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.15),
+                blurRadius: 6,
+                spreadRadius: 2,
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: mainColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600)),
-          ],
+            ],
+          ),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  imagePath,
+                  width: double.infinity,
+                  height: 100,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      color: mainColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600)),
+            ],
+          ),
         ),
       ),
     );

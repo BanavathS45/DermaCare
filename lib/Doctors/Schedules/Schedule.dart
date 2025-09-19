@@ -28,11 +28,13 @@ class ScheduleScreen extends StatefulWidget {
   final HospitalDoctorModel doctorData;
   final String mobileNumber;
   final String username;
+  final String? branchId;
   const ScheduleScreen(
       {super.key,
       required this.doctorData,
       required this.mobileNumber,
-      required this.username});
+      required this.username,
+      this.branchId});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -111,7 +113,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonHeader(
-        title: "Schedule",
+        title: "Schedule ${widget.branchId}",
         onNotificationPressed: () {},
         onSettingPressed: () {},
       ),

@@ -305,12 +305,104 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
                   readOnly: true,
                   enabled: false,
                 )
-              : CustomTextField(
-                  controller: patientdetailsformcontroller.nameController,
-                  labelText: 'Enter Full Name',
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) =>
-                      siginSignUpController.validatedata(value, "full name"),
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ✅ Dropdown for Title
+                    DropdownButtonFormField<String>(
+                      value: patientdetailsformcontroller.selectedTitle,
+                      decoration: InputDecoration(
+                        labelText: 'Select Title',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide:
+                              BorderSide(color: Colors.grey.shade300, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide:
+                              BorderSide(color: theme.primaryColor, width: 1),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide:
+                              BorderSide(color: Colors.grey.shade300, width: 1),
+                        ),
+                      ),
+                      items: [
+                        "Mr.",
+                        "Mrs.",
+                        "Miss",
+                        "Ms.",
+                        "Mx.",
+                        "Dr.",
+                        "Prof.",
+                        "Rev.",
+                        "Sir",
+                        "Dame",
+                        "Lord",
+                        "Lady",
+                        "Capt.",
+                        "Col.",
+                        "Gen.",
+                        "Hon.",
+                      ]
+                          .map((title) => DropdownMenuItem(
+                                value: title,
+                                child: Text(title),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        patientdetailsformcontroller.selectedTitle = value!;
+                        patientdetailsformcontroller.updateFullName();
+                      },
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Please select title"
+                          : null,
+                    ),
+                    const SizedBox(height: 10),
+
+                    // ✅ First Name (Required)
+
+                    // ✅ Last Name (Optional)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextField(
+                            controller: patientdetailsformcontroller
+                                .firstNameController,
+                            labelText: 'Enter First Name',
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            onChanged: (value) =>
+                                patientdetailsformcontroller.updateFullName(),
+                            validator: (value) => siginSignUpController
+                                .validatedata(value, "first name"),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: CustomTextField(
+                            controller:
+                                patientdetailsformcontroller.lastNameController,
+                            labelText: 'Enter Last Name (Optional)',
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            onChanged: (value) =>
+                                patientdetailsformcontroller.updateFullName(),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // ✅ Final Full Name (Read Only)
+                    CustomTextField(
+                      controller: patientdetailsformcontroller.nameController,
+                      labelText: 'Full Name',
+                      readOnly: true,
+                      enabled: false,
+                    ),
+                  ],
                 ),
 
           /// Relation Field
@@ -321,7 +413,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
                   enabled: false,
                 )
               : Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
                   child: DropdownButtonFormField<String>(
                     value: patientdetailsformcontroller
                             .relationController.text.isNotEmpty

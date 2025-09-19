@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cutomer_app/ConfirmBooking/ConsultationController.dart';
 import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:cutomer_app/Inputs/CustomInputField.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
   Branch? selectedBranch;
   List<HospitalCardModel> hospitalCards = [];
   bool isLoading = true;
-
+  final consultationcontroller = Get.find<Consultationcontroller>();
   String? branchId;
   @override
   void initState() {
@@ -62,7 +63,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
 
     final double? lat = prefs.getDouble('latitude');
     final double? long = prefs.getDouble('longitude');
-    branchId = await prefs.getString('branchId');
+    // branchId = await prefs.getString('branchId');
     // await prefs.setString('hospitalId', data['hospitalId'] ?? "");
     final clinicId = await prefs.getString('hospitalId');
 
@@ -197,6 +198,11 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                         value; // ✅ value will be null if "All Branches" selected
                   });
                   if (value != null) {
+                    consultationcontroller.selectedBranchName.value =
+                        value.branchName;
+                    consultationcontroller.selectedBranchId.value =
+                        value.branchId;
+
                     Get.find<SymptomsController>().updateBranch(value);
                   }
                 },
@@ -400,7 +406,27 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                 // Branches
                                 ...displayedBranches.map((branch) {
                                   return GestureDetector(
-                                    onTap: () {
+                                    onTap: () async {
+                                      // ✅ Update Controller
+                                      consultationcontroller.selectedBranchName
+                                          .value = branch.branchName;
+                                      consultationcontroller.selectedBranchId
+                                          .value = branch.branchId;
+
+                                      // ✅ Persist selection in SharedPreferences
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      await prefs.setString(
+                                          'branchId', branch.branchId);
+                                      await prefs.setString(
+                                          'branchName', branch.branchName);
+
+                                      // ✅ Update SymptomsController (already in your code)
+                                      Get.find<SymptomsController>()
+                                          .updateBranch(branch);
+
+                                      // ✅ Update local state so dropdown stays in sync
+                                      setState(() => selectedBranch = branch);
                                       // Navigate to ServiceDetailsPage with this branch's hospital info
                                       Navigator.push(
                                         context,

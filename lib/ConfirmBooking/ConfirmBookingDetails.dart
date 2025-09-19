@@ -52,6 +52,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   final SymptomsController symptomsController = Get.put(SymptomsController());
   final TextEditingController controller = TextEditingController();
   final TextEditingController doctorRefController = TextEditingController();
+  final consultationcontroller = Get.find<Consultationcontroller>();
   SubService? subServiceDetails;
   // final confirmbookingcontroller = Get.find<Confirmbookingcontroller>();
   Doctor? doctor;
@@ -220,28 +221,31 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Text("Doctor Refferal Code (if any)",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                 ),
                 // Replace your CustomTextField with this widget
-                CustomDropdownField<String>(
-                  value: selectedDoctor,
-                  labelText: "Select Referring Doctor",
-                  icon: Icons.person,
-                  items: dummyDoctors.map((doctor) {
-                    return DropdownMenuItem<String>(
-                      value: doctor['refId'],
-                      child: Text("${doctor['name']} (${doctor['refId']})"),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedDoctor = value;
-                      controller.text = value ?? '';
-                    });
-                  },
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: CustomDropdownField<String>(
+                    value: selectedDoctor,
+                    labelText: "Select Referring Doctor",
+                    icon: Icons.person,
+                    items: dummyDoctors.map((doctor) {
+                      return DropdownMenuItem<String>(
+                        value: doctor['refId'],
+                        child: Text("${doctor['name']} (${doctor['refId']})"),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDoctor = value;
+                        controller.text = value ?? '';
+                      });
+                    },
+                  ),
                 ),
 
                 PaymentModeSelector(
@@ -520,6 +524,15 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             print("Selected Payment: $selectedPayment");
             String? pdfBase64 =
                 widget.pdfBytes != null ? base64Encode(widget.pdfBytes!) : null;
+
+            final branchName =
+                consultationcontroller.selectedBranchName.value.isNotEmpty
+                    ? consultationcontroller.selectedBranchName.value
+                    : "Not Selected";
+            final branchId =
+                consultationcontroller.selectedBranchId.value.isNotEmpty
+                    ? consultationcontroller.selectedBranchId.value
+                    : "Not Selected";
             final bookingDetails = BookingDetailsModel(
               subServiceName: globalServiceId == backeEndCOnsulationID
                   ? selectedServicesController
@@ -571,6 +584,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               freeFollowUps: widget.doctor.hospital.freeFollowUps,
               consentFormPdf: pdfBase64 ?? "",
               doctorRefCode: doctorRefController.text ?? "",
+              branchname: branchName,
+              branchId: branchId,
             );
             print(
                 '[🏥] Booking via Pay at Hospital ${bookingDetails.toString()}');
@@ -768,12 +783,23 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
-                Text(
-                  hospital!.city,
-                  style: const TextStyle(
-                      color: Color.fromARGB(255, 209, 207, 207)),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Obx(() {
+                  final controller = Get.find<Consultationcontroller>();
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${controller.selectedBranchName.value.isNotEmpty ? controller.selectedBranchName.value : "Not Selected"}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                  );
+                })
               ],
             ),
             Divider(

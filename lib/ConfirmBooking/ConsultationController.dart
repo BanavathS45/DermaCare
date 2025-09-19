@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 
 class Consultationcontroller extends GetxController {
   Rx<ConsultationModel?> selectedConsultation = Rx<ConsultationModel?>(null);
+  RxString selectedBranchName = ''.obs;
+  RxString selectedBranchId = ''.obs;
   // var consultations = <ConsultationModel>[].obs;
   // var loading = false.obs;
 

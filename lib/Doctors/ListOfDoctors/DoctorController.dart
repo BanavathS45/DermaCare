@@ -144,6 +144,7 @@ import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Doctors/RatingAndFeedback/RatingService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'DoctorService.dart';
 
@@ -190,14 +191,15 @@ class DoctorController extends GetxController {
 
     try {
       isLoading.value = true;
-
+      final prefs = await SharedPreferences.getInstance();
+      var branchId = await prefs.getString('branchId');
       final hospitalIdToUse = selectedServicesController.hospitalId.value;
       print("🏥 Using hospitalId: $hospitalIdToUse");
       print("🏥 Using hospitalId hospitalId: $hospitalId");
       print("🏥 Using hospitalId subServiceId: $subServiceId");
 
-      final List<HospitalDoctorModel> doctors =
-          await doctorService.fetchDoctorsAndClinic(hospitalId, subServiceId);
+      final List<HospitalDoctorModel> doctors = await doctorService
+          .fetchDoctorsAndClinic(hospitalId, subServiceId, branchId!);
       print("🏥 Using hospitalId doctors: ${doctors.first.hospital.branch}");
 
       allDoctorsFlat.value = doctors;

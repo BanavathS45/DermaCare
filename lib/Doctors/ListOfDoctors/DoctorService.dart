@@ -83,7 +83,7 @@ import 'DoctorController.dart';
 class DoctorService {
   Future<List<HospitalDoctorModel>> fetchDoctorsAndClinic(
     String hospitalId,
-    String subServiceId,
+    String subServiceId,String branchId
   ) async {
      print('📡  hospitalId & subServiceId ${hospitalId}, ${subServiceId}');
     final url =

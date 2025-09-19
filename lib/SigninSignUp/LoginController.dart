@@ -116,9 +116,9 @@ class SiginSignUpController extends GetxController {
       );
 
       if (response['status'] == 200) {
-        final prefs = await SharedPreferences.getInstance();
 
         final data = response['data'];
+        final prefs = await SharedPreferences.getInstance();
 
         await prefs.setString('userName', data['userName'] ?? "");
         await prefs.setString('customerName', data['customerName'] ?? "");

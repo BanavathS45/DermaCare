@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cutomer_app/Booings/BooingService.dart';
 import 'package:cutomer_app/Booings/FollowUpModal.dart';
 import 'package:cutomer_app/BottomNavigation/Appoinments/AppointmentService.dart';
+import 'package:cutomer_app/BottomNavigation/Appoinments/AppointmentView.dart';
 import 'package:cutomer_app/BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import 'package:cutomer_app/BottomNavigation/BottomNavigation.dart';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
@@ -13,6 +14,7 @@ import 'package:cutomer_app/Doctors/Schedules/Schedule.dart';
 import 'package:cutomer_app/Doctors/Schedules/ScheduleController.dart';
 import 'package:cutomer_app/Screens/BookingSuccess.dart';
 import 'package:cutomer_app/Services/GetHospiatlsAndDoctorWithSubService.dart';
+import 'package:cutomer_app/Utils/AppointmentCard.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
@@ -131,6 +133,7 @@ class _VisitTypeState extends State<VisitType> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // --- Drag Handle ---
             Container(
               height: 5,
               width: 50,
@@ -140,11 +143,13 @@ class _VisitTypeState extends State<VisitType> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
+
             const Text(
               "Select Your Follow-Up Appointment",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
+
             Flexible(
               child: Obx(() {
                 return ListView.builder(
@@ -159,109 +164,197 @@ class _VisitTypeState extends State<VisitType> {
 
                     return Card(
                       color: Colors.white,
-                      elevation: 3,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      elevation: 1,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(
-                          color: Colors.grey.shade300, // light border color
-                          width: 1,
-                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: mainColor, width: 1),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 5),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "${capitalizeEachWord(appt.name) ?? "Unknown Patient"}",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text("Relation: ${appt.relation ?? "NA"}"),
-                                  Text(
-                                      "Clinic: ${selectedHospitalDoctor?.hospital.name ?? "NA"}"),
-                                  Text(
-                                      "Doctor: ${selectedHospitalDoctor?.doctor.doctorName ?? "-"}"),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    "Last Consultation: ${appt.serviceDate ?? "-"} ${appt.servicetime ?? "-"}",
-                                    style: const TextStyle(
-                                        color: Colors.redAccent, fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment: MainAxisAlignment.end,
+                            // ---- Top Row: Patient Name + Free Follow-Up Badge ----
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                Expanded(
+                                  child: Text(
+                                    capitalizeEachWord(appt.name) ??
+                                        "Unknown Patient",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 4, horizontal: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.green.shade100,
-                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.white,
+                                    border: Border.all(color: secondaryColor),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Text(
-                                    "Free Follow-Ups: ${appt.freeFollowUps != null ? appt.freeFollowUps : "0"} ",
-                                    style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.w600),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.favorite,
+                                          size: 14, color: secondaryColor),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        "${appt.freeFollowUpsLeft ?? "0"} Left",
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: secondaryColor,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 12),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: mainColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                              ],
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            // ---- Details with Icons ----
+                            Row(
+                              children: [
+                                const Icon(Icons.family_restroom,
+                                    size: 18, color: Colors.grey),
+                                const SizedBox(width: 6),
+                                Text(" ${appt.relation ?? "NA"}"),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+
+                            Row(
+                              children: [
+                                const Icon(Icons.local_hospital,
+                                    size: 18, color: Colors.grey),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                    child: Text(
+                                        " ${selectedHospitalDoctor?.hospital.name ?? "NA"}")),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+
+                            Row(
+                              children: [
+                                const Icon(Icons.person,
+                                    size: 18, color: Colors.grey),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                    child: Text(
+                                        " ${selectedHospitalDoctor?.doctor.doctorName ?? "-"}")),
+                              ],
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            // ---- Last Consultation ----
+                            Row(
+                              children: [
+                                const Icon(Icons.calendar_month,
+                                    size: 18, color: mainColor),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    "Last Consultation: ${appt.serviceDate ?? "-"} ${appt.servicetime ?? "-"}",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
+                                ),
+                              ],
+                            ),
+
+                            // ---- Action Buttons ----
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextButton.icon(
+                                  icon: const Icon(
+                                    Icons.remove_red_eye,
+                                    size: 18,
+                                    color: mainColor,
+                                  ),
                                   onPressed: () {
-                                    selectedBooking = appt;
-                                    Get.back();
-                                    final doctor =
-                                        hospitalDoctors.firstWhereOrNull(
-                                      (doc) =>
-                                          doc.doctor.doctorId == appt.doctorId,
-                                    );
-                                    if (doctor != null &&
-                                        doctor
-                                            .doctor.doctorAvailabilityStatus) {
-                                      Get.bottomSheet(
-                                        bottomSlotWidget(
+                                    Get.to(() => AppointmentPreview(
+                                          doctor: selectedHospitalDoctor!,
+                                          doctorBookings: appt,
+                                        ));
+                                  },
+                                  label: const Text(
+                                    "View Details",
+                                    style: TextStyle(color: mainColor),
+                                  ),
+                                ),
+                                Container(
+                                  width: 1, // thickness of vertical line
+                                  height: 28, // height of line
+                                  color: Colors.grey.shade300,
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                ),
+                                Expanded(
+                                  child: TextButton.icon(
+                                    icon: const Icon(
+                                      Icons.check_circle_outline,
+                                      size: 18,
+                                      color: mainColor,
+                                    ),
+                                    onPressed: () {
+                                      selectedBooking = appt;
+                                      Get.back();
+
+                                      final doctor =
+                                          hospitalDoctors.firstWhereOrNull(
+                                        (doc) =>
+                                            doc.doctor.doctorId ==
+                                            appt.doctorId,
+                                      );
+
+                                      if (doctor != null &&
+                                          doctor.doctor
+                                              .doctorAvailabilityStatus) {
+                                        Get.bottomSheet(
+                                          bottomSlotWidget(
                                             selectedHospitalDoctor!
                                                 .hospital.hospitalId,
                                             selectedHospitalDoctor!
                                                 .doctor.doctorId,
                                             appt.patientId,
                                             appt.clinicName,
-                                            appt.doctorName),
-                                        isScrollControlled: true,
-                                        backgroundColor: Colors.white,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(20)),
-                                        ),
-                                      );
-                                      controller.updateVisitType(selectedType);
-                                    } else {
-                                      ScaffoldMessageSnackbar.show(
-                                        context: context,
-                                        message: "Doctor not Available Now",
-                                        type: SnackbarType.warning,
-                                      );
-                                    }
-                                  },
-                                  child: const Text("Select"),
+                                            appt.doctorName,
+                                          ),
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.white,
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20),
+                                            ),
+                                          ),
+                                        );
+                                        controller
+                                            .updateVisitType(selectedType);
+                                      } else {
+                                        ScaffoldMessageSnackbar.show(
+                                          context: context,
+                                          message: "Doctor not Available Now",
+                                          type: SnackbarType.warning,
+                                        );
+                                      }
+                                    },
+                                    label: const Text(
+                                      "Select",
+                                      style: TextStyle(color: mainColor),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
