@@ -24,6 +24,7 @@ import 'package:cutomer_app/Widget/Bottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ConfirmBooking/ConsultationPrice.dart';
 
@@ -72,9 +73,10 @@ class _VisitTypeState extends State<VisitType> {
         final today = scheduleController.weekDates[0]; // first date (today)
         final doctorId = hospitalDoctors.first.doctor.doctorId;
         final clinicId = hospitalDoctors.first.hospital.hospitalId;
-
-        final slots =
-            await DoctorSlotService.fetchDoctorSlots(doctorId, clinicId);
+        final prefs = await SharedPreferences.getInstance();
+        var branchId = await prefs.getString('branchId');
+        final slots = await DoctorSlotService.fetchDoctorSlots(
+            doctorId, clinicId, branchId!);
         scheduleController.selectDate(today, slots);
       }
     });
@@ -782,8 +784,10 @@ class _VisitTypeState extends State<VisitType> {
 
             return GestureDetector(
               onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                var branchId = await prefs.getString('branchId');
                 final slots = await DoctorSlotService.fetchDoctorSlots(
-                    doctorId, clinicId);
+                    doctorId, clinicId, branchId!);
                 scheduleController.selectDate(date, slots);
               },
               child: Container(

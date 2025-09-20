@@ -2,6 +2,7 @@ import 'package:cutomer_app/Doctors/Schedules/DoctorSlotService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Utils/Constant.dart';
 import '../../Widget/Bottomsheet.dart';
@@ -79,10 +80,11 @@ class ScheduleController extends GetxController {
 
     Future.delayed(durationUntilMidnight, () async {
       print("⏰ Refreshing slots after midnight...");
-
+      final prefs = await SharedPreferences.getInstance();
+      var branchId = await prefs.getString('branchId');
       await initializeWeekDates();
-      final slots =
-          await DoctorSlotService.fetchDoctorSlots(doctorId, hospitalId);
+      final slots = await DoctorSlotService.fetchDoctorSlots(
+          doctorId, hospitalId, branchId!);
       filterSlotsForSelectedDate(slots);
 
       // Schedule again for the next night

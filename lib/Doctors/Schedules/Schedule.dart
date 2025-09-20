@@ -87,9 +87,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   Future<void> fetchDoctorSlotsOnce() async {
     print("iam calling slots");
+    final prefs = await SharedPreferences.getInstance();
+    var branchId = await prefs.getString('branchId');
     final allSlots = await DoctorSlotService.fetchDoctorSlots(
         widget.doctorData.doctor.doctorId,
-        widget.doctorData.hospital.hospitalId);
+        widget.doctorData.hospital.hospitalId,
+        branchId!);
     scheduleController.filterSlotsForSelectedDate(allSlots);
     print("iam calling doctorId ${widget.doctorData.doctor.doctorId}");
     print("iam calling hospitalId ${widget.doctorData.hospital.hospitalId}");
@@ -493,11 +496,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             return GestureDetector(
               onTap: () async {
                 final tappedDate = date;
-
+                final prefs = await SharedPreferences.getInstance();
+                var branchId = await prefs.getString('branchId');
                 final slots = await DoctorSlotService.fetchDoctorSlots(
-                  widget.doctorData.doctor.doctorId,
-                  widget.doctorData.hospital.hospitalId,
-                );
+                    widget.doctorData.doctor.doctorId,
+                    widget.doctorData.hospital.hospitalId,
+                    branchId!);
 
                 scheduleController.selectDate(tappedDate, slots);
               },

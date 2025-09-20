@@ -195,6 +195,7 @@ class DoctorController extends GetxController {
       var branchId = await prefs.getString('branchId');
       final hospitalIdToUse = selectedServicesController.hospitalId.value;
       print("🏥 Using hospitalId: $hospitalIdToUse");
+      print("🏥 Using branchId: $branchId");
       print("🏥 Using hospitalId hospitalId: $hospitalId");
       print("🏥 Using hospitalId subServiceId: $subServiceId");
 

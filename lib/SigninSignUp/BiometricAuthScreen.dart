@@ -80,38 +80,36 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
       }
 
       final prefs = await SharedPreferences.getInstance();
-      final username = prefs.getString('username');
+      final customerId = prefs.getString('customerId');
+      final username = prefs.getString('userName');
       final mobileNumber = prefs.getString('mobileNumber');
       final isAuthenticate = prefs.getBool('isAuthenticated') ?? false;
       final isFirstLoginDone = prefs.getBool('isFirstLoginDone') ?? false;
-
+      final fullname = prefs.getString('customerName');
       debugPrint("🔐 Biometric Authenticated: $isAuthenticated");
       debugPrint("📦 Username: $username");
       debugPrint("📦 Mobile Number: $mobileNumber");
       debugPrint("✅ First Login Completed: $isFirstLoginDone");
 
       // ✅ Validate stored data
-      if (!isAuthenticate ||
-          !isFirstLoginDone ||
-          username == null ||
-          mobileNumber == null) {
+      if (!isAuthenticate || !isFirstLoginDone) {
         debugPrint("❌ Missing user data. Redirecting to login.");
         _goToLogin();
         return;
       }
 
-      // ✅ Fetch user details from backend
-      final checkUserResponse = await http.get(
-        Uri.parse('$registerUrl/getBasicDetails/$mobileNumber'),
+      final checkCustomerResponse = await http.get(
+        Uri.parse('$clinicUrl/customers/$customerId'),
       );
-
-      if (checkUserResponse.statusCode != 200) {
-        debugPrint("❌ Server Error: ${checkUserResponse.statusCode}");
+      debugPrint("✅ API Responsed: ${checkCustomerResponse.body}");
+      debugPrint("✅ API Responsed url: ${clinicUrl}/customers/${customerId}");
+      if (checkCustomerResponse.statusCode != 200) {
+        debugPrint("❌ Server Error: ${checkCustomerResponse.statusCode}");
         _goToLogin();
         return;
       }
 
-      final data = json.decode(checkUserResponse.body);
+      final data = json.decode(checkCustomerResponse.body);
       debugPrint("✅ API Response: $data");
 
       if (data['success'] != true) {
@@ -133,8 +131,8 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
 
       // ✅ Navigate to bottom navigation
       Get.offAll(() => BottomNavController(
-            mobileNumber: mobileNumber,
-            username: username,
+            mobileNumber: mobileNumber!,
+            username: fullname!,
             index: 0,
           ));
     } catch (e) {

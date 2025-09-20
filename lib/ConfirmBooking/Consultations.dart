@@ -40,6 +40,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   String? cityName;
   double? latitude;
   double? longitude;
+  String? fullname;
   String selectedVisitType = "First Time"; // 👈 store visit type here
   @override
   void initState() {
@@ -65,6 +66,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
       cityName = prefs.getString('cityName');
       latitude = prefs.getDouble('latitude');
       longitude = prefs.getDouble('longitude');
+      fullname = prefs.getString('customerName');
     });
 
     print("City loaded: $cityName");
@@ -160,8 +162,8 @@ class ConsultationsTypeState extends State<ConsultationsType> {
                                     .setConsultation(_consultations.first);
                                 Get.to(DashboardScreen(
                                   mobileNumber: widget.mobileNumber,
-                                  username: widget.username,
-                                  consulationType: "Services & Treatments",
+                                  username: fullname!,
+                                  // consulationType: "Services & Treatments",
                                 ));
                               },
                             ),

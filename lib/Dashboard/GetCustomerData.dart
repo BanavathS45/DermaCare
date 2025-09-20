@@ -5,14 +5,13 @@ import 'package:http/http.dart' as http;
 import 'package:cutomer_app/APIs/BaseUrl.dart'; // Make sure this is correct
 
 // Define the API call function
-Future<GetCustomerModel> fetchUserData(String mobileNumber) async {
+Future<GetCustomerModel> fetchUserData(String customerId) async {
   try {
     final response = await http.get(
-      Uri.parse('${registerUrl}/getBasicDetails/$mobileNumber'),
+      Uri.parse('$clinicUrl/customers/$customerId'),
     );
+    print("Response Data statusCode url: $clinicUrl/customers/$customerId");
     print("Response Data statusCode: ${response.statusCode}");
-    print(
-        "Response Data url: ${registerUrl}/getBasicDetails/$mobileNumber");
 
     if (response.statusCode == 200) {
       // Decode the response body

@@ -336,12 +336,8 @@ class MyApp extends StatelessWidget {
 
     if (initialMessage != null) {
       homeScreen = NotificationScreen();
-    } else if (!isFirstLoginDone) {
-      homeScreen = SplashScreen();
-    } else if (isFirstLoginDone) {
-      homeScreen = BiometricAuthScreen();
     } else {
-      homeScreen = Loginscreen();
+      homeScreen = SplashScreen(); // Always start splash
     }
 
     return GetMaterialApp(

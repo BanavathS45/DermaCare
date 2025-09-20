@@ -1,12 +1,24 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-import 'package:cutomer_app/Clinic/AboutClinicController.dart';
-import 'package:cutomer_app/Utils/Header.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ClinicScreen extends StatelessWidget {
+import 'package:cutomer_app/Clinic/AboutClinicController.dart';
+import 'package:cutomer_app/Utils/Header.dart';
+
+class ClinicScreen extends StatefulWidget {
+  final String hospitalId;
+
+  const ClinicScreen({super.key, required this.hospitalId});
+  @override
+  State<ClinicScreen> createState() => _ClinicScreenState();
+}
+
+class _ClinicScreenState extends State<ClinicScreen> {
   final controller = Get.put(ClinicController());
 
   Future<void> _openLink(String url) async {
@@ -19,9 +31,24 @@ class ClinicScreen extends StatelessWidget {
     }
   }
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   getCustomerId();
+  // }
+
+  // String? hospitalId;
+
+  // Future<void> getCustomerId() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   hospitalId = prefs.getString('hospitalId');
+
+  //   print("Customer ID: $hospitalId"); // optional debug
+  // }
+
   @override
   Widget build(BuildContext context) {
-    controller.fetchClinic("H_1");
+    controller.fetchClinic(widget.hospitalId);
 
     return Scaffold(
       appBar: CommonHeader(title: "Clinic Details"),

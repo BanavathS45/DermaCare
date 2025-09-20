@@ -22,6 +22,7 @@ class ProfileDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dashboardcontroller = Get.put(Dashboardcontroller());
+
     return Scaffold(
       appBar: CommonHeader(
         title: 'Customer Profile',
@@ -88,15 +89,24 @@ class ProfileDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
                 children: [
+                  _buildDetailTile(Icons.verified_user, "Patient Id",
+                      "${cusData.patientId}"),
                   _buildDetailTile(
                       Icons.call, "Mobile Number", "${cusData.mobileNumber}"),
-                  _buildDetailTile(
-                      Icons.email, "Email ID", "${cusData.emailId}"),
+                  _buildDetailTile(Icons.email, "Email ID",
+                      "${cusData.emailId.isNotEmpty ? cusData.emailId : "NA"}"),
                   _buildDetailTile(
                       Icons.account_circle, "Gender", "${cusData.gender}"),
-                  _buildDetailTile(Icons.cake, "DOB", "${cusData.dateOfBirth}"),
+                  _buildDetailTile(Icons.cake, "DOB/Age",
+                      "${cusData.dateOfBirth}/${cusData.age}"),
                   _buildDetailTile(Icons.confirmation_number, "Refferal Code",
                       "${cusData.referCode.isNotEmpty ? cusData.referCode : "No Refferial Code Avaiable"}"),
+                  _buildDetailTile(
+                      Icons.location_on,
+                      "Address",
+                      cusData.address != null
+                          ? "${cusData.address.houseNo}, ${cusData.address.street}, ${cusData.address.city}, ${cusData.address.state}, ${cusData.address.postalCode}"
+                          : "No Available")
                 ],
               ),
             ),
@@ -155,7 +165,8 @@ class HelpScreen extends StatelessWidget {
     }
   }
 
-  final String chatMessage = "Hello! I need help from Udit Cometech Support";
+  final String chatMessage =
+      "Hello! I need help from Pragna Advanced Skin Care Support";
 
   String get whatsappUrl =>
       "https://wa.me/${phone.replaceAll("+", "")}?text=${Uri.encodeComponent(chatMessage)}";
@@ -182,7 +193,7 @@ class HelpScreen extends StatelessWidget {
                 height: 20,
               ),
               Text(
-                "Need assistance? Reach out to Udit Cometech for support.",
+                "Need assistance? Reach out to Pragna Advanced Skin Care for support.",
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,

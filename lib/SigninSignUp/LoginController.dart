@@ -116,7 +116,6 @@ class SiginSignUpController extends GetxController {
       );
 
       if (response['status'] == 200) {
-
         final data = response['data'];
         final prefs = await SharedPreferences.getInstance();
 
@@ -128,6 +127,7 @@ class SiginSignUpController extends GetxController {
         await prefs.setString('hospitalName', data['hospitalName'] ?? "");
         await prefs.setString('hospitalId', data['hospitalId'] ?? "");
         await prefs.setString('branchId', data['branchId'] ?? "");
+        await prefs.setString('mobileNumber', mobileNumber ?? "");
         await prefs.setString('fcm', token ?? "");
 
         final isFirstTimeAuthenticated =
@@ -142,13 +142,13 @@ class SiginSignUpController extends GetxController {
         if (isFirstTimeAuthenticated) {
           Get.offAll(() => BottomNavController(
                 mobileNumber: mobileNumber,
-                username: fullname,
+                username: data['customerName'],
                 index: 0,
               ));
         } else {
           Get.to(() => EnableBiometricScreen(
                 mobileNumber: mobileNumber,
-                fullname: fullname,
+                fullname: data['customerName'],
               ));
         }
       }

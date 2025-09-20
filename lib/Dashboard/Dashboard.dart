@@ -25,7 +25,7 @@ class DashboardScreen extends StatefulWidget {
     super.key,
     required this.mobileNumber,
     required this.username,
-    required String consulationType,
+ 
   });
 
   @override
