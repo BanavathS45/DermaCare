@@ -1,90 +1,110 @@
 import 'dart:convert';
-
-import '../../APIs/BaseUrl.dart';
-import 'BookingModal.dart';
+import 'package:cutomer_app/APIs/BaseUrl.dart';
 import 'package:http/http.dart' as http;
-
 import 'GetAppointmentModel.dart';
 
 class AppointmentService {
+  /// Fetch all bookings for a mobile number
   Future<List<Getappointmentmodel>> fetchAppointments(
       String mobileNumber) async {
     final url = '$registerUrl/getBookedServices/$mobileNumber';
-    print("🔍 Service – Response url: ${url}");
+    print("🔍 URL: $url");
 
     try {
       final response = await http.get(Uri.parse(url));
-      print("🔍 Service – Response code: ${response.statusCode}");
-      print("🔍 Service – Response body: ${response.body}");
+      print("🔍 Status code: ${response.statusCode}");
+      print("🔍 Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         final List<dynamic> data = jsonData['data'] ?? [];
-        print("📥 Service – Received ${data.length} booking items");
+        print("📥 Data array length: ${data.length}");
 
-        return data.map((e) => Getappointmentmodel.fromJson(e)).toList();
+        // Safely parse each item
+        return data
+            .map((item) {
+              try {
+                return Getappointmentmodel.fromJson(item);
+              } catch (e) {
+                print("❌ Error parsing appointment: $e\nData: $item");
+                return null;
+              }
+            })
+            .whereType<Getappointmentmodel>()
+            .toList();
       } else {
-        print("⚠️ Service – HTTP error: ${response.reasonPhrase}");
+        print("⚠️ HTTP error: ${response.reasonPhrase}");
         return [];
       }
     } catch (e) {
-      print("❌ Service – fetchAppointments Exception: $e");
+      print("❌ Exception in fetchAppointments: $e");
       return [];
     }
   }
 
+  /// Fetch in-progress appointments
   Future<List<Getappointmentmodel>> fetchInprogressAppointments(
       String mobileNumber) async {
     final url = '$registerUrl/inprogressAppointments/$mobileNumber';
-    print("🔍 Service – Response url: ${url}");
+    print("🔍 URL: $url");
 
     try {
       final response = await http.get(Uri.parse(url));
-      print("🔍 Service – Response code: ${response.statusCode}");
-      print("🔍 Service – Response body: ${response.body}");
+      print("🔍 Status code: ${response.statusCode}");
+      print("🔍 Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         final List<dynamic> data = jsonData['data'] ?? [];
-        print("📥 Service – Received ${data.length} booking items");
+        print("📥 Data array length: ${data.length}");
 
-        return data.map((e) => Getappointmentmodel.fromJson(e)).toList();
+        return data
+            .map((item) {
+              try {
+                return Getappointmentmodel.fromJson(item);
+              } catch (e) {
+                print(
+                    "❌ Error parsing in-progress appointment: $e\nData: $item");
+                return null;
+              }
+            })
+            .whereType<Getappointmentmodel>()
+            .toList();
       } else {
-        print("⚠️ Service – HTTP error: ${response.reasonPhrase}");
+        print("⚠️ HTTP error: ${response.reasonPhrase}");
         return [];
       }
     } catch (e) {
-      print("❌ Service – fetchAppointments Exception: $e");
+      print("❌ Exception in fetchInprogressAppointments: $e");
       return [];
     }
   }
 
+  /// Fetch a single appointment by ID
   Future<Getappointmentmodel?> fetchAppointmentById(String appID) async {
     final url = '$registerUrl/getBookedService/$appID';
+    print("🔍 URL: $url");
 
     try {
       final response = await http.get(Uri.parse(url));
-      print("Response status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
+      print("🔍 Status code: ${response.statusCode}");
+      print("🔍 Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        final dynamic data = responseData['data'];
-        print("Booking Data: $data");
-
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        final dynamic data = jsonData['data'];
         if (data != null) {
-          // Assuming data is a JSON object for a single appointment
           return Getappointmentmodel.fromJson(data);
         } else {
-          print("No data found in response");
+          print("⚠️ No appointment data found");
           return null;
         }
       } else {
-        print("Error: ${response.reasonPhrase}");
+        print("⚠️ HTTP error: ${response.reasonPhrase}");
         return null;
       }
     } catch (e) {
-      print("Failed to fetch appointment: $e");
+      print("❌ Exception in fetchAppointmentById: $e");
       return null;
     }
   }

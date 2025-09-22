@@ -100,7 +100,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               leading: Icon(Icons.local_hospital_outlined, color: Colors.blue),
               children: [
                 _infoRow("Hospital", patient.clinicName),
-                _infoRow("Branch", doctor.hospital.branch),
+                _infoRow("Branch", patient?.branchname ?? ""),
                 // _infoRow("Location", doctor.hospital.address),
                 // _infoRow("Contact", doctor.hospital.contactNumber),
               ],
@@ -111,7 +111,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(doctor.doctor.doctorName),
+                  Text(patient.doctorName),
                   TextButton(
                     onPressed: () {
                       Get.to(DoctorDetailScreen(doctorData: doctor));
@@ -247,9 +247,10 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                     Divider(),
 
                   // ✅ Reports Section
-                  if (patient.reports != null &&
-                      patient.reports!.reportsList.isNotEmpty)
-                    ...patient.reports!.reportsList.map((reportItem) {
+                  if (patient.reports != null && patient.reports!.isNotEmpty)
+                    ...patient.reports!
+                        .expand((reportGroup) => reportGroup.reportsList)
+                        .map((reportItem) {
                       return Column(
                         children: [
                           Row(
@@ -353,16 +354,6 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                         ],
                       );
                     }).toList(),
-
-                  // ✅ No reports or prescription
-                  if ((patient.priscriptionPdf == null ||
-                          patient.priscriptionPdf!.isEmpty) &&
-                      (patient.reports == null ||
-                          patient.reports!.reportsList.isEmpty))
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("📝🩺 No reports available"),
-                    ),
                 ],
               ),
           ],

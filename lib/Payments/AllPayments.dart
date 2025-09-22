@@ -18,6 +18,7 @@ class RazorpaySubscription extends StatefulWidget {
   final HospitalDoctorModel serviceDetails;
   final String amount;
   final String mobileNumber;
+  final String branchName;
   final BuildContext context;
   final PatientModel patient;
   final PostBookingModel bookingDetails;
@@ -31,6 +32,7 @@ class RazorpaySubscription extends StatefulWidget {
     required this.patient,
     required this.bookingDetails,
     required this.mobileNumber,
+    required this.branchName,
   });
 
   @override
@@ -86,8 +88,6 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
     );
   }
 
- 
-
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     showDialog(
       context: context,
@@ -122,12 +122,14 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
           context,
           MaterialPageRoute(
             builder: (ctx) => SuccessScreen(
-                serviceDetails: widget.serviceDetails,
-                paymentId: paymentId.toString(),
-                patient: widget.patient,
-                mobileNumber: widget.mobileNumber,
-                paymentType: "online",
-                clinicName: widget.bookingDetails.booking.clinicName),
+              serviceDetails: widget.serviceDetails,
+              paymentId: paymentId.toString(),
+              patient: widget.patient,
+              mobileNumber: widget.mobileNumber,
+              paymentType: "online",
+              clinicName: widget.bookingDetails.booking.clinicName,
+              branchName: widget.branchName,
+            ),
           ),
           (route) => false);
 

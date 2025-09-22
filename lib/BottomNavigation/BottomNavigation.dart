@@ -40,8 +40,7 @@ class _BottomNavControllerState extends State<BottomNavController> {
   @override
   void initState() {
     super.initState();
-    print(
-        "doctorController.appointmentCount ${doctorController.appointmentCount}");
+
     print("doctorController.mobileNumber ${widget.mobileNumber}");
     _selectedIndex = widget.index;
 

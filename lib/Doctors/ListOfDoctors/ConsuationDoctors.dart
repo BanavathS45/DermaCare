@@ -27,10 +27,10 @@ class ConsulationDoctorScreen extends StatelessWidget {
 
       if (hospitalId.isNotEmpty) {
         doctorController.hospitalId.value = hospitalId;
-        doctorController.fetchDoctors(
-          hospitalId: "H_9",
-          subServiceId: "683ad13a3fd93777eef8d7b0",
-        );
+        // doctorController.fetchDoctors(
+        //   hospitalId: "H_9",
+        //   subServiceId: "683ad13a3fd93777eef8d7b0",
+        // );
       } else {
         print("❌ Missing hospitalId or subServiceID");
       }
@@ -155,11 +155,11 @@ class ConsulationDoctorScreen extends StatelessWidget {
                     : ListView.builder(
                         itemCount: doctorController.filteredDoctors.length,
                         itemBuilder: (context, index) {
-                          return buildDoctorCard(
-                              context,
-                              doctorController.filteredDoctors[index],
-                              doctorController,
-                              mobileNumber,username);
+                          // return buildDoctorCard(
+                          //     context,
+                          //     doctorController.filteredDoctors[index],
+                          //     doctorController,
+                          //     mobileNumber,username);
                         },
                       ),
               ),

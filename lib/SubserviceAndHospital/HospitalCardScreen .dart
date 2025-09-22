@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cutomer_app/APIs/FetchBranch.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationController.dart';
 import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:cutomer_app/Inputs/CustomInputField.dart';
@@ -53,6 +54,9 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<SymptomsController>()) {
+      Get.put(SymptomsController());
+    }
     fetchHospitalCards();
   }
 
@@ -63,7 +67,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
 
     final double? lat = prefs.getDouble('latitude');
     final double? long = prefs.getDouble('longitude');
-    // branchId = await prefs.getString('branchId');
+    branchId = await prefs.getString('branchId');
     // await prefs.setString('hospitalId', data['hospitalId'] ?? "");
     final clinicId = await prefs.getString('hospitalId');
 
@@ -192,18 +196,24 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                     );
                   }).toList()
                 ],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
-                    selectedBranch =
-                        value; // ✅ value will be null if "All Branches" selected
+                    selectedBranch = value;
+                    if (value != null)
+                      selectedCity = value.city; // keep city in sync
                   });
+
                   if (value != null) {
+                    // final prefs = await SharedPreferences.getInstance();
+                    // await prefs.setString('branchId', value.branchId);
+                    // await prefs.setString('branchName', value.branchName);
+                    final branch =
+                        await BranchService().getBranchById(value.branchId);
                     consultationcontroller.selectedBranchName.value =
                         value.branchName;
                     consultationcontroller.selectedBranchId.value =
                         value.branchId;
-
-                    Get.find<SymptomsController>().updateBranch(value);
+                    Get.find<SymptomsController>().updateBranch(branch);
                   }
                 },
               ),
@@ -320,28 +330,51 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.miscellaneous_services,
-                                            color: Colors.amber, size: 18),
-                                        const SizedBox(width: 4),
-                                        Text("${card.serviceName}",
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w500)),
-                                      ],
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                              Icons.miscellaneous_services,
+                                              color: Colors.amber,
+                                              size: 18),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              "${card.serviceName}",
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w500),
+                                              maxLines:
+                                                  2, // ✅ allow max 2 lines
+                                              overflow: TextOverflow
+                                                  .ellipsis, // ✅ show "..." if still too long
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.biotech,
-                                            color: Colors.amber, size: 18),
-                                        const SizedBox(width: 4),
-                                        Text("${card.subServiceName}",
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w500)),
-                                      ],
+                                    const SizedBox(
+                                        width: 8), // space between columns
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.biotech,
+                                              color: Colors.amber, size: 18),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              "${card.subServiceName}",
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w500),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
+
                                 const SizedBox(height: 12),
                                 Row(
                                   mainAxisAlignment:
@@ -416,10 +449,9 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                       // ✅ Persist selection in SharedPreferences
                                       final prefs =
                                           await SharedPreferences.getInstance();
-                                      await prefs.setString(
-                                          'branchId', branch.branchId);
-                                      await prefs.setString(
-                                          'branchName', branch.branchName);
+                                      // await prefs.setString(
+                                      //     'branchId', branch.branchId);
+                                      // await prefs.setString('branchName', branch.branchName);
 
                                       // ✅ Update SymptomsController (already in your code)
                                       Get.find<SymptomsController>()
@@ -473,6 +505,16 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: mainColor)),
+                                              // Text(branch.branchId,
+                                              //     style: const TextStyle(
+                                              //         fontWeight:
+                                              //             FontWeight.w600,
+                                              //         color: mainColor)),
+                                              // Text(branchId!,
+                                              //     style: const TextStyle(
+                                              //         fontWeight:
+                                              //             FontWeight.w600,
+                                              //         color: mainColor)),
                                               if (branch.branchId == branchId)
                                                 Container(
                                                   padding: const EdgeInsets

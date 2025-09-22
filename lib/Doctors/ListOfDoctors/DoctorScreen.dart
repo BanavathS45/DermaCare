@@ -15,13 +15,15 @@ class Doctorscreen extends StatelessWidget {
   final String subServiceID;
   final String? hospiatlName;
   final String branchName;
+  final String branchId;
 
   Doctorscreen(
       {required this.mobileNumber,
       required this.username,
       required this.subServiceID,
       this.hospiatlName,
-      required this.branchName}) {
+      required this.branchName,
+      required this.branchId}) {
     // Trigger fetch after widget builds
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final doctorController = Get.find<DoctorController>();
@@ -31,9 +33,9 @@ class Doctorscreen extends StatelessWidget {
       if (hospitalId.isNotEmpty && subServiceID.isNotEmpty) {
         doctorController.hospitalId.value = hospitalId;
         doctorController.fetchDoctors(
-          hospitalId: hospitalId,
-          subServiceId: subServiceID,
-        );
+            hospitalId: hospitalId,
+            subServiceId: subServiceID,
+            branchId: branchId);
       } else {
         print("❌ Missing hospitalId or subServiceID");
       }
@@ -52,7 +54,7 @@ class Doctorscreen extends StatelessWidget {
 
     return Scaffold(
       appBar: CommonHeader(
-        title: "Doctors",
+        title: "Doctors ",
         onNotificationPressed: () {},
         onSettingPressed: () {},
       ),
@@ -202,9 +204,16 @@ class Doctorscreen extends StatelessWidget {
                   // ❌ No data
                   return ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    children: const [
+                    children: [
                       SizedBox(height: 200),
-                      Center(child: Text("No doctors found")),
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Center(
+                            child: Text(
+                          "No doctors are currently available in the $branchName branch.",
+                          textAlign: TextAlign.center,
+                        )),
+                      ),
                     ],
                   );
                 } else {
@@ -212,18 +221,18 @@ class Doctorscreen extends StatelessWidget {
                   return RefreshIndicator(
                     onRefresh: () async {
                       await doctorController.refreshDoctors(
-                          subServiceId: subServiceID);
+                          subServiceId: subServiceID, branchId: branchId);
                     },
                     child: ListView.builder(
                       itemCount: doctorController.filteredDoctors.length,
                       itemBuilder: (context, index) {
                         return buildDoctorCard(
-                          context,
-                          doctorController.filteredDoctors[index],
-                          doctorController,
-                          mobileNumber,
-                          username,
-                        );
+                            context,
+                            doctorController.filteredDoctors[index],
+                            doctorController,
+                            mobileNumber,
+                            username,
+                            branchId);
                       },
                     ),
                   );

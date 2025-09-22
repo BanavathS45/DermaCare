@@ -112,9 +112,8 @@ Future<List<HospitalDoctorModel>> fetchHospitalDoctor() async {
   }
 }
 
-//best doctor
-Future<List<HospitalDoctorModel>> fetchBestHospitalDoctor() async {
-  final url = Uri.parse('$clinicUrl/clinics/getAllDoctorWithRespectiveClinics');
+Future<List<HospitalDoctorModel>> fetchBestHospitalDoctor(String key) async {
+  final url = Uri.parse('$clinicUrl/getBestDoctorByKeyWords/$key');
   print('API URL: $url');
 
   final response = await http.get(url);
@@ -124,30 +123,22 @@ Future<List<HospitalDoctorModel>> fetchBestHospitalDoctor() async {
     final body = json.decode(response.body);
     print('Response Body: $body');
 
-    if (body['success'] == true && body['data'] is List) {
-      final List<dynamic> dataList = body['data'];
-      print('Total Hospitals Found: ${dataList.length}');
+    if (body['success'] == true && body['data'] != null) {
+      final data = body['data'];
+
+      // ✅ Parse Hospital
+      Hospital hospital = Hospital.fromJson(data);
 
       List<HospitalDoctorModel> result = [];
 
-      for (var item in dataList) {
-        print('Parsing Hospital: ${item['name']}');
-        Hospital hospital = Hospital.fromJson(item);
+      // ✅ Directly take first doctor (backend already sends best doctor)
+      if (data['doctors'] is List && data['doctors'].isNotEmpty) {
+        final bestDoctorJson = data['doctors'][0];
+        Doctor doctor = Doctor.fromJson(bestDoctorJson);
 
-        // ✅ Take only the first doctor if available
-        if (item['doctors'] is List && item['doctors'].isNotEmpty) {
-          final sortedDoctors =
-              List<Map<String, dynamic>>.from(item['doctors']);
-          sortedDoctors.sort((a, b) => (b['doctorAverageRating'] ?? 0)
-              .compareTo(a['doctorAverageRating'] ?? 0));
-
-          final bestDoctorJson = sortedDoctors.first; // 👈 Highest rated doctor
-          Doctor doctor = Doctor.fromJson(bestDoctorJson);
-
-          result.add(HospitalDoctorModel(doctor: doctor, hospital: hospital));
-        } else {
-          print('No doctors found for hospital: ${item['name']}');
-        }
+        result.add(HospitalDoctorModel(doctor: doctor, hospital: hospital));
+      } else {
+        print('No doctors found for hospital: ${data['name']}');
       }
 
       print('Total Hospital-Doctor pairs parsed: ${result.length}');

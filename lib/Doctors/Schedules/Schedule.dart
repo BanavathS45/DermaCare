@@ -28,13 +28,13 @@ class ScheduleScreen extends StatefulWidget {
   final HospitalDoctorModel doctorData;
   final String mobileNumber;
   final String username;
-  final String? branchId;
+  final String branchId;
   const ScheduleScreen(
       {super.key,
       required this.doctorData,
       required this.mobileNumber,
       required this.username,
-      this.branchId});
+      required this.branchId});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -69,12 +69,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       id = consultationController.selectedConsultation.value?.consultationId;
 
       await fetchDoctorSlotsOnce();
-
+      final prefs = await SharedPreferences.getInstance();
+      var hospitalId = await prefs.getString('hospitalId');
       // ⏰ Schedule refresh after midnight
       scheduleController.scheduleMidnightRefresh(
-        doctorId: widget.doctorData.doctor.doctorId,
-        hospitalId: widget.doctorData.hospital.hospitalId,
-      );
+          doctorId: widget.doctorData.doctor.doctorId,
+          hospitalId: hospitalId!,
+          branchId: widget.branchId);
     } catch (e) {
       debugPrint('Initialization error: $e');
     }
@@ -88,11 +89,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Future<void> fetchDoctorSlotsOnce() async {
     print("iam calling slots");
     final prefs = await SharedPreferences.getInstance();
-    var branchId = await prefs.getString('branchId');
+    var hospitalId = await prefs.getString('hospitalId');
     final allSlots = await DoctorSlotService.fetchDoctorSlots(
-        widget.doctorData.doctor.doctorId,
-        widget.doctorData.hospital.hospitalId,
-        branchId!);
+        widget.doctorData.doctor.doctorId, hospitalId!, widget.branchId);
     scheduleController.filterSlotsForSelectedDate(allSlots);
     print("iam calling doctorId ${widget.doctorData.doctor.doctorId}");
     print("iam calling hospitalId ${widget.doctorData.hospital.hospitalId}");
@@ -102,8 +101,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   String? fullName;
 
   Future<void> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    var customerId = await prefs.getString('customerId');
     final userData = await fetchUserData(
-        widget.mobileNumber); // Assuming this returns a Map or model
+        customerId!); // Assuming this returns a Map or model
     if (userData != null) {
       setState(() {
         fullName =
@@ -116,7 +117,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonHeader(
-        title: "Schedule ${widget.branchId}",
+        title: "Schedule",
         onNotificationPressed: () {},
         onSettingPressed: () {},
       ),
@@ -497,11 +498,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               onTap: () async {
                 final tappedDate = date;
                 final prefs = await SharedPreferences.getInstance();
-                var branchId = await prefs.getString('branchId');
+                var hospitalId = await prefs.getString('hospitalId');
                 final slots = await DoctorSlotService.fetchDoctorSlots(
                     widget.doctorData.doctor.doctorId,
-                    widget.doctorData.hospital.hospitalId,
-                    branchId!);
+                    hospitalId!,
+                    widget.branchId);
 
                 scheduleController.selectDate(tappedDate, slots);
               },

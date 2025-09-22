@@ -34,6 +34,10 @@ class SymptomsController extends GetxController {
     attachments.removeAt(index);
   }
 
+  void clearAttachments() {
+  attachments.clear();
+}
+
  
 
   void clearForm() {

@@ -1,3 +1,4 @@
+import 'package:cutomer_app/ConfirmBooking/ConsultationController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Notification/LocalNotification.dart';
 import 'package:cutomer_app/Review/ReviewScreen.dart';
@@ -8,6 +9,7 @@ import 'package:cutomer_app/VideoCalling/VideoCalling.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigation/Appoinments/AppointmentView.dart';
 import '../BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
@@ -86,16 +88,27 @@ class _AppointmentCardState extends State<AppointmentCard> {
   bool hasReviewed = false;
 
   Future<void> _fetchRating() async {
+    // final prefs = await SharedPreferences.getInstance();
+
+    // final branchId = prefs.getString('branchId');
+    final consultationcontroller = Get.find<Consultationcontroller>();
     try {
       final summary = await fetchAndSetRatingSummary(
-        widget.doctorData.clinicId,
+        widget.doctorData.branchId!,
         widget.doctorData.doctorId,
       );
+
+      // Debug print
+      for (var comment in summary.comments) {
+        print("Rated: ${comment.rated}");
+      }
 
       setState(() {
         ratingSummary = summary;
         hasReviewed = summary.comments.any((e) => e.rated == true);
       });
+
+      print("Has reviewed: $hasReviewed");
     } catch (e) {
       print("Rating fetch error: $e");
       setState(() {
@@ -103,6 +116,49 @@ class _AppointmentCardState extends State<AppointmentCard> {
       });
     }
   }
+  // Future<void> _fetchRating() async {
+  //   final consultationcontroller = Get.find<Consultationcontroller>();
+
+  //   try {
+  //     print("🔎 Fetching ratings for doctor: ${widget.doctorData.doctorId}");
+  //     print(
+  //         "🔎 Using branchId: ${consultationcontroller.selectedBranchId.value}");
+
+  //     final summary = await fetchAndSetRatingSummary(
+  //       consultationcontroller.selectedBranchId.value,
+  //       widget.doctorData.doctorId,
+  //     );
+
+  //     /// 🖨️ PRINT THE ENTIRE OBJECT FOR DEBUGGING
+  //     print("✅ RatingSummary fetched successfully:");
+  //     print("  DoctorId: ${summary.doctorId}");
+  //     print("  BranchId: ${summary.branchId}");
+  //     print("  OverallDoctorRating: ${summary.overallDoctorRating}");
+  //     print("  OverallHospitalRating: ${summary.overallHospitalRating}");
+  //     print("  Count: ${summary.count}");
+  //     print("  Comments (${summary.comments.length}):");
+  //     for (var comment in summary.comments) {
+  //       print("    🗨️ Feedback: ${comment.feedback}");
+  //       print("       DoctorRating: ${comment.doctorRating}");
+  //       print("       HospitalRating: ${comment.hospitalRating}");
+  //       print("       CustomerMobileNumber: ${comment.customerMobileNumber}");
+  //       print("       AppointmentId: ${comment.appointmentId}");
+  //       print("       PatientName: ${comment.patientNamme}");
+  //       print("       Rated: ${comment.rated}");
+  //       print("       DateAndTimeAtRating: ${comment.dateAndTimeAtRating}");
+  //     }
+
+  //     setState(() {
+  //       ratingSummary = summary;
+  //       hasReviewed = summary.comments.any((e) => e.rated == true);
+  //     });
+  //   } catch (e) {
+  //     print("❌ Rating fetch error: $e");
+  //     setState(() {
+  //       hasReviewed = false;
+  //     });
+  //   }
+  // }
 
   Future<void> _fetchHospitaAndDoctorData() async {
     print(">> _fetchHospitaAndDoctorData called");

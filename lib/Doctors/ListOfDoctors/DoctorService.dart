@@ -86,11 +86,12 @@ class DoctorService {
     print('📡  hospitalId & subServiceId ${hospitalId}, ${subServiceId}');
     final url =
         '$registerUrl/getDoctorsAndClinicDetails/$hospitalId/$subServiceId';
-    final curl = '$clinicUrl/Doctors/$hospitalId/$branchId/$subServiceId';
+    final curl =
+        '$registerUrl/getDoctorsAndClinicDetailsByBranchId/$hospitalId/$branchId/$subServiceId';
     print('📡  GET $url');
     print('📡  GET $curl');
 
-    final res = await http.get(Uri.parse(url));
+    final res = await http.get(Uri.parse(curl));
 
     if (res.statusCode != 200) {
       throw Exception('Server error: ${res.statusCode}');

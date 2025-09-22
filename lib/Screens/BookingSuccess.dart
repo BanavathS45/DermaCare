@@ -28,6 +28,7 @@ class SuccessScreen extends StatefulWidget {
   final String mobileNumber;
   final String paymentType;
   final String clinicName;
+  final String branchName;
 
   const SuccessScreen({
     super.key,
@@ -37,6 +38,7 @@ class SuccessScreen extends StatefulWidget {
     required this.mobileNumber,
     required this.paymentType,
     required this.clinicName,
+    required this.branchName,
   });
 
   @override
@@ -142,6 +144,8 @@ class _SuccessScreenState extends State<SuccessScreen> {
     selectedServicesController.clearAll();
     consultationController.selectedConsultation.value = null;
     consultationController.clear();
+    scontroller.clearForm();
+    scontroller.clearAttachments();
 
     Get.offAll(
       BottomNavController(
@@ -282,8 +286,12 @@ class _SuccessScreenState extends State<SuccessScreen> {
                       customerCare();
                     },
                     onDirection: () {
+                      // String address =
+                      //     "${widget.serviceDetails.hospital.name}, ${widget.serviceDetails.hospital.address}";
                       String address =
-                          "${widget.serviceDetails.hospital.name}, ${widget.serviceDetails.hospital.address}";
+                          scontroller.selectedBranch.value!.address;
+                      print(
+                          "scontroller.selectedBranch.value!.address; ${scontroller.selectedBranch.value!.address}");
                       MapUtils.openMapByAddress(address);
                     },
                     hospitalNumber:
@@ -304,6 +312,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
         decoration: BoxDecoration(gradient: appGradient()),
         child: TextButton(
           onPressed: () {
+            // final scontroller = Get.find<SymptomsController>();
             scontroller.clearForm();
             showDialog(
               context: context,

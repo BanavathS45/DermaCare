@@ -75,7 +75,7 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
   Future<void> _loadBestDoctor(String value) async {
     setState(() => isLoading = true);
     try {
-      final result = await fetchBestHospitalDoctor();
+      final result = await fetchBestHospitalDoctor(widget.symptoms);
       setState(() {
         bestDoctorList = result;
         isLoading = false;

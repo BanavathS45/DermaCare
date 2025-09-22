@@ -1,31 +1,56 @@
 import 'dart:convert';
-
+import 'package:cutomer_app/ConfirmBooking/ConsultationController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../Help/Numbers.dart';
 import '../../Utils/MapOnGoogle.dart';
 import '../ListOfDoctors/DoctorController.dart';
-import '../RatingAndFeedback/RatingController.dart';
-import '../RatingAndFeedback/RatingService.dart';
+import '../RatingAndFeedback/RatingAndFeedback.dart';
 import 'DoctorDetailsController.dart';
 
-import '../RatingAndFeedback/RatingAndFeedback.dart';
-
-class DoctorDetailScreen extends StatelessWidget {
+class DoctorDetailScreen extends StatefulWidget {
   final HospitalDoctorModel doctorData;
 
   const DoctorDetailScreen({super.key, required this.doctorData});
 
   @override
+  State<DoctorDetailScreen> createState() => _DoctorDetailScreenState();
+}
+
+class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
+  String? hospitalId;
+  String? hospitalName;
+
+  final Doctordetailscontroller doctordetailscontroller =
+      Doctordetailscontroller();
+  final DoctorController doctorController = Get.put(DoctorController());
+  final consultationcontroller = Get.find<Consultationcontroller>();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHospitalData();
+  }
+
+  Future<void> _loadHospitalData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      hospitalId = prefs.getString('hospitalId');
+      hospitalName = prefs.getString('hospitalName');
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final doctor = doctorData.doctor;
-    final hospital = doctorData.hospital;
-    Doctordetailscontroller doctordetailscontroller = Doctordetailscontroller();
-    final DoctorController doctorController = Get.put(DoctorController());
+    final doctor = widget.doctorData.doctor;
+    final hospital = widget.doctorData.hospital;
+
     return Scaffold(
       appBar: CommonHeader(
         title: "Doctor Information",
@@ -50,8 +75,6 @@ class DoctorDetailScreen extends StatelessWidget {
                   /// Profile Row
                   Row(
                     children: [
-// ...
-
                       CircleAvatar(
                         radius: 40,
                         backgroundImage: doctor.doctorPicture.isNotEmpty
@@ -64,7 +87,6 @@ class DoctorDetailScreen extends StatelessWidget {
                             ? const Icon(Icons.person, size: 40)
                             : null,
                       ),
-
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -99,38 +121,28 @@ class DoctorDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
 
-                  /// Stats Row
-                  // Row( //TODO:imapement pending
-                  //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //   children: [
-                  //     doctordetailscontroller.iconText(
-                  //         Icons.star, "${doctor.overallRating}"),
-                  //     doctordetailscontroller.iconText(
-                  //         Icons.message, "${doctor.comments.length}"),
-                  //     doctordetailscontroller.iconText(
-                  //         Icons.location_city, hospital.city),
-                  //   ],
-                  // ),
+                  /// Hospital Info Row (Showing from SharedPreferences)
+                  if (hospitalId != null && hospitalName != null)
+                    Row(
+                      children: [
+                        const Icon(Icons.local_hospital,
+                            color: Colors.white, size: 18),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            "$hospitalName  ",
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+
                   const SizedBox(height: 10),
 
-                  /// hospital
-                  Row(
-                    children: [
-                      const Icon(Icons.local_hospital,
-                          color: Colors.white, size: 18),
-                      const SizedBox(width: 6),
-                      Text(
-                        "${hospital.name}",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-
-                  /// Experience
                   Row(
                     children: [
                       const Icon(Icons.badge, color: Colors.white, size: 18),
@@ -143,7 +155,6 @@ class DoctorDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  /// Available Timing
                   Row(
                     children: [
                       const Icon(Icons.schedule, color: Colors.white, size: 18),
@@ -162,7 +173,6 @@ class DoctorDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            /// Focus
             const Text(
               "Doctor's Profile",
               style: TextStyle(
@@ -199,34 +209,6 @@ class DoctorDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            /// Profile
-
-            /// Career Path
-            // const Text(
-            //   "Career Path",
-            //   style: TextStyle(
-            //       fontWeight: FontWeight.bold, color: mainColor, fontSize: 16),
-            // ),
-            // const SizedBox(height: 8),
-
-            // const SizedBox(height: 8),
-            // Column(
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: doctor.careerPath.asMap().entries.map((entry) {
-            //     int index = entry.key + 1;
-            //     String step = entry.value;
-            //     return Padding(
-            //       padding: const EdgeInsets.symmetric(vertical: 4),
-            //       child: Text(
-            //         "$index. $step",
-            //         style: const TextStyle(color: mainColor),
-            //       ),
-            //     );
-            //   }).toList(),
-            // ),
-            // const SizedBox(height: 20),
-
-            /// Highlights
             const Text(
               "Highlights & Achievements",
               style: TextStyle(
@@ -254,24 +236,10 @@ class DoctorDetailScreen extends StatelessWidget {
                 );
               }).toList(),
             ),
-
-            // doctordetailscontroller.buildTimingAndContactSection(
-            //     timing: doctor.availableTimes,
-            //     // doctor: doctor,
-            //     onCall: () {
-            //       customerCare();
-            //     },
-            //     onDirection: () {
-            //       String address = "${hospital.name},${hospital.address}";
-            //       MapUtils.openMapByAddress(address);
-            //     },
-            //     hospitalNumber: hospital.contactNumber,
-            //     days: doctor.availableDays),
             const SizedBox(height: 20),
-            // doctordetailscontroller.buildReportContactSection(
-            //     context, doctordetailscontroller.moreDetails),
+
             RatingAndFeedback(
-              item: doctorData,
+              item: widget.doctorData,
               controller: doctorController,
             ),
           ],

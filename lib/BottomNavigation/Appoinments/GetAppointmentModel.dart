@@ -112,7 +112,7 @@ class Getappointmentmodel {
   final String? channelId;
   final String? reasonForCancel;
   final String? notes; // ✅ make nullable
-  final Reports? reports;
+  final List<Reports>? reports; // instead of single Reports?
 
   final String status;
   final double totalFee;
@@ -202,8 +202,10 @@ class Getappointmentmodel {
         reasonForCancel: json['reasonForCancel']?.toString(),
         notes: json['notes']?.toString(),
 
-        reports:
-            json['reports'] != null ? Reports.fromJson(json['reports']) : null,
+        reports: (json['reports'] as List?)
+            ?.map((e) => Reports.fromJson(e as Map<String, dynamic>))
+            .toList(),
+
         status: json['status']?.toString() ?? '',
         freeFollowUps: json['freeFollowUps'] ?? 0,
         freeFollowUpsLeft: json['freeFollowUpsLeft'] ?? 0,
@@ -221,15 +223,13 @@ class Getappointmentmodel {
 }
 
 class Reports {
-  final String? id;
   final List<ReportItem> reportsList;
 
-  Reports({this.id, required this.reportsList});
+  Reports({required this.reportsList});
 
   factory Reports.fromJson(Map<String, dynamic> json) {
     return Reports(
-      id: json['id'],
-      reportsList: (json['reportsList'] as List)
+      reportsList: (json['reportsList'] as List? ?? [])
           .map((e) => ReportItem.fromJson(e))
           .toList(),
     );

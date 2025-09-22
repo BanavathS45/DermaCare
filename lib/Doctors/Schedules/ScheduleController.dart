@@ -72,7 +72,7 @@ class ScheduleController extends GetxController {
 
   void scheduleMidnightRefresh({
     required String doctorId,
-    required String hospitalId,
+    required String hospitalId,required String branchId
   }) {
     final now = DateTime.now();
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
@@ -80,15 +80,15 @@ class ScheduleController extends GetxController {
 
     Future.delayed(durationUntilMidnight, () async {
       print("⏰ Refreshing slots after midnight...");
-      final prefs = await SharedPreferences.getInstance();
-      var branchId = await prefs.getString('branchId');
+      // final prefs = await SharedPreferences.getInstance();
+      // var branchId = await prefs.getString('branchId');
       await initializeWeekDates();
       final slots = await DoctorSlotService.fetchDoctorSlots(
-          doctorId, hospitalId, branchId!);
+          doctorId, hospitalId, branchId);
       filterSlotsForSelectedDate(slots);
 
       // Schedule again for the next night
-      scheduleMidnightRefresh(doctorId: doctorId, hospitalId: hospitalId);
+      scheduleMidnightRefresh(doctorId: doctorId, hospitalId: hospitalId, branchId: branchId);
     });
   }
 

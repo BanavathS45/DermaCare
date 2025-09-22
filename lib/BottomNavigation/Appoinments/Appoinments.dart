@@ -1,6 +1,7 @@
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
 import 'package:cutomer_app/Help/Numbers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import '../../Utils/AppointmentCard.dart';
 import '../../Utils/Constant.dart';
@@ -38,9 +39,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
     return Scaffold(
       appBar: CommonHeader(
         title: "Appointments",
-        onNotificationPressed: () {
-          
-        },
+        onNotificationPressed: () {},
         onSettingPressed: () async {
           await whatsUpChat();
         },
@@ -85,7 +84,12 @@ class _AppointmentPageState extends State<AppointmentPage> {
                 print(
                     "controller.isLoading.value ${controller.isLoading.value}");
                 if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: SpinKitFadingCircle(
+                      color: mainColor,
+                      size: 40.0,
+                    ),
+                  );
                 } else if (controller.filteredBookings.isEmpty) {
                   return const Center(
                       child: Text('No bookings found for this tab'));

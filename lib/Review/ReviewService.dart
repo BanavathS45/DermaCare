@@ -8,8 +8,9 @@ import 'package:http/http.dart' as http;
 
 Future<void> submitCustomerRating(
     {required double doctorRating,
-    required double hospitalRating,
+    required double branchRating,
     required String feedback,
+    required String branchId,
     required String doctorId,
     required String customerMobileNumber,
     required String appointmentId,
@@ -20,7 +21,7 @@ Future<void> submitCustomerRating(
 
   final Map<String, dynamic> payload = {
     "doctorRating": doctorRating,
-    "hospitalRating": hospitalRating,
+    "branchRating": branchRating,
     "feedback": feedback,
     "doctorId": doctorId,
     "customerMobileNumber": customerMobileNumber,
@@ -28,6 +29,7 @@ Future<void> submitCustomerRating(
     "hospitalId": hospitalId,
     "patientId": patientId,
     "patientName": patientName,
+    "branchId": branchId,
   };
 
   try {

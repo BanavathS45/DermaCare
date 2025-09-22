@@ -16,7 +16,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Terms and Conditions for Derma Care',
+              'Terms and Conditions for Pragna Advanced Skin Care',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -24,7 +24,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             const Text(
-              'Welcome to the Derma Care App. Please read these Terms and Conditions carefully before using the app.',
+              'Welcome to the Pragna Advanced Skin Care App. Please read these Terms and Conditions carefully before using the app.',
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 24.0),
@@ -38,7 +38,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'By accessing or using the Derma Care App, you agree to comply with these Terms. If you do not agree, you must uninstall the app and discontinue its use immediately.',
+              'By accessing or using the Pragna Advanced Skin Care App, you agree to comply with these Terms. If you do not agree, you must uninstall the app and discontinue its use immediately.',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16.0),
@@ -52,7 +52,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'The Derma Care App is provided for personal, non-commercial use. You agree not to misuse the app or use it for unlawful purposes.',
+              'The Pragna Advanced Skin Care App is provided for personal, non-commercial use. You agree not to misuse the app or use it for unlawful purposes.',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16.0),
@@ -66,7 +66,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'All content, including text, graphics, and logos, is the property of Derma Care and protected under copyright laws. Unauthorized use is strictly prohibited.',
+              'All content, including text, graphics, and logos, is the property of Pragna Advanced Skin Care and protected under copyright laws. Unauthorized use is strictly prohibited.',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16.0),
@@ -80,7 +80,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'Derma Care is not responsible for any damages or loss resulting from the use of the app. All information is provided "as is" without warranties of any kind.',
+              'Pragna Advanced Skin Care is not responsible for any damages or loss resulting from the use of the app. All information is provided "as is" without warranties of any kind.',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             const SizedBox(height: 16.0),

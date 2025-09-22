@@ -105,7 +105,7 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
                 patient: widget.patient,
                 mobileNumber: widget.mobileNumber,
                 paymentType: "online",
-                clinicName: widget.bookingDetails.booking.clinicName,
+                clinicName: widget.bookingDetails.booking.clinicName, branchName: '',
               ),
             ),
             (route) => false);

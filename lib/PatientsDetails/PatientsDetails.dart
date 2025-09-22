@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Consultations/SymptomsController.dart';
 import '../ConfirmBooking/ConsultationController.dart';
@@ -46,6 +47,8 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
   final TextEditingController _durationController = TextEditingController();
   String? fullName;
   String? age;
+  String? address;
+
   String? _selectedDurationType;
   final List<String> durationTypes = [
     "Hours",
@@ -62,8 +65,13 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
 
   Future<void> getUserData() async {
     print("getUserData called");
+    final prefs = await SharedPreferences.getInstance();
 
-    final userData = await fetchUserData(widget.mobileNumber);
+    final customerId = prefs.getString('customerId');
+
+    // hospitalId = prefs.getString('hospitalId');
+
+    final userData = await fetchUserData(customerId!);
     print("Fetched userData: $userData");
 
     if (userData != null && userData.dateOfBirth != null) {
@@ -80,6 +88,13 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
         setState(() {
           fullName = userData.fullName;
           age = calculatedAge.toString();
+          String formattedAddress = userData.address != null
+              ? "${userData.address.houseNo}, ${userData.address.street}, ${userData.address.city}, ${userData.address.state}, ${userData.address.postalCode}"
+              : "";
+
+          patientdetailsformcontroller.addressController.text =
+              formattedAddress;
+
           patientdetailsformcontroller.setAge(age ?? "0");
         });
       } catch (e) {
@@ -241,6 +256,32 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
     );
   }
 
+  void clearForm() {
+    print("🧹 Clearing form for Someone...");
+
+    // ✅ Reset controllers
+    patientdetailsformcontroller.firstNameController.clear();
+    patientdetailsformcontroller.lastNameController.clear();
+    patientdetailsformcontroller.nameController.clear();
+    patientdetailsformcontroller.relationController.clear();
+    patientdetailsformcontroller.ageController.clear();
+    patientdetailsformcontroller.addressController.clear();
+    patientdetailsformcontroller.patientMobileNumberController.clear();
+    patientdetailsformcontroller.selectedTitle = null;
+
+    // ✅ Reset gender
+    registercontroller.selectedGender = "";
+
+    // ✅ Reset duration and symptoms
+    _durationController.clear();
+    _selectedDurationType = null;
+    patientdetailsformcontroller.notesController.clear();
+    controller.clearAttachments(); // Clear files/images in SymptomsController
+
+    // ✅ Trigger UI update
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -262,38 +303,59 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
 
           /// Self / Someone toggle
           Row(
-            children: ["Self", "Someone"].map((option) {
-              final isSelected =
-                  patientdetailsformcontroller.selectedFor == option;
-              return Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: isSelected
-                        ? patientdetailsformcontroller.activeColor
-                        : patientdetailsformcontroller.inactiveColor,
-                    side: BorderSide(
-                        color: patientdetailsformcontroller.activeColor),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: ["Self", "Someone"].map((option) {
+                  final isSelected =
+                      patientdetailsformcontroller.selectedFor == option;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: isSelected
+                            ? patientdetailsformcontroller.activeColor
+                            : patientdetailsformcontroller.inactiveColor,
+                        side: BorderSide(
+                            color: patientdetailsformcontroller.activeColor),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          patientdetailsformcontroller.selectedFor = option;
+                        });
+
+                        // ✅ If switching to "Someone", clear previous data
+                        // if (option == "Someone") {
+                        //   clearForm();
+                        // }
+                      },
+                      child: Text(
+                        option,
+                        style: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : patientdetailsformcontroller.activeColor,
+                        ),
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    setState(() =>
-                        patientdetailsformcontroller.selectedFor = option);
-                  },
-                  child: Text(
-                    option,
-                    style: TextStyle(
-                      color: isSelected
-                          ? Colors.white
-                          : patientdetailsformcontroller.activeColor,
-                    ),
+                  );
+                }).toList(),
+              ),
+              if (patientdetailsformcontroller.selectedFor == "Someone")
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: clearForm,
+                    icon: Icon(Icons.clear, color: Colors.red),
+                    label: Text("Clear", style: TextStyle(color: Colors.red)),
                   ),
                 ),
-              );
-            }).toList(),
+            ],
           ),
+
           const SizedBox(height: 20),
 
           /// Name Field
@@ -471,7 +533,8 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
                   enabled: false,
                 )
               : CustomTextField(
-                  controller: patientdetailsformcontroller.mobileController,
+                  controller: patientdetailsformcontroller
+                      .patientMobileNumberController,
                   labelText: 'Enter Patient Mobile Number',
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   keyboardType: TextInputType.phone,
@@ -587,6 +650,9 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.black)),
+            SizedBox(
+              height: 15,
+            ),
             CustomTextAera(
               controller: patientdetailsformcontroller.notesController,
               labelText: "Enter Symptoms",

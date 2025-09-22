@@ -5,6 +5,8 @@ class Consultationcontroller extends GetxController {
   Rx<ConsultationModel?> selectedConsultation = Rx<ConsultationModel?>(null);
   RxString selectedBranchName = ''.obs;
   RxString selectedBranchId = ''.obs;
+  RxString selectedBranchAddress = ''.obs;
+  RxString selectedBranchNumber = ''.obs;
   // var consultations = <ConsultationModel>[].obs;
   // var loading = false.obs;
 

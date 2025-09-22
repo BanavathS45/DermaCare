@@ -9,6 +9,7 @@ import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart'; // Import the rating bar package
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 
@@ -204,21 +205,21 @@ class _ReviewScreenState extends State<ReviewScreen> {
           print('doctorId: ${widget.doctorBookings!.doctorId}');
           print('mobileNumber: ${widget.doctorBookings!.mobileNumber}');
           print('appointmentId: ${widget.doctorBookings!.bookingId}');
+          final prefs = await SharedPreferences.getInstance();
 
+          final branchId = prefs.getString('branchId');
           try {
             await submitCustomerRating(
                 doctorRating: _doctorRating,
-                hospitalRating: _hospitalRating,
+                branchRating: _hospitalRating,
                 feedback: _commentController.text,
                 doctorId: widget.doctorBookings!.doctorId,
                 customerMobileNumber: widget.mobileNUmber,
                 appointmentId: widget.doctorBookings!.bookingId,
                 hospitalId: widget.doctorBookings!.clinicId,
                 patientId: widget.doctorBookings!.patientId,
-                patientName: widget.doctorBookings!.name
-                
-                
-                );
+                patientName: widget.doctorBookings!.name,
+                branchId: branchId!);
             print('✅ submitCustomerRating called successfully');
             // After success
             Get.back(result: true);

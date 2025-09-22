@@ -132,8 +132,9 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
                                     radius: 20,
                                     backgroundColor: Colors.grey.shade300,
                                     child: Text(
-                                      customerName.isNotEmpty
-                                          ? customerName[0].toUpperCase()
+                                      comment.patientNamme.isNotEmpty
+                                          ? comment.patientNamme[0]
+                                              .toUpperCase()
                                           : "?",
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -156,7 +157,7 @@ class _AllfeedbacksState extends State<Allfeedbacks> {
                                           children: [
                                             Expanded(
                                               child: Text(
-                                                customerName,
+                                                comment.patientNamme,
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.black,

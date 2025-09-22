@@ -6,15 +6,15 @@ import 'package:http/http.dart' as http;
 class DoctorSlotService {
   static Future<List<DoctorSlot>> fetchDoctorSlots(
       String doctorId, String hospitalId, String branchId) async {
-    final url = Uri.parse(
-        '$clinicUrl/getDoctorslots/${hospitalId}/$doctorId'); //TODO:chnage api
+    // final url = Uri.parse(
+    //     '$clinicUrl/getDoctorslots/${hospitalId}/$doctorId'); //TODO:chnage api
     final curl = Uri.parse(
-        '$clinicUrl/getDoctorSlots/${hospitalId}/$branchId/$doctorId'); //TODO:chnage api
+        '$registerUrl/getDoctorSlots/${hospitalId}/$branchId/$doctorId'); //TODO:chnage api
 
-    print('📡 Requesting slots from: $url');
+    print('📡 Requesting slots from: $curl');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(curl);
       print('📥 Status Code: ${response.statusCode}');
 
       if (response.statusCode == 200) {

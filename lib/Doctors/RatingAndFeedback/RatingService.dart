@@ -5,39 +5,52 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'RatingModal.dart'; // Your model
 
-Future<RatingSummary> fetchAndSetRatingSummary(
-    String hospitalId, String doctorId) async {
-  final url = Uri.parse('${clinicUrl}/averageRatings/$hospitalId/$doctorId');
+import 'dart:convert';
+import 'package:cutomer_app/APIs/BaseUrl.dart';
+import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorController.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'RatingModal.dart';
 
-  print("urlurl ${url}");
+/// ✅ Safely fetches ratings for a given doctor.
+/// If no ratings exist, returns an empty [RatingSummary] with 0 ratings (no crash).
+Future<RatingSummary> fetchAndSetRatingSummary(
+    String branchId, String doctorId) async {
+  final url =
+      Uri.parse('$wifiUrl/api/customer/getAverageRating/$branchId/$doctorId');
+
   final doctorController = Get.find<DoctorController>();
+
+  print("🔎 Fetching ratings for doctor $doctorId from: $url");
 
   try {
     final response = await http.get(url);
+
+    print("📡 API Response Status: ${response.statusCode}");
+    print("📡 API Raw Body: ${response.body}");
+
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
+      print("📦 Parsed JSON: $jsonResponse");
 
-      // ✅ Ensure correct type mapping
       final success = jsonResponse['success'] == true;
       final data = jsonResponse['data'];
 
       if (success && data != null) {
-        // Convert Map<dynamic, dynamic> -> Map<String, dynamic>
         final dataMap = Map<String, dynamic>.from(data);
+        print("🔧 dataMap after conversion: $dataMap");
 
-        // Also ensure comments are correctly typed
         if (dataMap['comments'] != null && dataMap['comments'] is List) {
           dataMap['comments'] = (dataMap['comments'] as List)
               .map((item) => Map<String, dynamic>.from(item))
               .toList();
+          print("💬 Parsed Comments Count: ${dataMap['comments'].length}");
         }
 
         final ratingSummary = RatingSummary.fromJson(dataMap);
-
         print(
-            '✅ Fetched ratings: ${ratingSummary.comments.map((e) => e.customerMobileNumber)}');
+            "✅ Ratings fetched for doctor: ${ratingSummary.doctorId}, Rating: ${ratingSummary.overallDoctorRating}, Comments: ${ratingSummary.comments.length}");
 
-        // Update observables in controller
         doctorController.doctorRatings[doctorId] =
             ratingSummary.overallDoctorRating;
         doctorController.doctorCommentCounts[doctorId] =
@@ -45,13 +58,15 @@ Future<RatingSummary> fetchAndSetRatingSummary(
 
         return ratingSummary;
       } else {
-        throw Exception('API returned failure: ${jsonResponse['message']}');
+        print("⚠️ API success=false or data=null -> Returning empty summary");
+        return RatingSummary.empty(branchId, doctorId);
       }
     } else {
-      throw Exception('HTTP error: ${response.statusCode}');
+      print("❌ HTTP error: ${response.statusCode} ${response.reasonPhrase}");
+      return RatingSummary.empty(branchId, doctorId);
     }
   } catch (e) {
-    print('❌ Error fetching ratings: $e');
-    throw Exception('Failed to fetch ratings: $e');
+    print("❌ Exception while fetching ratings: $e");
+    return RatingSummary.empty(branchId, doctorId);
   }
 }

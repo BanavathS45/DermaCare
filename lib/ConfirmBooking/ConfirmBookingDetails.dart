@@ -1,27 +1,26 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
 import 'package:cutomer_app/Booings/BooingService.dart';
+import 'package:cutomer_app/Clinic/AboutClinicController.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
-import 'package:cutomer_app/Inputs/CustomInputField.dart';
 import 'package:cutomer_app/Loading/FullScreeenLoader.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
-
 import 'package:cutomer_app/Screens/BookingSuccess.dart';
 import 'package:cutomer_app/Services/SubServiceServices.dart';
 import 'package:cutomer_app/TreatmentAndServices/SubserviceController.dart';
-
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigation/Appoinments/PostBooingModel.dart';
 import '../Controller/CustomerController.dart';
 import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
@@ -62,12 +61,14 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   int consultationFee = 0;
   int totalFee = 0;
   // globals.dart
+  final hcontroller = Get.put(ClinicController());
   String globalServiceId = '';
   @override
   void initState() {
     super.initState();
+
     doctor = widget.doctor.doctor;
-    hospital = widget.doctor.hospital;
+    // hospital = widget.doctor.hospital;
     loadSubService();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final selectedId =
@@ -109,10 +110,17 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     });
   }
 
+  String? hospitalId;
+  String? clinicName;
+
   void loadSubService() async {
+    final prefs = await SharedPreferences.getInstance();
+    var hospitalId = await prefs.getString('hospitalId');
+    hcontroller.fetchClinic(hospitalId!);
     print("Calling loadSubService...");
 
-    final hospitalId = widget.doctor.hospital.hospitalId;
+    clinicName = await prefs.getString('hospitalName');
+    // final hospitalId = widget.doctor.hospital.hospitalId;
 
     // Get the selected sub-service from controller
     final selectedSubService = subServiceController.selectedSubService.value;
@@ -122,12 +130,12 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
       return;
     }
 
-    print("Hospital ID: $hospitalId");
+    // print("Hospital ID: $hospitalId");
     print("Selected Sub-Service ID: ${selectedSubService.subServiceId}");
 
     // Use subServiceId to fetch the details
     final result = await fetchSubServiceDetails(
-        hospitalId, selectedSubService.subServiceId);
+        hospitalId!, selectedSubService.subServiceId);
 
     print("Fetched Sub-Service Details: $result");
 
@@ -147,6 +155,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
   @override
   Widget build(BuildContext context) {
+    final clinic = hcontroller.clinic.value;
     Widget? consultationWidget;
     bool loading = false;
     String? currentConsultationId;
@@ -173,6 +182,10 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     final backeEndCOnsulationID = _consultations[0].consultationId;
     // final consultationId =
     //     consultationController.selectedConsultation.value?.consultationId;
+
+    print(
+        '[🏥] Booking via Pay at paymentType ${selectedServicesController.selectedPayment.value}');
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: CommonHeader(
@@ -188,7 +201,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             // Doctor Info Card
             Column(
               children: [
-                profileCard(),
+                profileCard(clinicName ?? ''),
                 Obx(() {
                   final consultationId = consultationController
                       .selectedConsultation.value?.consultationId;
@@ -533,71 +546,78 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 consultationcontroller.selectedBranchId.value.isNotEmpty
                     ? consultationcontroller.selectedBranchId.value
                     : "Not Selected";
-            final bookingDetails = BookingDetailsModel(
-              subServiceName: globalServiceId == backeEndCOnsulationID
-                  ? selectedServicesController
-                      .selectedSubServices.first.subServiceName
-                  : "NA",
-              subServiceId: globalServiceId == backeEndCOnsulationID
-                  ? selectedServicesController
-                      .selectedSubServices.first.subServiceId
-                  : "NA",
-              doctorId: widget.doctor.doctor.doctorId,
-              consultationType: consultationController
-                  .selectedConsultation.value!.consultationType,
-              consultationFee: consultationFee.toDouble(),
-              totalFee: globalServiceId == backeEndCOnsulationID
-                  ? selectedServicesController
-                      .selectedSubServices.first.finalCost
-                  : consultationFee + (consultationFee * 0.18) + 0,
-              clinicId: widget.doctor.hospital.hospitalId,
-              doctorDeviceId: widget.doctor.doctor.deviceId,
-              clinicAddress: widget.doctor.hospital.address,
-              categoryName: globalServiceId == backeEndCOnsulationID
-                  ? selectedServicesController
-                      .selectedSubServices.first.categoryName
-                  : "NA",
-              categoryId: globalServiceId == backeEndCOnsulationID
-                  ? selectedServicesController
-                      .selectedSubServices.first.categoryId
-                  : "NA",
-              servicename: globalServiceId == backeEndCOnsulationID
-                  ? selectedServicesController
-                      .selectedSubServices.first.serviceName
-                  : "NA",
-              serviceId: globalServiceId == backeEndCOnsulationID
-                  ? selectedServicesController
-                      .selectedSubServices.first.serviceId
-                  : "NA",
-              clinicName: widget.doctor.hospital.name,
-              doctorName: widget.doctor.doctor.doctorName,
-              // consultationExpiration:
-              //     widget.doctor.hospital.consultationExpiration,
-              consultationExpiration:
-                  widget.doctor.hospital.consultationExpiration ?? "10 Days",
-              paymentType: "Pay at Hospital",
-              visitType: symptomsController.visitType.value,
-              symptomsDuration:
-                  "${symptomsController.duration.value}", //TODO:develop in UI
 
-              attachments: symptomsController.attachments.value,
-              freeFollowUps: widget.doctor.hospital.freeFollowUps,
-              consentFormPdf: pdfBase64 ?? "",
-              doctorRefCode: doctorRefController.text ?? "",
-              branchname: branchName,
-              branchId: branchId,
-            );
+            final prefs = await SharedPreferences.getInstance();
+            var clinicName = await prefs.getString('hospitalName');
+            var hospitalId = await prefs.getString('hospitalId');
+            var customerId = await prefs.getString('customerId');
+
+            final bookingDetails = BookingDetailsModel(
+                subServiceName: globalServiceId == backeEndCOnsulationID
+                    ? selectedServicesController
+                        .selectedSubServices.first.subServiceName
+                    : "NA",
+                subServiceId: globalServiceId == backeEndCOnsulationID
+                    ? selectedServicesController
+                        .selectedSubServices.first.subServiceId
+                    : "NA",
+                doctorId: widget.doctor.doctor.doctorId,
+                consultationType: consultationController
+                    .selectedConsultation.value!.consultationType,
+                consultationFee: consultationFee.toDouble(),
+                totalFee: globalServiceId == backeEndCOnsulationID
+                    ? selectedServicesController
+                        .selectedSubServices.first.finalCost
+                    : consultationFee + (consultationFee * 0.18) + 0,
+                clinicId: hospitalId ?? "",
+                doctorDeviceId: widget.doctor.doctor.deviceId,
+                clinicAddress: clinic?.address ?? "",
+                //TODO:chnage address
+                categoryName: globalServiceId == backeEndCOnsulationID
+                    ? selectedServicesController
+                        .selectedSubServices.first.categoryName
+                    : "NA",
+                categoryId: globalServiceId == backeEndCOnsulationID
+                    ? selectedServicesController
+                        .selectedSubServices.first.categoryId
+                    : "NA",
+                servicename: globalServiceId == backeEndCOnsulationID
+                    ? selectedServicesController
+                        .selectedSubServices.first.serviceName
+                    : "NA",
+                serviceId: globalServiceId == backeEndCOnsulationID
+                    ? selectedServicesController
+                        .selectedSubServices.first.serviceId
+                    : "NA",
+                clinicName: clinicName ?? "",
+                doctorName: widget.doctor.doctor.doctorName,
+                // consultationExpiration:
+                //     widget.doctor.hospital.consultationExpiration,
+                consultationExpiration: clinic?.consultationExpiration ??
+                    "0 Days", //TODO:chnage consultationExpiration
+                paymentType: selectedPayment,
+                visitType: symptomsController.visitType.value,
+                symptomsDuration:
+                    "${symptomsController.duration.value}", //TODO:develop in UI
+
+                attachments: symptomsController.attachments.value,
+                freeFollowUps: clinic?.freeFollowUps ?? 0,
+                consentFormPdf: pdfBase64 ?? "",
+                doctorRefCode: selectedDoctor ?? "",
+                branchname: branchName,
+                branchId: branchId,
+                customerId: customerId!);
             print(
                 '[🏥] Booking via Pay at Hospital ${bookingDetails.toString()}');
-            print(
-                '[🏥] Booking via Pay at Hospital ${bookingDetails.paymentType}');
+            print('[🏥] Booking via Pay at Hospital ${controller.text}');
 
             // 📦 Model ready for API
             final postBookingPayload = PostBookingModel(
               patient: widget.patient,
               booking: bookingDetails,
             );
-
+            print(
+                "📦 Final Payload: ${jsonEncode(postBookingPayload.toJson())}");
             if (selectedPayment == "Pay at Hospital") {
               // 🏥 DIRECTLY POST BOOKING
               print('[🏥] Booking via Pay at Hospital');
@@ -613,6 +633,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
 
               var responseData = await postBookings(postBookingPayload);
               print('[DEBUG] Response Data: $responseData');
+              Navigator.of(context, rootNavigator: true).pop();
 
               if (responseData != null &&
                   responseData['statusCode'] == 201 &&
@@ -624,34 +645,40 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   MaterialPageRoute(
                     builder: (ctx) => SuccessScreen(
                         serviceDetails: widget.doctor,
-                        clinicName: widget.doctor.hospital.name,
+                        clinicName: clinicName ?? "",
                         paymentId: "pay_at_hospital",
                         patient: widget.patient,
                         mobileNumber: widget.patient.mobileNumber,
-                        paymentType: "cash"),
+                        paymentType: "cash",
+                        branchName: branchName),
                   ),
                   (route) => false,
                 );
               } else {
                 print(
                     '[❌] Booking failed or unexpected response: $responseData');
-                showSnackbar("Error", "Booking failed", "error");
+                ScaffoldMessageSnackbar.show(
+                  context: context,
+                  message: "Booking failed",
+                  type: SnackbarType.error,
+                );
+                // showSnackbar("Error", "Booking failed", "error");
               }
             } else {
               // 💳 GO TO PAYMENT SCREEN
               print('[💳] Navigating to Razorpay...');
 
               Get.to(RazorpaySubscription(
-                context: context,
-                amount: consultationFee.toString(),
-                onPaymentInitiated: () {
-                  showSnackbar("Info", "Payment Initiated", "info");
-                },
-                serviceDetails: widget.doctor,
-                patient: widget.patient,
-                bookingDetails: postBookingPayload,
-                mobileNumber: widget.patient.mobileNumber,
-              ));
+                  context: context,
+                  amount: consultationFee.toString(),
+                  onPaymentInitiated: () {
+                    showSnackbar("Info", "Payment Initiated", "info");
+                  },
+                  serviceDetails: widget.doctor,
+                  patient: widget.patient,
+                  bookingDetails: postBookingPayload,
+                  mobileNumber: widget.patient.mobileNumber,
+                  branchName: branchName));
               // }
               // void handleNextScreen(BuildContext context, Map<String, dynamic> payload) async {
               //   final response = await http.get(Uri.parse(
@@ -752,7 +779,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     );
   }
 
-  Widget profileCard() {
+  Widget profileCard(String clinicName) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -768,13 +795,13 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Column(
               children: [
                 Text(
-                  "${hospital?.name}",
+                  "${clinicName}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -782,6 +809,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
+                  textAlign: TextAlign.center,
                 ),
                 Obx(() {
                   final controller = Get.find<Consultationcontroller>();

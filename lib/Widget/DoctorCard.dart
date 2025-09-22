@@ -10,8 +10,13 @@ import '../Doctors/DoctorDetails/DoctorDetailsScreen.dart';
 import '../Doctors/Schedules/Schedule.dart';
 import '../Utils/GradintColor.dart';
 
-Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
-    DoctorController controller, String mobileNumber, String username) {
+Widget buildDoctorCard(
+    BuildContext context,
+    HospitalDoctorModel doctorModel,
+    DoctorController controller,
+    String mobileNumber,
+    String username,
+    String branchId) {
   final doctor = doctorModel.doctor;
   final hospital = doctorModel.hospital;
   String base64String = doctor.doctorPicture;
@@ -285,6 +290,7 @@ Widget buildDoctorCard(BuildContext context, HospitalDoctorModel doctorModel,
                                 doctorData: doctorModel,
                                 mobileNumber: mobileNumber,
                                 username: username,
+                                branchId: branchId,
                               ))
                           : null;
 

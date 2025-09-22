@@ -27,7 +27,7 @@ class BookingDetailsModel {
   final int freeFollowUps;
   final String consentFormPdf;
   final String? doctorRefCode;
-  // final String customerId;
+  final String customerId;
   final String branchname;
   final String branchId;
 
@@ -54,7 +54,7 @@ class BookingDetailsModel {
     required this.freeFollowUps,
     required this.consentFormPdf,
     this.doctorRefCode,
-    // required this.customerId,
+    required this.customerId,
     required this.branchname,
     required this.branchId,
     this.attachments, // ✅ nullable
@@ -74,10 +74,11 @@ class BookingDetailsModel {
       clinicId: json['clinicId'],
       clinicName: json['clinicName'],
       clinicAddress: json['clinicAddress'],
+
       doctorId: json['doctorId'],
       consentFormPdf: json['consentFormPdf'],
       doctorName: json['doctorName'],
-      // customerId: json['customerId'],
+      customerId: json['customerId'],
       branchname: json['branchname'],
       branchId: json['branchId'],
       doctorDeviceId: json['doctorDeviceId'],
@@ -115,7 +116,7 @@ class BookingDetailsModel {
       'totalFee': totalFee,
       "paymentType": paymentType,
       "consentFormPdf": consentFormPdf,
-      // "customerId": customerId,
+      "customerId": customerId,
       "branchname": branchname,
       "branchId": branchId,
       "doctorRefCode": doctorRefCode,

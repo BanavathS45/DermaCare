@@ -73,8 +73,8 @@ class _VisitTypeState extends State<VisitType> {
         final today = scheduleController.weekDates[0]; // first date (today)
         final doctorId = hospitalDoctors.first.doctor.doctorId;
         final clinicId = hospitalDoctors.first.hospital.hospitalId;
-        final prefs = await SharedPreferences.getInstance();
-        var branchId = await prefs.getString('branchId');
+        // final prefs = await SharedPreferences.getInstance();
+        var branchId = visitController.bookings.first.branchId;
         final slots = await DoctorSlotService.fetchDoctorSlots(
             doctorId, clinicId, branchId!);
         scheduleController.selectDate(today, slots);
@@ -326,14 +326,14 @@ class _VisitTypeState extends State<VisitType> {
                                               .doctorAvailabilityStatus) {
                                         Get.bottomSheet(
                                           bottomSlotWidget(
-                                            selectedHospitalDoctor!
-                                                .hospital.hospitalId,
-                                            selectedHospitalDoctor!
-                                                .doctor.doctorId,
-                                            appt.patientId,
-                                            appt.clinicName,
-                                            appt.doctorName,
-                                          ),
+                                              selectedHospitalDoctor!
+                                                  .hospital.hospitalId,
+                                              selectedHospitalDoctor!
+                                                  .doctor.doctorId,
+                                              appt.patientId,
+                                              appt.clinicName,
+                                              appt.doctorName,
+                                              appt.branchId),
                                           isScrollControlled: true,
                                           backgroundColor: Colors.white,
                                           shape: const RoundedRectangleBorder(
@@ -376,7 +376,7 @@ class _VisitTypeState extends State<VisitType> {
   }
 
   Widget bottomSlotWidget(String hospitalId, String doctorId, String patientId,
-      String clinicName, String doctorName) {
+      String clinicName, String doctorName, branchId) {
     final screenHeight = MediaQuery.of(context).size.height;
     return Container(
       height: screenHeight * 0.75,
@@ -472,7 +472,7 @@ class _VisitTypeState extends State<VisitType> {
                   ),
 
                   const SizedBox(height: 12),
-                  showDays(hospitalId, doctorId),
+                  showDays(hospitalId, doctorId, branchId),
                   const Divider(height: 32),
                   timeslots(),
                 ],
@@ -768,7 +768,7 @@ class _VisitTypeState extends State<VisitType> {
     );
   }
 
-  Widget showDays(String clinicId, String doctorId) {
+  Widget showDays(String clinicId, String doctorId, String branchId) {
     return SizedBox(
       height: 50,
       child: ListView.builder(
@@ -784,10 +784,11 @@ class _VisitTypeState extends State<VisitType> {
 
             return GestureDetector(
               onTap: () async {
-                final prefs = await SharedPreferences.getInstance();
-                var branchId = await prefs.getString('branchId');
+                // final prefs = await SharedPreferences.getInstance();
+                // var branchId = await prefs.getString('branchId');
+
                 final slots = await DoctorSlotService.fetchDoctorSlots(
-                    doctorId, clinicId, branchId!);
+                    doctorId, clinicId, branchId);
                 scheduleController.selectDate(date, slots);
               },
               child: Container(

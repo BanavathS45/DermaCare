@@ -139,6 +139,7 @@
 //   }
 // }
 
+import 'package:cutomer_app/ConfirmBooking/ConsultationController.dart';
 import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Doctors/RatingAndFeedback/RatingService.dart';
@@ -151,27 +152,25 @@ import 'DoctorService.dart';
 class DoctorController extends GetxController {
   final DoctorService doctorService = DoctorService();
 
+  // Lists for doctors
   RxList<HospitalDoctorModel> allServices = <HospitalDoctorModel>[].obs;
   RxList<HospitalDoctorModel> allDoctorsFlat = <HospitalDoctorModel>[].obs;
   RxList<HospitalDoctorModel> filteredDoctors = <HospitalDoctorModel>[].obs;
-  RxInt appointmentCount = 0.obs;
 
-  // For doctor rating and number of comments
-// RxDouble overallDoctorRating = 0.0.obs;
-// RxInt commentCount = 0.obs;
+  // Doctor ratings and comments
   RxMap<String, double> doctorRatings = <String, double>{}.obs;
   RxMap<String, int> doctorCommentCounts = <String, int>{}.obs;
 
+  // Filters
   RxString selectedGender = 'All'.obs;
   RxString selectedCity = 'All'.obs;
   RxBool selectedRecommended = false.obs;
-
   RxBool showFavoritesOnly = false.obs;
   RxBool sortByAZ = false.obs;
   RxDouble selectedRating = 0.0.obs;
 
+  // Other info
   RxList<String> cityList = <String>[].obs;
-  RxString doctorId = "".obs;
   RxBool isLoading = false.obs;
   RxString hospitalId = ''.obs;
 
@@ -183,60 +182,64 @@ class DoctorController extends GetxController {
     super.onInit();
   }
 
+  /// Fetch doctors from API for a specific hospital, subService, and branch
   Future<void> fetchDoctors({
     required String hospitalId,
     required String subServiceId,
+    required String branchId,
   }) async {
-    print("🌀 Fetching doctors from API...");
-
     try {
       isLoading.value = true;
-      final prefs = await SharedPreferences.getInstance();
-      var branchId = await prefs.getString('branchId');
-      final hospitalIdToUse = selectedServicesController.hospitalId.value;
-      print("🏥 Using hospitalId: $hospitalIdToUse");
-      print("🏥 Using branchId: $branchId");
-      print("🏥 Using hospitalId hospitalId: $hospitalId");
-      print("🏥 Using hospitalId subServiceId: $subServiceId");
+
+      // ✅ Clear previous data to avoid duplicates
+      allDoctorsFlat.clear();
+      allServices.clear();
+      filteredDoctors.clear();
+      doctorRatings.clear();
+      // doctorCommentCounts.clear();
+      cityList.clear();
+
+      print("🌀 Fetching doctors for branchId: $branchId");
 
       final List<HospitalDoctorModel> doctors = await doctorService
-          .fetchDoctorsAndClinic(hospitalId, subServiceId, branchId!);
-      print("🏥 Using hospitalId doctors: ${doctors.first.hospital.branch}");
+          .fetchDoctorsAndClinic(hospitalId, subServiceId, branchId);
 
-      allDoctorsFlat.value = doctors;
-      allServices.value = doctors;
+      print("📊 Doctors fetched: ${doctors.length}");
 
-      for (var d in doctors) {
-        print(
-            "✅ Doctor loaded: ${d.doctor.doctorName}, ${d.hospital.recommended},${d.hospital.branch},${d.hospital.consultationExpiration}");
-        print("✅ Doctor signture: ${d.doctor.toString()}");
-        print("✅ Doctor signture: ${d.doctor.doctorSignature}");
-        // print("📝 Full Doctor Data: ${d.doctor.toJson()}");
-        // print("🏥 Full Hospital Data: ${d.hospital.toJson()}");
+      // ✅ Remove duplicates based on doctorId
+      final uniqueDoctors = <String, HospitalDoctorModel>{};
+      for (var doctor in doctors) {
+        uniqueDoctors[doctor.doctor.doctorId] = doctor;
       }
-      List<Future<void>> ratingFutures = [];
-      for (var doctorModel in doctors) {
-        final dId = doctorModel.doctor.doctorId;
-        final hId = doctorModel.hospital.hospitalId;
 
-        // Wrap in a Future<void> to collect them
-        final future = fetchAndSetRatingSummary(hId, dId).then((rating) {
+      allDoctorsFlat.value = uniqueDoctors.values.toList();
+      allServices.value = List.from(allDoctorsFlat);
+
+      // Fetch ratings asynchronously
+      final ratingFutures = allDoctorsFlat.map((doctorModel) async {
+        final dId = doctorModel.doctor.doctorId;
+        final consultationcontroller = Get.find<Consultationcontroller>();
+
+        final hId = consultationcontroller.selectedBranchId.value;
+        // final hId = doctorModel.hospital.hospitalId;
+
+        try {
+          final rating = await fetchAndSetRatingSummary(hId, dId);
           doctorRatings[dId] = rating.overallDoctorRating;
           doctorCommentCounts[dId] = rating.comments.length;
-        }).catchError((e) {
+        } catch (e) {
           print("⚠️ Failed to fetch rating for $dId: $e");
-        });
+        }
+      }).toList();
 
-        ratingFutures.add(future);
-      }
+      await Future.wait(ratingFutures);
 
-      await Future.wait(ratingFutures); // ✅ Wait for all ratings to complete
+      // Populate city list
+      final cities =
+          allDoctorsFlat.map((d) => d.hospital.city).toSet().toList();
+      cityList.addAll(['All', ...cities]);
 
-      final cities = doctors.map((d) => d.hospital.city).toSet().toList();
-      print("🏥 Using hospitalId doctors: ${cities}");
-
-      cityList.value = ['All', ...cities];
-
+      // Apply filters to populate filteredDoctors
       applyFilters();
     } catch (e) {
       print("❌ Fetch error: $e");
@@ -245,8 +248,9 @@ class DoctorController extends GetxController {
     }
   }
 
+  /// Filter doctors based on selected filters
   void applyFilters() {
-    List<HospitalDoctorModel> filtered = List.from(allDoctorsFlat);
+    var filtered = List<HospitalDoctorModel>.from(allDoctorsFlat);
 
     if (selectedGender.value != 'All') {
       filtered = filtered
@@ -263,8 +267,7 @@ class DoctorController extends GetxController {
       filtered = filtered.where((d) => d.hospital.recommended == true).toList();
     }
 
-    // 🔥 Rating filter
-    if (selectedRating.value > 0.0) {
+    if (selectedRating.value > 0) {
       filtered = filtered.where((d) {
         final rating = doctorRatings[d.doctor.doctorId] ?? 0.0;
         return rating >= selectedRating.value;
@@ -279,15 +282,15 @@ class DoctorController extends GetxController {
     filteredDoctors.value = filtered;
   }
 
-  Future<void> refreshDoctors({required String subServiceId}) async {
-    try {
-      isLoading.value = true;
-      await fetchDoctors(
-        hospitalId: hospitalId.value,
-        subServiceId: subServiceId,
-      );
-    } finally {
-      isLoading.value = false;
-    }
+  /// Refresh doctors for a branch
+  Future<void> refreshDoctors({
+    required String subServiceId,
+    required String branchId,
+  }) async {
+    await fetchDoctors(
+      hospitalId: hospitalId.value,
+      subServiceId: subServiceId,
+      branchId: branchId,
+    );
   }
 }
