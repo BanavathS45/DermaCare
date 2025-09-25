@@ -132,7 +132,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            "$hospitalName  ",
+                            "$hospitalName",
                             style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
@@ -236,6 +236,37 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 );
               }).toList(),
             ),
+            const SizedBox(height: 20),
+
+            if (doctor.associationsOrMemberships != null)
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text(
+                  "Associations / Memberships",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: mainColor,
+                      fontSize: 16),
+                ),
+                Text(
+                  "${doctor.associationsOrMemberships}",
+                  style: TextStyle(color: mainColor, fontSize: 16),
+                ),
+              ]),
+            const SizedBox(height: 20),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text(
+                "Branches",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: mainColor,
+                    fontSize: 16),
+              ),
+              Text(
+                "${doctor.branches.map((e) => e.branchName)}",
+                style: TextStyle(color: mainColor, fontSize: 16),
+              ),
+            ]),
+
             const SizedBox(height: 20),
 
             RatingAndFeedback(

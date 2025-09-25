@@ -56,6 +56,12 @@ class _AppointmentCardState extends State<AppointmentCard> {
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchHospitaAndDoctorData(); // ✅ refresh whenever dependencies change
+  }
+
   bool _notificationSent = false;
 
   void checkAndScheduleNotification() async {
@@ -88,27 +94,27 @@ class _AppointmentCardState extends State<AppointmentCard> {
   bool hasReviewed = false;
 
   Future<void> _fetchRating() async {
-    // final prefs = await SharedPreferences.getInstance();
-
-    // final branchId = prefs.getString('branchId');
-    final consultationcontroller = Get.find<Consultationcontroller>();
     try {
       final summary = await fetchAndSetRatingSummary(
         widget.doctorData.branchId!,
         widget.doctorData.doctorId,
       );
 
-      // Debug print
-      for (var comment in summary.comments) {
-        print("Rated: ${comment.rated}");
-      }
+      // Filter only comments for the current appointment & patient
+      final currentAppointmentId = widget.doctorData.bookingId;
+      final currentPatientMobile = widget.doctorData.mobileNumber;
+
+      final matchingComments = summary.comments.where((comment) =>
+          comment.appointmentId == currentAppointmentId &&
+          comment.customerMobileNumber == currentPatientMobile);
 
       setState(() {
         ratingSummary = summary;
-        hasReviewed = summary.comments.any((e) => e.rated == true);
+        hasReviewed = matchingComments.any((e) => e.rated == true);
       });
 
-      print("Has reviewed: $hasReviewed");
+      print(
+          "✅ hasReviewed: $hasReviewed (for appointmentId: $currentAppointmentId, patient: $currentPatientMobile)");
     } catch (e) {
       print("Rating fetch error: $e");
       setState(() {
@@ -116,6 +122,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
       });
     }
   }
+
   // Future<void> _fetchRating() async {
   //   final consultationcontroller = Get.find<Consultationcontroller>();
 
@@ -220,6 +227,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
         ));
       },
       child: Card(
+        color: Colors.white,
         margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -249,7 +257,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      d.hospital.city,
+                      d.hospital.branch,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.blueGrey[600],

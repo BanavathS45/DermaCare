@@ -9,6 +9,7 @@ import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:cutomer_app/Services/SubServiceServices.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Widget/DoctorCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -82,7 +83,12 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
       });
     } catch (e) {
       setState(() => isLoading = false);
-      Get.snackbar("Error", "Failed to fetch best doctor: $e");
+      ScaffoldMessageSnackbar.show(
+        context: context,
+        message: "Failed to fetch best doctor: $e",
+        type: SnackbarType.error,
+      );
+      // Get.snackbar("Error", "Failed to fetch best doctor: $e");
     }
   }
 
@@ -305,6 +311,19 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
 
                                 return InkWell(
                                   onTap: () async {
+                                    // ✅ Check doctor availability first
+                                    if (!doctor.doctorAvailabilityStatus) {
+                                      // assuming you have a boolean field `isAvailable`
+
+                                      ScaffoldMessageSnackbar.show(
+                                        context: context,
+                                        message: "Doctor not available",
+                                        type: SnackbarType.warning,
+                                      );
+
+                                      return; // exit early, don't open branch bottom sheet
+                                    }
+
                                     final branches = doctor.branches;
 
                                     if (branches.isEmpty) {
@@ -316,11 +335,12 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                       await _loadBestDoctor(doctor.deviceId);
                                       if (bestDoctorList.isNotEmpty) {
                                         Get.to(() => ScheduleScreen(
-                                            doctorData: bestDoctorList.first,
-                                            mobileNumber: widget.mobileNumber,
-                                            username: widget.username,
-                                            branchId: consultationcontroller
-                                                .selectedBranchId.value));
+                                              doctorData: bestDoctorList.first,
+                                              mobileNumber: widget.mobileNumber,
+                                              username: widget.username,
+                                              branchId: consultationcontroller
+                                                  .selectedBranchId.value,
+                                            ));
                                       }
                                       return;
                                     }
@@ -335,8 +355,7 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                       ),
                                       builder: (context) {
                                         return BranchSelectionSheet(
-                                            branches:
-                                                branches); // ✅ no conversion to List<String>
+                                            branches: branches);
                                       },
                                     );
 
@@ -344,13 +363,11 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                       final selectedBranch =
                                           branches[selectedIndex];
 
-                                      // ✅ Store both ID and name in controller
                                       consultationcontroller.selectedBranchName
                                           .value = selectedBranch.branchName;
                                       consultationcontroller.selectedBranchId
                                           .value = selectedBranch.branchId;
 
-                                      // ✅ Fetch best doctor & navigate
                                       await _loadBestDoctor(doctor.deviceId);
                                       if (bestDoctorList.isNotEmpty) {
                                         Get.to(() => ScheduleScreen(
@@ -431,32 +448,43 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(doctor.doctorName,
+                          // ✅ Doctor name wrapped in 2 lines
+                          Expanded(
+                            child: Text(
+                              doctor.doctorName,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                  color: Colors.black)),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                              maxLines: 2, // Wrap into 2 lines
+                              overflow:
+                                  TextOverflow.ellipsis, // Adds ... if exceeds
+                            ),
+                          ),
+
+                          // ✅ About button
                           TextButton(
                             style: TextButton.styleFrom(
-                              padding:
-                                  EdgeInsets.zero, // 🔥 Removes inner padding
+                              padding: EdgeInsets.zero, // Removes inner padding
                               minimumSize:
-                                  Size(0, 0), // 🔥 Removes default min size
-                              tapTargetSize: MaterialTapTargetSize
-                                  .shrinkWrap, // 🔥 Shrinks touch area
+                                  Size(0, 0), // Removes default min size
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                             onPressed: () {
                               Get.to(DoctorDetailScreen(doctorData: item));
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 6.0),
-                              child: const Text(
+                            child: const Padding(
+                              padding: EdgeInsets.only(right: 6.0),
+                              child: Text(
                                 "About",
                                 style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w600),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       const SizedBox(height: 2),

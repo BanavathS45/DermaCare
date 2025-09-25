@@ -43,6 +43,7 @@ class Doctor {
   final double doctorAverageRating;
   final String? doctorSignature;
   final List<Branch> branches;
+  final String? associationsOrMemberships;
   Doctor({
     required this.id,
     required this.doctorId,
@@ -69,6 +70,7 @@ class Doctor {
     required this.deviceId,
     required this.doctorAverageRating,
     this.doctorSignature,
+    this.associationsOrMemberships,
     this.branches = const [], // default empty list
   });
 
@@ -88,6 +90,7 @@ class Doctor {
       id: json['id'] ?? '',
       doctorId: json['doctorId'] ?? '',
       hospitalId: json['hospitalId'] ?? '',
+      associationsOrMemberships: json['associationsOrMemberships'] ?? '',
       doctorAverageRating: json['doctorAverageRating'] ?? 0.0,
       doctorName: json['doctorName'] ?? '',
       doctorPicture: json['doctorPicture'] ?? '',

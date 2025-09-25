@@ -84,9 +84,121 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
     super.dispose();
   }
 
-  void _openQuestions() {
-    // Navigate to your Questions page or show a dialog
-    print('Questions button clicked');
+  // void _openQuestions() {
+  //   // Navigate to your Questions page or show a dialog
+  //   print('Questions button clicked');
+  // }
+
+  void _openQuestions(BuildContext context) {
+    print("_openQuestions calling ");
+    showDialog(
+      context: context,
+      builder: (context) {
+        // List of questions and answers
+        final faqList = [
+          {
+            "question": "How was the quality of the service you received?",
+            "answer":
+                "The service was excellent, and the staff followed all the procedures carefully."
+          },
+          {
+            "question": "Was the service completed on time?",
+            "answer":
+                "Yes, the appointment started and ended on time without any delays."
+          },
+          {
+            "question": "Was the cost of the service reasonable?",
+            "answer":
+                "The cost was fair and matched the quality of care provided."
+          },
+          {
+            "question": "How clean was Pragna Clinic?",
+            "answer":
+                "The clinic was very clean and well-maintained, giving a safe and comfortable environment."
+          },
+          {
+            "question": "Was the staff polite and helpful?",
+            "answer":
+                "The staff were courteous, attentive, and made the visit smooth."
+          },
+          {
+            "question":
+                "How would you rate your overall experience at Pragna Clinic?",
+            "answer":
+                "Overall, the experience was excellent, and I felt well taken care of."
+          },
+          {
+            "question": "Was this branch easy to find?",
+            "answer":
+                "The branch was easy to locate, with clear directions and signage."
+          },
+          {
+            "question": "Was the waiting time at this branch reasonable?",
+            "answer": "The waiting time was minimal and managed efficiently."
+          },
+          {
+            "question": "How friendly was the reception staff?",
+            "answer": "The reception staff were very friendly and welcoming."
+          },
+          {
+            "question": "Would you visit this branch again?",
+            "answer":
+                "Yes, I would definitely return to this branch in the future."
+          },
+        ];
+
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            constraints: BoxConstraints(maxHeight: 500),
+            child: Column(
+              children: [
+                const Text(
+                  "Frequently Asked Questions",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: faqList.length,
+                    itemBuilder: (context, index) {
+                      final item = faqList[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Q${index + 1}: ${item['question']}",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "A: ${item['answer']}",
+                              style: const TextStyle(color: Colors.black87),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Close"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   // Future<void> _openPatientSignSheet() async {
@@ -618,7 +730,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                 children: [
                   // Questions Button
                   ElevatedButton.icon(
-                    onPressed: _openQuestions,
+                    onPressed: () => _openQuestions(context),
                     icon: Icon(
                       Icons.question_answer,
                       color: Colors.white,

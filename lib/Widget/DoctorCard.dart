@@ -134,29 +134,29 @@ Widget buildDoctorCard(
                     height: 5,
                   ),
                   // Availability text
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.white, // ✅ White background
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        doctor.doctorAvailabilityStatus
-                            ? "Available Now"
-                            : "Not Available",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: doctor.doctorAvailabilityStatus
-                              ? Colors.green // ✅ Green when available
-                              : Colors.red, // ✅ Red when not available
-                        ),
-                      ),
-                    ),
-                  )
+                  // Center(
+                  //   child: Container(
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: 6, vertical: 2),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.white, // ✅ White background
+                  //       borderRadius: BorderRadius.circular(6),
+                  //     ),
+                  //     child: Text(
+                  //       doctor.doctorAvailabilityStatus
+                  //           ? "Available Now"
+                  //           : "Not Available",
+                  //       textAlign: TextAlign.center,
+                  //       style: TextStyle(
+                  //         fontSize: 10,
+                  //         fontWeight: FontWeight.bold,
+                  //         color: doctor.doctorAvailabilityStatus
+                  //             ? Colors.green // ✅ Green when available
+                  //             : Colors.red, // ✅ Red when not available
+                  //       ),
+                  //     ),
+                  //   ),
+                  // )
                 ],
               ),
               const SizedBox(width: 12),
@@ -310,7 +310,7 @@ Widget buildDoctorCard(
                       ),
                       child: Text(
                         doctor.doctorAvailabilityStatus
-                            ? "BOOK"
+                            ? "Consult"
                             : "Unavailable",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,

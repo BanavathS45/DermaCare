@@ -122,7 +122,8 @@ class Getappointmentmodel {
   final int freeFollowUps;
   final String clinicName;
   final String doctorName;
-  final String? priscriptionPdf;
+  final List<String>? prescriptionPdf;
+
   final int freeFollowUpsLeft;
   // final String customerId;
   final String? branchname;
@@ -164,7 +165,7 @@ class Getappointmentmodel {
       this.consentFormPdf,
       this.doctorRefCode,
       this.branchId,
-      this.priscriptionPdf});
+      this.prescriptionPdf});
 
   factory Getappointmentmodel.fromJson(Map<String, dynamic> json) {
     try {
@@ -192,7 +193,9 @@ class Getappointmentmodel {
         branchId: json['branchId'],
         consentFormPdf: json['consentFormPdf'],
         doctorRefCode: json['doctorRefCode'],
-        priscriptionPdf: json['priscriptionPdf']?.toString() ?? '',
+        prescriptionPdf: json['prescriptionPdf'] != null
+            ? List<String>.from(json['prescriptionPdf'])
+            : [],
 
         // 👇 Safely parse doubles
         consultationFee:

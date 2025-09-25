@@ -5,6 +5,8 @@ import 'package:cutomer_app/Clinic/AboutClinicController.dart';
 import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
 import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
+import 'package:cutomer_app/DotorRef/RefDoctorModal.dart';
+import 'package:cutomer_app/DotorRef/RefDoctorService.dart';
 import 'package:cutomer_app/Inputs/CustomDropdownField.dart';
 import 'package:cutomer_app/Loading/FullScreeenLoader.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
@@ -63,10 +65,13 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   // globals.dart
   final hcontroller = Get.put(ClinicController());
   String globalServiceId = '';
+  List<RefDoctor> apiDoctors = [];
+  String? selectedDoctorRefId;
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
-
+    _getDoctors();
     doctor = widget.doctor.doctor;
     // hospital = widget.doctor.hospital;
     loadSubService();
@@ -144,14 +149,25 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     });
   }
 
+  void _getDoctors() async {
+    final service = RefDoctorService();
+    final result = await service.fetchDoctors();
+    print("Fetched doctors length: ${result.length}"); // Debug
+
+    setState(() {
+      apiDoctors = result;
+      isLoading = false;
+    });
+  }
+
   String? selectedDoctor;
   // doctor_data.dart
-  final List<Map<String, String>> dummyDoctors = [
-    {"name": "Dr. John Doe", "refId": "REF123"},
-    {"name": "Dr. Smith Adams", "refId": "REF456"},
-    {"name": "Dr. Priya Sharma", "refId": "REF789"},
-    {"name": "Dr. Rahul Verma", "refId": "REF987"},
-  ];
+  // final List<Map<String, String>> dummyDoctors = [
+  //   {"name": "Dr. John Doe", "refId": "REF123"},
+  //   {"name": "Dr. Smith Adams", "refId": "REF456"},
+  //   {"name": "Dr. Priya Sharma", "refId": "REF789"},
+  //   {"name": "Dr. Rahul Verma", "refId": "REF987"},
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -159,6 +175,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     Widget? consultationWidget;
     bool loading = false;
     String? currentConsultationId;
+    String? selectedDoctorRefId = null; // not ''
 
     final double gstRate = 0.18;
     final double taxRate = 0;
@@ -235,32 +252,42 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text("Doctor Refferal Code (if any)",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                ),
-                // Replace your CustomTextField with this widget
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: CustomDropdownField<String>(
-                    value: selectedDoctor,
-                    labelText: "Select Referring Doctor",
-                    icon: Icons.person,
-                    items: dummyDoctors.map((doctor) {
-                      return DropdownMenuItem<String>(
-                        value: doctor['refId'],
-                        child: Text("${doctor['name']} (${doctor['refId']})"),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedDoctor = value;
-                        controller.text = value ?? '';
-                      });
-                    },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Doctor Referral Code (if any)",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 8),
+                      isLoading
+                          ? const CircularProgressIndicator()
+                          : DropdownButtonFormField<String>(
+                              value: selectedDoctorRefId,
+                              decoration: const InputDecoration(
+                                labelText: "Select Referring Doctor",
+                                prefixIcon: Icon(Icons.person),
+                                border: OutlineInputBorder(),
+                              ),
+                              items: apiDoctors.map((doctor) {
+                                return DropdownMenuItem<String>(
+                                  value: doctor.referralId,
+                                  child: Text(
+                                      "${doctor.fullName} (${doctor.referralId})"),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedDoctorRefId = value;
+                                  print(
+                                      "Selected Doctor Ref ID: $selectedDoctorRefId");
+                                });
+                              },
+                            ),
+                    ],
                   ),
                 ),
-
                 PaymentModeSelector(
                   consultationType: consultationController
                       .selectedConsultation.value!.consultationType,

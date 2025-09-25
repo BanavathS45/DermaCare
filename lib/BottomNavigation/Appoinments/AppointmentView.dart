@@ -97,7 +97,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
             // Hospital Accordion
             ExpansionTile(
               title: Text("Clinic Details"),
-              leading: Icon(Icons.local_hospital_outlined, color: Colors.blue),
+              leading: Icon(Icons.local_hospital_outlined, color: mainColor),
               children: [
                 _infoRow("Hospital", patient.clinicName),
                 _infoRow("Branch", patient?.branchname ?? ""),
@@ -109,14 +109,17 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
             // Doctor Accordion
             ExpansionTile(
               title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(patient.doctorName),
-                  TextButton(
-                    onPressed: () {
-                      Get.to(DoctorDetailScreen(doctorData: doctor));
-                    },
-                    child: Text("About Doctor"),
+                  Expanded(
+                    // ✅ Wrap with Expanded so it respects width
+                    child: Text(
+                      patient.doctorName,
+                      maxLines: 2, // ✅ Allow up to 2 lines
+                      overflow:
+                          TextOverflow.ellipsis, // ✅ Show ... if text overflows
+                      style: const TextStyle(fontSize: 16), // optional styling
+                    ),
                   ),
                 ],
               ),
@@ -130,13 +133,20 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
               children: [
                 _infoRow("Specialization", doctor.doctor.specialization),
                 _infoRow("Experience", "${doctor.doctor.experience} years"),
+                TextButton(
+                  onPressed: () {
+                    Get.to(DoctorDetailScreen(doctorData: doctor));
+                  },
+                  child: const Text("About Doctor"),
+                ),
               ],
             ),
+
             const SizedBox(height: 8),
             // Patient Info Accordion
             ExpansionTile(
               title: Text("Patient Details"),
-              leading: Icon(Icons.account_circle_outlined, color: Colors.blue),
+              leading: Icon(Icons.account_circle_outlined, color: mainColor),
               children: [
                 _infoRow("Name", patient.name),
                 _infoRow("Age", patient.age.toString()),
@@ -151,7 +161,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
             // Service / Payment Info Accordion
             ExpansionTile(
               title: Text("Service & Payment Details"),
-              leading: Icon(Icons.payment_outlined, color: Colors.blue),
+              leading: Icon(Icons.payment_outlined, color: mainColor),
               children: [
                 _infoRow("Service", patient.subServiceName),
                 _infoRow("Consultation Type", patient.consultationType),
@@ -164,198 +174,228 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
 
             if (showReports)
               ExpansionTile(
-                title: Text("Patient Reports"),
-                leading:
-                    Icon(Icons.picture_as_pdf_outlined, color: Colors.blue),
+                title: const Text(
+                  "Reports & Prescriptions",
+                ),
+                leading: const Icon(
+                  Icons.picture_as_pdf_outlined,
+                  color: mainColor,
+                ),
                 children: [
-                  // ✅ Prescription PDF (if available)
-                  if (patient.priscriptionPdf != null &&
-                      patient.priscriptionPdf!.isNotEmpty)
-                    Row(
+                  // ✅ Tab Controller for Prescription & Reports
+                  DefaultTabController(
+                    length: 2,
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: Text("Prescription",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        Container(
+                          // color: Colors.blue.shade50,
+                          child: const TabBar(
+                            labelColor: mainColor,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: mainColor,
+                            tabs: [
+                              Tab(text: "Prescriptions"),
+                              Tab(text: "Reports"),
+                            ],
+                          ),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.visibility, color: mainColor),
-                          onPressed: () async {
-                            try {
-                              final bytes =
-                                  base64Decode(patient.priscriptionPdf!);
-                              final tempDir = await getTemporaryDirectory();
-                              final filePath =
-                                  "${tempDir.path}/Prescription.pdf";
-                              final file = File(filePath);
-                              await file.writeAsBytes(bytes);
-                              await OpenFilex.open(file.path);
-                            } catch (e) {
-                              ScaffoldMessageSnackbar.show(
-                                context: context,
-                                message: "Failed to open prescription: $e",
-                                type: SnackbarType.error,
-                              );
-                            }
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.download, color: mainColor),
-                          onPressed: () async {
-                            if (!await requestStoragePermission()) {
-                              ScaffoldMessageSnackbar.show(
-                                context: context,
-                                message: "Storage permission is required",
-                                type: SnackbarType.warning,
-                              );
+                        SizedBox(
+                          height:
+                              300, // Adjust height as needed or use Expanded in parent
+                          child: TabBarView(
+                            children: [
+                              // ✅ Prescriptions Tab
+                              if (patient.prescriptionPdf != null &&
+                                  patient.prescriptionPdf!.isNotEmpty)
+                                ListView.builder(
+                                  itemCount: patient.prescriptionPdf!.length,
+                                  itemBuilder: (context, index) {
+                                    final base64File =
+                                        patient.prescriptionPdf![index];
+                                    final fileName =
+                                        "Prescription_Visit_${index + 1}.pdf";
 
-                              return;
-                            }
-                            try {
-                              final bytes =
-                                  base64Decode(patient.priscriptionPdf!);
-                              final downloadDir =
-                                  Directory("/storage/emulated/0/Download");
-                              if (!await downloadDir.exists()) {
-                                await downloadDir.create(recursive: true);
-                              }
+                                    return ListTile(
+                                      title: Text(
+                                          "Prescription_Visit_${index + 1}"),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(Icons.visibility,
+                                                color: mainColor),
+                                            onPressed: () async {
+                                              try {
+                                                final bytes =
+                                                    base64Decode(base64File);
+                                                final tempDir =
+                                                    await getTemporaryDirectory();
+                                                final filePath =
+                                                    "${tempDir.path}/$fileName";
+                                                final file = File(filePath);
+                                                await file.writeAsBytes(bytes);
+                                                await OpenFilex.open(file.path);
+                                              } catch (e) {
+                                                ScaffoldMessageSnackbar.show(
+                                                  context: context,
+                                                  message:
+                                                      "Failed to open $fileName: $e",
+                                                  type: SnackbarType.error,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.download,
+                                                color: mainColor),
+                                            onPressed: () async {
+                                              try {
+                                                final bytes =
+                                                    base64Decode(base64File);
+                                                final downloadDir = Directory(
+                                                    "/storage/emulated/0/Download");
+                                                if (!await downloadDir
+                                                    .exists()) {
+                                                  await downloadDir.create(
+                                                      recursive: true);
+                                                }
+                                                final filePath =
+                                                    "${downloadDir.path}/$fileName";
+                                                final file = File(filePath);
+                                                await file.writeAsBytes(bytes);
+                                                ScaffoldMessageSnackbar.show(
+                                                  context: context,
+                                                  message:
+                                                      "$fileName saved to Downloads",
+                                                  type: SnackbarType.success,
+                                                );
+                                                await OpenFilex.open(file.path);
+                                              } catch (e) {
+                                                ScaffoldMessageSnackbar.show(
+                                                  context: context,
+                                                  message:
+                                                      "Failed to download $fileName: $e",
+                                                  type: SnackbarType.error,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                )
+                              else
+                                const Center(
+                                  child: Text("No prescriptions available"),
+                                ),
 
-                              final filePath =
-                                  "${downloadDir.path}/Prescription.pdf";
-                              final file = File(filePath);
-                              await file.writeAsBytes(bytes);
-                              ScaffoldMessageSnackbar.show(
-                                context: context,
-                                message: "Prescription saved to Downloads",
-                                type: SnackbarType.success,
-                              );
+                              // ✅ Reports Tab
+                              if (patient.reports != null &&
+                                  patient.reports!.isNotEmpty)
+                                ListView(
+                                  children: patient.reports!
+                                      .expand((reportGroup) =>
+                                          reportGroup.reportsList)
+                                      .map((reportItem) {
+                                    return Column(
+                                      children: reportItem.reportFile
+                                          .map((fileBase64) {
+                                        final fileName =
+                                            "${reportItem.reportName.replaceAll(" ", "_")}.pdf";
 
-                              await OpenFilex.open(file.path);
-                            } catch (e) {
-                              ScaffoldMessageSnackbar.show(
-                                context: context,
-                                message: "Failed to download: $e",
-                                type: SnackbarType.error,
-                              );
-                            }
-                          },
+                                        return ListTile(
+                                          title: Text(reportItem.reportName),
+                                          subtitle: Text(reportItem.reportDate),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                icon: Icon(Icons.visibility,
+                                                    color: mainColor),
+                                                onPressed: () async {
+                                                  try {
+                                                    final bytes = base64Decode(
+                                                        fileBase64);
+                                                    final tempDir =
+                                                        await getTemporaryDirectory();
+                                                    final filePath =
+                                                        "${tempDir.path}/$fileName";
+                                                    final file = File(filePath);
+                                                    await file
+                                                        .writeAsBytes(bytes);
+                                                    await OpenFilex.open(
+                                                        file.path);
+                                                  } catch (e) {
+                                                    ScaffoldMessageSnackbar
+                                                        .show(
+                                                      context: context,
+                                                      message:
+                                                          "Failed to open report: $e",
+                                                      type: SnackbarType.error,
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                              IconButton(
+                                                icon: Icon(Icons.download,
+                                                    color: mainColor),
+                                                onPressed: () async {
+                                                  try {
+                                                    final bytes = base64Decode(
+                                                        fileBase64);
+                                                    final downloadDir = Directory(
+                                                        "/storage/emulated/0/Download");
+                                                    if (!await downloadDir
+                                                        .exists()) {
+                                                      await downloadDir.create(
+                                                          recursive: true);
+                                                    }
+                                                    final filePath =
+                                                        "${downloadDir.path}/$fileName";
+                                                    final file = File(filePath);
+                                                    await file
+                                                        .writeAsBytes(bytes);
+                                                    ScaffoldMessageSnackbar
+                                                        .show(
+                                                      context: context,
+                                                      message:
+                                                          "$fileName saved to Downloads",
+                                                      type:
+                                                          SnackbarType.success,
+                                                    );
+                                                    await OpenFilex.open(
+                                                        file.path);
+                                                  } catch (e) {
+                                                    ScaffoldMessageSnackbar
+                                                        .show(
+                                                      context: context,
+                                                      message:
+                                                          "Failed to download report: $e",
+                                                      type: SnackbarType.error,
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    );
+                                  }).toList(),
+                                )
+                              else
+                                const Center(
+                                  child: Text("No reports available"),
+                                ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-
-                  if (patient.priscriptionPdf != null &&
-                      patient.priscriptionPdf!.isNotEmpty)
-                    Divider(),
-
-                  // ✅ Reports Section
-                  if (patient.reports != null && patient.reports!.isNotEmpty)
-                    ...patient.reports!
-                        .expand((reportGroup) => reportGroup.reportsList)
-                        .map((reportItem) {
-                      return Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(reportItem.reportName,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    Text(reportItem.reportDate,
-                                        style: TextStyle(
-                                            fontSize: 12, color: Colors.grey)),
-                                  ],
-                                ),
-                              ),
-                              ...reportItem.reportFile.map((fileBase64) {
-                                return Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.visibility,
-                                          color: mainColor),
-                                      onPressed: () async {
-                                        try {
-                                          final bytes =
-                                              base64Decode(fileBase64);
-                                          final tempDir =
-                                              await getTemporaryDirectory();
-                                          final filePath =
-                                              "${tempDir.path}/${reportItem.reportName.replaceAll(" ", "_")}.pdf";
-                                          final file = File(filePath);
-                                          await file.writeAsBytes(bytes);
-                                          await OpenFilex.open(file.path);
-                                        } catch (e) {
-                                          ScaffoldMessageSnackbar.show(
-                                            context: context,
-                                            message:
-                                                "Failed to open report: $e",
-                                            type: SnackbarType.error,
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.download,
-                                          color: mainColor),
-                                      onPressed: () async {
-                                        // if (!await requestStoragePermission()) {
-                                        //   ScaffoldMessageSnackbar.show(
-                                        //     context: context,
-                                        //     message:
-                                        //         "Storage permission is required",
-                                        //     type: SnackbarType.success,
-                                        //   );
-
-                                        //   return;
-                                        // }
-                                        try {
-                                          final bytes =
-                                              base64Decode(fileBase64);
-                                          await downloadAndOpenReport(
-                                              fileBase64);
-
-                                          final downloadDir = Directory(
-                                              "/storage/emulated/0/Download");
-                                          if (!await downloadDir.exists()) {
-                                            await downloadDir.create(
-                                                recursive: true);
-                                          }
-
-                                          final filePath =
-                                              "${downloadDir.path}/${reportItem.reportName.replaceAll(" ", "_")}.pdf";
-                                          final file = File(filePath);
-                                          await file.writeAsBytes(bytes);
-                                          ScaffoldMessageSnackbar.show(
-                                            context: context,
-                                            message:
-                                                "${reportItem.reportName} saved to Downloads",
-                                            type: SnackbarType.success,
-                                          );
-
-                                          await OpenFilex.open(file.path);
-                                        } catch (e) {
-                                          ScaffoldMessageSnackbar.show(
-                                            context: context,
-                                            message:
-                                                "Failed to download report: $e",
-                                            type: SnackbarType.error,
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                );
-                              }).toList(),
-                            ],
-                          ),
-                          Divider(),
-                        ],
-                      );
-                    }).toList(),
+                  ),
                 ],
-              ),
+              )
           ],
         ),
       ),

@@ -1,10 +1,11 @@
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'AppointmentService.dart';
 import 'GetAppointmentModel.dart';
 import '../../Dashboard/DashBoardController.dart';
 
 class AppointmentController extends GetxController {
-  // 👇 Observables
+  // Observables
   final RxList<Getappointmentmodel> doctorBookings =
       <Getappointmentmodel>[].obs;
   final RxList<Getappointmentmodel> inProgressBookings =
@@ -14,7 +15,7 @@ class AppointmentController extends GetxController {
   final RxInt upcomingCountRx = 0.obs;
   final RxInt videoConsultationCountRx = 0.obs;
 
-  // 👇 Services and dashboard controller
+  // Services and dashboard controller
   final AppointmentService appointmentService = AppointmentService();
   final dashboardController = Get.find<Dashboardcontroller>();
 
@@ -22,23 +23,26 @@ class AppointmentController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // 👇 Fetch bookings whenever mobileNumber is available
-    ever(dashboardController.mobileNumber, (val) {
-      if (val != null && val.isNotEmpty) {
-        fetchBookings();
-      }
-    });
+    // Fetch bookings whenever mobileNumber is available
+    // ever(dashboardController.mobileNumber, (val) {
+    //   if (val != null && val.isNotEmpty) {
+    fetchBookings();
+    //   }
+    // });
   }
 
-  // 👇 Fetch all bookings
+  // Fetch all bookings
   Future<void> fetchBookings() async {
-    final mobileNumber = dashboardController.mobileNumber.value.trim();
-    if (mobileNumber.isEmpty) return;
+    // final mobileNumber = dashboardController.mobileNumber.value.trim();
 
     isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    var usermobilenumber = await prefs.getString('mobileNumber');
+    if (usermobilenumber!.isEmpty) return;
 
     try {
-      final response = await appointmentService.fetchAppointments(mobileNumber);
+      final response =
+          await appointmentService.fetchAppointments(usermobilenumber);
       print("📥 fetchBookings – raw list length: ${response.length}");
 
       if (response.isNotEmpty) {
@@ -55,7 +59,7 @@ class AppointmentController extends GetxController {
         upcomingCountRx.value = doctorBookings.where((b) {
           final status = b.status.toLowerCase().trim();
           final type = b.consultationType.toLowerCase().trim();
-          return (status == 'pending' || status == 'confirmed') &&
+          return (status == 'confirmed') &&
               type != 'online consultation' &&
               type != 'video consultation';
         }).length;
@@ -86,15 +90,13 @@ class AppointmentController extends GetxController {
     }
   }
 
-  // 👇 Filter bookings based on selected tab
+  // Filter bookings based on selected tab
   List<Getappointmentmodel> get filteredBookings {
     if (selectedTab.value == 'UPCOMING') {
       return doctorBookings.where((b) {
         final status = b.status.toLowerCase().trim();
         final type = b.consultationType.toLowerCase().trim();
-        return (status == 'pending' ||
-                status == 'confirmed' ||
-                status == 'in_progress') &&
+        return (status == 'confirmed' || status == 'in_progress') &&
             !(type == 'online consultation' || type == 'video consultation');
       }).toList();
     } else if (selectedTab.value == 'COMPLETED') {
@@ -108,12 +110,13 @@ class AppointmentController extends GetxController {
     }
   }
 
-  // 👇 Change tab
-  void changeTab(String tab) {
+  // Change tab
+  void changeTab(String tab) async {
     selectedTab.value = tab;
+    await fetchBookings();
   }
 
-  // 👇 Refresh bookings manually
+  // Refresh bookings manually
   Future<void> refreshBookings() async {
     await fetchBookings();
   }

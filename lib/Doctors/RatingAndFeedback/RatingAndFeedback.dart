@@ -108,22 +108,25 @@ class _RatingAndFeedbackState extends State<RatingAndFeedback> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              OutlinedButton(
-                onPressed: userHasRated
-                    ? null
-                    : () async {
-                        final controller = Get.find<AppointmentController>();
-                        final booking = controller.filteredBookings;
-                        final result = await Get.to(() => ReviewScreen(
-                              doctorData: widget.item,
-                              doctorBookings: null, //TODO: check this
-                              mobileNUmber: loggedInUserMobile!,
-                            ));
-                        if (result == true) setState(() {});
-                      },
-                // child: Text(userHasRated ? "Rated" : "Share your feedback"),
-                child: Text(userHasRated ? "Rated" : ""),
-              ),
+              // if (userHasRated)
+              //   OutlinedButton(
+              //     onPressed: () async {
+              //       final controller = Get.find<AppointmentController>();
+              //       final booking = controller.filteredBookings;
+              //       final result = await Get.to(() => ReviewScreen(
+              //             doctorData: widget.item,
+              //             doctorBookings: null, // TODO: check this
+              //             mobileNUmber: loggedInUserMobile!,
+              //           ));
+              //       if (result == true) setState(() {});
+              //     },
+              //     child: const Text("Rated"),
+              //   ),
+              if (userHasRated)
+                OutlinedButton(
+                  onPressed: () {},
+                  child: const Text("Rated"),
+                ),
               OutlinedButton(
                 onPressed: () {
                   Get.to(Allfeedbacks(

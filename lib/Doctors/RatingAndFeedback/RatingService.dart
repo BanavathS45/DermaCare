@@ -17,7 +17,7 @@ import 'RatingModal.dart';
 Future<RatingSummary> fetchAndSetRatingSummary(
     String branchId, String doctorId) async {
   final url =
-      Uri.parse('$wifiUrl/api/customer/getAverageRating/$branchId/$doctorId');
+      Uri.parse('$wifiUrl/api/customer/getAverageRatingByDoctorId/$doctorId');
 
   final doctorController = Get.find<DoctorController>();
 

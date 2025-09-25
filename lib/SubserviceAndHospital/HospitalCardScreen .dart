@@ -57,6 +57,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
     if (!Get.isRegistered<SymptomsController>()) {
       Get.put(SymptomsController());
     }
+    selectedBranch = null;
     fetchHospitalCards();
   }
 
@@ -207,13 +208,12 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                     // final prefs = await SharedPreferences.getInstance();
                     // await prefs.setString('branchId', value.branchId);
                     // await prefs.setString('branchName', value.branchName);
-                    final branch =
-                        await BranchService().getBranchById(value.branchId);
-                    consultationcontroller.selectedBranchName.value =
-                        value.branchName;
-                    consultationcontroller.selectedBranchId.value =
-                        value.branchId;
-                    Get.find<SymptomsController>().updateBranch(branch);
+                    // final branch = await BranchService().getBranchById(value.branchId);
+                    // consultationcontroller.selectedBranchName.value =
+                    //     value.branchName;
+                    // consultationcontroller.selectedBranchId.value =
+                    //     value.branchId;
+                    // Get.find<SymptomsController>().updateBranch(branch);
                   }
                 },
               ),
@@ -480,7 +480,7 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                       // Update selected branch in controller
                                       Get.find<SymptomsController>()
                                           .updateBranch(branch);
-                                      setState(() => selectedBranch = branch);
+                                      setState(() => selectedBranch = null);
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(

@@ -366,11 +366,11 @@ class _ServiceDetailsPageState extends State<ServiceDetailsPage>
                         color: Colors.white,
                       ),
                     ),
-                    Text(
-                      "(including tax\n& discount (if any))",
-                      style: TextStyle(fontSize: 12, color: Colors.white),
-                      textAlign: TextAlign.center,
-                    )
+                    // Text(
+                    //   "(including tax\n& discount (if any))",
+                    //   style: TextStyle(fontSize: 12, color: Colors.white),
+                    //   textAlign: TextAlign.center,
+                    // )
                   ],
                 ),
               ),

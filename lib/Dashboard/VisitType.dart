@@ -57,7 +57,7 @@ class _VisitTypeState extends State<VisitType> {
   bool showAllRows = false;
   final ScrollController _dateScrollController = ScrollController();
   Getappointmentmodel? selectedBooking;
-
+  bool loading = false;
   @override
   @override
   void initState() {
@@ -84,12 +84,16 @@ class _VisitTypeState extends State<VisitType> {
 
   Future<void> _fetchAppointments() async {
     try {
+      loading = true;
       final appointments = await appointmentService
           .fetchInprogressAppointments(widget.mobileNumber);
       visitController.setBookings(appointments);
       print("jhgjjhjhg L::${appointments.length}");
     } catch (e) {
+      loading = false;
       print("❌ Error fetching appointments: $e");
+    } finally {
+      loading = false;
     }
   }
 
@@ -152,180 +156,200 @@ class _VisitTypeState extends State<VisitType> {
             ),
             const SizedBox(height: 16),
 
+            // --- List of appointments ---
             Flexible(
               child: Obx(() {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: visitController.bookings.length,
-                  itemBuilder: (_, index) {
-                    final Getappointmentmodel appt =
-                        visitController.bookings[index];
-                    selectedHospitalDoctor = hospitalDoctors.firstWhereOrNull(
-                      (doc) => doc.doctor.doctorId == appt.doctorId,
-                    );
+                if (loading) {
+                  // ✅ Loading state
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (visitController.bookings.isEmpty) {
+                  // ✅ Empty state
+                  return const Center(
+                    child: Text('No follow-up appointments available'),
+                  );
+                } else {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: visitController.bookings.length,
+                    itemBuilder: (_, index) {
+                      final Getappointmentmodel appt =
+                          visitController.bookings[index];
 
-                    return Card(
-                      color: Colors.white,
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: mainColor, width: 1),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // ---- Top Row: Patient Name + Free Follow-Up Badge ----
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    capitalizeEachWord(appt.name) ??
-                                        "Unknown Patient",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 4, horizontal: 8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(color: secondaryColor),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.favorite,
-                                          size: 14, color: secondaryColor),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        "${appt.freeFollowUpsLeft ?? "0"} Left",
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: secondaryColor,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                      // ✅ Ensure patient name is available
+                      final patientName = appt.name.isNotEmpty
+                          ? capitalizeEachWord(appt.name)
+                          : "Unknown Patient";
+
+                      selectedHospitalDoctor = hospitalDoctors.firstWhereOrNull(
+                        (doc) => doc.doctor.doctorId == appt.doctorId,
+                      );
+
+                      return Card(
+                        color: Colors.white,
+                        elevation: 1,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: mainColor, width: 1),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ---- Top Row: Patient Name + Free Follow-Up Badge ----
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      patientName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black,
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            // ---- Details with Icons ----
-                            Row(
-                              children: [
-                                const Icon(Icons.family_restroom,
-                                    size: 18, color: Colors.grey),
-                                const SizedBox(width: 6),
-                                Text(" ${appt.relation ?? "NA"}"),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-
-                            Row(
-                              children: [
-                                const Icon(Icons.local_hospital,
-                                    size: 18, color: Colors.grey),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                    child: Text(
-                                        " ${selectedHospitalDoctor?.hospital.name ?? "NA"}")),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-
-                            Row(
-                              children: [
-                                const Icon(Icons.person,
-                                    size: 18, color: Colors.grey),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                    child: Text(
-                                        " ${selectedHospitalDoctor?.doctor.doctorName ?? "-"}")),
-                              ],
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            // ---- Last Consultation ----
-                            Row(
-                              children: [
-                                const Icon(Icons.calendar_month,
-                                    size: 18, color: mainColor),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    "Last Consultation: ${appt.serviceDate ?? "-"} ${appt.servicetime ?? "-"}",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4, horizontal: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(color: secondaryColor),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.favorite,
+                                            size: 14, color: secondaryColor),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "${appt.freeFollowUpsLeft ?? 0} Left",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: secondaryColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
 
-                            // ---- Action Buttons ----
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TextButton.icon(
-                                  icon: const Icon(
-                                    Icons.remove_red_eye,
-                                    size: 18,
-                                    color: mainColor,
+                              const SizedBox(height: 10),
+
+                              // ---- Details ----
+                              Row(
+                                children: [
+                                  const Icon(Icons.family_restroom,
+                                      size: 18, color: Colors.grey),
+                                  const SizedBox(width: 6),
+                                  Text(" ${appt.relation ?? "NA"}"),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.local_hospital,
+                                      size: 18, color: Colors.grey),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                        " ${selectedHospitalDoctor?.hospital.name ?? "NA"}"),
                                   ),
-                                  onPressed: () {
-                                    Get.to(() => AppointmentPreview(
-                                          doctor: selectedHospitalDoctor!,
-                                          doctorBookings: appt,
-                                        ));
-                                  },
-                                  label: const Text(
-                                    "View Details",
-                                    style: TextStyle(color: mainColor),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.person,
+                                      size: 18, color: Colors.grey),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                        " ${selectedHospitalDoctor?.doctor.doctorName ?? "-"}"),
                                   ),
-                                ),
-                                Container(
-                                  width: 1, // thickness of vertical line
-                                  height: 28, // height of line
-                                  color: Colors.grey.shade300,
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                ),
-                                Expanded(
-                                  child: TextButton.icon(
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+
+                              // ---- Last Consultation ----
+                              Row(
+                                children: [
+                                  const Icon(Icons.calendar_month,
+                                      size: 18, color: mainColor),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      "Last Consultation: ${appt.serviceDate ?? "-"} ${appt.servicetime ?? "-"}",
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 8),
+
+                              // ---- Action Buttons ----
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  TextButton.icon(
                                     icon: const Icon(
-                                      Icons.check_circle_outline,
+                                      Icons.remove_red_eye,
                                       size: 18,
                                       color: mainColor,
                                     ),
                                     onPressed: () {
-                                      selectedBooking = appt;
-                                      Get.back();
+                                      Get.to(() => AppointmentPreview(
+                                            doctor: selectedHospitalDoctor!,
+                                            doctorBookings: appt,
+                                          ));
+                                    },
+                                    label: const Text(
+                                      "View Details",
+                                      style: TextStyle(color: mainColor),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 1,
+                                    height: 28,
+                                    color: Colors.grey.shade300,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                  ),
+                                  Expanded(
+                                    child: TextButton.icon(
+                                      icon: const Icon(
+                                        Icons.check_circle_outline,
+                                        size: 18,
+                                        color: mainColor,
+                                      ),
+                                      onPressed: () {
+                                        selectedBooking = appt;
+                                        Get.back();
 
-                                      final doctor =
-                                          hospitalDoctors.firstWhereOrNull(
-                                        (doc) =>
-                                            doc.doctor.doctorId ==
-                                            appt.doctorId,
-                                      );
+                                        final doctor =
+                                            hospitalDoctors.firstWhereOrNull(
+                                          (doc) =>
+                                              doc.doctor.doctorId ==
+                                              appt.doctorId,
+                                        );
 
-                                      if (doctor != null &&
-                                          doctor.doctor
-                                              .doctorAvailabilityStatus) {
-                                        Get.bottomSheet(
-                                          bottomSlotWidget(
+                                        if (doctor != null &&
+                                            doctor.doctor
+                                                .doctorAvailabilityStatus) {
+                                          Get.bottomSheet(
+                                            bottomSlotWidget(
                                               selectedHospitalDoctor!
                                                   .hospital.hospitalId,
                                               selectedHospitalDoctor!
@@ -333,39 +357,42 @@ class _VisitTypeState extends State<VisitType> {
                                               appt.patientId,
                                               appt.clinicName,
                                               appt.doctorName,
-                                              appt.branchId),
-                                          isScrollControlled: true,
-                                          backgroundColor: Colors.white,
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(20),
+                                              appt.branchId,
                                             ),
-                                          ),
-                                        );
-                                        controller
-                                            .updateVisitType(selectedType);
-                                      } else {
-                                        ScaffoldMessageSnackbar.show(
-                                          context: context,
-                                          message: "Doctor not Available Now",
-                                          type: SnackbarType.warning,
-                                        );
-                                      }
-                                    },
-                                    label: const Text(
-                                      "Select",
-                                      style: TextStyle(color: mainColor),
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.white,
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                top: Radius.circular(20),
+                                              ),
+                                            ),
+                                          );
+                                          controller
+                                              .updateVisitType(selectedType);
+                                        } else {
+                                          ScaffoldMessageSnackbar.show(
+                                            context: context,
+                                            message: "Doctor not Available Now",
+                                            type: SnackbarType.warning,
+                                          );
+                                        }
+                                      },
+                                      label: const Text(
+                                        "Select",
+                                        style: TextStyle(color: mainColor),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
+                      );
+                    },
+                  );
+                }
               }),
             ),
           ],
