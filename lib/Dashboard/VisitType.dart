@@ -88,7 +88,7 @@ class _VisitTypeState extends State<VisitType> {
     final prefs = await SharedPreferences.getInstance();
     final id = prefs.getString('customerId') ?? "";
     print("jhgjjhjhg L::${id}");
-    setState(() => loading = true);
+    setState(() => visitController.loading.value = true);
     try {
       final appointments =
           await appointmentService.fetchInprogressAppointments(id);
@@ -97,7 +97,7 @@ class _VisitTypeState extends State<VisitType> {
     } catch (e) {
       print("❌ Error fetching appointments: $e");
     } finally {
-      setState(() => loading = false);
+      setState(() => visitController.loading.value = false);
     }
   }
 
@@ -163,7 +163,7 @@ class _VisitTypeState extends State<VisitType> {
             // --- List of appointments ---
             Flexible(
               child: Obx(() {
-                if (loading) {
+                if (visitController.loading.value) {
                   // ✅ Loading state
                   return const Center(
                     child: Column(
@@ -187,7 +187,8 @@ class _VisitTypeState extends State<VisitType> {
                       ],
                     ),
                   );
-                } else if (visitController.bookings.isEmpty) {
+                }
+                if (visitController.bookings.isEmpty) {
                   // ✅ Empty state
                   return const Center(
                     child: Text('No follow-up appointments available'),
@@ -250,11 +251,19 @@ class _VisitTypeState extends State<VisitType> {
 
                       // ✅ Normal doctor available card
                       return Card(
-                        color: Colors.white,
+                        color: selectedHospitalDoctor!
+                                .doctor.doctorAvailabilityStatus
+                            ? Colors.white
+                            : Colors.grey.shade100,
                         elevation: 1,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: mainColor, width: 1),
+                          side: BorderSide(
+                              color: selectedHospitalDoctor!
+                                      .doctor.doctorAvailabilityStatus
+                                  ? mainColor
+                                  : Colors.grey.shade100,
+                              width: 1),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -370,7 +379,6 @@ class _VisitTypeState extends State<VisitType> {
                                         size: 18, color: mainColor),
                                     onPressed: () {
                                       selectedBooking = appt;
-                                      Get.back();
 
                                       if (!selectedHospitalDoctor!
                                           .doctor.doctorAvailabilityStatus) {
@@ -523,7 +531,7 @@ class _VisitTypeState extends State<VisitType> {
                   const SizedBox(height: 12),
                   showDays(hospitalId, doctorId, branchId),
                   const Divider(height: 32),
-                  timeslots(),
+                  timeslots(doctorId),
                 ],
               ),
             ),
@@ -669,7 +677,7 @@ class _VisitTypeState extends State<VisitType> {
     );
   }
 
-  Widget timeslots() {
+  Widget timeslots(String doctorId) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -755,8 +763,10 @@ class _VisitTypeState extends State<VisitType> {
                             child: GestureDetector(
                               onTap: () {
                                 if (!isBooked) {
-                                  scheduleController.selectSlot(
-                                      actualIndex, slotText); // ✅ real index
+                                  scheduleController.selectSlotAsync(
+                                      actualIndex,
+                                      slotText,
+                                      doctorId); // ✅ real index
                                 }
                               },
                               child: Container(

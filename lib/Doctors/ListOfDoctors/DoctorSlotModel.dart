@@ -25,12 +25,18 @@ class DoctorSlot {
 class Slot {
   final String slot;
   final bool slotbooked;
+  bool tempSelected; // <- add this field
 
-  Slot({required this.slot, required this.slotbooked});
+  Slot({
+    required this.slot,
+    required this.slotbooked,
+    this.tempSelected = false, // default false
+  });
 
   factory Slot.fromJson(Map<String, dynamic> json) => Slot(
         slot: json['slot'],
         slotbooked: json['slotbooked'],
+        tempSelected: false,
       );
 
   Map<String, dynamic> toJson() => {

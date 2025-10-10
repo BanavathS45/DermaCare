@@ -500,13 +500,18 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
       });
 
       // Show success message using GetX
-      Get.snackbar(
-        "Success",
-        "Consent Form Uploaded Sucessfully...!",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+      ScaffoldMessageSnackbar.show(
+        context: context,
+        message: "Consent Form Uploaded Sucessfully...!",
+        type: SnackbarType.success,
       );
+      // Get.snackbar(
+      //   "Success",
+      //   "Consent Form Uploaded Sucessfully...!",
+      //   backgroundColor: Colors.green,
+      //   colorText: Colors.white,
+      //   snackPosition: SnackPosition.BOTTOM,
+      // );
 
       // Navigate to dashboard
       Get.offAll(() => BottomNavController(
@@ -912,21 +917,32 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                         });
 
                         // Use Get.snackbar instead of context-based snackbar
-                        Get.snackbar(
-                          "Success",
-                          "Signature Saved Successfully",
-                          backgroundColor: Colors.green,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
+                        ScaffoldMessageSnackbar.show(
+                          context: context,
+                          message: "Signature Saved Successfully",
+                          type: SnackbarType.success,
                         );
+                        // Get.snackbar(
+                        //   "Success",
+                        //   "Signature Saved Successfully",
+                        //   backgroundColor: Colors.green,
+                        //   colorText: Colors.white,
+                        //   snackPosition: SnackPosition.BOTTOM,
+                        // );
                       } else {
-                        Get.snackbar(
-                          "Error",
-                          "Please provide your signature",
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
+                        ScaffoldMessageSnackbar.show(
+                          context: context,
+                          message: "Please provide your signature",
+                          type: SnackbarType.error,
                         );
+
+                        // Get.snackbar(
+                        //   "Error",
+                        //   "Please provide your signature",
+                        //   backgroundColor: Colors.red,
+                        //   colorText: Colors.white,
+                        //   snackPosition: SnackPosition.BOTTOM,
+                        // );
                       }
                     },
                     child: const Text("Save"),

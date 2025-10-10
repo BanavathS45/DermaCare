@@ -49,7 +49,7 @@ class ScheduleController extends GetxController {
   final weekDates = <DateTime>[].obs;
   final selectedDate = DateTime.now().obs;
   RxInt selectedDayIndex = 0.obs;
-
+  final currentSlotsSelected = <DoctorSlotItem>[].obs;
   final selectedSlotIndex = (-1).obs;
   final selectedSlotText = ''.obs;
 
@@ -70,10 +70,10 @@ class ScheduleController extends GetxController {
     selectedDayIndex.value = 0;
   }
 
-  void scheduleMidnightRefresh({
-    required String doctorId,
-    required String hospitalId,required String branchId
-  }) {
+  void scheduleMidnightRefresh(
+      {required String doctorId,
+      required String hospitalId,
+      required String branchId}) {
     final now = DateTime.now();
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
     final durationUntilMidnight = nextMidnight.difference(now);
@@ -83,12 +83,14 @@ class ScheduleController extends GetxController {
       // final prefs = await SharedPreferences.getInstance();
       // var branchId = await prefs.getString('branchId');
       await initializeWeekDates();
-      final slots = await DoctorSlotService.fetchDoctorSlots(
+      final updatedSlots = await DoctorSlotService.fetchDoctorSlots(
           doctorId, hospitalId, branchId);
-      filterSlotsForSelectedDate(slots);
+      filterSlotsForSelectedDate(updatedSlots);
+      currentSlots.refresh();
 
       // Schedule again for the next night
-      scheduleMidnightRefresh(doctorId: doctorId, hospitalId: hospitalId, branchId: branchId);
+      scheduleMidnightRefresh(
+          doctorId: doctorId, hospitalId: hospitalId, branchId: branchId);
     });
   }
 
@@ -173,7 +175,7 @@ class ScheduleController extends GetxController {
     }
   }
 
-  void selectSlot(int index, String slotText) {
+  void selectSlott(int index, String slotText) {
     selectedSlotIndex.value = index;
     selectedSlotText.value = slotText;
   }
@@ -218,4 +220,78 @@ class ScheduleController extends GetxController {
       },
     );
   }
+
+  Future<bool> selectSlotAsync(
+      int index, String slotText, String doctorId) async {
+    final slot = currentSlots[index];
+
+    if (slot.slotbooked) return false;
+
+    try {
+      for (var s in currentSlots) s.tempSelected = false;
+      slot.tempSelected = true;
+      currentSlots.refresh();
+
+      final isBlocked = await DoctorSlotService.blockSlot(
+        doctorId: doctorId,
+        slotTime: slot.slot,
+        date: DateFormat('yyyy-MM-dd').format(selectedDate.value),
+      );
+
+      if (isBlocked) {
+        final prefs = await SharedPreferences.getInstance();
+        final hospitalId = prefs.getString('hospitalId');
+        final branchId = prefs.getString('branchId');
+
+        if (hospitalId != null && branchId != null) {
+          final updatedSlots = await DoctorSlotService.fetchDoctorSlots(
+            doctorId,
+            hospitalId,
+            branchId,
+          );
+          filterSlotsForSelectedDate(updatedSlots);
+          selectedSlotIndex.value = index;
+          selectedSlotText.value = slotText;
+          currentSlots.refresh();
+        }
+
+        return true;
+      } else {
+        slot.tempSelected = false;
+        currentSlots.refresh();
+        return false;
+      }
+    } catch (e) {
+      slot.tempSelected = false;
+      currentSlots.refresh();
+      print("Error blocking slot: $e");
+      return false;
+    }
+  }
+}
+
+class DoctorSlotItem {
+  String slot;
+  bool slotbooked; // already booked
+  bool tempBlocked; // temporarily blocked
+
+  DoctorSlotItem({
+    required this.slot,
+    this.slotbooked = false,
+    this.tempBlocked = false,
+  });
+
+  // If you have fromJson:
+  factory DoctorSlotItem.fromJson(Map<String, dynamic> json) {
+    return DoctorSlotItem(
+      slot: json['slot'],
+      slotbooked: json['slotbooked'] ?? false,
+      tempBlocked: false, // default to false
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'slot': slot,
+        'slotbooked': slotbooked,
+      };
 }

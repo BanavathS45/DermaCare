@@ -103,8 +103,10 @@ class ScaffoldMessageSnackbar {
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
+          
         ),
         duration: Duration(seconds: durationInSeconds),
+     
       ),
     );
   }

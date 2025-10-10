@@ -65,20 +65,31 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   Future<void> _initialize() async {
     if (!mounted) return;
-
     try {
       await scheduleController.initializeWeekDates();
+
       id = consultationController.selectedConsultation.value?.consultationId;
 
-      await fetchDoctorSlotsOnce();
       final prefs = await SharedPreferences.getInstance();
-      var hospitalId = await prefs.getString('hospitalId');
+      var hospitalId = prefs.getString('hospitalId');
 
-      // ⏰ Schedule refresh after midnight
+      // ✅ Fetch latest slots fresh
+      final allSlots = await DoctorSlotService.fetchDoctorSlots(
+        widget.doctorData.doctor.doctorId,
+        hospitalId!,
+        widget.branchId,
+      );
+
+      // ✅ Force the controller to update with new slots
+      scheduleController.filterSlotsForSelectedDate(allSlots);
+      scheduleController.currentSlots.refresh();
+
+      // ⏰ Schedule midnight refresh
       scheduleController.scheduleMidnightRefresh(
-          doctorId: widget.doctorData.doctor.doctorId,
-          hospitalId: hospitalId!,
-          branchId: widget.branchId);
+        doctorId: widget.doctorData.doctor.doctorId,
+        hospitalId: hospitalId,
+        branchId: widget.branchId,
+      );
     } catch (e) {
       debugPrint('Initialization error: $e');
     }
@@ -89,16 +100,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _initialize();
+  }
+
   Future<void> fetchDoctorSlotsOnce() async {
-    print("iam calling slots");
+    print("📡 Fetching slots once...");
     final prefs = await SharedPreferences.getInstance();
-    var hospitalId = await prefs.getString('hospitalId');
+    var hospitalId = prefs.getString('hospitalId');
+
     final allSlots = await DoctorSlotService.fetchDoctorSlots(
-        widget.doctorData.doctor.doctorId, hospitalId!, widget.branchId);
+      widget.doctorData.doctor.doctorId,
+      hospitalId!,
+      widget.branchId,
+    );
+
+    // ✅ Immediately update the controller with new data
     scheduleController.filterSlotsForSelectedDate(allSlots);
-    print("iam calling doctorId ${widget.doctorData.doctor.doctorId}");
-    print("iam calling hospitalId ${widget.doctorData.hospital.hospitalId}");
-    // scheduleController.initializeWeekDates();
+    scheduleController.currentSlots.refresh();
   }
 
   String? fullName;
@@ -121,183 +142,377 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonHeader(
-        title: "Schedule",
-        onNotificationPressed: () {},
-        onSettingPressed: () {},
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Month & Arrow
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    DateFormat('MMMM yyyy')
-                        .format(scheduleController.selectedDate.value),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.keyboard_arrow_right, color: mainColor),
-                    onPressed: () {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _dateScrollController.animateTo(
-                          _dateScrollController.position.maxScrollExtent,
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.easeOut,
-                        );
-                      });
-                    },
-                  ),
-                ],
-              ),
+        appBar: CommonHeader(
+          title: "Schedule",
+          onNotificationPressed: () {},
+          onSettingPressed: () {},
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Month & Arrow
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat('MMMM yyyy')
+                          .format(scheduleController.selectedDate.value),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_right, color: mainColor),
+                      onPressed: () {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _dateScrollController.animateTo(
+                            _dateScrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOut,
+                          );
+                        });
+                      },
+                    ),
+                  ],
+                ),
 
-              const SizedBox(height: 12),
-              showDays(),
+                const SizedBox(height: 12),
+                showDays(),
 
-              const SizedBox(height: 24),
-              timeslots(),
+                const SizedBox(height: 24),
+                timeslots(),
 
-              const SizedBox(height: 24),
-              Divider(color: secondaryColor),
-              const SizedBox(height: 12),
-              languagesKnown(),
-              Divider(color: secondaryColor),
+                const SizedBox(height: 24),
+                Divider(color: secondaryColor),
+                const SizedBox(height: 12),
+                languagesKnown(),
+                Divider(color: secondaryColor),
 
-              PatientDetailsForm(
-                mobileNumber: widget.mobileNumber,
-                username: widget.username,
-              ), // ✅ Add your working form here
-            ],
+                PatientDetailsForm(
+                  mobileNumber: widget.mobileNumber,
+                  username: widget.username,
+                ), // ✅ Add your working form here
+              ],
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: Container(
+        bottomNavigationBar: Container(
           height: 60,
           decoration: BoxDecoration(
             gradient: appGradient(),
           ),
-          child: TextButton(
-              onPressed: () async {
-                print(
-                    "devicedIDdevicedID${consultationController.selectedConsultation.value!.consultationType}");
+          child: Obx(() => TextButton(
+                onPressed: scheduleController.currentSlots.isEmpty
+                    ? null // ✅ Button disabled if no slots available
+                    : () async {
+                        if (!patientdetailsformcontroller.formKey.currentState!
+                            .validate()) {
+                          showSnackbar(
+                              "Warning",
+                              "Please fill the Patient Details Form",
+                              "warning");
+                          return;
+                        }
 
-                final prefs = await SharedPreferences.getInstance();
-                var devicedID = prefs.getString('fcm');
-                var patientProblem = consultationController
-                        .selectedConsultation.value!.consultationType
-                        .toLowerCase() ==
-                    "services & treatments";
-                print("devicedIDdevicedID${devicedID}");
-                if (patientdetailsformcontroller.formKey.currentState!
-                    .validate()) {
-                  if (scheduleController.selectedSlotText.value.isNotEmpty) {
-                    // showSnackbar("Success", "Form Validated", "success");
-                    String formattedDate = DateFormat('yyyy-MM-dd')
-                        .format(scheduleController.selectedDate.value);
-                    PatientModel patientmodel = PatientModel(
-                      name: patientdetailsformcontroller.selectedFor == 'Self'
-                          ? (fullName ?? widget.username)
-                          : patientdetailsformcontroller.nameController.text
-                              .trim(),
-                      patientId:
-                          patientdetailsformcontroller.selectedFor == 'Self'
-                              ? patientData!.patientId
-                              : "",
-                      age: patientdetailsformcontroller.selectedFor == 'Self'
-                          ? "${patientdetailsformcontroller.age} Yrs"
-                          : "${patientdetailsformcontroller.ageController.text} Yrs",
-                      // age: "20",
-                      gender: registercontroller.selectedGender,
-                      bookingFor: patientdetailsformcontroller.selectedFor,
-                      problem: patientProblem
-                          ? patientdetailsformcontroller.notesController.text
-                          : symptomsController.symptoms.value,
-                      monthYear: DateFormat('MMMM dd, yyyy')
-                          .format(scheduleController.selectedDate.value),
-                      serviceDate: formattedDate,
-                      servicetime: scheduleController.selectedSlotText.value,
-                      mobileNumber: widget.mobileNumber,
-                      customerDeviceId: devicedID ?? "",
-                      relation: patientdetailsformcontroller.selectedFor ==
-                              'Self'
-                          ? "Self"
-                          : patientdetailsformcontroller.relationController.text
-                              .trim(),
-                      patientMobileNumber:
-                          patientdetailsformcontroller.selectedFor == 'Self'
-                              ? widget.mobileNumber
-                              : patientdetailsformcontroller
-                                  .patientMobileNumberController.text
+                        final slotIndex =
+                            scheduleController.selectedSlotIndex.value;
+
+                        if (slotIndex == -1) {
+                          showSnackbar(
+                              "Warning", "Please select a slot", "warning");
+                          return;
+                        }
+
+                        final slot = scheduleController.currentSlots[slotIndex];
+
+                        bool success = await scheduleController.selectSlotAsync(
+                          slotIndex,
+                          slot.slot,
+                          widget.doctorData.doctor.doctorId,
+                        );
+
+                        if (!success) {
+                          showSnackbar("Warning",
+                              "Failed to select slot. Try again", "warning");
+                          return;
+                        }
+
+                        // ✅ Slot successfully selected, continue to next screen
+                        String formattedDate = DateFormat('yyyy-MM-dd')
+                            .format(scheduleController.selectedDate.value);
+
+                        PatientModel patientmodel = PatientModel(
+                          name: patientdetailsformcontroller.selectedFor ==
+                                  'Self'
+                              ? (fullName ?? widget.username)
+                              : patientdetailsformcontroller.nameController.text
                                   .trim(),
-                      patientAddress:
-                          patientdetailsformcontroller.addressController.text,
-                    );
-                    // 'dB4XJQ7xQ1KsY_BLUxo0r-:APA91bE74fgP5hWGuf26QAXAB6pFpimSaB22MWw9ccLK44TkFYPnMHaz7vXI7otlxPkLn28zAzNoU5zRIG_Un5fGebPU9TMSTfPWzpnmLgH7MyFxHlSlA3M'
+                          patientId:
+                              patientdetailsformcontroller.selectedFor == 'Self'
+                                  ? patientData!.patientId
+                                  : "",
+                          age: patientdetailsformcontroller.selectedFor ==
+                                  'Self'
+                              ? "${patientdetailsformcontroller.age} Yrs"
+                              : "${patientdetailsformcontroller.ageController.text} Yrs",
+                          gender: registercontroller.selectedGender,
+                          bookingFor: patientdetailsformcontroller.selectedFor,
+                          problem: consultationController.selectedConsultation
+                                      .value!.consultationType
+                                      .toLowerCase() ==
+                                  "services & treatments"
+                              ? patientdetailsformcontroller
+                                  .notesController.text
+                              : symptomsController.symptoms.value,
+                          monthYear: DateFormat('MMMM dd, yyyy')
+                              .format(scheduleController.selectedDate.value),
+                          serviceDate: formattedDate,
+                          servicetime:
+                              scheduleController.selectedSlotText.value,
+                          mobileNumber: widget.mobileNumber,
+                          customerDeviceId:
+                              (await SharedPreferences.getInstance())
+                                      .getString('fcm') ??
+                                  "",
+                          relation:
+                              patientdetailsformcontroller.selectedFor == 'Self'
+                                  ? "Self"
+                                  : patientdetailsformcontroller
+                                      .relationController.text
+                                      .trim(),
+                          patientMobileNumber:
+                              patientdetailsformcontroller.selectedFor == 'Self'
+                                  ? widget.mobileNumber
+                                  : patientdetailsformcontroller
+                                      .patientMobileNumberController.text
+                                      .trim(),
+                          patientAddress: patientdetailsformcontroller
+                              .addressController.text,
+                        );
 
-                    print("patientmodel ${patientmodel.toJson()}");
+                        Get.to(() => Confirmbookingdetails(
+                              doctor: widget.doctorData,
+                              patient: patientmodel,
+                            ));
+                      },
+                child: Text(
+                  "CONTINUE",
+                  style: TextStyle(
+                      color: scheduleController.currentSlots.isEmpty
+                          ? Colors.grey.shade400
+                          : Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20),
+                ),
+              )),
+        )
 
-                    // Get.to(() => Confirmbookingdetails(doctor: doctorData, patient: patientData));
-                    print('Doctor 8888: ${widget.doctorData}');
-                    print('Patient: $patientmodel');
-                    if (consultationController.selectedConsultation.value !=
-                            null &&
-                        consultationController
-                                .selectedConsultation.value!.consultationType
-                                .toLowerCase() ==
-                            "services & treatments") {
-                      // symptomsController.updateDuration(
-                      //     patientdetailsformcontroller.durationController.text);
+        // bottomNavigationBar: Container(
+        //     height: 60,
+        //     decoration: BoxDecoration(
+        //       gradient: appGradient(),
+        //     ),
+        //     child: TextButton(
+        //         onPressed: () async {
+        //           final prefs = await SharedPreferences.getInstance();
+        //           if (!patientdetailsformcontroller.formKey.currentState!
+        //               .validate()) {
+        //             showSnackbar("Warning",
+        //                 "Please fill the Patient Details Form", "warning");
+        //             return;
+        //           }
 
-                      // Get.to(SkinCareConsentFormScreen(
-                      //   doctor: widget.doctorData,
-                      //   patient: patientmodel,
-                      // ));
-                      Get.to(() => Confirmbookingdetails(
-                            doctor: widget.doctorData,
-                            patient: patientmodel,
-                            // pass pdf to next screen
-                          ));
-                      // print(
-                      //     "patientdetailsformcontroller.durationController.text ${symptomsController.duration}");
-                    } else {
-                      Get.to(() => Confirmbookingdetails(
-                            doctor: widget.doctorData,
-                            patient: patientmodel,
-                            // pass pdf to next screen
-                          ));
-                    }
-                    // Get.to(SkinCareConsentFormScreen(
-                    //   doctor: widget.doctorData,
-                    //   patient: patientmodel,
-                    // ));
+        //           // Ensure a slot is selected
+        //           if (scheduleController.selectedSlotText.value.isEmpty) {
+        //             final firstAvailableIndex = scheduleController.currentSlots
+        //                 .indexWhere((slot) => !slot.slotbooked);
+        //             if (firstAvailableIndex == -1) {
+        //               showSnackbar(
+        //                   "Warning", "No available slots to select", "warning");
+        //               return;
+        //             }
 
-                    // symptomsController.updateDuration(
-                    //     patientdetailsformcontroller.durationController.text);
-                    // Get.to(Confirmbookingdetails(
-                    //   doctor: widget.doctorData,
-                    //   patient: patientmodel,
-                    // ));
-                  } else {
-                    showSnackbar("Warning", "Please Select Slot", "warning");
-                  }
-                } else {
-                  showSnackbar("Warning",
-                      "Please fill the Patient Details Form", "warning");
-                }
-              },
-              child: Text(
-                "CONTINUE",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),
-              ))),
-    );
+        //             final slot =
+        //                 scheduleController.currentSlots[firstAvailableIndex];
+        //             bool success = await scheduleController.selectSlotAsync(
+        //               firstAvailableIndex,
+        //               slot.slot,
+        //               widget.doctorData.doctor.doctorId,
+        //             );
+
+        //             if (!success) {
+        //               showSnackbar("Warning", "Failed to select slot. Try again.",
+        //                   "warning");
+        //               return;
+        //             }
+        //           }
+
+        //           // ✅ After a slot is selected
+        //           String formattedDate = DateFormat('yyyy-MM-dd')
+        //               .format(scheduleController.selectedDate.value);
+
+        //           PatientModel patientmodel = PatientModel(
+        //             name: patientdetailsformcontroller.selectedFor == 'Self'
+        //                 ? (fullName ?? widget.username)
+        //                 : patientdetailsformcontroller.nameController.text.trim(),
+        //             patientId: patientdetailsformcontroller.selectedFor == 'Self'
+        //                 ? patientData!.patientId
+        //                 : "",
+        //             age: patientdetailsformcontroller.selectedFor == 'Self'
+        //                 ? "${patientdetailsformcontroller.age} Yrs"
+        //                 : "${patientdetailsformcontroller.ageController.text} Yrs",
+        //             gender: registercontroller.selectedGender,
+        //             bookingFor: patientdetailsformcontroller.selectedFor,
+        //             problem: consultationController
+        //                         .selectedConsultation.value!.consultationType
+        //                         .toLowerCase() ==
+        //                     "services & treatments"
+        //                 ? patientdetailsformcontroller.notesController.text
+        //                 : symptomsController.symptoms.value,
+        //             monthYear: DateFormat('MMMM dd, yyyy')
+        //                 .format(scheduleController.selectedDate.value),
+        //             serviceDate: formattedDate,
+        //             servicetime: scheduleController.selectedSlotText.value,
+        //             mobileNumber: widget.mobileNumber,
+        //             customerDeviceId: prefs.getString('fcm') ?? "",
+        //             relation: patientdetailsformcontroller.selectedFor == 'Self'
+        //                 ? "Self"
+        //                 : patientdetailsformcontroller.relationController.text
+        //                     .trim(),
+        //             patientMobileNumber:
+        //                 patientdetailsformcontroller.selectedFor == 'Self'
+        //                     ? widget.mobileNumber
+        //                     : patientdetailsformcontroller
+        //                         .patientMobileNumberController.text
+        //                         .trim(),
+        //             patientAddress:
+        //                 patientdetailsformcontroller.addressController.text,
+        //           );
+
+        //           Get.to(() => Confirmbookingdetails(
+        //                 doctor: widget.doctorData,
+        //                 patient: patientmodel,
+        //               ));
+
+        //           // onPressed: () async {
+        //           //   print(
+        //           //       "devicedIDdevicedID${consultationController.selectedConsultation.value!.consultationType}");
+
+        //           //   final prefs = await SharedPreferences.getInstance();
+        //           //   var devicedID = prefs.getString('fcm');
+        //           //   var patientProblem = consultationController
+        //           //           .selectedConsultation.value!.consultationType
+        //           //           .toLowerCase() ==
+        //           //       "services & treatments";
+        //           //   print("devicedIDdevicedID${devicedID}");
+        //           //   if (patientdetailsformcontroller.formKey.currentState!
+        //           //       .validate()) {
+        //           //     if (scheduleController.selectedSlotText.value.isNotEmpty) {
+        //           //       // showSnackbar("Success", "Form Validated", "success");
+        //           //       String formattedDate = DateFormat('yyyy-MM-dd')
+        //           //           .format(scheduleController.selectedDate.value);
+        //           //       PatientModel patientmodel = PatientModel(
+        //           //         name: patientdetailsformcontroller.selectedFor == 'Self'
+        //           //             ? (fullName ?? widget.username)
+        //           //             : patientdetailsformcontroller.nameController.text
+        //           //                 .trim(),
+        //           //         patientId:
+        //           //             patientdetailsformcontroller.selectedFor == 'Self'
+        //           //                 ? patientData!.patientId
+        //           //                 : "",
+        //           //         age: patientdetailsformcontroller.selectedFor == 'Self'
+        //           //             ? "${patientdetailsformcontroller.age} Yrs"
+        //           //             : "${patientdetailsformcontroller.ageController.text} Yrs",
+        //           //         // age: "20",
+        //           //         gender: registercontroller.selectedGender,
+        //           //         bookingFor: patientdetailsformcontroller.selectedFor,
+        //           //         problem: patientProblem
+        //           //             ? patientdetailsformcontroller.notesController.text
+        //           //             : symptomsController.symptoms.value,
+        //           //         monthYear: DateFormat('MMMM dd, yyyy')
+        //           //             .format(scheduleController.selectedDate.value),
+        //           //         serviceDate: formattedDate,
+        //           //         servicetime: scheduleController.selectedSlotText.value,
+        //           //         mobileNumber: widget.mobileNumber,
+        //           //         customerDeviceId: devicedID ?? "",
+        //           //         relation: patientdetailsformcontroller.selectedFor ==
+        //           //                 'Self'
+        //           //             ? "Self"
+        //           //             : patientdetailsformcontroller.relationController.text
+        //           //                 .trim(),
+        //           //         patientMobileNumber:
+        //           //             patientdetailsformcontroller.selectedFor == 'Self'
+        //           //                 ? widget.mobileNumber
+        //           //                 : patientdetailsformcontroller
+        //           //                     .patientMobileNumberController.text
+        //           //                     .trim(),
+        //           //         patientAddress:
+        //           //             patientdetailsformcontroller.addressController.text,
+        //           //       );
+        //           //       // 'dB4XJQ7xQ1KsY_BLUxo0r-:APA91bE74fgP5hWGuf26QAXAB6pFpimSaB22MWw9ccLK44TkFYPnMHaz7vXI7otlxPkLn28zAzNoU5zRIG_Un5fGebPU9TMSTfPWzpnmLgH7MyFxHlSlA3M'
+
+        //           //       print("patientmodel ${patientmodel.toJson()}");
+
+        //           //       // Get.to(() => Confirmbookingdetails(doctor: doctorData, patient: patientData));
+        //           //       print('Doctor 8888: ${widget.doctorData}');
+        //           //       print('Patient: $patientmodel');
+        //           //       if (consultationController.selectedConsultation.value !=
+        //           //               null &&
+        //           //           consultationController
+        //           //                   .selectedConsultation.value!.consultationType
+        //           //                   .toLowerCase() ==
+        //           //               "services & treatments") {
+        //           //         // symptomsController.updateDuration(
+        //           //         //     patientdetailsformcontroller.durationController.text);
+
+        //           //         // Get.to(SkinCareConsentFormScreen(
+        //           //         //   doctor: widget.doctorData,
+        //           //         //   patient: patientmodel,
+        //           //         // ));
+        //           //         Get.to(() => Confirmbookingdetails(
+        //           //               doctor: widget.doctorData,
+        //           //               patient: patientmodel,
+        //           //               // pass pdf to next screen
+        //           //             ));
+        //           //         // print(
+        //           //         //     "patientdetailsformcontroller.durationController.text ${symptomsController.duration}");
+        //           //       } else {
+        //           //         Get.to(() => Confirmbookingdetails(
+        //           //               doctor: widget.doctorData,
+        //           //               patient: patientmodel,
+        //           //               // pass pdf to next screen
+        //           //             ));
+        //           //       }
+        //           //       // Get.to(SkinCareConsentFormScreen(
+        //           //       //   doctor: widget.doctorData,
+        //           //       //   patient: patientmodel,
+        //           //       // ));
+
+        //           //       // symptomsController.updateDuration(
+        //           //       //     patientdetailsformcontroller.durationController.text);
+        //           //       // Get.to(Confirmbookingdetails(
+        //           //       //   doctor: widget.doctorData,
+        //           //       //   patient: patientmodel,
+        //           //       // ));
+        //           //     } else {
+        //           //       showSnackbar("Warning", "Please Select Slot", "warning");
+        //           //     }
+        //           //   } else {
+        //           //     showSnackbar("Warning",
+        //           //         "Please fill the Patient Details Form", "warning");
+        //           //   }
+        //           // },
+        //         },
+        //         child: Text(
+        //           "CONTINUE",
+        //           style: TextStyle(
+        //               color: Colors.white,
+        //               fontWeight: FontWeight.bold,
+        //               fontSize: 20),
+        //         ))),
+
+        );
   }
 
   languagesKnown() {
@@ -421,38 +636,44 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         final isBooked = slotData.slotbooked;
                         final actualIndex = startIndex + i;
 
-                        final isSelected = actualIndex ==
-                            scheduleController.selectedSlotIndex.value;
-
+                        final isSelected = slotData.tempSelected ||
+                            (actualIndex ==
+                                scheduleController.selectedSlotIndex.value);
+                        // final isSelected = slotData.tempSelected ||
+                        //     (actualIndex ==
+                        //         scheduleController.selectedSlotIndex.value);
                         return Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(4),
                             child: GestureDetector(
                               onTap: () {
                                 if (!isBooked) {
-                                  scheduleController.selectSlot(
-                                      actualIndex, slotText);
+                                  scheduleController.selectSlott(
+                                    actualIndex,
+                                    slotText,
+                                  );
                                 }
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 4),
                                 decoration: BoxDecoration(
-                                  color: isBooked
+                                  color: slotData.slotbooked
                                       ? Colors.grey.shade300
                                       : isSelected
                                           ? mainColor
                                           : Colors.white,
                                   border: Border.all(
-                                      color:
-                                          isBooked ? Colors.grey : mainColor),
+                                      color: slotData.slotbooked
+                                          ? Colors.grey
+                                          : mainColor),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
-                                  slotText,
+                                  slotData.slot,
                                   style: TextStyle(
-                                    color: isBooked
+                                    color: slotData.slotbooked
                                         ? Colors.grey
                                         : isSelected
                                             ? Colors.white
