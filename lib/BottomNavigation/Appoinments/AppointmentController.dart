@@ -40,9 +40,11 @@ class AppointmentController extends GetxController {
     var usermobilenumber = await prefs.getString('mobileNumber');
     if (usermobilenumber!.isEmpty) return;
 
+    final id = prefs.getString('customerId') ?? "";
+    print("📥 fetchBookings ${id}");
+
     try {
-      final response =
-          await appointmentService.fetchAppointments(usermobilenumber);
+      final response = await appointmentService.fetchAppointments(id);
       print("📥 fetchBookings – raw list length: ${response.length}");
 
       if (response.isNotEmpty) {

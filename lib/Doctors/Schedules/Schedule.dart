@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Customers/GetCustomerModel.dart';
 import 'package:cutomer_app/Dashboard/GetCustomerData.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorSlotModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
@@ -58,6 +59,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
+
     getUserData();
   }
 
@@ -71,6 +73,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       await fetchDoctorSlotsOnce();
       final prefs = await SharedPreferences.getInstance();
       var hospitalId = await prefs.getString('hospitalId');
+
       // ⏰ Schedule refresh after midnight
       scheduleController.scheduleMidnightRefresh(
           doctorId: widget.doctorData.doctor.doctorId,
@@ -99,6 +102,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   String? fullName;
+  GetCustomerModel? patientData;
 
   Future<void> getUserData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -109,6 +113,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       setState(() {
         fullName =
             userData.fullName; // or userData.fullName depending on structure
+        patientData = userData;
       });
     }
   }
@@ -199,6 +204,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           ? (fullName ?? widget.username)
                           : patientdetailsformcontroller.nameController.text
                               .trim(),
+                      patientId:
+                          patientdetailsformcontroller.selectedFor == 'Self'
+                              ? patientData!.patientId
+                              : "",
                       age: patientdetailsformcontroller.selectedFor == 'Self'
                           ? "${patientdetailsformcontroller.age} Yrs"
                           : "${patientdetailsformcontroller.ageController.text} Yrs",
@@ -244,10 +253,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       // symptomsController.updateDuration(
                       //     patientdetailsformcontroller.durationController.text);
 
-                      Get.to(SkinCareConsentFormScreen(
-                        doctor: widget.doctorData,
-                        patient: patientmodel,
-                      ));
+                      // Get.to(SkinCareConsentFormScreen(
+                      //   doctor: widget.doctorData,
+                      //   patient: patientmodel,
+                      // ));
+                      Get.to(() => Confirmbookingdetails(
+                            doctor: widget.doctorData,
+                            patient: patientmodel,
+                            // pass pdf to next screen
+                          ));
                       // print(
                       //     "patientdetailsformcontroller.durationController.text ${symptomsController.duration}");
                     } else {

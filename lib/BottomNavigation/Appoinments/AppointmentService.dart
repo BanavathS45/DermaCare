@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:cutomer_app/APIs/BaseUrl.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'GetAppointmentModel.dart';
 
 class AppointmentService {
   /// Fetch all bookings for a mobile number
-  Future<List<Getappointmentmodel>> fetchAppointments(
-      String mobileNumber) async {
-    final url = '$registerUrl/getBookedServices/$mobileNumber';
+  Future<List<Getappointmentmodel>> fetchAppointments(String customerId) async {
+    final url = '$registerUrl/bookings/customerId/$customerId';
     print("🔍 URL: $url");
 
     try {
@@ -44,9 +44,11 @@ class AppointmentService {
 
   /// Fetch in-progress appointments
   Future<List<Getappointmentmodel>> fetchInprogressAppointments(
-      String mobileNumber) async {
-    final url = '$registerUrl/inprogressAppointments/$mobileNumber';
-    print("🔍 URL: $url");
+      String customerId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getString('customerId') ?? "";
+    final url = '$registerUrl/bookings/Inprogress/customerId/$customerId';
+    print("🔍 InprogressURL: $url");
 
     try {
       final response = await http.get(Uri.parse(url));

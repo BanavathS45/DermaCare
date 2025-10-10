@@ -42,6 +42,7 @@ class _BottomNavControllerState extends State<BottomNavController> {
     super.initState();
 
     print("doctorController.mobileNumber ${widget.mobileNumber}");
+    print("doctorController.mobileNumber ${widget.username}");
     _selectedIndex = widget.index;
 
     // Initialize pages

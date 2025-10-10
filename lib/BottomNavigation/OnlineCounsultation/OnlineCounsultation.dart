@@ -1,6 +1,7 @@
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Booings/BooingService.dart';
 import '../../Doctors/ListOfDoctors/DoctorController.dart';
@@ -33,6 +34,9 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
   }
 
   Future<void> fetchBookings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getString('customerId') ?? "";
+
     try {
       final bookings =
           await appointmentService.fetchAppointments(widget.mobileNumber);

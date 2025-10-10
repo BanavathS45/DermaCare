@@ -65,6 +65,70 @@ Future<Map<String, dynamic>?> followUpBookings(
   }
 }
 
+Future<Map<String, dynamic>?> updateConsentForm(
+    Map<String, dynamic> bookingDetails) async {
+  final String url = '${clinicUrl}/updateAppointmentBasedOnBookingId';
+  print('Request URL: $url');
+  print('Request payload: $bookingDetails');
+
+  try {
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(bookingDetails), // ✅ Encode Dart map to JSON
+    );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return jsonDecode(response.body); // ✅ Parse JSON response
+    } else {
+      print('Failed to update consent form: ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Error updating consent form: $e');
+    return null;
+  }
+}
+
+// Future<bool> updateConsentForm({
+//   required String bookingId,
+//   required String consentPdfBase64, // <-- use String instead of Uint8List
+// }) async {
+//   final url = Uri.parse(BookingUrl);
+//   print("Request URL: $url");
+
+//   try {
+//     // Build request payload
+//     final payload = {
+//       "bookingId": bookingId,
+//       "consentFormPdf": consentPdfBase64,
+//     };
+
+//     final response = await http.put(
+//       url,
+//       headers: {'Content-Type': 'application/json'},
+//       body: jsonEncode(payload),
+//     );
+
+//     if (response.statusCode == 200) {
+//       print("Consent form updated successfully");
+//       return true;
+//     } else {
+//       print("Failed to update consent form: ${response.statusCode}");
+//       print("Response body: ${response.body}");
+//       return false;
+//     }
+//   } catch (e) {
+//     print("Error updating consent form: $e");
+//     return false;
+//   }
+// }
+
 Future<List<Map<String, dynamic>>> getBookingsByMobileNumber(
     String mobileNumber) async {
   print("dshffdfjsd ${mobileNumber}");

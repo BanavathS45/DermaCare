@@ -121,7 +121,9 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   void loadSubService() async {
     final prefs = await SharedPreferences.getInstance();
     var hospitalId = await prefs.getString('hospitalId');
-    hcontroller.fetchClinic(hospitalId!);
+    print("Calling loadSubService...${hospitalId}");
+
+    // hcontroller.fetchClinic(hospitalId!);
     print("Calling loadSubService...");
 
     clinicName = await prefs.getString('hospitalName');
@@ -172,6 +174,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
   @override
   Widget build(BuildContext context) {
     final clinic = hcontroller.clinic.value;
+    print("Clinic Data222: $clinic");
     Widget? consultationWidget;
     bool loading = false;
     String? currentConsultationId;
@@ -636,6 +639,8 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                 customerId: customerId!);
             print(
                 '[🏥] Booking via Pay at Hospital ${bookingDetails.toString()}');
+            print(
+                '[🏥] Booking via Pay at freeFollowUps ${clinic?.freeFollowUps}');
             print('[🏥] Booking via Pay at Hospital ${controller.text}');
 
             // 📦 Model ready for API
@@ -695,17 +700,23 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
               // 💳 GO TO PAYMENT SCREEN
               print('[💳] Navigating to Razorpay...');
 
-              Get.to(RazorpaySubscription(
-                  context: context,
-                  amount: consultationFee.toString(),
-                  onPaymentInitiated: () {
-                    showSnackbar("Info", "Payment Initiated", "info");
-                  },
-                  serviceDetails: widget.doctor,
-                  patient: widget.patient,
-                  bookingDetails: postBookingPayload,
-                  mobileNumber: widget.patient.mobileNumber,
-                  branchName: branchName));
+              Get.to(() => RazorpaySubscription(
+                    context: context,
+                    amount: isServiceConsultation
+                        ? (subServiceDetails?.finalCost?.toStringAsFixed(0) ??
+                            "0")
+                        : (consultationFee + consultationFee * 0.18)
+                            .toStringAsFixed(0),
+                    onPaymentInitiated: () {
+                      showSnackbar("Info", "Payment Initiated", "info");
+                    },
+                    serviceDetails: widget.doctor,
+                    patient: widget.patient,
+                    bookingDetails: postBookingPayload,
+                    mobileNumber: widget.patient.mobileNumber,
+                    branchName: branchName,
+                  ));
+
               // }
               // void handleNextScreen(BuildContext context, Map<String, dynamic> payload) async {
               //   final response = await http.get(Uri.parse(

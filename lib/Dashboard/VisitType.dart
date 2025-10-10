@@ -22,6 +22,7 @@ import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:cutomer_app/Widget/Bottomsheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,12 +66,12 @@ class _VisitTypeState extends State<VisitType> {
     _fetchAppointments();
     selectedType = "First Time";
     controller.updateVisitType("First Time");
-
+    scheduleController.initializeWeekDates();
     fetchHospitalDoctor().then((value) async {
       setState(() => hospitalDoctors = value);
 
       if (hospitalDoctors.isNotEmpty) {
-        final today = scheduleController.weekDates[0]; // first date (today)
+        final today = scheduleController.weekDates.first; // first date (today)
         final doctorId = hospitalDoctors.first.doctor.doctorId;
         final clinicId = hospitalDoctors.first.hospital.hospitalId;
         // final prefs = await SharedPreferences.getInstance();
@@ -78,22 +79,25 @@ class _VisitTypeState extends State<VisitType> {
         final slots = await DoctorSlotService.fetchDoctorSlots(
             doctorId, clinicId, branchId!);
         scheduleController.selectDate(today, slots);
+        print("jhgjjhjhgslots L::${slots}");
       }
     });
   }
 
   Future<void> _fetchAppointments() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getString('customerId') ?? "";
+    print("jhgjjhjhg L::${id}");
+    setState(() => loading = true);
     try {
-      loading = true;
-      final appointments = await appointmentService
-          .fetchInprogressAppointments(widget.mobileNumber);
+      final appointments =
+          await appointmentService.fetchInprogressAppointments(id);
       visitController.setBookings(appointments);
       print("jhgjjhjhg L::${appointments.length}");
     } catch (e) {
-      loading = false;
       print("❌ Error fetching appointments: $e");
     } finally {
-      loading = false;
+      setState(() => loading = false);
     }
   }
 
@@ -162,7 +166,26 @@ class _VisitTypeState extends State<VisitType> {
                 if (loading) {
                   // ✅ Loading state
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Center(
+                          child: SpinKitFadingCircle(
+                            color: mainColor,
+                            size: 40.0,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          "Loading Appointments...",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 } else if (visitController.bookings.isEmpty) {
                   // ✅ Empty state
@@ -172,12 +195,9 @@ class _VisitTypeState extends State<VisitType> {
                 } else {
                   return ListView.builder(
                     shrinkWrap: true,
-                    itemCount: visitController.bookings.length,
+                    itemCount: appointments.length,
                     itemBuilder: (_, index) {
-                      final Getappointmentmodel appt =
-                          visitController.bookings[index];
-
-                      // ✅ Ensure patient name is available
+                      final Getappointmentmodel appt = appointments[index];
                       final patientName = appt.name.isNotEmpty
                           ? capitalizeEachWord(appt.name)
                           : "Unknown Patient";
@@ -186,6 +206,49 @@ class _VisitTypeState extends State<VisitType> {
                         (doc) => doc.doctor.doctorId == appt.doctorId,
                       );
 
+                      // ✅ Doctor not found (unavailable)
+                      if (selectedHospitalDoctor == null) {
+                        return Card(
+                          color: Colors.grey.shade100,
+                          elevation: 1,
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 6, horizontal: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(
+                                color: Colors.grey, width: 0.8),
+                          ),
+                          child: ListTile(
+                            leading: const Icon(Icons.block,
+                                color: Colors.redAccent),
+                            title: Text(
+                              patientName,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: const Text(
+                              "Doctor not available currently",
+                              style: TextStyle(color: Colors.redAccent),
+                            ),
+                            trailing: TextButton(
+                              onPressed: () {
+                                ScaffoldMessageSnackbar.show(
+                                  context: context,
+                                  message:
+                                      "Doctor details are unavailable for this booking",
+                                  type: SnackbarType.warning,
+                                );
+                              },
+                              child: const Text(
+                                "View Details",
+                                style: TextStyle(color: Colors.redAccent),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      // ✅ Normal doctor available card
                       return Card(
                         color: Colors.white,
                         elevation: 1,
@@ -195,11 +258,10 @@ class _VisitTypeState extends State<VisitType> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 8),
+                              horizontal: 16, vertical: 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // ---- Top Row: Patient Name + Free Follow-Up Badge ----
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -210,7 +272,6 @@ class _VisitTypeState extends State<VisitType> {
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
-                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
@@ -230,29 +291,16 @@ class _VisitTypeState extends State<VisitType> {
                                         Text(
                                           "${appt.freeFollowUpsLeft ?? 0} Left",
                                           style: const TextStyle(
-                                            fontSize: 12,
-                                            color: secondaryColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                              fontSize: 12,
+                                              color: secondaryColor,
+                                              fontWeight: FontWeight.w600),
                                         ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 10),
-
-                              // ---- Details ----
-                              Row(
-                                children: [
-                                  const Icon(Icons.family_restroom,
-                                      size: 18, color: Colors.grey),
-                                  const SizedBox(width: 6),
-                                  Text(" ${appt.relation ?? "NA"}"),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
                               Row(
                                 children: [
                                   const Icon(Icons.local_hospital,
@@ -277,8 +325,6 @@ class _VisitTypeState extends State<VisitType> {
                                 ],
                               ),
                               const SizedBox(height: 8),
-
-                              // ---- Last Consultation ----
                               Row(
                                 children: [
                                   const Icon(Icons.calendar_month,
@@ -295,30 +341,22 @@ class _VisitTypeState extends State<VisitType> {
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 8),
-
-                              // ---- Action Buttons ----
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   TextButton.icon(
-                                    icon: const Icon(
-                                      Icons.remove_red_eye,
-                                      size: 18,
-                                      color: mainColor,
-                                    ),
+                                    icon: const Icon(Icons.remove_red_eye,
+                                        size: 18, color: mainColor),
                                     onPressed: () {
                                       Get.to(() => AppointmentPreview(
                                             doctor: selectedHospitalDoctor!,
                                             doctorBookings: appt,
                                           ));
                                     },
-                                    label: const Text(
-                                      "View Details",
-                                      style: TextStyle(color: mainColor),
-                                    ),
+                                    label: const Text("View Details",
+                                        style: TextStyle(color: mainColor)),
                                   ),
                                   Container(
                                     width: 1,
@@ -327,62 +365,46 @@ class _VisitTypeState extends State<VisitType> {
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 8),
                                   ),
-                                  Expanded(
-                                    child: TextButton.icon(
-                                      icon: const Icon(
-                                        Icons.check_circle_outline,
-                                        size: 18,
-                                        color: mainColor,
-                                      ),
-                                      onPressed: () {
-                                        selectedBooking = appt;
-                                        Get.back();
+                                  TextButton.icon(
+                                    icon: const Icon(Icons.check_circle_outline,
+                                        size: 18, color: mainColor),
+                                    onPressed: () {
+                                      selectedBooking = appt;
+                                      Get.back();
 
-                                        final doctor =
-                                            hospitalDoctors.firstWhereOrNull(
-                                          (doc) =>
-                                              doc.doctor.doctorId ==
-                                              appt.doctorId,
+                                      if (!selectedHospitalDoctor!
+                                          .doctor.doctorAvailabilityStatus) {
+                                        ScaffoldMessageSnackbar.show(
+                                          context: context,
+                                          message: "Doctor not Available Now",
+                                          type: SnackbarType.warning,
                                         );
+                                        return;
+                                      }
 
-                                        if (doctor != null &&
-                                            doctor.doctor
-                                                .doctorAvailabilityStatus) {
-                                          Get.bottomSheet(
-                                            bottomSlotWidget(
-                                              selectedHospitalDoctor!
-                                                  .hospital.hospitalId,
-                                              selectedHospitalDoctor!
-                                                  .doctor.doctorId,
-                                              appt.patientId,
-                                              appt.clinicName,
-                                              appt.doctorName,
-                                              appt.branchId,
-                                            ),
-                                            isScrollControlled: true,
-                                            backgroundColor: Colors.white,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                top: Radius.circular(20),
-                                              ),
-                                            ),
-                                          );
-                                          controller
-                                              .updateVisitType(selectedType);
-                                        } else {
-                                          ScaffoldMessageSnackbar.show(
-                                            context: context,
-                                            message: "Doctor not Available Now",
-                                            type: SnackbarType.warning,
-                                          );
-                                        }
-                                      },
-                                      label: const Text(
-                                        "Select",
-                                        style: TextStyle(color: mainColor),
-                                      ),
-                                    ),
+                                      Get.bottomSheet(
+                                        bottomSlotWidget(
+                                          selectedHospitalDoctor!
+                                              .hospital.hospitalId,
+                                          selectedHospitalDoctor!
+                                              .doctor.doctorId,
+                                          appt.patientId,
+                                          appt.clinicName,
+                                          appt.doctorName,
+                                          appt.branchId,
+                                        ),
+                                        isScrollControlled: true,
+                                        backgroundColor: Colors.white,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20)),
+                                        ),
+                                      );
+
+                                      controller.updateVisitType(selectedType);
+                                    },
+                                    label: const Text("Select",
+                                        style: TextStyle(color: mainColor)),
                                   ),
                                 ],
                               ),

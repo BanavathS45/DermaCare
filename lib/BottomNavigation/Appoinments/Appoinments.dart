@@ -3,6 +3,7 @@ import 'package:cutomer_app/Help/Numbers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Utils/AppointmentCard.dart';
 import '../../Utils/Constant.dart';
 import '../../Utils/Header.dart';
@@ -21,12 +22,29 @@ class _AppointmentPageState extends State<AppointmentPage> {
   final dashboardcontroller = Get.put(Dashboardcontroller());
 
   // final couns = Get.put(Dashboardcontroller());
+
+  String? customId; // ✅ Not final, can assign later
+
+  final appointmentController = Get.put(AppointmentController());
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     dashboardcontroller.setMobileNumber(widget.mobileNumber);
-    final appointmentController = Get.put(AppointmentController());
+    // final appointmentController = Get.put(AppointmentController());
+    // appointmentController.fetchBookings();
+    _loadCustomerId();
+  }
+
+  Future<void> _loadCustomerId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getString('customerId') ?? "";
+
+    setState(() {
+      customId = id;
+    });
+
+    dashboardcontroller.setMobileNumber(id);
     appointmentController.fetchBookings();
   }
 

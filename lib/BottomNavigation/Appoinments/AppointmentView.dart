@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+// import 'package:cutomer_app/Doctors/Schedules/ConsentFormWithSign.dart';
 import 'package:cutomer_app/Reports/DownloadReports.dart';
 import 'package:cutomer_app/Reports/FilePreviewScreen.dart';
 import 'package:cutomer_app/Utils/SavePdfToDownloads.dart';
@@ -395,7 +396,35 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                     ),
                   ),
                 ],
-              )
+              ),
+            Column(
+              children: [
+                // Other widgets...
+
+                if (patient.consultationType.toLowerCase() ==
+                        "services & treatments" &&
+                    patient.consentFormPdf == null &&
+                    patient.status.toLowerCase() == "confirmed")
+                  ListTile(
+                    title: const Text("Consent Form"),
+                    trailing: Icon(Icons.picture_as_pdf, color: mainColor),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SkinCareConsentFormScreen(
+                            doctor: doctor,
+                            patient: null,
+                            bookingId: patient.bookingId,
+                            pID: patient.subServiceId,
+                            doctorBookings: widget.doctorBookings,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+              ],
+            )
           ],
         ),
       ),

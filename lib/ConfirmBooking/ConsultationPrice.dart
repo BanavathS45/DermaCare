@@ -332,10 +332,10 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                       consultationcontroller
                                           .selectedBranchId.value = '';
 
-                                      await _loadBestDoctor(doctor.deviceId);
+                                      await _loadBestDoctor(widget.symptoms);
                                       if (bestDoctorList.isNotEmpty) {
                                         Get.to(() => ScheduleScreen(
-                                              doctorData: bestDoctorList.first,
+                                              doctorData: item,
                                               mobileNumber: widget.mobileNumber,
                                               username: widget.username,
                                               branchId: consultationcontroller
@@ -349,15 +349,31 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                     final selectedIndex =
                                         await showModalBottomSheet<int>(
                                       context: context,
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(20)),
-                                      ),
                                       builder: (context) {
                                         return BranchSelectionSheet(
                                             branches: branches);
                                       },
                                     );
+
+                                    if (selectedIndex != null) {
+                                      final selectedBranch =
+                                          branches[selectedIndex];
+                                      consultationcontroller.selectedBranchName
+                                          .value = selectedBranch.branchName;
+                                      consultationcontroller.selectedBranchId
+                                          .value = selectedBranch.branchId;
+
+                                      await _loadBestDoctor(widget.symptoms);
+                                      if (bestDoctorList.isNotEmpty) {
+                                        Get.to(() => ScheduleScreen(
+                                              doctorData: item,
+                                              mobileNumber: widget.mobileNumber,
+                                              username: widget.username,
+                                              branchId: consultationcontroller
+                                                  .selectedBranchId.value,
+                                            ));
+                                      }
+                                    }
 
                                     if (selectedIndex != null) {
                                       final selectedBranch =
@@ -368,10 +384,10 @@ class _ConsultationPriceState extends State<ConsultationPrice> {
                                       consultationcontroller.selectedBranchId
                                           .value = selectedBranch.branchId;
 
-                                      await _loadBestDoctor(doctor.deviceId);
+                                      await _loadBestDoctor(widget.symptoms);
                                       if (bestDoctorList.isNotEmpty) {
                                         Get.to(() => ScheduleScreen(
-                                              doctorData: bestDoctorList.first,
+                                              doctorData: item,
                                               mobileNumber: widget.mobileNumber,
                                               username: widget.username,
                                               branchId: consultationcontroller

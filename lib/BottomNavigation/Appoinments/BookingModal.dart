@@ -9,13 +9,11 @@ class AppointmentData {
   final String emailId;
   final String age;
   final String customerNumber;
-
   final String categoryName;
   final List<ServiceAdded> servicesAdded;
   final double totalPrice;
   final double totalDiscountAmount;
   final double totalDiscountedAmount;
-
   final double totalTax;
   final double payAmount;
   final String bookedAt;

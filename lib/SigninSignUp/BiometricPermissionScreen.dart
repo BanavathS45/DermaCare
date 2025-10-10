@@ -56,7 +56,8 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
         showSnackbar("Success", "Biometric authentication enabled", "success");
         Get.offAll(BottomNavController(
           mobileNumber: widget.mobileNumber,
-          username: widget.fullname, index: 0,
+          username: widget.fullname,
+          index: 0,
         ));
 
         // Navigator.pop(context); // Or navigate to home/dashboard
@@ -113,9 +114,14 @@ class _EnableBiometricScreenState extends State<EnableBiometricScreen> {
                         final prefs = await SharedPreferences.getInstance();
                         await prefs.setBool('isFirstLoginDone', true);
                         await prefs.setBool('isAuthenticated', false);
-                        Get.to(ConsultationsType(
+                        // Get.to(ConsultationsType(
+                        //   mobileNumber: widget.mobileNumber,
+                        //   username: widget.fullname ?? '',
+                        // ));
+                        Get.offAll(BottomNavController(
                           mobileNumber: widget.mobileNumber,
-                          username: widget.fullname ?? '',
+                          username: widget.fullname,
+                          index: 0,
                         ));
                       },
                       child: Text("Skip", style: TextStyle(color: mainColor)),

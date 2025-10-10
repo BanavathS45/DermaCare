@@ -11,11 +11,13 @@ import 'package:cutomer_app/UserManuval/AppointmentManual.dart';
 import 'package:cutomer_app/UserManuval/UserManual.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Doctors/ListOfDoctors/DoctorModel.dart';
@@ -36,8 +38,9 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // clear session
-    await prefs.setBool('isFirstLoginDone', true);
-    await prefs.setBool('isAuthenticated', true);
+    // ✅ Clear all GetX controllers from memory
+    // Get.deleteAll();
+
     Get.offAllNamed('/login'); // or use Get.offAll(() => Loginscreen());
   }
 
@@ -50,6 +53,86 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   void initState() {
     super.initState();
     getCustomerId();
+    _loadBiometricSetting();
+  }
+
+  final LocalAuthentication auth = LocalAuthentication();
+  bool _biometricEnabled = false;
+  bool _loading = true;
+
+  Future<void> _loadBiometricSetting() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _biometricEnabled = prefs.getBool('isAuthenticated') ?? false;
+      _loading = false;
+    });
+  }
+
+  Future<void> _toggleBiometric(bool value) async {
+    if (value) {
+      // User wants to enable biometrics → ask for authentication
+      try {
+        bool canCheck = await auth.canCheckBiometrics;
+        if (!canCheck) {
+          ScaffoldMessageSnackbar.show(
+            context: context,
+            message: "Biometrics not available",
+            type: SnackbarType.error,
+          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(content: Text("Biometrics not available")),
+          // );
+          return;
+        }
+
+        bool didAuthenticate = await auth.authenticate(
+          localizedReason: "Enable biometric login",
+          options: const AuthenticationOptions(
+            biometricOnly: true,
+            stickyAuth: true,
+          ),
+        );
+
+        if (didAuthenticate) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isAuthenticated', true);
+
+          setState(() => _biometricEnabled = true);
+
+          ScaffoldMessageSnackbar.show(
+            context: context,
+            message: "Biometrics enabled",
+            type: SnackbarType.success,
+          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(content: Text("✅ Biometrics enabled")),
+          // );
+        }
+      } catch (e) {
+        ScaffoldMessageSnackbar.show(
+          context: context,
+          message: "Error enabling biometrics: $e",
+          type: SnackbarType.error,
+        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("Error enabling biometrics: $e")),
+        // );
+      }
+    } else {
+      // User wants to disable biometrics
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isAuthenticated', false);
+
+      setState(() => _biometricEnabled = false);
+      ScaffoldMessageSnackbar.show(
+        context: context,
+        message: "Biometrics disabled",
+        type: SnackbarType.warning,
+      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("🚫 Biometrics disabled")),
+      // );
+    }
   }
 
 // Correct async function
@@ -67,6 +150,9 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   GetCustomerModel? userData;
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Scaffold(
       appBar: CommonHeader(
         title: "Profile",
@@ -213,7 +299,41 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                       icon: Icons.logout,
                       label: "Logout",
                       onTap: () => {showLogout(context)}),
-                  const SizedBox(height: 20),
+
+                  SizedBox(
+                    height: 100,
+                    child: ListView(
+                      children: [
+                        SwitchListTile(
+                          inactiveThumbColor: Colors.white,
+                          inactiveTrackColor: Colors.grey,
+                          activeThumbColor: mainColor,
+                          secondary: CircleAvatar(
+                            backgroundColor: mainColor,
+                            child: Icon(
+                              Icons.fingerprint, // 👈 Biometric icon
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                          title: const Text(
+                            "Enable Biometric Login",
+                            style: TextStyle(
+                              color: mainColor,
+                            ),
+                          ),
+                          subtitle: const Text(
+                            "Use fingerprint or face ID to login faster",
+                          ),
+                          value: _biometricEnabled,
+                          onChanged: (value) {
+                            _toggleBiometric(value);
+                          },
+                        ),
+                        const Divider(),
+                      ],
+                    ),
+                  )
                 ],
               ),
             );

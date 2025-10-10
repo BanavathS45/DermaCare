@@ -1,3 +1,4 @@
+import 'package:cutomer_app/Utils/UpperCase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -66,13 +67,13 @@ class _LoginscreenState extends State<Loginscreen> {
                     const SizedBox(height: 30.0),
                     CustomTextField(
                       controller: siginSignUpController.nameController,
-                      labelText: 'Enter Patient Id',
+                      labelText: 'Enter Customer Id',
                       autovalidateMode: AutovalidateMode.onUnfocus,
-                      // inputFormatters: [
-                      //   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
-                      // ],
+                      inputFormatters: [
+                        UpperCaseTextFormatter(), // 👈 add this custom formatter
+                      ],
                       validator: (value) => siginSignUpController.validatedata(
-                          value, "Patient Id"),
+                          value, "Customer Id"),
                     ),
                     SizedBox(
                       height: 10,

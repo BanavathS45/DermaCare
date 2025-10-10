@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cutomer_app/APIs/BaseUrl.dart';
+import 'package:cutomer_app/Clinic/AboutClinicController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorService.dart';
 import 'package:cutomer_app/Firebase/RequestNotificationPermissions.dart';
 import 'package:cutomer_app/SigninSignUp/LoginController.dart';
@@ -7,6 +8,7 @@ import 'package:cutomer_app/SigninSignUp/LoginService.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/LocationService.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:cutomer_app/Widget/ControllerInitializer.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,7 +28,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
   final SiginSignUpController siginSignUpController = SiginSignUpController();
   final LoginApiService _loginApiService = LoginApiService();
   final DoctorService _doctorService = DoctorService();
-
+  final clinicController = Get.find<ClinicController>();
   bool _isLoading = false;
 
   @override
@@ -128,7 +130,10 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
       } finally {
         Navigator.pop(context); // close dialog safely
       }
+      initializeControllers();
 
+      final hospitalId = prefs.getString('hospitalId');
+      await clinicController.fetchClinic(hospitalId!);
       // ✅ Navigate to bottom navigation
       Get.offAll(() => BottomNavController(
             mobileNumber: mobileNumber!,

@@ -1,9 +1,11 @@
 import 'package:cutomer_app/BottomNavigation/BottomNavigation.dart';
+import 'package:cutomer_app/Clinic/AboutClinicController.dart';
 
 import 'package:cutomer_app/SigninSignUp/BiometricPermissionScreen.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/LocationService.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:cutomer_app/Widget/ControllerInitializer.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +22,7 @@ class SiginSignUpController extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final LoginApiService _loginapiService = LoginApiService();
+  final clinicController = Get.find<ClinicController>();
 
   bool agreeToTerms = true; // Initialize to false to require agreement
   String? phoneNumber;
@@ -130,6 +133,7 @@ class SiginSignUpController extends GetxController {
         await prefs.setString('mobileNumber', mobileNumber ?? "");
         await prefs.setString('fcm', token ?? "");
 
+        await prefs.setBool('isFirstLoginDone', true);
         final isFirstTimeAuthenticated =
             prefs.getBool('isFirstLoginDone') ?? true;
 
@@ -137,9 +141,22 @@ class SiginSignUpController extends GetxController {
         showFetchingLocationDialog(context);
         await LocationService.fetchAndStoreLocation();
         Navigator.pop(context);
+        try {
+          await clinicController.fetchClinic(data['hospitalId']);
 
+          if (clinicController.clinic.value == null) {
+            showSnackbar("Error",
+                "Clinic data not available. Please try again.", "error");
+            return; // stop further navigation
+          }
+        } catch (e) {
+          showSnackbar(
+              "Error", "Failed to fetch clinic information: $e", "error");
+          return; // stop further navigation
+        }
         // ✅ Navigate after location is stored
-        if (isFirstTimeAuthenticated) {
+        initializeControllers();
+        if (!isFirstTimeAuthenticated) {
           Get.offAll(() => BottomNavController(
                 mobileNumber: mobileNumber,
                 username: data['customerName'],
