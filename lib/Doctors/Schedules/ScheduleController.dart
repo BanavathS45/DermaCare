@@ -52,6 +52,8 @@ class ScheduleController extends GetxController {
   final currentSlotsSelected = <DoctorSlotItem>[].obs;
   final selectedSlotIndex = (-1).obs;
   final selectedSlotText = ''.obs;
+  final RxBool isLoading = false.obs;
+  final selectedSlotsByDate = <String, Slot>{}.obs;
 
   Future<void> initializeWeekDates() async {
     final now = DateTime.now();
@@ -70,10 +72,11 @@ class ScheduleController extends GetxController {
     selectedDayIndex.value = 0;
   }
 
-  void scheduleMidnightRefresh(
-      {required String doctorId,
-      required String hospitalId,
-      required String branchId}) {
+  void scheduleMidnightRefresh({
+    required String doctorId,
+    required String hospitalId,
+    required String branchId,
+  }) {
     final now = DateTime.now();
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
     final durationUntilMidnight = nextMidnight.difference(now);
@@ -83,8 +86,13 @@ class ScheduleController extends GetxController {
       // final prefs = await SharedPreferences.getInstance();
       // var branchId = await prefs.getString('branchId');
       await initializeWeekDates();
+
       final updatedSlots = await DoctorSlotService.fetchDoctorSlots(
-          doctorId, hospitalId, branchId);
+        doctorId,
+        hospitalId,
+        branchId,
+        onLoading: (loading) => isLoading.value = loading,
+      );
       filterSlotsForSelectedDate(updatedSlots);
       currentSlots.refresh();
 
@@ -124,6 +132,7 @@ class ScheduleController extends GetxController {
       }
     } catch (e) {
       currentSlots.clear();
+
       print('Error filtering slots: $e');
     }
   }
@@ -147,19 +156,35 @@ class ScheduleController extends GetxController {
 
   void selectDate(DateTime date, List<DoctorSlot> allSlots) {
     selectedDate.value = date;
-    selectedSlotIndex.value = -1;
-    selectedSlotText.value = '';
 
-    final index = weekDates.indexWhere((d) =>
-        DateFormat('yyyy-MM-dd').format(d) ==
-        DateFormat('yyyy-MM-dd').format(date));
-    if (index != -1) {
-      selectedDayIndex.value = index;
-      selectedDayIndex.refresh(); // ✅ Force rebuild
-      print("selectedDayIndex updated: $index");
+    // Update slots for this date
+    filterSlotsForSelectedDate(allSlots);
+
+    final dateKey = DateFormat('yyyy-MM-dd').format(date);
+    final savedSlot = selectedSlotsByDate[dateKey];
+
+    if (savedSlot != null) {
+      // restore selection for this date
+      final index = currentSlots.indexWhere((s) => s.slot == savedSlot.slot);
+      if (index != -1) {
+        selectedSlotIndex.value = index;
+        selectedSlotText.value = savedSlot.slot;
+      } else {
+        selectedSlotIndex.value = -1;
+        selectedSlotText.value = '';
+      }
+    } else {
+      // no previous selection for this date
+      selectedSlotIndex.value = -1;
+      selectedSlotText.value = '';
     }
 
-    filterSlotsForSelectedDate(allSlots);
+    selectedDayIndex.value = weekDates.indexWhere((d) =>
+        DateFormat('yyyy-MM-dd').format(d) ==
+        DateFormat('yyyy-MM-dd').format(date));
+
+    selectedDayIndex.refresh();
+    currentSlots.refresh();
   }
 
   void _updateSlotsForDate(List<DoctorSlot> allSlots, DateTime date) {
@@ -178,6 +203,11 @@ class ScheduleController extends GetxController {
   void selectSlott(int index, String slotText) {
     selectedSlotIndex.value = index;
     selectedSlotText.value = slotText;
+
+    final dateKey = DateFormat('yyyy-MM-dd').format(selectedDate.value);
+    selectedSlotsByDate[dateKey] =
+        currentSlots[index]; // store the selected slot for that date
+    selectedSlotsByDate.refresh();
   }
 
   void showReportBottomSheet({
@@ -222,7 +252,7 @@ class ScheduleController extends GetxController {
   }
 
   Future<bool> selectSlotAsync(
-      int index, String slotText, String doctorId) async {
+      int index, String slotText, String doctorId,String branchId) async {
     final slot = currentSlots[index];
 
     if (slot.slotbooked) return false;
@@ -236,12 +266,13 @@ class ScheduleController extends GetxController {
         doctorId: doctorId,
         slotTime: slot.slot,
         date: DateFormat('yyyy-MM-dd').format(selectedDate.value),
+        branchId: branchId
       );
 
       if (isBlocked) {
         final prefs = await SharedPreferences.getInstance();
         final hospitalId = prefs.getString('hospitalId');
-        final branchId = prefs.getString('branchId');
+        // final branchId = prefs.getString('branchId');
 
         if (hospitalId != null && branchId != null) {
           final updatedSlots = await DoctorSlotService.fetchDoctorSlots(

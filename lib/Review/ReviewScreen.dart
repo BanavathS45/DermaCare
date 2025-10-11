@@ -207,7 +207,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
           print('appointmentId: ${widget.doctorBookings!.bookingId}');
           final prefs = await SharedPreferences.getInstance();
 
-          final branchId = prefs.getString('branchId');
+          // final branchId = prefs.getString('branchId');
           try {
             await submitCustomerRating(
                 doctorRating: _doctorRating,
@@ -219,7 +219,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 hospitalId: widget.doctorBookings!.clinicId,
                 patientId: widget.doctorBookings!.patientId,
                 patientName: widget.doctorBookings!.name,
-                branchId: branchId!);
+                branchId: widget.doctorBookings!.branchId ?? "");
             print('✅ submitCustomerRating called successfully');
             // After success
             Get.back(result: true);

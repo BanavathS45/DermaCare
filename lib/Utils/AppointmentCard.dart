@@ -246,10 +246,29 @@ class _AppointmentCardState extends State<AppointmentCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Text(
+                    //   d.hospital.name,
+                    //   style: TextStyle(
+                    //     fontWeight: FontWeight.bold,
+                    //     fontSize: 13.5,
+                    //     color: Colors.blueGrey[900],
+                    //   ),
+                    //   maxLines: 1,
+                    //   overflow: TextOverflow.ellipsis,
+                    // ),
                     Text(
-                      d.hospital.name,
+                      capitalizeEachWord(data.name),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Colors.blueGrey[800],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      d.doctor.doctorName,
+                      style: TextStyle(
                         fontSize: 13.5,
                         color: Colors.blueGrey[900],
                       ),
@@ -265,16 +284,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      capitalizeEachWord(data.name),
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                        color: Colors.blueGrey[800],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+
                     Container(
                       margin: const EdgeInsets.only(top: 2),
                       padding: const EdgeInsets.symmetric(

@@ -7,7 +7,9 @@ import 'package:cutomer_app/Doctors/Schedules/ScheduleController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:cutomer_app/Widget/TimerController.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Consultations/SymptomsController.dart';
@@ -45,7 +47,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final ScrollController _dateScrollController = ScrollController();
   // final scheduleController = Get.find<ScheduleController>();
   final SymptomsController symptomsController = Get.put(SymptomsController());
-  final scheduleController = Get.find<ScheduleController>();
+  final ScheduleController scheduleController =
+      Get.put(ScheduleController(), tag: UniqueKey().toString());
+
   final patientdetailsformcontroller = Get.put(Patientdetailsformcontroller());
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
@@ -65,38 +69,55 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   Future<void> _initialize() async {
     if (!mounted) return;
+
     try {
+      // Start loading first
+      scheduleController.isLoading.value = true;
+      scheduleController.currentSlots.clear();
+      scheduleController.selectedSlotIndex.value = -1;
+      scheduleController.selectedSlotText.value = '';
+
+      // Initialize week dates
       await scheduleController.initializeWeekDates();
 
       id = consultationController.selectedConsultation.value?.consultationId;
 
       final prefs = await SharedPreferences.getInstance();
-      var hospitalId = prefs.getString('hospitalId');
+      final hospitalId = prefs.getString('hospitalId');
 
-      // ✅ Fetch latest slots fresh
+      // Fetch latest slots
       final allSlots = await DoctorSlotService.fetchDoctorSlots(
         widget.doctorData.doctor.doctorId,
         hospitalId!,
         widget.branchId,
+        onLoading: (loading) => scheduleController.isLoading.value = loading,
       );
 
-      // ✅ Force the controller to update with new slots
+      // Apply slots to controller
       scheduleController.filterSlotsForSelectedDate(allSlots);
       scheduleController.currentSlots.refresh();
 
-      // ⏰ Schedule midnight refresh
+      // Schedule midnight refresh
       scheduleController.scheduleMidnightRefresh(
         doctorId: widget.doctorData.doctor.doctorId,
         hospitalId: hospitalId,
         branchId: widget.branchId,
       );
     } catch (e) {
-      debugPrint('Initialization error: $e');
+      debugPrint('❌ Initialization error: $e');
+    } finally {
+      // Stop loading after everything
+      scheduleController.isLoading.value = false;
     }
   }
 
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
   @override
   void dispose() {
+    Get.delete<ScheduleController>(tag: scheduleController.hashCode.toString());
     super.dispose();
   }
 
@@ -218,7 +239,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         final slotIndex =
                             scheduleController.selectedSlotIndex.value;
 
-                        if (slotIndex == -1) {
+                        // if (slotIndex == -1) {
+                        //   showSnackbar(
+                        //       "Warning", "Please select a slot", "warning");
+                        //   return;
+                        // }
+
+                        final slotText =
+                            scheduleController.selectedSlotText.value;
+
+                        if (slotIndex == -1 || slotText.isEmpty) {
                           showSnackbar(
                               "Warning", "Please select a slot", "warning");
                           return;
@@ -227,16 +257,19 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         final slot = scheduleController.currentSlots[slotIndex];
 
                         bool success = await scheduleController.selectSlotAsync(
-                          slotIndex,
-                          slot.slot,
-                          widget.doctorData.doctor.doctorId,
-                        );
+                            slotIndex,
+                            slot.slot,
+                            widget.doctorData.doctor.doctorId,
+                            widget.branchId);
 
-                        if (!success) {
-                          showSnackbar("Warning",
-                              "Failed to select slot. Try again", "warning");
-                          return;
-                        }
+                        // if (!success) {
+                        //   showSnackbar("Warning",
+                        //       "Failed to select slot. Try again", "warning");
+                        //   return;
+                        // }
+                        // ✅ Start global timer when continuing
+                        final timerController = Get.find<TimerController>();
+                        timerController.startTimer(seconds: 120);
 
                         // ✅ Slot successfully selected, continue to next screen
                         String formattedDate = DateFormat('yyyy-MM-dd')
@@ -306,213 +339,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       fontSize: 20),
                 ),
               )),
-        )
-
-        // bottomNavigationBar: Container(
-        //     height: 60,
-        //     decoration: BoxDecoration(
-        //       gradient: appGradient(),
-        //     ),
-        //     child: TextButton(
-        //         onPressed: () async {
-        //           final prefs = await SharedPreferences.getInstance();
-        //           if (!patientdetailsformcontroller.formKey.currentState!
-        //               .validate()) {
-        //             showSnackbar("Warning",
-        //                 "Please fill the Patient Details Form", "warning");
-        //             return;
-        //           }
-
-        //           // Ensure a slot is selected
-        //           if (scheduleController.selectedSlotText.value.isEmpty) {
-        //             final firstAvailableIndex = scheduleController.currentSlots
-        //                 .indexWhere((slot) => !slot.slotbooked);
-        //             if (firstAvailableIndex == -1) {
-        //               showSnackbar(
-        //                   "Warning", "No available slots to select", "warning");
-        //               return;
-        //             }
-
-        //             final slot =
-        //                 scheduleController.currentSlots[firstAvailableIndex];
-        //             bool success = await scheduleController.selectSlotAsync(
-        //               firstAvailableIndex,
-        //               slot.slot,
-        //               widget.doctorData.doctor.doctorId,
-        //             );
-
-        //             if (!success) {
-        //               showSnackbar("Warning", "Failed to select slot. Try again.",
-        //                   "warning");
-        //               return;
-        //             }
-        //           }
-
-        //           // ✅ After a slot is selected
-        //           String formattedDate = DateFormat('yyyy-MM-dd')
-        //               .format(scheduleController.selectedDate.value);
-
-        //           PatientModel patientmodel = PatientModel(
-        //             name: patientdetailsformcontroller.selectedFor == 'Self'
-        //                 ? (fullName ?? widget.username)
-        //                 : patientdetailsformcontroller.nameController.text.trim(),
-        //             patientId: patientdetailsformcontroller.selectedFor == 'Self'
-        //                 ? patientData!.patientId
-        //                 : "",
-        //             age: patientdetailsformcontroller.selectedFor == 'Self'
-        //                 ? "${patientdetailsformcontroller.age} Yrs"
-        //                 : "${patientdetailsformcontroller.ageController.text} Yrs",
-        //             gender: registercontroller.selectedGender,
-        //             bookingFor: patientdetailsformcontroller.selectedFor,
-        //             problem: consultationController
-        //                         .selectedConsultation.value!.consultationType
-        //                         .toLowerCase() ==
-        //                     "services & treatments"
-        //                 ? patientdetailsformcontroller.notesController.text
-        //                 : symptomsController.symptoms.value,
-        //             monthYear: DateFormat('MMMM dd, yyyy')
-        //                 .format(scheduleController.selectedDate.value),
-        //             serviceDate: formattedDate,
-        //             servicetime: scheduleController.selectedSlotText.value,
-        //             mobileNumber: widget.mobileNumber,
-        //             customerDeviceId: prefs.getString('fcm') ?? "",
-        //             relation: patientdetailsformcontroller.selectedFor == 'Self'
-        //                 ? "Self"
-        //                 : patientdetailsformcontroller.relationController.text
-        //                     .trim(),
-        //             patientMobileNumber:
-        //                 patientdetailsformcontroller.selectedFor == 'Self'
-        //                     ? widget.mobileNumber
-        //                     : patientdetailsformcontroller
-        //                         .patientMobileNumberController.text
-        //                         .trim(),
-        //             patientAddress:
-        //                 patientdetailsformcontroller.addressController.text,
-        //           );
-
-        //           Get.to(() => Confirmbookingdetails(
-        //                 doctor: widget.doctorData,
-        //                 patient: patientmodel,
-        //               ));
-
-        //           // onPressed: () async {
-        //           //   print(
-        //           //       "devicedIDdevicedID${consultationController.selectedConsultation.value!.consultationType}");
-
-        //           //   final prefs = await SharedPreferences.getInstance();
-        //           //   var devicedID = prefs.getString('fcm');
-        //           //   var patientProblem = consultationController
-        //           //           .selectedConsultation.value!.consultationType
-        //           //           .toLowerCase() ==
-        //           //       "services & treatments";
-        //           //   print("devicedIDdevicedID${devicedID}");
-        //           //   if (patientdetailsformcontroller.formKey.currentState!
-        //           //       .validate()) {
-        //           //     if (scheduleController.selectedSlotText.value.isNotEmpty) {
-        //           //       // showSnackbar("Success", "Form Validated", "success");
-        //           //       String formattedDate = DateFormat('yyyy-MM-dd')
-        //           //           .format(scheduleController.selectedDate.value);
-        //           //       PatientModel patientmodel = PatientModel(
-        //           //         name: patientdetailsformcontroller.selectedFor == 'Self'
-        //           //             ? (fullName ?? widget.username)
-        //           //             : patientdetailsformcontroller.nameController.text
-        //           //                 .trim(),
-        //           //         patientId:
-        //           //             patientdetailsformcontroller.selectedFor == 'Self'
-        //           //                 ? patientData!.patientId
-        //           //                 : "",
-        //           //         age: patientdetailsformcontroller.selectedFor == 'Self'
-        //           //             ? "${patientdetailsformcontroller.age} Yrs"
-        //           //             : "${patientdetailsformcontroller.ageController.text} Yrs",
-        //           //         // age: "20",
-        //           //         gender: registercontroller.selectedGender,
-        //           //         bookingFor: patientdetailsformcontroller.selectedFor,
-        //           //         problem: patientProblem
-        //           //             ? patientdetailsformcontroller.notesController.text
-        //           //             : symptomsController.symptoms.value,
-        //           //         monthYear: DateFormat('MMMM dd, yyyy')
-        //           //             .format(scheduleController.selectedDate.value),
-        //           //         serviceDate: formattedDate,
-        //           //         servicetime: scheduleController.selectedSlotText.value,
-        //           //         mobileNumber: widget.mobileNumber,
-        //           //         customerDeviceId: devicedID ?? "",
-        //           //         relation: patientdetailsformcontroller.selectedFor ==
-        //           //                 'Self'
-        //           //             ? "Self"
-        //           //             : patientdetailsformcontroller.relationController.text
-        //           //                 .trim(),
-        //           //         patientMobileNumber:
-        //           //             patientdetailsformcontroller.selectedFor == 'Self'
-        //           //                 ? widget.mobileNumber
-        //           //                 : patientdetailsformcontroller
-        //           //                     .patientMobileNumberController.text
-        //           //                     .trim(),
-        //           //         patientAddress:
-        //           //             patientdetailsformcontroller.addressController.text,
-        //           //       );
-        //           //       // 'dB4XJQ7xQ1KsY_BLUxo0r-:APA91bE74fgP5hWGuf26QAXAB6pFpimSaB22MWw9ccLK44TkFYPnMHaz7vXI7otlxPkLn28zAzNoU5zRIG_Un5fGebPU9TMSTfPWzpnmLgH7MyFxHlSlA3M'
-
-        //           //       print("patientmodel ${patientmodel.toJson()}");
-
-        //           //       // Get.to(() => Confirmbookingdetails(doctor: doctorData, patient: patientData));
-        //           //       print('Doctor 8888: ${widget.doctorData}');
-        //           //       print('Patient: $patientmodel');
-        //           //       if (consultationController.selectedConsultation.value !=
-        //           //               null &&
-        //           //           consultationController
-        //           //                   .selectedConsultation.value!.consultationType
-        //           //                   .toLowerCase() ==
-        //           //               "services & treatments") {
-        //           //         // symptomsController.updateDuration(
-        //           //         //     patientdetailsformcontroller.durationController.text);
-
-        //           //         // Get.to(SkinCareConsentFormScreen(
-        //           //         //   doctor: widget.doctorData,
-        //           //         //   patient: patientmodel,
-        //           //         // ));
-        //           //         Get.to(() => Confirmbookingdetails(
-        //           //               doctor: widget.doctorData,
-        //           //               patient: patientmodel,
-        //           //               // pass pdf to next screen
-        //           //             ));
-        //           //         // print(
-        //           //         //     "patientdetailsformcontroller.durationController.text ${symptomsController.duration}");
-        //           //       } else {
-        //           //         Get.to(() => Confirmbookingdetails(
-        //           //               doctor: widget.doctorData,
-        //           //               patient: patientmodel,
-        //           //               // pass pdf to next screen
-        //           //             ));
-        //           //       }
-        //           //       // Get.to(SkinCareConsentFormScreen(
-        //           //       //   doctor: widget.doctorData,
-        //           //       //   patient: patientmodel,
-        //           //       // ));
-
-        //           //       // symptomsController.updateDuration(
-        //           //       //     patientdetailsformcontroller.durationController.text);
-        //           //       // Get.to(Confirmbookingdetails(
-        //           //       //   doctor: widget.doctorData,
-        //           //       //   patient: patientmodel,
-        //           //       // ));
-        //           //     } else {
-        //           //       showSnackbar("Warning", "Please Select Slot", "warning");
-        //           //     }
-        //           //   } else {
-        //           //     showSnackbar("Warning",
-        //           //         "Please fill the Patient Details Form", "warning");
-        //           //   }
-        //           // },
-        //         },
-        //         child: Text(
-        //           "CONTINUE",
-        //           style: TextStyle(
-        //               color: Colors.white,
-        //               fontWeight: FontWeight.bold,
-        //               fontSize: 20),
-        //         ))),
-
-        );
+        ));
   }
 
   languagesKnown() {
@@ -605,11 +432,44 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         ),
         const SizedBox(height: 10),
         Obx(() {
-          if (scheduleController.currentSlots.isEmpty) {
-            return const Text("No available slots",
-                style: TextStyle(color: Colors.red));
+          if (scheduleController.isLoading.value) {
+            // Show loading spinner while fetching slots
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: SpinKitFadingCircle(
+                      color: mainColor,
+                      size: 40.0,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    "Fetching Slots...",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
 
+          if (scheduleController.currentSlots.isEmpty) {
+            // Show message if no slots available
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Text(
+                "No available slots",
+                style: TextStyle(color: Colors.red),
+              ),
+            );
+          }
+
+          // Slots available
           return Column(
             children: [
               // Slot rows (4 per row)
@@ -639,9 +499,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         final isSelected = slotData.tempSelected ||
                             (actualIndex ==
                                 scheduleController.selectedSlotIndex.value);
-                        // final isSelected = slotData.tempSelected ||
-                        //     (actualIndex ==
-                        //         scheduleController.selectedSlotIndex.value);
+
                         return Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(4),

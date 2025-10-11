@@ -9,6 +9,7 @@ import 'package:cutomer_app/Screens/splashScreen.dart';
 import 'package:cutomer_app/SubserviceAndHospital/HospitalCardScreen%20.dart';
 import 'package:cutomer_app/TreatmentAndServices/SubserviceController.dart';
 import 'package:cutomer_app/Widget/ControllerInitializer.dart';
+import 'package:cutomer_app/Widget/TimerController.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -91,6 +92,7 @@ Future<void> main() async {
   Get.put(SubServiceController());
   Get.put(SelectedServicesController());
   Get.put(ClinicController());
+  Get.put(TimerController());
   // ✅ FCM Notification tap handling
   final RemoteMessage? initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();

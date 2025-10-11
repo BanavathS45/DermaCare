@@ -389,7 +389,7 @@ class _VisitTypeState extends State<VisitType> {
                                         );
                                         return;
                                       }
-
+                                      Get.back();
                                       Get.bottomSheet(
                                         bottomSlotWidget(
                                           selectedHospitalDoctor!
@@ -550,11 +550,20 @@ class _VisitTypeState extends State<VisitType> {
                   ),
                 ),
                 onPressed: () async {
-                  if (scheduleController.selectedSlotIndex.value != -1) {
-                    // ✅ Book appointment logic
+                  if (scheduleController.selectedSlotIndex.value == -1) {
+                    Get.snackbar(
+                      "Warning",
+                      "No Slot Selected. Please choose a slot before booking",
+                      backgroundColor: Colors.orange,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                    return;
+                  }
+
+                  try {
                     final selectedSlot = scheduleController.currentSlots[
                         scheduleController.selectedSlotIndex.value];
-                    Get.back();
                     String formattedDate = DateFormat('yyyy-MM-dd')
                         .format(scheduleController.selectedDate.value);
 
@@ -562,56 +571,55 @@ class _VisitTypeState extends State<VisitType> {
                       bookingId: selectedBooking?.bookingId ?? "",
                       doctorId: selectedBooking?.doctorId ?? "",
                       visitType: selectedType,
-                      mobileNumber: widget.mobileNumber, // ✅ always String
+                      mobileNumber: widget.mobileNumber,
                       serviceDate: formattedDate,
                       servicetime: scheduleController.selectedSlotText.value,
                       patientId: patientId,
                     );
-
-                    print(
-                        '[DEBUG] Response Data:followUpBookings $postBookingPayload');
 
                     var resData = await followUpBookings(postBookingPayload);
 
                     if (resData != null &&
                         (resData['statusCode'] == 200 ||
                             resData['statusCode'] == 201)) {
-                      print('[✅] Booking successful');
-                      await _fetchAppointments();
-                      ScaffoldMessageSnackbar.show(
-                        context: context,
-                        message:
-                            "Appointment Booked \n You booked ${DateFormat('dd MMM').format(scheduleController.selectedDate.value)} ",
-                        type: SnackbarType.success,
+                      // ✅ Show success before navigation
+                      Get.snackbar(
+                        "Success",
+                        "Appointment Booked on ${DateFormat('dd MMM').format(scheduleController.selectedDate.value)}",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
                       );
+
+                      // Clear selection
                       scheduleController.selectedSlotIndex.value = -1;
                       scheduleController.currentSlots.clear();
+
+                      // Navigate after showing snackbar
+                      await Future.delayed(
+                          const Duration(seconds: 1)); // optional delay
                       Get.to(BottomNavController(
-                          mobileNumber: widget.mobileNumber,
-                          username: widget.username,
-                          index: 1));
+                        mobileNumber: widget.mobileNumber,
+                        username: widget.username,
+                        index: 1,
+                      ));
                     } else {
-                      print(
-                          '[❌] Booking failed or unexpected response: $resData');
-                      ScaffoldMessageSnackbar.show(
-                        context: context,
-                        message: "Error \n Booking failed",
-                        type: SnackbarType.error,
+                      Get.snackbar(
+                        "Error",
+                        resData?['message'] ?? "Booking failed. Try again",
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
                       );
-                      if (resData != null && resData['message'] != null) {
-                        ScaffoldMessageSnackbar.show(
-                          context: context,
-                          message: "Error \n ${resData['message']}",
-                          type: SnackbarType.error,
-                        );
-                      }
                     }
-                  } else {
-                    ScaffoldMessageSnackbar.show(
-                      context: context,
-                      message:
-                          "No Slot Selected \n Please choose a slot before booking",
-                      type: SnackbarType.warning,
+                  } catch (e) {
+                    print('[❌] Exception booking appointment: $e');
+                    Get.snackbar(
+                      "Error",
+                      "Unexpected error occurred",
+                      backgroundColor: mainColor,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.TOP,
                     );
                   }
                 },
@@ -762,11 +770,18 @@ class _VisitTypeState extends State<VisitType> {
                             padding: const EdgeInsets.all(4),
                             child: GestureDetector(
                               onTap: () {
+                                // if (!isBooked) {
+                                //   scheduleController.selectSlotAsync(
+                                //       actualIndex,
+                                //       slotText,
+                                //       doctorId); // ✅ real index
+                                // }
+
                                 if (!isBooked) {
-                                  scheduleController.selectSlotAsync(
-                                      actualIndex,
-                                      slotText,
-                                      doctorId); // ✅ real index
+                                  scheduleController.selectSlott(
+                                    actualIndex,
+                                    slotText,
+                                  ); // ✅ real index
                                 }
                               },
                               child: Container(
