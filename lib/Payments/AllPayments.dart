@@ -5,6 +5,7 @@ import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/Loading/FullScreeenLoader.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:cutomer_app/Widget/GobelTimer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -84,7 +85,23 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Container(), // Placeholder when loading is false
+          : Stack(
+              children: [
+                // Your main content here
+                Center(
+                  child: Text(
+                    "Payment Details Here",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+
+                // Timer FAB
+                GlobalTimerFAB(
+                  doctorId: widget.serviceDetails.doctor.doctorId,
+                  slot: widget.bookingDetails.patient.servicetime,
+                ),
+              ],
+            ),
     );
   }
 

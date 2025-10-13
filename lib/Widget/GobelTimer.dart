@@ -1,9 +1,12 @@
-import 'package:cutomer_app/Widget/TimerController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'TimerController.dart';
 
 class GlobalTimerFAB extends StatelessWidget {
-  const GlobalTimerFAB({super.key});
+  final String doctorId;
+  final String slot;
+
+  const GlobalTimerFAB({super.key, required this.doctorId, required this.slot});
 
   String formatTime(int seconds) {
     final m = (seconds ~/ 60).toString().padLeft(2, '0');
@@ -14,20 +17,20 @@ class GlobalTimerFAB extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final timerController = Get.find<TimerController>();
+    final remaining = timerController.getRemainingSecondsRx(doctorId, slot);
 
     return Obx(() {
-      if (timerController.remainingSeconds.value <= 0) {
-        return const SizedBox.shrink();
-      }
+      if (remaining.value <= 0) return const SizedBox.shrink();
+
       return Positioned(
-        bottom: 80,
+        bottom: 20,
         right: 16,
         child: FloatingActionButton.extended(
           backgroundColor: Colors.redAccent,
           onPressed: () {},
           icon: const Icon(Icons.timer),
           label: Text(
-            formatTime(timerController.remainingSeconds.value),
+            formatTime(remaining.value),
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),

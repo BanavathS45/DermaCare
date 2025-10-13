@@ -7,6 +7,7 @@ import 'package:cutomer_app/Doctors/Schedules/ScheduleController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:cutomer_app/Widget/GobelTimer.dart';
 import 'package:cutomer_app/Widget/TimerController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -144,6 +145,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   String? fullName;
+  String? patientId;
   GetCustomerModel? patientData;
 
   Future<void> getUserData() async {
@@ -156,6 +158,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         fullName =
             userData.fullName; // or userData.fullName depending on structure
         patientData = userData;
+        patientId = userData.patientId;
+        print("✅ Fetched user data: $fullName, $patientId");
       });
     }
   }
@@ -168,56 +172,62 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           onNotificationPressed: () {},
           onSettingPressed: () {},
         ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Month & Arrow
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      DateFormat('MMMM yyyy')
-                          .format(scheduleController.selectedDate.value),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.keyboard_arrow_right, color: mainColor),
-                      onPressed: () {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _dateScrollController.animateTo(
-                            _dateScrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 400),
-                            curve: Curves.easeOut,
-                          );
-                        });
-                      },
-                    ),
-                  ],
-                ),
+        body: Stack(children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Month & Arrow
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        DateFormat('MMMM yyyy')
+                            .format(scheduleController.selectedDate.value),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon:
+                            Icon(Icons.keyboard_arrow_right, color: mainColor),
+                        onPressed: () {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _dateScrollController.animateTo(
+                              _dateScrollController.position.maxScrollExtent,
+                              duration: const Duration(milliseconds: 400),
+                              curve: Curves.easeOut,
+                            );
+                          });
+                        },
+                      ),
+                    ],
+                  ),
 
-                const SizedBox(height: 12),
-                showDays(),
+                  const SizedBox(height: 12),
+                  showDays(),
 
-                const SizedBox(height: 24),
-                timeslots(),
+                  const SizedBox(height: 24),
+                  timeslots(),
 
-                const SizedBox(height: 24),
-                Divider(color: secondaryColor),
-                const SizedBox(height: 12),
-                languagesKnown(),
-                Divider(color: secondaryColor),
+                  const SizedBox(height: 24),
+                  Divider(color: secondaryColor),
+                  const SizedBox(height: 12),
+                  languagesKnown(),
+                  Divider(color: secondaryColor),
 
-                PatientDetailsForm(
-                  mobileNumber: widget.mobileNumber,
-                  username: widget.username,
-                ), // ✅ Add your working form here
-              ],
+                  PatientDetailsForm(
+                    mobileNumber: widget.mobileNumber,
+                    username: widget.username,
+                  ), // ✅ Add your working form here
+                ],
+              ),
             ),
           ),
-        ),
+          GlobalTimerFAB(
+              doctorId: widget.doctorData.doctor.doctorId,
+              slot: scheduleController.selectedSlotText.value),
+        ]),
         bottomNavigationBar: Container(
           height: 60,
           decoration: BoxDecoration(
@@ -268,8 +278,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         //   return;
                         // }
                         // ✅ Start global timer when continuing
+                        // Start timer
                         final timerController = Get.find<TimerController>();
-                        timerController.startTimer(seconds: 120);
+                        timerController.startTimer(
+                            doctorId: widget.doctorData.doctor.doctorId,
+                            slot: slotText,
+                            context: context);
 
                         // ✅ Slot successfully selected, continue to next screen
                         String formattedDate = DateFormat('yyyy-MM-dd')
@@ -281,16 +295,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               ? (fullName ?? widget.username)
                               : patientdetailsformcontroller.nameController.text
                                   .trim(),
-                          patientId:
-                              patientdetailsformcontroller.selectedFor == 'Self'
-                                  ? patientData!.patientId
+                          patientId: patientdetailsformcontroller.selectedFor ==
+                                  'Self'
+                              ? patientId ??
+                                  "" // use patientData.patientId if Self, fallback to empty
+                              : patientdetailsformcontroller
+                                          .patientId?.isNotEmpty ==
+                                      ""
+                                  ? patientdetailsformcontroller.patientId!
                                   : "",
                           age: patientdetailsformcontroller.selectedFor ==
                                   'Self'
                               ? "${patientdetailsformcontroller.age} Yrs"
                               : "${patientdetailsformcontroller.ageController.text} Yrs",
                           gender: registercontroller.selectedGender,
-                          bookingFor: patientdetailsformcontroller.selectedFor,
+                          bookingFor: patientdetailsformcontroller.selectedFor.value,
                           problem: consultationController.selectedConsultation
                                       .value!.consultationType
                                       .toLowerCase() ==

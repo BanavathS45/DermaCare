@@ -575,6 +575,7 @@ class _VisitTypeState extends State<VisitType> {
                       serviceDate: formattedDate,
                       servicetime: scheduleController.selectedSlotText.value,
                       patientId: patientId,
+                      bookingFor: selectedBooking?.bookingFor ?? "",
                     );
 
                     var resData = await followUpBookings(postBookingPayload);
@@ -598,6 +599,7 @@ class _VisitTypeState extends State<VisitType> {
                       // Navigate after showing snackbar
                       await Future.delayed(
                           const Duration(seconds: 1)); // optional delay
+                      Get.back();
                       Get.to(BottomNavController(
                         mobileNumber: widget.mobileNumber,
                         username: widget.username,

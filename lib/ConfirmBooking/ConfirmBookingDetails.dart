@@ -17,6 +17,7 @@ import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
+import 'package:cutomer_app/Widget/GobelTimer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -186,11 +187,12 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     final double gstAmount = servicePrice * gstRate;
     final double taxAmount = servicePrice * taxRate;
     final double totalAmount = (servicePrice + gstAmount + taxAmount);
-    final isServiceConsultation =
-        consultationController.selectedConsultation.value?.consultationType ==
-                _consultations[0].consultationType
-            ? true
-            : false;
+    final isServiceConsultation = _consultations.isNotEmpty &&
+            consultationController
+                    .selectedConsultation.value?.consultationType ==
+                _consultations.first.consultationType
+        ? true
+        : false;
 
     final consultationType = consultationController
         .selectedConsultation.value?.consultationType
@@ -199,7 +201,9 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
     //     consultationController.selectedConsultation.value?.consultationId;
     final consultationId =
         consultationController.selectedConsultation.value?.consultationId;
-    final backeEndCOnsulationID = _consultations[0].consultationId;
+    final backeEndCOnsulationID =
+        _consultations.isNotEmpty ? _consultations.first.consultationId : '';
+
     // final consultationId =
     //     consultationController.selectedConsultation.value?.consultationId;
 
@@ -213,348 +217,355 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
         onNotificationPressed: () {},
         onSettingPressed: () {},
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(top: 85), // ✅ Remove extra padding
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Doctor Info Card
-            Column(
-              children: [
-                profileCard(clinicName ?? ''),
-                Obx(() {
-                  final consultationId = consultationController
-                      .selectedConsultation.value?.consultationId;
-                  if (consultationId == null) return SizedBox();
+      body: Stack(children: [
+        SingleChildScrollView(
+          padding: EdgeInsets.only(top: 85), // ✅ Remove extra padding
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Doctor Info Card
+              Column(
+                children: [
+                  profileCard(clinicName ?? ''),
+                  Obx(() {
+                    final consultationId = consultationController
+                        .selectedConsultation.value?.consultationId;
+                    if (consultationId == null) return SizedBox();
 
-                  print("consultationId sdsadsad: $consultationId");
+                    print("consultationId sdsadsad: $consultationId");
 
-                  return FutureBuilder(
-                    key: ValueKey(consultationId),
-                    future: _getServiceButton(
-                        consultationId, backeEndCOnsulationID),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        print("🔥 Error: ${snapshot.error}");
-                        return Text("Error: ${snapshot.error}");
-                      } else {
-                        return snapshot.data as Widget;
-                      }
-                    },
-                  );
-                })
-              ],
-            ),
-
-            const SizedBox(height: 20),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Doctor Referral Code (if any)",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(height: 8),
-                      isLoading
-                          ? const CircularProgressIndicator()
-                          : DropdownButtonFormField<String>(
-                              value: selectedDoctorRefId,
-                              decoration: const InputDecoration(
-                                labelText: "Select Referring Doctor",
-                                prefixIcon: Icon(Icons.person),
-                                border: OutlineInputBorder(),
-                              ),
-                              items: apiDoctors.map((doctor) {
-                                return DropdownMenuItem<String>(
-                                  value: doctor.referralId,
-                                  child: Text(
-                                      "${doctor.fullName} (${doctor.referralId})"),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedDoctorRefId = value;
-                                  print(
-                                      "Selected Doctor Ref ID: $selectedDoctorRefId");
-                                });
-                              },
-                            ),
-                    ],
-                  ),
-                ),
-                PaymentModeSelector(
-                  consultationType: consultationController
-                      .selectedConsultation.value!.consultationType,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "Patient Details",
-                style: TextStyle(
-                    color: mainColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600),
+                    return FutureBuilder(
+                      key: ValueKey(consultationId),
+                      future: _getServiceButton(
+                          consultationId, backeEndCOnsulationID),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          print("🔥 Error: ${snapshot.error}");
+                          return Text("Error: ${snapshot.error}");
+                        } else {
+                          return snapshot.data as Widget;
+                        }
+                      },
+                    );
+                  })
+                ],
               ),
-            ),
 
-            const SizedBox(height: 10),
-            infoRow("Booking For", widget.patient.bookingFor),
-            infoRow("Patient Name", widget.patient.name),
-            infoRow("Patient Age", "${widget.patient.age} "),
-            infoRow("Patient Gender", widget.patient.gender),
+              const SizedBox(height: 20),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Doctor Referral Code (if any)",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 8),
+                        isLoading
+                            ? const CircularProgressIndicator()
+                            : DropdownButtonFormField<String>(
+                                value: selectedDoctorRefId,
+                                decoration: const InputDecoration(
+                                  labelText: "Select Referring Doctor",
+                                  prefixIcon: Icon(Icons.person),
+                                  border: OutlineInputBorder(),
+                                ),
+                                items: apiDoctors.map((doctor) {
+                                  return DropdownMenuItem<String>(
+                                    value: doctor.referralId,
+                                    child: Text(
+                                        "${doctor.fullName} (${doctor.referralId})"),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedDoctorRefId = value;
+                                    print(
+                                        "Selected Doctor Ref ID: $selectedDoctorRefId");
+                                  });
+                                },
+                              ),
+                      ],
+                    ),
+                  ),
+                  PaymentModeSelector(
+                    consultationType: consultationController
+                        .selectedConsultation.value!.consultationType,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Patient Details",
+                  style: TextStyle(
+                      color: mainColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+              infoRow("Booking For", widget.patient.bookingFor),
+              infoRow("Patient Name", widget.patient.name),
+              infoRow("Patient Age", "${widget.patient.age} "),
+              infoRow("Patient Gender", widget.patient.gender),
 
 // Show Symptoms if available
-            if (symptomsController.duration.value.isNotEmpty)
+              if (symptomsController.duration.value.isNotEmpty)
+                Obx(() {
+                  // final duration = symptomsController.duration.value;
+                  return infoRow(
+                    "Duration",
+                    "${symptomsController.duration.value}",
+                  );
+                }),
+
+              if (symptomsController.visitType.value.isNotEmpty)
+                Obx(() {
+                  return infoRow(
+                      "Visit Type", "${symptomsController.visitType.value}");
+                }),
+
+              // Show Symptoms if available
               Obx(() {
-                // final duration = symptomsController.duration.value;
-                return infoRow(
-                  "Duration",
-                  "${symptomsController.duration.value}",
+                return infoColumn(
+                  symptomsController.symptoms.value.isNotEmpty
+                      ? "Symptoms"
+                      : "Patient Problem",
+                  symptomsController.symptoms.value.isNotEmpty
+                      ? symptomsController.symptoms.value
+                      : widget.patient.problem,
                 );
               }),
 
-            if (symptomsController.visitType.value.isNotEmpty)
-              Obx(() {
-                return infoRow(
-                    "Visit Type", "${symptomsController.visitType.value}");
-              }),
-
-            // Show Symptoms if available
-            Obx(() {
-              return infoColumn(
-                symptomsController.symptoms.value.isNotEmpty
-                    ? "Symptoms"
-                    : "Patient Problem",
-                symptomsController.symptoms.value.isNotEmpty
-                    ? symptomsController.symptoms.value
-                    : widget.patient.problem,
-              );
-            }),
-
-            SizedBox(height: 15),
+              SizedBox(height: 15),
 
 // Show Attachment if available
-            if (symptomsController.attachments.value != null)
-              Obx(() {
-                if (symptomsController.attachments.isEmpty) {
-                  return SizedBox.shrink();
-                }
+              if (symptomsController.attachments.value != null)
+                Obx(() {
+                  if (symptomsController.attachments.isEmpty) {
+                    return SizedBox.shrink();
+                  }
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16.0, bottom: 4),
-                      child: Text(
-                        "Attachments",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0, bottom: 4),
+                        child: Text(
+                          "Attachments",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: List.generate(
-                            symptomsController.attachments.length, (index) {
-                          final file = symptomsController.attachments[index];
-                          final isPdf =
-                              file.path.toLowerCase().endsWith('.pdf');
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: List.generate(
+                              symptomsController.attachments.length, (index) {
+                            final file = symptomsController.attachments[index];
+                            final isPdf =
+                                file.path.toLowerCase().endsWith('.pdf');
 
-                          final isPDF =
-                              file.path.toLowerCase().endsWith('.pdf');
-                          return Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              GestureDetector(
-                                onTap: () async {
-                                  if (isPDF) {
-                                    await OpenFilex.open(file.path);
-                                  } else {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => Scaffold(
-                                          appBar: CommonHeader(
-                                            title: "Image Preview",
-                                          ),
-                                          body: Center(
-                                            child: InteractiveViewer(
-                                              child: Image.file(file),
+                            final isPDF =
+                                file.path.toLowerCase().endsWith('.pdf');
+                            return Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    if (isPDF) {
+                                      await OpenFilex.open(file.path);
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => Scaffold(
+                                            appBar: CommonHeader(
+                                              title: "Image Preview",
                                             ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: isPDF
-                                    ? Container(
-                                        width: 140,
-                                        padding: EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.grey),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.grey[200],
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.picture_as_pdf,
-                                                color: Colors.red, size: 30),
-                                            const SizedBox(width: 5),
-                                            Expanded(
-                                              child: Text(
-                                                file.path.split('/').last,
-                                                overflow: TextOverflow.ellipsis,
+                                            body: Center(
+                                              child: InteractiveViewer(
+                                                child: Image.file(file),
                                               ),
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      )
-                                    : Container(
-                                        height: 120,
-                                        width: 120,
-                                        decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.grey),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                      );
+                                    }
+                                  },
+                                  child: isPDF
+                                      ? Container(
+                                          width: 140,
+                                          padding: EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.grey[200],
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.picture_as_pdf,
+                                                  color: Colors.red, size: 30),
+                                              const SizedBox(width: 5),
+                                              Expanded(
+                                                child: Text(
+                                                  file.path.split('/').last,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : Container(
+                                          height: 120,
+                                          width: 120,
+                                          decoration: BoxDecoration(
+                                            border:
+                                                Border.all(color: Colors.grey),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: Image.file(file,
+                                                fit: BoxFit.cover),
+                                          ),
                                         ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: Image.file(file,
-                                              fit: BoxFit.cover),
-                                        ),
-                                      ),
-                              ),
-                              Positioned(
-                                right: -5,
-                                top: -5,
-                                child: InkWell(
-                                  onTap: () => symptomsController
-                                      .removeAttachment(index),
-                                  child: CircleAvatar(
-                                    radius: 14,
-                                    backgroundColor: Colors.red,
-                                    child: Icon(Icons.close,
-                                        size: 16, color: Colors.white),
+                                ),
+                                Positioned(
+                                  right: -5,
+                                  top: -5,
+                                  child: InkWell(
+                                    onTap: () => symptomsController
+                                        .removeAttachment(index),
+                                    child: CircleAvatar(
+                                      radius: 14,
+                                      backgroundColor: Colors.red,
+                                      child: Icon(Icons.close,
+                                          size: 16, color: Colors.white),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        }),
+                              ],
+                            );
+                          }),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 15),
-                  ],
-                );
-              }),
+                      SizedBox(height: 15),
+                    ],
+                  );
+                }),
 
-            Divider(
-              height: 1,
-              color: secondaryColor,
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            // patyment imaformation
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "Payment Details",
-                style: TextStyle(
-                    color: mainColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600),
+              Divider(
+                height: 1,
+                color: secondaryColor,
               ),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Text("${consultationId}"),
-                if (_consultations.isNotEmpty) ...[
-                  // Text("${_consultations[0].consultationId}"),
-                  if (consultationId != "ST_01") ...[
-                    // Static fields for Services & Treatments
-                    infoRow("Consultation Fee",
-                        "₹ ${consultationFee.toStringAsFixed(0) ?? '0'}"),
-                    infoRow("GST (18%)",
-                        "₹ ${(consultationFee * 0.18).toStringAsFixed(0) ?? '0'}"),
-                    infoRow("Other Tax",
-                        "₹ ${taxAmount.toStringAsFixed(0) ?? '0'}"),
-                    infoRow("Total Fee",
-                        "₹ ${(consultationFee + consultationFee * 0.18 + 0)?.toStringAsFixed(0) ?? '0'}"),
-                  ] else ...[
-                    // Normal flow from subServiceDetails
-                    infoRow(
-                      "Consultation Fee",
-                      "₹ ${subServiceDetails?.consultationFee?.toStringAsFixed(0) ?? '0'}",
-                    ),
-                    infoRow(
-                      "${consultationController.selectedConsultation.value?.consultationType ?? 'Consultation'} Fee",
-                      "₹ ${subServiceDetails?.price?.toStringAsFixed(0) ?? '0'}",
-                    ),
-                    infoRow(
-                      "GST (${subServiceDetails?.gst ?? 0}%)",
-                      "₹ ${subServiceDetails?.gstAmount?.toStringAsFixed(0) ?? '0'}",
-                    ),
-                    infoRow(
-                      "Other Tax (${subServiceDetails?.taxPercentage?.toStringAsFixed(0) ?? '0'}%)",
-                      "₹ ${subServiceDetails?.taxAmount?.toStringAsFixed(0) ?? '0'}",
-                    ),
-                    infoRow(
-                      "Discounted Amount (${subServiceDetails?.discountPercentage?.toStringAsFixed(0) ?? '0'}%)",
-                      "₹ ${subServiceDetails?.discountAmount?.toStringAsFixed(0) ?? '0'}",
-                    ),
-                    infoRow(
-                      "Total Fee",
-                      "₹ ${subServiceDetails?.finalCost?.toStringAsFixed(0) ?? '0'}",
-                    ),
-                  ]
-                ] else
-                  Text("No consultation data available")
-              ],
-            ),
+              SizedBox(
+                height: 15,
+              ),
+              // patyment imaformation
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Payment Details",
+                  style: TextStyle(
+                      color: mainColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Text("${consultationId}"),
+                  if (_consultations.isNotEmpty) ...[
+                    // Text("${_consultations[0].consultationId}"),
+                    if (consultationId != "ST_01") ...[
+                      // Static fields for Services & Treatments
+                      infoRow("Consultation Fee",
+                          "₹ ${consultationFee.toStringAsFixed(0) ?? '0'}"),
+                      infoRow("GST (18%)",
+                          "₹ ${(consultationFee * 0.18).toStringAsFixed(0) ?? '0'}"),
+                      infoRow("Other Tax",
+                          "₹ ${taxAmount.toStringAsFixed(0) ?? '0'}"),
+                      infoRow("Total Fee",
+                          "₹ ${(consultationFee + consultationFee * 0.18 + 0)?.toStringAsFixed(0) ?? '0'}"),
+                    ] else ...[
+                      // Normal flow from subServiceDetails
+                      infoRow(
+                        "Consultation Fee",
+                        "₹ ${subServiceDetails?.consultationFee?.toStringAsFixed(0) ?? '0'}",
+                      ),
+                      infoRow(
+                        "${consultationController.selectedConsultation.value?.consultationType ?? 'Consultation'} Fee",
+                        "₹ ${subServiceDetails?.price?.toStringAsFixed(0) ?? '0'}",
+                      ),
+                      infoRow(
+                        "GST (${subServiceDetails?.gst ?? 0}%)",
+                        "₹ ${subServiceDetails?.gstAmount?.toStringAsFixed(0) ?? '0'}",
+                      ),
+                      infoRow(
+                        "Other Tax (${subServiceDetails?.taxPercentage?.toStringAsFixed(0) ?? '0'}%)",
+                        "₹ ${subServiceDetails?.taxAmount?.toStringAsFixed(0) ?? '0'}",
+                      ),
+                      infoRow(
+                        "Discounted Amount (${subServiceDetails?.discountPercentage?.toStringAsFixed(0) ?? '0'}%)",
+                        "₹ ${subServiceDetails?.discountAmount?.toStringAsFixed(0) ?? '0'}",
+                      ),
+                      infoRow(
+                        "Total Fee",
+                        "₹ ${subServiceDetails?.finalCost?.toStringAsFixed(0) ?? '0'}",
+                      ),
+                    ]
+                  ] else
+                    Text("No consultation data available")
+                ],
+              ),
 
-            SizedBox(
-              height: 25,
-            ),
-            Divider(
-              height: 1,
-              color: secondaryColor,
-            ),
-            // PaymentModeSelector(
-            //   consultationType: consultationController
-            //       .selectedConsultation.value!.consultationType,
-            // ),
-            // const SizedBox(height: 20),
-            // Obx(() => Text(selectedServicesController.selectedPayment.value)),
-          ],
+              SizedBox(
+                height: 25,
+              ),
+              Divider(
+                height: 1,
+                color: secondaryColor,
+              ),
+              // PaymentModeSelector(
+              //   consultationType: consultationController
+              //       .selectedConsultation.value!.consultationType,
+              // ),
+              // const SizedBox(height: 20),
+              // Obx(() => Text(selectedServicesController.selectedPayment.value)),
+            ],
+          ),
         ),
-      ),
+        GlobalTimerFAB(
+            doctorId: widget.doctor.doctor.doctorId,
+            slot: widget.patient.servicetime),
+      ]),
       bottomNavigationBar: Container(
         width: double.infinity,
         height: 60,
@@ -583,60 +594,61 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
             var customerId = await prefs.getString('customerId');
 
             final bookingDetails = BookingDetailsModel(
-                subServiceName: globalServiceId == backeEndCOnsulationID
-                    ? selectedServicesController
-                        .selectedSubServices.first.subServiceName
-                    : "NA",
-                subServiceId: globalServiceId == backeEndCOnsulationID
-                    ? selectedServicesController
-                        .selectedSubServices.first.subServiceId
-                    : "NA",
-                doctorId: widget.doctor.doctor.doctorId,
-                consultationType: consultationController
-                    .selectedConsultation.value!.consultationType,
-                consultationFee: consultationFee.toDouble(),
-                totalFee: globalServiceId == backeEndCOnsulationID
-                    ? selectedServicesController
-                        .selectedSubServices.first.finalCost
-                    : consultationFee + (consultationFee * 0.18) + 0,
-                clinicId: hospitalId ?? "",
-                doctorDeviceId: widget.doctor.doctor.deviceId,
-                clinicAddress: clinic?.address ?? "",
-                //TODO:chnage address
-                categoryName: globalServiceId == backeEndCOnsulationID
-                    ? selectedServicesController
-                        .selectedSubServices.first.categoryName
-                    : "NA",
-                categoryId: globalServiceId == backeEndCOnsulationID
-                    ? selectedServicesController
-                        .selectedSubServices.first.categoryId
-                    : "NA",
-                servicename: globalServiceId == backeEndCOnsulationID
-                    ? selectedServicesController
-                        .selectedSubServices.first.serviceName
-                    : "NA",
-                serviceId: globalServiceId == backeEndCOnsulationID
-                    ? selectedServicesController
-                        .selectedSubServices.first.serviceId
-                    : "NA",
-                clinicName: clinicName ?? "",
-                doctorName: widget.doctor.doctor.doctorName,
-                // consultationExpiration:
-                //     widget.doctor.hospital.consultationExpiration,
-                consultationExpiration: clinic?.consultationExpiration ??
-                    "0 Days", //TODO:chnage consultationExpiration
-                paymentType: selectedPayment,
-                visitType: symptomsController.visitType.value,
-                symptomsDuration:
-                    "${symptomsController.duration.value}", //TODO:develop in UI
+              subServiceName: globalServiceId == backeEndCOnsulationID
+                  ? selectedServicesController
+                      .selectedSubServices.first.subServiceName
+                  : "NA",
+              subServiceId: globalServiceId == backeEndCOnsulationID
+                  ? selectedServicesController
+                      .selectedSubServices.first.subServiceId
+                  : "NA",
+              doctorId: widget.doctor.doctor.doctorId,
+              consultationType: consultationController
+                  .selectedConsultation.value!.consultationType,
+              consultationFee: consultationFee.toDouble(),
+              totalFee: globalServiceId == backeEndCOnsulationID
+                  ? selectedServicesController
+                      .selectedSubServices.first.finalCost
+                  : consultationFee + (consultationFee * 0.18) + 0,
+              clinicId: hospitalId ?? "",
+              doctorDeviceId: widget.doctor.doctor.deviceId,
+              clinicAddress: clinic?.address ?? "",
+              //TODO:chnage address
+              categoryName: globalServiceId == backeEndCOnsulationID
+                  ? selectedServicesController
+                      .selectedSubServices.first.categoryName
+                  : "NA",
+              categoryId: globalServiceId == backeEndCOnsulationID
+                  ? selectedServicesController
+                      .selectedSubServices.first.categoryId
+                  : "NA",
+              servicename: globalServiceId == backeEndCOnsulationID
+                  ? selectedServicesController
+                      .selectedSubServices.first.serviceName
+                  : "NA",
+              serviceId: globalServiceId == backeEndCOnsulationID
+                  ? selectedServicesController
+                      .selectedSubServices.first.serviceId
+                  : "NA",
+              clinicName: clinicName ?? "",
+              doctorName: widget.doctor.doctor.doctorName,
+              // consultationExpiration:
+              //     widget.doctor.hospital.consultationExpiration,
+              consultationExpiration: clinic?.consultationExpiration ??
+                  "0 Days", //TODO:chnage consultationExpiration
+              paymentType: selectedPayment,
+              visitType: symptomsController.visitType.value,
+              symptomsDuration:
+                  "${symptomsController.duration.value}", //TODO:develop in UI
 
-                attachments: symptomsController.attachments.value,
-                freeFollowUps: clinic?.freeFollowUps ?? 0,
-                consentFormPdf: pdfBase64 ?? "",
-                doctorRefCode: selectedDoctor ?? "",
-                branchname: branchName,
-                branchId: branchId,
-                customerId: customerId!);
+              attachments: symptomsController.attachments.value,
+              freeFollowUps: clinic?.freeFollowUps ?? 0,
+              consentFormPdf: pdfBase64 ?? "",
+              doctorRefCode: selectedDoctor ?? "",
+              branchname: branchName,
+              branchId: branchId,
+              customerId: customerId!,
+            );
             print(
                 '[🏥] Booking via Pay at Hospital ${bookingDetails.toString()}');
             print(

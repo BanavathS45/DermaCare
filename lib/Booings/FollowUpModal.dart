@@ -6,6 +6,7 @@ class FollowUpModal {
   final String patientId;
   final String bookingId;
   final String doctorId;
+  final String bookingFor;
 
   FollowUpModal({
     required this.visitType,
@@ -15,6 +16,7 @@ class FollowUpModal {
     required this.patientId,
     required this.bookingId,
     required this.doctorId,
+    required this.bookingFor,
   });
 
   // Convert JSON → Object
@@ -27,6 +29,7 @@ class FollowUpModal {
       patientId: json['patientId'] ?? '',
       bookingId: json['bookingId'] ?? '',
       doctorId: json['doctorId'] ?? '',
+      bookingFor: json['bookingFor'] ?? '',
     );
   }
 
@@ -40,6 +43,7 @@ class FollowUpModal {
       "patientId": patientId,
       "bookingId": bookingId,
       "doctorId": doctorId,
+      "bookingFor": bookingFor,
     };
   }
 }

@@ -30,6 +30,7 @@ class BookingDetailsModel {
   final String customerId;
   final String branchname;
   final String branchId;
+ 
 
   BookingDetailsModel({
     required this.categoryName,
@@ -57,6 +58,7 @@ class BookingDetailsModel {
     required this.customerId,
     required this.branchname,
     required this.branchId,
+  
     this.attachments, // ✅ nullable
   });
 
@@ -74,6 +76,7 @@ class BookingDetailsModel {
       clinicId: json['clinicId'],
       clinicName: json['clinicName'],
       clinicAddress: json['clinicAddress'],
+   
 
       doctorId: json['doctorId'],
       consentFormPdf: json['consentFormPdf'],
@@ -98,6 +101,7 @@ class BookingDetailsModel {
   Map<String, dynamic> toJson() {
     return {
       'categoryName': categoryName,
+    
       // 'consultationExpiration': consultationExpiration,
       'categoryId': categoryId,
       'symptomsDuration': symptomsDuration,

@@ -38,8 +38,7 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
     final id = prefs.getString('customerId') ?? "";
 
     try {
-      final bookings =
-          await appointmentService.fetchAppointments(widget.mobileNumber);
+      final bookings = await appointmentService.fetchAppointments(id);
       print("📥 Received bookings: $bookings");
 
       if (bookings != null && bookings is List<Getappointmentmodel>) {
@@ -70,6 +69,7 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
     return doctorBookings.where((b) {
       final type = b.consultationType.trim().toLowerCase();
       final status = b.status.trim().toLowerCase();
+      print("type: $type, status: $status");
 
       final isOnlineOrVideo =
           type == 'online consultation' || type == 'video consultation';
