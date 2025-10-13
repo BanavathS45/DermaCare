@@ -144,7 +144,7 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
               patient: widget.patient,
               mobileNumber: widget.mobileNumber,
               paymentType: "online",
-              clinicName: widget.bookingDetails.booking.clinicName,
+              clinicData: widget.serviceDetails,
               branchName: widget.branchName,
             ),
           ),

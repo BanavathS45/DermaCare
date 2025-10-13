@@ -689,7 +689,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   MaterialPageRoute(
                     builder: (ctx) => SuccessScreen(
                         serviceDetails: widget.doctor,
-                        clinicName: clinicName ?? "",
+                        clinicData: widget.doctor,
                         paymentId: "pay_at_hospital",
                         patient: widget.patient,
                         mobileNumber: widget.patient.mobileNumber,

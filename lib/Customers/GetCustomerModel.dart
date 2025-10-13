@@ -5,11 +5,14 @@ class GetCustomerModel {
   final String gender;
   final String? fcm; // Nullable field
   final String emailId;
-  final String referCode;
+ 
   final String dateOfBirth;
   final String age;
   final Address address;
   final String patientId;
+  final String referralCode;
+  final String referredBy;
+
   // Constructor
   GetCustomerModel({
     required this.customerId,
@@ -18,11 +21,13 @@ class GetCustomerModel {
     required this.gender,
     this.fcm,
     required this.emailId,
-    required this.referCode,
+ 
     required this.dateOfBirth,
     required this.age,
     required this.address,
     required this.patientId,
+    required this.referralCode,
+    required this.referredBy,
   });
 
   // Factory method to create a GetCustomerModel from JSON
@@ -36,10 +41,12 @@ class GetCustomerModel {
       gender: data['gender'] ?? '',
       fcm: data['fcm'], // Can be null
       emailId: data['emailId'] ?? '',
-      referCode: data['referCode'] ?? '',
+ 
       dateOfBirth: data['dateOfBirth'] ?? '',
       age: data['age'] ?? '',
       patientId: data['patientId'] ?? '',
+      referralCode: data['referralCode'] ?? '',
+      referredBy: data['referredBy'] ?? '',
       address: Address.fromJson(data['address'] ?? {}),
     );
   }
@@ -53,11 +60,13 @@ class GetCustomerModel {
       'gender': gender,
       'fcm': fcm,
       'emailId': emailId,
-      'referCode': referCode,
+ 
       'dateOfBirth': dateOfBirth,
       'age': age,
       'patientId': patientId,
+      'referralCode': referralCode,
       'address': address.toJson(),
+      'referredBy': referredBy,
     };
   }
 }

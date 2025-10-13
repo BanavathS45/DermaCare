@@ -1,5 +1,7 @@
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -87,7 +89,12 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
         automaticallyImplyLeading: false,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: SpinKitFadingCircle(
+                color: mainColor,
+                size: 40.0,
+              ),
+            )
           : RefreshIndicator(
               onRefresh: _onRefresh,
               child: _filteredBookings().isEmpty
@@ -110,4 +117,6 @@ class _OnlineCounsultationState extends State<OnlineCounsultation> {
             ),
     );
   }
+
+ 
 }

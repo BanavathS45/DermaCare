@@ -5,6 +5,7 @@ import 'package:cutomer_app/Booings/FollowUpModal.dart';
 import 'package:cutomer_app/BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import 'package:cutomer_app/BottomNavigation/BottomNavigation.dart';
 import 'package:cutomer_app/ConfirmBooking/ConfirmBookingDetails.dart';
+import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Doctors/Schedules/ConsentFormAPI.dart';
 import 'package:cutomer_app/Doctors/Schedules/ConsentFromModal.dart';
@@ -61,7 +62,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
   DateTime _procedureDate = DateTime.now();
   final selectedServicesController = Get.find<SelectedServicesController>();
   // consent points
-
+  final scontroller = SymptomsController();
   final Map<String, bool> _consentPoints = {
     "I consent to the procedure": true,
     "I consent to the use of my data": true,
@@ -825,7 +826,8 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
 
                   // WhatsApp Button
                   ElevatedButton.icon(
-                    onPressed: whatsUpChat,
+                    onPressed: whatsUpChat(
+                        scontroller.selectedBranch.value!.contactNumber),
                     icon: Icon(
                       Icons.whatshot,
                       color: Colors.white,

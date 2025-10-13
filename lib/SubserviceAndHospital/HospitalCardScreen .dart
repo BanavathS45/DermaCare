@@ -454,11 +454,10 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                       // await prefs.setString('branchName', branch.branchName);
 
                                       // ✅ Update SymptomsController (already in your code)
-                                      Get.find<SymptomsController>()
-                                          .updateBranch(branch);
-
-                                      // ✅ Update local state so dropdown stays in sync
-                                      setState(() => selectedBranch = branch);
+                                      // Update controller
+                                      final scontroller =
+                                          Get.find<SymptomsController>();
+                                      scontroller.updateBranch(branch);
                                       // Navigate to ServiceDetailsPage with this branch's hospital info
                                       Navigator.push(
                                         context,
@@ -478,9 +477,8 @@ class _HospitalCardScreenState extends State<HospitalCardScreen> {
                                       );
 
                                       // Update selected branch in controller
-                                      Get.find<SymptomsController>()
-                                          .updateBranch(branch);
-                                      setState(() => selectedBranch = null);
+                                     
+                                   
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(

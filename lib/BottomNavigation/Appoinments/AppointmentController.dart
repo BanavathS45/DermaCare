@@ -98,7 +98,8 @@ class AppointmentController extends GetxController {
       return doctorBookings.where((b) {
         final status = b.status.toLowerCase().trim();
         final type = b.consultationType.toLowerCase().trim();
-        return (status == 'confirmed' || status == 'in_progress') &&
+        return (status ==
+                'confirmed') && //if need in-progress appointmnets  || status == 'in_progress'
             !(type == 'online consultation' || type == 'video consultation');
       }).toList();
     } else if (selectedTab.value == 'COMPLETED') {

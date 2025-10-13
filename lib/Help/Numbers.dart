@@ -4,8 +4,8 @@ String customerNumber = "7842259803";
 String customerWhatsupNumber = "7842259803";
 String emailID = "surecare@gmail.com";
 
-customerCare() async {
-  final Uri callNow = Uri.parse("tel:+91${customerNumber}");
+customerCare(clinicNumber) async {
+  final Uri callNow = Uri.parse("tel:+91${clinicNumber}");
 
   // Check if the URL can be launched
   if (await canLaunchUrl(callNow)) {
@@ -17,9 +17,9 @@ customerCare() async {
   }
 }
 
-whatsUpChat() async {
+whatsUpChat(clinicNumber) async {
   final Uri whatsappNumber =
-      Uri.parse("https://wa.me/+91${customerWhatsupNumber}");
+      Uri.parse("https://wa.me/+91${clinicNumber}");
 
   // Check if the URL can be launched
   if (await canLaunchUrl(whatsappNumber)) {

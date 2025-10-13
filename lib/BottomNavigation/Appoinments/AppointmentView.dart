@@ -5,6 +5,7 @@ import 'package:cutomer_app/Reports/DownloadReports.dart';
 import 'package:cutomer_app/Reports/FilePreviewScreen.dart';
 import 'package:cutomer_app/Utils/SavePdfToDownloads.dart';
 import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
+import 'package:cutomer_app/Widget/TreatmentSittingsCard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_filex/open_filex.dart';
@@ -62,6 +63,30 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
         // ✅ iOS or other platforms - no special permission needed
         return true;
       }
+    }
+
+    final today = DateTime.now();
+    final serviceDate =
+        DateTime.parse(patient.serviceDate); // example: "2025-10-12"
+
+// Compare only the date part (ignore time)
+    bool isToday = serviceDate.year == today.year &&
+        serviceDate.month == today.month &&
+        serviceDate.day == today.day;
+
+    if (patient.consultationType.toLowerCase() == "services & treatments" &&
+        patient.consentFormPdf == null &&
+        isToday &&
+        patient.status.toLowerCase() == "confirmed") {
+      print("✅ Condition matched — service is today!");
+    }
+
+    bool isSameDate(String dateString) {
+      final today = DateTime.now();
+      final parsed = DateTime.parse(dateString);
+      return parsed.year == today.year &&
+          parsed.month == today.month &&
+          parsed.day == today.day;
     }
 
     final isCompletedStatus = patient.status.toLowerCase() == 'completed';
@@ -170,6 +195,33 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                 _infoRow("Total Fee", "₹${patient.totalFee}"),
               ],
             ),
+            const SizedBox(height: 8),
+
+            Column(
+              children: [
+                if (patient.consultationType.toLowerCase() ==
+                        "services & treatments" &&
+                    patient.status.toLowerCase() !=
+                        "confirmed") //TODO : remove !
+                  ExpansionTile(
+                    title: Text("Treatments Sittings Details"),
+                    leading: Icon(Icons.healing, color: mainColor),
+                    children: [
+                      SittingDetailsCard(
+                        totalSittings: 6,
+                        takenSittings: 1,
+                        currentSitting: 2,
+                        pending: 5, // recommended - taken
+                        onTapDetails: () {
+                          // show expanded details or navigate to detail screen
+                        },
+                      ),
+                    ],
+                  ),
+                // example usage inside a Column or ListView
+              ],
+            ),
+
             const SizedBox(height: 8),
             // Reports Accordion
 
@@ -404,6 +456,7 @@ class _AppointmentPreviewState extends State<AppointmentPreview>
                 if (patient.consultationType.toLowerCase() ==
                         "services & treatments" &&
                     patient.consentFormPdf == null &&
+                    isSameDate(patient.serviceDate) &&
                     patient.status.toLowerCase() == "confirmed")
                   ListTile(
                     title: const Text("Consent Form"),

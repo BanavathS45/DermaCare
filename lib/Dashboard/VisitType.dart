@@ -21,6 +21,8 @@ import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:cutomer_app/Widget/Bottomsheet.dart';
+import 'package:cutomer_app/Widget/date_selector_widget.dart';
+import 'package:cutomer_app/Widget/time_slot_grid_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -60,28 +62,57 @@ class _VisitTypeState extends State<VisitType> {
   Getappointmentmodel? selectedBooking;
   bool loading = false;
   @override
-  @override
   void initState() {
     super.initState();
-    _fetchAppointments();
+    // _fetchAppointments();
     selectedType = "First Time";
     controller.updateVisitType("First Time");
     scheduleController.initializeWeekDates();
-    fetchHospitalDoctor().then((value) async {
-      setState(() => hospitalDoctors = value);
+    _initializeData();
+    // fetchHospitalDoctor().then((value) async {
+    //   setState(() => hospitalDoctors = value);
 
-      if (hospitalDoctors.isNotEmpty) {
-        final today = scheduleController.weekDates.first; // first date (today)
+    //   if (hospitalDoctors.isNotEmpty) {
+    //     final today = scheduleController.weekDates.first; // first date (today)
+    //     final doctorId = hospitalDoctors.first.doctor.doctorId;
+    //     final clinicId = hospitalDoctors.first.hospital.hospitalId;
+    //     // final prefs = await SharedPreferences.getInstance();
+    //     var branchId = visitController.bookings.first.branchId;
+    //     final slots = await DoctorSlotService.fetchDoctorSlots(
+    //         doctorId, clinicId, branchId!);
+    //     scheduleController.selectDate(today, slots);
+    //     print("jhgjjhjhgslots L::${slots}");
+    //   }
+    // });
+  }
+
+  Future<void> _initializeData() async {
+    try {
+      await _fetchAppointments(); // Wait for appointments first
+
+      final hospitalList = await fetchHospitalDoctor();
+      setState(() => hospitalDoctors = hospitalList);
+
+      if (hospitalDoctors.isNotEmpty && visitController.bookings.isNotEmpty) {
+        final today = scheduleController.weekDates.first;
         final doctorId = hospitalDoctors.first.doctor.doctorId;
         final clinicId = hospitalDoctors.first.hospital.hospitalId;
-        // final prefs = await SharedPreferences.getInstance();
-        var branchId = visitController.bookings.first.branchId;
+        final branchId = visitController.bookings.first.branchId ?? "";
+
         final slots = await DoctorSlotService.fetchDoctorSlots(
-            doctorId, clinicId, branchId!);
+          doctorId,
+          clinicId,
+          branchId,
+        );
+
         scheduleController.selectDate(today, slots);
-        print("jhgjjhjhgslots L::${slots}");
+        print("✅ Loaded slots for today: $slots");
+      } else {
+        print("⚠️ No doctors or bookings available to load slots.");
       }
-    });
+    } catch (e) {
+      print("❌ Error initializing data: $e");
+    }
   }
 
   Future<void> _fetchAppointments() async {
@@ -529,9 +560,20 @@ class _VisitTypeState extends State<VisitType> {
                   ),
 
                   const SizedBox(height: 12),
-                  showDays(hospitalId, doctorId, branchId),
-                  const Divider(height: 32),
-                  timeslots(doctorId),
+                  // showDays(hospitalId, doctorId, branchId),
+                  // const Divider(height: 32),
+                  // timeslots(doctorId),
+
+                  DateSelectorWidget(
+                    scrollController: _dateScrollController,
+                    scheduleController: scheduleController,
+                    doctorId: doctorId,
+                    branchId: branchId,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  TimeSlotGridWidget(scheduleController: scheduleController),
                 ],
               ),
             ),
@@ -570,59 +612,50 @@ class _VisitTypeState extends State<VisitType> {
                     final postBookingPayload = FollowUpModal(
                       bookingId: selectedBooking?.bookingId ?? "",
                       doctorId: selectedBooking?.doctorId ?? "",
-                      visitType: selectedType,
+                      visitType: "follow-up",
                       mobileNumber: widget.mobileNumber,
                       serviceDate: formattedDate,
                       servicetime: scheduleController.selectedSlotText.value,
                       patientId: patientId,
                       bookingFor: selectedBooking?.bookingFor ?? "",
+                      branchId: selectedBooking?.branchId ?? "",
                     );
 
                     var resData = await followUpBookings(postBookingPayload);
+                    print("resData: $resData");
 
-                    if (resData != null &&
-                        (resData['statusCode'] == 200 ||
-                            resData['statusCode'] == 201)) {
-                      // ✅ Show success before navigation
-                      Get.snackbar(
-                        "Success",
-                        "Appointment Booked on ${DateFormat('dd MMM').format(scheduleController.selectedDate.value)}",
-                        backgroundColor: Colors.green,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
+                    if (resData != null) {
+                      final statusCode = resData['statusCode'] ?? 0;
+                      final message =
+                          resData['message'] ?? "Booking failed. Try again";
 
-                      // Clear selection
-                      scheduleController.selectedSlotIndex.value = -1;
-                      scheduleController.currentSlots.clear();
+                      if (statusCode == 200 || statusCode == 201) {
+                        // Show success snackbar
+                        showSnackbar(
+                          "Success",
+                          "Appointment Booked on ${DateFormat('dd MMM').format(scheduleController.selectedDate.value)}",
+                          "success",
+                        );
 
-                      // Navigate after showing snackbar
-                      await Future.delayed(
-                          const Duration(seconds: 1)); // optional delay
-                      Get.back();
-                      Get.to(BottomNavController(
-                        mobileNumber: widget.mobileNumber,
-                        username: widget.username,
-                        index: 1,
-                      ));
+                        // Clear selection
+                        scheduleController.selectedSlotIndex.value = -1;
+                        scheduleController.currentSlots.clear();
+
+                        Get.offAll(() => BottomNavController(
+                              mobileNumber: widget.mobileNumber,
+                              username: widget.username,
+                              index: 1,
+                            ));
+                      } else {
+                        showSnackbar("Error", message, "error");
+                      }
                     } else {
-                      Get.snackbar(
-                        "Error",
-                        resData?['message'] ?? "Booking failed. Try again",
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
+                      showSnackbar(
+                          "Error", "Unexpected error occurred", "error");
                     }
                   } catch (e) {
                     print('[❌] Exception booking appointment: $e');
-                    Get.snackbar(
-                      "Error",
-                      "Unexpected error occurred",
-                      backgroundColor: mainColor,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.TOP,
-                    );
+                    showSnackbar("Error", "Unexpected error occurred", "error");
                   }
                 },
                 child: const Text(

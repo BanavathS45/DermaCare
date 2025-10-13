@@ -2,6 +2,7 @@ import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Dashboard/DashBoardController.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:cutomer_app/Utils/MapOnGoogle.dart';
 import 'package:device_calendar/device_calendar.dart';
@@ -27,7 +28,7 @@ class SuccessScreen extends StatefulWidget {
   final String paymentId;
   final String mobileNumber;
   final String paymentType;
-  final String clinicName;
+  final HospitalDoctorModel clinicData;
   final String branchName;
 
   const SuccessScreen({
@@ -37,7 +38,7 @@ class SuccessScreen extends StatefulWidget {
     required this.patient,
     required this.mobileNumber,
     required this.paymentType,
-    required this.clinicName,
+    required this.clinicData,
     required this.branchName,
   });
 
@@ -49,11 +50,12 @@ class _SuccessScreenState extends State<SuccessScreen> {
   DoctorService service = DoctorService();
   final doctorController = Get.put(DoctorController());
   final doctordetailscontroller = Doctordetailscontroller();
-  final scontroller = SymptomsController();
+  final scontroller = Get.find<SymptomsController>();
+
   final Dashboardcontroller controller = Dashboardcontroller();
   final consultationController = Get.put(Consultationcontroller());
   final selectedServicesController = Get.find<SelectedServicesController>();
-
+  final branchController = Get.find<SymptomsController>();
   @override
   void initState() {
     super.initState();
@@ -222,7 +224,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
                             textAlign: TextAlign.center,
                           ),
                           Text(
-                            "${widget.clinicName} ",
+                            "${widget.clinicData.hospital.name} ",
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyLarge
@@ -246,7 +248,20 @@ class _SuccessScreenState extends State<SuccessScreen> {
                             maxLines: 2,
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 25),
+
+                          Text(
+                            "${branchController.selectedBranch.value!.branchName}, ",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(
+                                  color:
+                                      const Color.fromARGB(255, 236, 230, 230),
+                                ),
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
 
                           /// Date & Time
                           Row(
@@ -280,24 +295,39 @@ class _SuccessScreenState extends State<SuccessScreen> {
                   const SizedBox(height: 20),
 
                   /// Doctor timing & hospital contact
-                  doctordetailscontroller.buildTimingAndContactSection(
-                    timing: widget.serviceDetails.doctor.availableTimes,
-                    onCall: () {
-                      customerCare();
-                    },
-                    onDirection: () {
-                      // String address =
-                      //     "${widget.serviceDetails.hospital.name}, ${widget.serviceDetails.hospital.address}";
-                      String address =
-                          scontroller.selectedBranch.value!.address;
-                      print(
-                          "scontroller.selectedBranch.value!.address; ${scontroller.selectedBranch.value!.address}");
-                      MapUtils.openMapByAddress(address);
-                    },
-                    hospitalNumber:
-                        widget.serviceDetails.hospital.contactNumber,
-                    days: widget.serviceDetails.doctor.availableDays,
-                  ),
+                  Obx(() {
+                    var branch = branchController.selectedBranch.value;
+                    if (branch == null) {
+                      print("⚠️ No branch selected yet"); // debug
+                      return const SizedBox();
+                    }
+
+                    print(
+                        "✅ Displaying branch in ServiceDetailsPage: ${branch.branchName}");
+
+                    return doctordetailscontroller.buildTimingAndContactSection(
+                      timing: widget.serviceDetails.doctor.availableTimes,
+                      onCall: () {
+                        print("📞 Calling: ${branch.contactNumber}");
+                        customerCare(branch.contactNumber);
+                      },
+                      onDirection: () {
+                        final double latitude =
+                            double.parse(branch.latitude ?? "0.0");
+                        final double longitude =
+                            double.parse(branch.longitude ?? "0.0");
+                        // replace with your branch longitude
+
+                        print(
+                            "📍 Opening map for coordinates: $latitude, $longitude");
+
+                        // Open map using latitude and longitude
+                        MapUtils.openMapByCoordinates(latitude, longitude);
+                      },
+                      hospitalNumber: branch.contactNumber,
+                      days: widget.serviceDetails.doctor.availableDays,
+                    );
+                  })
                 ],
               ),
             ),
@@ -308,86 +338,158 @@ class _SuccessScreenState extends State<SuccessScreen> {
       /// Bottom Button
       bottomNavigationBar: Container(
         width: double.infinity,
-        height: 60,
-        decoration: BoxDecoration(gradient: appGradient()),
-        child: TextButton(
+        height: 70,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: appGradient(),
+        ),
+        child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            elevation: 5,
+            backgroundColor: Colors.transparent, // use gradient from parent
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+          ),
+          icon: const Icon(Icons.calendar_today, color: Colors.white),
+          label: const Text(
+            "Add to Google Calendar",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           onPressed: () {
-            // final scontroller = Get.find<SymptomsController>();
-            scontroller.clearForm();
             showDialog(
               context: context,
+              barrierDismissible: true,
               builder: (context) {
-                return AlertDialog(
-                  title: const Text("Add to Google Calendar?"),
-                  content: const Text(
-                      "Do you want to add this appointment to your Google Calendar?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _navigateToBookingDetails();
-                      },
-                      child: const Text("No"),
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  elevation: 5,
+                  backgroundColor: Colors.transparent,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [mainColor, secondaryColor],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    TextButton(
-                      onPressed: () async {
-                        Navigator.pop(context);
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.calendar_today,
+                          size: 60,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Add to Google Calendar?",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "Do you want to add this appointment to your Google Calendar?",
+                          style: TextStyle(fontSize: 16, color: Colors.white70),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _navigateToBookingDetails();
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                      color: Colors.white,
+                                      width: 1), // white border
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                ),
+                                child: const Text(
+                                  "No",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () async {
+                                  Navigator.pop(context);
 
-                        // Combine serviceDate + serviceTime into a single DateTime
-                        final dateStr =
-                            widget.patient.serviceDate; // e.g. "2025-08-16"
-                        final timeStr =
-                            widget.patient.servicetime; // e.g. "15:30 PM"
+                                  final dateStr = widget.patient.serviceDate;
+                                  final timeStr = widget.patient.servicetime;
+                                  final dateTimeStr = "$dateStr $timeStr";
+                                  final format =
+                                      DateFormat("yyyy-MM-dd hh:mm a");
+                                  final start = format.parse(dateTimeStr);
+                                  final end =
+                                      start.add(const Duration(minutes: 30));
 
-                        // Merge into one string
-                        final dateTimeStr =
-                            "$dateStr $timeStr"; // "2025-08-16 15:30 PM"
+                                  print("📅 Start: $start");
+                                  print("📅 End: $end");
 
-                        // Define format
-                        final format = DateFormat("yyyy-MM-dd hh:mm a");
+                                  await addToGoogleCalendarWeb(
+                                    title:
+                                        "Appointment with ${widget.serviceDetails.doctor.doctorName}",
+                                    description:
+                                        "Consultation at ${widget.serviceDetails.hospital.name}",
+                                    startTime: start,
+                                    endTime: end,
+                                    location:
+                                        widget.serviceDetails.hospital.address,
+                                  );
 
-                        // Parse
-                        final start = format.parse(dateTimeStr);
-
-                        // Add 30 minutes for end time
-                        final end = start.add(const Duration(minutes: 30));
-
-                        print("📅 Start: $start");
-                        print("📅 End: $end");
-
-                        // Option 1 → Open Google Calendar (Web)
-                        await addToGoogleCalendarWeb(
-                          title:
-                              "Appointment with ${widget.serviceDetails.doctor.doctorName}",
-                          description:
-                              "Consultation at ${widget.serviceDetails.hospital.name}",
-                          startTime: start,
-                          endTime: end,
-                          location: widget.serviceDetails.hospital.address,
-                        );
-
-                        // Option 2 → Device Calendar
-                        // await addToDeviceCalendar(
-                        //   title: "Appointment with ${widget.serviceDetails.doctor.doctorName}",
-                        //   description: "Consultation at ${widget.serviceDetails.hospital.name}",
-                        //   startTime: start,
-                        //   endTime: end,
-                        //   location: widget.serviceDetails.hospital.address,
-                        // );
-
-                        _navigateToBookingDetails();
-                      },
-                      child: const Text("Yes"),
+                                  _navigateToBookingDetails();
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                      color: Colors.white,
+                                      width: 1), // white border
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                ),
+                                child: const Text(
+                                  "Yes",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
-                  ],
+                  ),
                 );
               },
             );
           },
-          child: const Text(
-            "VIEW BOOKING DETAILS",
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
         ),
       ),
     );

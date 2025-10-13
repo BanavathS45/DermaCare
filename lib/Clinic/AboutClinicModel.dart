@@ -1,3 +1,5 @@
+import 'package:cutomer_app/SubserviceAndHospital/HospitalCardModel.dart';
+
 class Clinic {
   final String hospitalId;
   final String name;
@@ -103,49 +105,49 @@ class Clinic {
   }
 }
 
-class Branch {
-  final String id;
-  final String clinicId;
-  final String branchId;
-  final String branchName;
-  final String address;
-  final String city;
-  final String contactNumber;
-  final String email;
-  final String latitude;
-  final String longitude;
-  final String virtualClinicTour;
-  final String role;
+// class Branch {
+//   final String id;
+//   final String clinicId;
+//   final String branchId;
+//   final String branchName;
+//   final String address;
+//   final String city;
+//   final String contactNumber;
+//   final String email;
+//   final String latitude;
+//   final String longitude;
+//   final String virtualClinicTour;
+//   final String role;
 
-  Branch({
-    required this.id,
-    required this.clinicId,
-    required this.branchId,
-    required this.branchName,
-    required this.address,
-    required this.city,
-    required this.contactNumber,
-    required this.email,
-    required this.latitude,
-    required this.longitude,
-    required this.virtualClinicTour,
-    required this.role,
-  });
+//   Branch({
+//     required this.id,
+//     required this.clinicId,
+//     required this.branchId,
+//     required this.branchName,
+//     required this.address,
+//     required this.city,
+//     required this.contactNumber,
+//     required this.email,
+//     required this.latitude,
+//     required this.longitude,
+//     required this.virtualClinicTour,
+//     required this.role,
+//   });
 
-  factory Branch.fromJson(Map<String, dynamic> json) {
-    return Branch(
-      id: json['id'] ?? '',
-      clinicId: json['clinicId'] ?? '',
-      branchId: json['branchId'] ?? '',
-      branchName: json['branchName'] ?? '',
-      address: json['address'] ?? '',
-      city: json['city'] ?? '',
-      contactNumber: json['contactNumber'] ?? '',
-      email: json['email'] ?? '',
-      latitude: json['latitude'] ?? '',
-      longitude: json['longitude'] ?? '',
-      virtualClinicTour: json['virtualClinicTour'] ?? '',
-      role: json['role'] ?? '',
-    );
-  }
-}
+//   factory Branch.fromJson(Map<String, dynamic> json) {
+//     return Branch(
+//       id: json['id'] ?? '',
+//       clinicId: json['clinicId'] ?? '',
+//       branchId: json['branchId'] ?? '',
+//       branchName: json['branchName'] ?? '',
+//       address: json['address'] ?? '',
+//       city: json['city'] ?? '',
+//       contactNumber: json['contactNumber'] ?? '',
+//       email: json['email'] ?? '',
+//       latitude: json['latitude'] ?? '',
+//       longitude: json['longitude'] ?? '',
+//       virtualClinicTour: json['virtualClinicTour'] ?? '',
+//       role: json['role'] ?? '',
+//     );
+//   }
+// }

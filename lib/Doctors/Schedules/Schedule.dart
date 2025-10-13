@@ -309,7 +309,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               ? "${patientdetailsformcontroller.age} Yrs"
                               : "${patientdetailsformcontroller.ageController.text} Yrs",
                           gender: registercontroller.selectedGender,
-                          bookingFor: patientdetailsformcontroller.selectedFor.value,
+                          bookingFor:
+                              patientdetailsformcontroller.selectedFor.value,
                           problem: consultationController.selectedConsultation
                                       .value!.consultationType
                                       .toLowerCase() ==
