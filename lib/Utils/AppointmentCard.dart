@@ -276,7 +276,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      d.hospital.branch,
+                      data.branchname ?? "",
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.blueGrey[600],
@@ -319,7 +319,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
-                        data.serviceDate,
+                        "${(data.followupDate != null && data.followupDate!.isNotEmpty) ? data.followupDate : data.serviceDate}",
                         style: TextStyle(fontSize: 12, color: Colors.grey[800]),
                       ),
                     ],
@@ -428,36 +428,47 @@ class _AppointmentCardState extends State<AppointmentCard> {
                               'video consultation' ||
                           widget.doctorData.consultationType.toLowerCase() ==
                               'online consultation') &&
-                      appointmentDateTime != null &&
-                      // DateTime.now().isAfter(appointmentDateTime!
-                      //     .subtract(const Duration(minutes: 5))))
-
-                      DateTime.now().isAfter(appointmentDateTime!
-                          .subtract(const Duration(minutes: 5))) &&
-                      DateTime.now().isBefore(appointmentDateTime!
-                          .add(const Duration(minutes: 30)))) ...[
-                    Container(
-                      height: 35,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: mainColor, width: 1),
-                      ),
-                      child: TextButton(
-                        onPressed: () {
-                          Get.to(
-                            HomeScreen(
-                              roomId: widget.doctorData.channelId!,
-                              username: widget.doctorData.name,
+                      appointmentDateTime != null) ...[
+                    if (DateTime.now().isAfter(appointmentDateTime!
+                            .subtract(const Duration(minutes: 5))) &&
+                        DateTime.now().isBefore(appointmentDateTime!
+                            .add(const Duration(minutes: 30)))) ...[
+                      // 🔹 Show JOIN button if in the valid time window
+                      Container(
+                        height: 35,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: mainColor, width: 1),
+                          color: Colors.white,
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            Get.to(
+                              HomeScreen(
+                                  roomId: widget.doctorData.channelId!,
+                                  username: widget.doctorData.name,
+                                  clinicId: widget.doctorData.clinicId),
+                            );
+                          },
+                          child: Text(
+                            'JOIN',
+                            style: TextStyle(
+                              color: mainColor,
+                              fontWeight: FontWeight.bold,
                             ),
-                          );
-                        },
-                        child: const Text(
-                          'JOIN',
-                          style: TextStyle(color: mainColor),
+                          ),
                         ),
                       ),
-                    )
-                  ],
+                    ] else ...[
+                      // 🔹 Show CONFIRMED status button (disabled look)
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                            _buildStatusBadges("confirmed"), // ✅ Now works
+                      ),
+                    ],
+                  ]
                 ],
               ),
             ],

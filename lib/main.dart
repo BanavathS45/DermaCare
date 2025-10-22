@@ -64,9 +64,12 @@ Future<void> main() async {
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     // ✅ Updated callback for v12+
-    onDidReceiveNotificationResponse: (NotificationResponse response) {
+    onDidReceiveNotificationResponse: (NotificationResponse response) async {
       print('[🔔] Notification tapped: ${response.payload}');
       // Handle navigation if needed
+      if (Get.currentRoute != '/NotificationScreen') {
+        await Get.to(() => NotificationScreen());
+      }
     },
   );
 

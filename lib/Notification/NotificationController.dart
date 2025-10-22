@@ -4,8 +4,6 @@ import 'package:get/get.dart';
 import 'NotificationModel.dart';
 
 class NotificationController extends GetxController {
-  var title = ''.obs;
-  var body = ''.obs;
   var notifications = <NotificationModel>[].obs;
   var unreadCount = 0.obs;
   var isLoading = true.obs;
@@ -13,59 +11,53 @@ class NotificationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchNotifications(); // Simulated load
+    fetchNotifications();
   }
 
+  // Simulate loading notifications (can be replaced with API call)
   void fetchNotifications() async {
     isLoading.value = true;
-    await Future.delayed(Duration(seconds: 2));
-
-    // If no data from server, simulate or leave empty
-    // Remove this if using real data
-    notifications.clear(); // Comment this line if testing dummy
-    // notifications.add(NotificationModel(
-    //   title: 'Welcome!',
-    //   body: 'You have no new notifications.',
-    //   type: 'info',
-    //   timestamp: DateTime.now(),
-    // ));
-
+    await Future.delayed(const Duration(seconds: 1));
     isLoading.value = false;
   }
 
-  void removeNotification(int index) {
-    final removed = notifications[index];
-
-    // Remove the notification
-    notifications.removeAt(index);
-
-    // Update unread count if the removed notification was unread
-    if (!removed.isRead) {
-      unreadCount.value =
-          (unreadCount.value - 1).clamp(0, notifications.length);
-    }
-  }
-
-  void markAllAsRead() {
-    for (var n in notifications) {
-      n.isRead = true;
-    }
-    unreadCount.value = 0;
-  }
-
+  // When a new push notification arrives
   void handleNotification(RemoteMessage message) {
     final newNotification = NotificationModel(
       title: message.notification?.title ?? "No Title",
       body: message.notification?.body ?? "No Body",
       type: message.data['type'] ?? 'general',
       timestamp: DateTime.now(),
+      isRead: false,
     );
 
-    title.value = newNotification.title;
-    body.value = newNotification.body;
+    // Add new notification to top of list
     notifications.insert(0, newNotification);
+
+    // Increase unread count
     unreadCount.value++;
 
-    Get.to(() => NotificationScreen());
+    // ✅ Navigate to Notifications screen only if not already there
+    if (Get.currentRoute != '/NotificationScreen') {
+      Get.to(() => NotificationScreen());
+    }
+  }
+
+  // Remove a specific notification
+  void removeNotification(int index) {
+    final removed = notifications[index];
+    notifications.removeAt(index);
+    if (!removed.isRead) {
+      unreadCount.value =
+          (unreadCount.value - 1).clamp(0, notifications.length);
+    }
+  }
+
+  // ✅ Mark all notifications as read (called when Notification screen opens)
+  void markAllAsRead() {
+    for (var n in notifications) {
+      n.isRead = true;
+    }
+    unreadCount.value = 0;
   }
 }

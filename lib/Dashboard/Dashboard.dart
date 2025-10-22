@@ -25,7 +25,6 @@ class DashboardScreen extends StatefulWidget {
     super.key,
     required this.mobileNumber,
     required this.username,
- 
   });
 
   @override
@@ -230,57 +229,57 @@ class _DashboardScreenState extends State<DashboardScreen>
                         //   height: 170,
                         // ),
                         const SizedBox(height: 20),
-                        if (controller.inProgressBookings.isNotEmpty) ...[
-                          Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Active Appointments",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text("${controller.inProgressBookings.length}")
-                              ],
-                            ),
-                          ),
-                          Obx(() {
-                            print(
-                                'In-progress bookings count: ${controller.inProgressBookings.length}');
+                        // if (controller.inProgressBookings.isNotEmpty) ...[
+                        //   Padding(
+                        //     padding: EdgeInsets.all(16.0),
+                        //     child: Row(
+                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //       children: [
+                        //         Text(
+                        //           "Active Appointments",
+                        //           style: TextStyle(
+                        //               fontSize: 18,
+                        //               fontWeight: FontWeight.bold),
+                        //         ),
+                        //         Text("${controller.inProgressBookings.length}")
+                        //       ],
+                        //     ),
+                        //   ),
+                        //   Obx(() {
+                        //     print(
+                        //         'In-progress bookings count: ${controller.inProgressBookings.length}');
 
-                            if (controller.inProgressBookings.isEmpty) {
-                              // 👈 Fix here
-                              return const Center(
-                                  child: Text('No in-progress appointments'));
-                            }
+                        //     if (controller.inProgressBookings.isEmpty) {
+                        //       // 👈 Fix here
+                        //       return const Center(
+                        //           child: Text('No in-progress appointments'));
+                        //     }
 
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: List.generate(
-                                  min(3, controller.inProgressBookings.length),
-                                  (index) {
-                                    final appointment =
-                                        controller.inProgressBookings[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.95,
-                                        child: AppointmentCard(
-                                            doctorData: appointment),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
-                          }),
-                        ],
+                        //     return SingleChildScrollView(
+                        //       scrollDirection: Axis.horizontal,
+                        //       child: Row(
+                        //         children: List.generate(
+                        //           min(3, controller.inProgressBookings.length),
+                        //           (index) {
+                        //             final appointment =
+                        //                 controller.inProgressBookings[index];
+                        //             return Padding(
+                        //               padding: const EdgeInsets.symmetric(
+                        //                   horizontal: 8.0),
+                        //               child: SizedBox(
+                        //                 width:
+                        //                     MediaQuery.of(context).size.width *
+                        //                         0.95,
+                        //                 child: AppointmentCard(
+                        //                     doctorData: appointment),
+                        //               ),
+                        //             );
+                        //           },
+                        //         ),
+                        //       ),
+                        //     );
+                        //   }),
+                        // ],
 
                         const SizedBox(height: 10),
                         Center(

@@ -28,6 +28,7 @@ print("ConsultationModel dataList : ${dataList}");
             .map((jsonItem) => ConsultationModel.fromJson(jsonItem))
             .toList();
       } else {
+        
         showSnackbar("Error", "No consultation data found", "error");
         return [];
       }

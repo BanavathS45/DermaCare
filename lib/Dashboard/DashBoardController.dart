@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cutomer_app/Dashboard/ImagePreview.dart';
 import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:cutomer_app/Notification/LocalNotification.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -190,9 +191,12 @@ class Dashboardcontroller extends GetxController {
                     );
                   } else {
                     // Handle case where no image is selected
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("No image selected for preview")),
-                    );
+                       ScaffoldMessageSnackbar.show(
+                  context: context,
+                  message: "No image selected for preview",
+                  type: SnackbarType.warning,
+                );
+                     
                   }
                   Navigator.of(context).pop();
                 },

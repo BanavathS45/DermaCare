@@ -100,7 +100,9 @@ class ProfileDetailScreen extends StatelessWidget {
                   _buildDetailTile(Icons.cake, "DOB/Age",
                       "${cusData.dateOfBirth}/${cusData.age}"),
                   _buildDetailTile(Icons.confirmation_number, "Refferal Code",
-                      "${cusData.referCode.isNotEmpty ? cusData.referCode : "No Refferial Code Avaiable"}"),
+                      "${cusData.referralCode.isNotEmpty ? cusData.referralCode : "No Refferial Code Avaiable"}"),
+                  _buildDetailTile(Icons.handshake, "Reffer By",
+                      "${cusData.referredBy.isNotEmpty ? cusData.referredBy : "Self"}"),
                   _buildDetailTile(
                       Icons.location_on,
                       "Address",

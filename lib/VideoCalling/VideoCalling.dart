@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:cutomer_app/Clinic/AboutClinicController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cutomer_app/VideoCalling/CallController.dart';
@@ -7,8 +11,12 @@ import 'package:cutomer_app/VideoCalling/VideoCallScreen.dart';
 class HomeScreen extends StatefulWidget {
   final String roomId;
   final String username;
-
-  const HomeScreen({super.key, required this.roomId, required this.username});
+  final String clinicId;
+  const HomeScreen(
+      {super.key,
+      required this.roomId,
+      required this.username,
+      required this.clinicId});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -24,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     nameCtrl = TextEditingController(text: widget.username);
   }
 
+  final controller = Get.put(ClinicController());
   @override
   void dispose() {
     nameCtrl.dispose();
@@ -34,7 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final themeColor = mainColor;
     final lightBg = Colors.grey.shade100;
-
+    controller.fetchClinic(widget.clinicId);
+    final clinic = controller.clinic.value;
     return Scaffold(
       backgroundColor: lightBg,
       appBar: AppBar(
@@ -51,10 +61,16 @@ class _HomeScreenState extends State<HomeScreen> {
               // Branding Section
               Column(
                 children: [
-                  Icon(Icons.local_hospital, size: 64, color: themeColor),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.memory(
+                      base64Decode(clinic!.hospitalLogo ?? ""),
+                      height: 80,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   Text(
-                    "Welcome to Pragna Clinic Video Consultation",
+                    "Welcome to ${clinic.name} Video Consultation",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 22,
@@ -68,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Main Card
               Card(
+                color: Colors.white,
                 elevation: 8,
                 shadowColor: Colors.black12,
                 shape: RoundedRectangleBorder(
@@ -132,9 +149,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () {
                           final name = nameCtrl.text.trim();
                           if (name.isEmpty) {
-                            Get.snackbar('Error', 'Please enter your name',
-                                backgroundColor: Colors.red.shade100,
-                                colorText: Colors.red.shade900);
+                            ScaffoldMessageSnackbar.show(
+                              context: context,
+                              message: "Please enter your name",
+                              type: SnackbarType.warning,
+                            );
+                            // Get.snackbar('Error', 'Please enter your name',
+                            //     backgroundColor: Colors.red.shade100,
+                            //     colorText: Colors.red.shade900);
                             return;
                           }
 

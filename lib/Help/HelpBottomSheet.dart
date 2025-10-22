@@ -89,7 +89,7 @@ class HelpDeskBottomScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 onTap: () async {
-                  await customerCare();
+                  await customerCare("7842259803");
                 }),
           ),
           const SizedBox(height: 10.0),

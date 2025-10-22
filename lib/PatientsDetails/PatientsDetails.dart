@@ -280,7 +280,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
     patientdetailsformcontroller.selectedTitle = null;
 
     // ✅ Reset gender
-    registercontroller.selectedGender = "";
+    registercontroller.selectedGender = "Male";
 
     // ✅ Reset duration and symptoms
     _durationController.clear();
@@ -372,100 +372,123 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
 
           const SizedBox(height: 20),
           patientdetailsformcontroller.selectedFor.value != "Self"
-              ? Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        child: Obx(() {
-                          if (patientdetailsformcontroller
-                              .isLoadingRelations.value) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
+              ? Obx(() {
+                  bool isManual =
+                      patientdetailsformcontroller.isManualFormVisible.value;
 
-                          final filteredRelations = patientdetailsformcontroller
-                              .relations
-                              .where((r) => r.relation != "Self")
-                              .toList();
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                          child: Obx(() {
+                            if (patientdetailsformcontroller
+                                .isLoadingRelations.value) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
 
-                          if (filteredRelations.isEmpty) {
-                            return DropdownButtonFormField<String>(
-                              items: [],
-                              onChanged: null,
+                            final filteredRelations =
+                                patientdetailsformcontroller.relations
+                                    .where((r) => r.relation != "Self")
+                                    .toList();
+
+                            if (filteredRelations.isEmpty) {
+                              return DropdownButtonFormField<String>(
+                                items: [],
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  labelText: 'No Relations Found',
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                ),
+                              );
+                            }
+
+                            return DropdownButtonFormField<RelationModel>(
+                              isExpanded: true,
+                              hint: const Text('Select Patient from Relations'),
                               decoration: InputDecoration(
-                                labelText: 'No Relations Found',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10)),
                               ),
+                              items: filteredRelations.map((relation) {
+                                return DropdownMenuItem<RelationModel>(
+                                  value: relation,
+                                  child: Text(
+                                      "${relation.fullname} (${relation.relation})"),
+                                );
+                              }).toList(),
+                              onChanged: (selected) {
+                                if (selected != null) {
+                                  patientdetailsformcontroller
+                                      .selectRelation(selected);
+                                  // Hide manual form since user picked a relation
+                                  patientdetailsformcontroller
+                                      .isManualFormVisible.value = true;
+                                }
+                              },
+                              selectedItemBuilder: (context) {
+                                return filteredRelations
+                                    .map((relation) => Text(
+                                        "${relation.fullname} (${relation.relation})"))
+                                    .toList();
+                              },
                             );
-                          }
+                          }),
+                        ),
+                      ),
 
-                          return DropdownButtonFormField<RelationModel>(
-                            isExpanded: true,
-                            hint: const Text('Select Patient from Relations'),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                            ),
-                            items: filteredRelations.map((relation) {
-                              return DropdownMenuItem<RelationModel>(
-                                value: relation,
-                                child: Text(
-                                    "${relation.fullname} (${relation.relation})"),
-                              );
-                            }).toList(),
-                            onChanged: (selected) {
-                              if (selected != null) {
-                                patientdetailsformcontroller
-                                    .isManualFormVisible.value = false;
-                                patientdetailsformcontroller
-                                    .selectRelation(selected);
-                              }
-                            },
-                            // validator: (value) =>
-                            //     value == null ? "Please select a relation" : null,
-                            selectedItemBuilder: (context) {
-                              return filteredRelations
-                                  .map((relation) => Text(
-                                      "${relation.fullname} (${relation.relation})"))
-                                  .toList();
-                            },
-                          );
-                        }),
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // Toggle or show the manual form
-                        patientdetailsformcontroller.isManualFormVisible.value =
-                            false;
-                      },
-                      icon: Icon(Icons.add, color: Colors.white),
-                      label: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6.0),
-                        child: Text(
-                          "Add",
-                          style: TextStyle(color: Colors.white),
+                      const SizedBox(width: 10),
+
+                      // 🔘 Add / Remove Button
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          if (isManual) {
+                            // Remove -> go back to dropdown, keep previous values
+                            patientdetailsformcontroller
+                                .isManualFormVisible.value = false;
+                            patientdetailsformcontroller.clearForm();
+                            // Do NOT clearForm() here
+                          } else {
+                            // Add -> show manual form
+                            patientdetailsformcontroller
+                                .isManualFormVisible.value = true;
+                            patientdetailsformcontroller.clearForm();
+                            // Only clear if you want a fresh manual form
+                          }
+                        },
+                        icon: Icon(
+                          !isManual ? Icons.remove : Icons.add,
+                          color: Colors.white,
+                        ),
+                        label: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          child: Text(
+                            !isManual ? "Remove" : "Add",
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: mainColor,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: mainColor, // Set background color
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                    ],
+                  );
+                })
               : const SizedBox.shrink(),
+
           SizedBox(
             height: 20,
           ),
+
           Obx(() {
+            print(patientdetailsformcontroller.isManualFormVisible.value);
             if (patientdetailsformcontroller.selectedFor.value.toLowerCase() ==
                     "someone" &&
                 patientdetailsformcontroller.isManualFormVisible.value) {

@@ -185,6 +185,9 @@ class ScheduleController extends GetxController {
 
     selectedDayIndex.refresh();
     currentSlots.refresh();
+
+    print("🗓️ Selected Date Updated: ${selectedDate.value}");
+    print("⏰ Selected Slot Text: ${selectedSlotText.value}");
   }
 
   void _updateSlotsForDate(List<DoctorSlot> allSlots, DateTime date) {
@@ -252,7 +255,7 @@ class ScheduleController extends GetxController {
   }
 
   Future<bool> selectSlotAsync(
-      int index, String slotText, String doctorId,String branchId) async {
+      int index, String slotText, String doctorId, String branchId) async {
     final slot = currentSlots[index];
 
     if (slot.slotbooked) return false;
@@ -263,11 +266,10 @@ class ScheduleController extends GetxController {
       currentSlots.refresh();
 
       final isBlocked = await DoctorSlotService.blockSlot(
-        doctorId: doctorId,
-        slotTime: slot.slot,
-        date: DateFormat('yyyy-MM-dd').format(selectedDate.value),
-        branchId: branchId
-      );
+          doctorId: doctorId,
+          slotTime: slot.slot,
+          date: DateFormat('yyyy-MM-dd').format(selectedDate.value),
+          branchId: branchId);
 
       if (isBlocked) {
         final prefs = await SharedPreferences.getInstance();

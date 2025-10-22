@@ -59,7 +59,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
         title: "Appointments",
         onNotificationPressed: () {},
         onSettingPressed: () async {
-          await whatsUpChat();
+          // await whatsUpChat();
         },
         automaticallyImplyLeading: false,
       ),

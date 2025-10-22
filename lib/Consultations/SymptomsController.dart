@@ -7,7 +7,7 @@ class SymptomsController extends GetxController {
   var duration = ''.obs;
   var visitType = ''.obs;
   var attachments = <File>[].obs;
-  var selectedBranch = Rxn<Branch>();
+  Rx<Branch?> selectedBranch = Rx<Branch?>(null);
 
   void updateSymptoms(String value) {
     symptoms.value = value;
@@ -35,10 +35,8 @@ class SymptomsController extends GetxController {
   }
 
   void clearAttachments() {
-  attachments.clear();
-}
-
- 
+    attachments.clear();
+  }
 
   void clearForm() {
     symptoms.value = '';

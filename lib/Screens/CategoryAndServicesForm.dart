@@ -4,6 +4,7 @@ import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/CopyRigths.dart';
 import 'package:cutomer_app/Utils/GradintColor.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../ConfirmBooking/ConsultationPrice.dart';
@@ -203,13 +204,23 @@ class _CategoryAndServicesFormState extends State<CategoryAndServicesForm> {
                         controller.selectedSubSubService.value;
 
                     if (selectedMain == null) {
-                      Get.snackbar(
-                          "Validation", "Please select a service category");
+                      ScaffoldMessageSnackbar.show(
+                        context: context,
+                        message: "Please select a service category",
+                        type: SnackbarType.warning,
+                      );
+                      // Get.snackbar(
+                      //     "Validation", "Please select a service category");
                       return;
                     }
 
                     if (selectedSub == null) {
-                      Get.snackbar("Validation", "Please select a sub-service");
+                      ScaffoldMessageSnackbar.show(
+                        context: context,
+                        message: "Please select a sub-service",
+                        type: SnackbarType.warning,
+                      );
+                      // Get.snackbar("Validation", "Please select a sub-service");
                       return;
                     }
 

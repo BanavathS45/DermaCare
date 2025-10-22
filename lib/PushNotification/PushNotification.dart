@@ -42,52 +42,45 @@ class NotificationService {
 
   /* ------------------ INTERNAL ------------------ */
   void _setupListeners() async {
-    // Foreground
+    // 🔹 Foreground
     FirebaseMessaging.onMessage.listen((msg) async {
       debugPrint('📥 Foreground: $msg');
 
-      // 1. Show system notification
-      FirebaseMessaging.onMessage.listen((msg) {
-        if (msg.notification == null) {
-          // _NotificationHelper.show(
-          //     msg); // Show only if it's a data-only message
-        }
-      });
-
-      // 2. Show toast/snackbar — optional
-      final title = msg.notification?.title ?? 'New Notification';
-      final body = msg.notification?.body ?? '';
-      // final ctx = navigatorKey.currentContext;
-
-      if (Platform.isAndroid) {
-        final testVideoCallTime = DateTime.now().add(Duration(minutes: 6));
-        await scheduleVideoCallNotification(
-          title: title,
-          body: body,
-          videoCallTime: testVideoCallTime,
+      // 🔸 Show local notification banner
+      if (msg.notification != null) {
+        await _flutterLocal.show(
+          0,
+          msg.notification!.title ?? 'Notification',
+          msg.notification!.body ?? '',
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'general',
+              'General',
+              importance: Importance.max,
+              priority: Priority.high,
+            ),
+          ),
         );
-      } else {
-        Fluttertoast.showToast(msg: "$title: $body");
       }
-      // Get.find<NotificationController>().handleNotification(msg);
+
+      // ✅ Update controller & badge count in real time
+      notificationController.handleNotification(msg);
     });
 
-    // Background ➜ foreground
+    // 🔹 Background ➜ foreground
     FirebaseMessaging.onMessageOpenedApp.listen((msg) {
       debugPrint('📬 Opened from background: $msg');
       notificationController.handleNotification(msg);
-      // TODO: navigate / handle payload
     });
 
-    // Terminated ➜ launch
+    // 🔹 Terminated ➜ launch
     final msg = await FirebaseMessaging.instance.getInitialMessage();
     if (msg != null) {
       debugPrint('🚀 Opened from quit state: $msg');
       notificationController.handleNotification(msg);
-      // TODO: handle payload
     }
 
-    // iOS: ensure heads‑up while app is foreground
+    // 🔹 iOS presentation options
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
       alert: true,

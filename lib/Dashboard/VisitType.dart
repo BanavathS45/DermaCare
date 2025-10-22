@@ -21,6 +21,8 @@ import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:cutomer_app/Widget/Bottomsheet.dart';
+import 'package:cutomer_app/Widget/date_selector_widget.dart';
+import 'package:cutomer_app/Widget/time_slot_grid_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -60,28 +62,57 @@ class _VisitTypeState extends State<VisitType> {
   Getappointmentmodel? selectedBooking;
   bool loading = false;
   @override
-  @override
   void initState() {
     super.initState();
-    _fetchAppointments();
+    // _fetchAppointments();
     selectedType = "First Time";
     controller.updateVisitType("First Time");
     scheduleController.initializeWeekDates();
-    fetchHospitalDoctor().then((value) async {
-      setState(() => hospitalDoctors = value);
+    _initializeData();
+    // fetchHospitalDoctor().then((value) async {
+    //   setState(() => hospitalDoctors = value);
 
-      if (hospitalDoctors.isNotEmpty) {
-        final today = scheduleController.weekDates.first; // first date (today)
+    //   if (hospitalDoctors.isNotEmpty) {
+    //     final today = scheduleController.weekDates.first; // first date (today)
+    //     final doctorId = hospitalDoctors.first.doctor.doctorId;
+    //     final clinicId = hospitalDoctors.first.hospital.hospitalId;
+    //     // final prefs = await SharedPreferences.getInstance();
+    //     var branchId = visitController.bookings.first.branchId;
+    //     final slots = await DoctorSlotService.fetchDoctorSlots(
+    //         doctorId, clinicId, branchId!);
+    //     scheduleController.selectDate(today, slots);
+    //     print("jhgjjhjhgslots L::${slots}");
+    //   }
+    // });
+  }
+
+  Future<void> _initializeData() async {
+    try {
+      await _fetchAppointments(); // Wait for appointments first
+
+      final hospitalList = await fetchHospitalDoctor();
+      setState(() => hospitalDoctors = hospitalList);
+
+      if (hospitalDoctors.isNotEmpty && visitController.bookings.isNotEmpty) {
+        final today = scheduleController.weekDates.first;
         final doctorId = hospitalDoctors.first.doctor.doctorId;
         final clinicId = hospitalDoctors.first.hospital.hospitalId;
-        // final prefs = await SharedPreferences.getInstance();
-        var branchId = visitController.bookings.first.branchId;
+        final branchId = visitController.bookings.first.branchId ?? "";
+
         final slots = await DoctorSlotService.fetchDoctorSlots(
-            doctorId, clinicId, branchId!);
+          doctorId,
+          clinicId,
+          branchId,
+        );
+
         scheduleController.selectDate(today, slots);
-        print("jhgjjhjhgslots L::${slots}");
+        print("✅ Loaded slots for today: $slots");
+      } else {
+        print("⚠️ No doctors or bookings available to load slots.");
       }
-    });
+    } catch (e) {
+      print("❌ Error initializing data: $e");
+    }
   }
 
   Future<void> _fetchAppointments() async {
@@ -110,23 +141,39 @@ class _VisitTypeState extends State<VisitType> {
     //     ));
   }
 
-  void _handleFollowUp() {
+  void _handleFollowUp() async {
     print("_handleFollowUp calling");
+    await _fetchAppointments();
     final screenHeight = MediaQuery.of(context).size.height;
     final appointments = visitController.bookings;
     if (appointments == null || appointments.isEmpty) {
       print("No appointments found");
 
-      Get.snackbar(
-        "No Appointments",
-        "You don’t have any past bookings",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color.fromARGB(255, 66, 119, 235),
-        colorText: const Color.fromARGB(255, 255, 255, 255),
-        duration: const Duration(seconds: 3),
-        margin: const EdgeInsets.all(12),
-        borderRadius: 10,
+      ScaffoldMessageSnackbar.show(
+        context: context,
+        message: "You don’t have any past bookings",
+        type: SnackbarType.warning,
       );
+
+      if (visitController.loading.value) {
+        ScaffoldMessageSnackbar.show(
+          context: context,
+          message: "Please wait, loading appointments...",
+          type: SnackbarType.warning,
+        );
+        return;
+      }
+
+      // Get.snackbar(
+      //   "No Appointments",
+      //   "You don’t have any past bookings",
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: const Color.fromARGB(255, 66, 119, 235),
+      //   colorText: const Color.fromARGB(255, 255, 255, 255),
+      //   duration: const Duration(seconds: 3),
+      //   margin: const EdgeInsets.all(12),
+      //   borderRadius: 10,
+      // );
 
       controller.updateVisitType(selectedType);
       return;
@@ -208,46 +255,46 @@ class _VisitTypeState extends State<VisitType> {
                       );
 
                       // ✅ Doctor not found (unavailable)
-                      if (selectedHospitalDoctor == null) {
-                        return Card(
-                          color: Colors.grey.shade100,
-                          elevation: 1,
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 6, horizontal: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(
-                                color: Colors.grey, width: 0.8),
-                          ),
-                          child: ListTile(
-                            leading: const Icon(Icons.block,
-                                color: Colors.redAccent),
-                            title: Text(
-                              patientName,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: const Text(
-                              "Doctor not available currently",
-                              style: TextStyle(color: Colors.redAccent),
-                            ),
-                            trailing: TextButton(
-                              onPressed: () {
-                                ScaffoldMessageSnackbar.show(
-                                  context: context,
-                                  message:
-                                      "Doctor details are unavailable for this booking",
-                                  type: SnackbarType.warning,
-                                );
-                              },
-                              child: const Text(
-                                "View Details",
-                                style: TextStyle(color: Colors.redAccent),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
+                      // if (selectedHospitalDoctor == null) {
+                      //   return Card(
+                      //     color: Colors.grey.shade100,
+                      //     elevation: 1,
+                      //     margin: const EdgeInsets.symmetric(
+                      //         vertical: 6, horizontal: 8),
+                      //     shape: RoundedRectangleBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       side: const BorderSide(
+                      //           color: Colors.grey, width: 0.8),
+                      //     ),
+                      //     child: ListTile(
+                      //       leading: const Icon(Icons.block,
+                      //           color: Colors.redAccent),
+                      //       title: Text(
+                      //         patientName,
+                      //         style:
+                      //             const TextStyle(fontWeight: FontWeight.bold),
+                      //       ),
+                      //       subtitle: const Text(
+                      //         "Doctor not available currently",
+                      //         style: TextStyle(color: Colors.redAccent),
+                      //       ),
+                      //       trailing: TextButton(
+                      //         onPressed: () {
+                      //           ScaffoldMessageSnackbar.show(
+                      //             context: context,
+                      //             message:
+                      //                 "Doctor details are unavailable for this booking",
+                      //             type: SnackbarType.warning,
+                      //           );
+                      //         },
+                      //         child: const Text(
+                      //           "View Details",
+                      //           style: TextStyle(color: Colors.redAccent),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   );
+                      // }
 
                       // ✅ Normal doctor available card
                       return Card(
@@ -313,7 +360,7 @@ class _VisitTypeState extends State<VisitType> {
                               Row(
                                 children: [
                                   const Icon(Icons.local_hospital,
-                                      size: 18, color: Colors.grey),
+                                      size: 18, color: mainColor),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
@@ -325,7 +372,7 @@ class _VisitTypeState extends State<VisitType> {
                               Row(
                                 children: [
                                   const Icon(Icons.person,
-                                      size: 18, color: Colors.grey),
+                                      size: 18, color: mainColor),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
@@ -352,6 +399,39 @@ class _VisitTypeState extends State<VisitType> {
                               ),
                               const SizedBox(height: 8),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(
+                                          255, 235, 201, 194),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.medical_services,
+                                            size: 12, color: mainColor),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          appt.consultationType ?? '',
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                            color: mainColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Divider(),
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
@@ -359,6 +439,7 @@ class _VisitTypeState extends State<VisitType> {
                                     icon: const Icon(Icons.remove_red_eye,
                                         size: 18, color: mainColor),
                                     onPressed: () {
+                                      // Get.back();
                                       Get.to(() => AppointmentPreview(
                                             doctor: selectedHospitalDoctor!,
                                             doctorBookings: appt,
@@ -529,9 +610,20 @@ class _VisitTypeState extends State<VisitType> {
                   ),
 
                   const SizedBox(height: 12),
-                  showDays(hospitalId, doctorId, branchId),
-                  const Divider(height: 32),
-                  timeslots(doctorId),
+                  // showDays(hospitalId, doctorId, branchId),
+                  // const Divider(height: 32),
+                  // timeslots(doctorId),
+
+                  DateSelectorWidget(
+                    scrollController: _dateScrollController,
+                    scheduleController: scheduleController,
+                    doctorId: doctorId,
+                    branchId: branchId,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  TimeSlotGridWidget(scheduleController: scheduleController),
                 ],
               ),
             ),
@@ -564,65 +656,86 @@ class _VisitTypeState extends State<VisitType> {
                   try {
                     final selectedSlot = scheduleController.currentSlots[
                         scheduleController.selectedSlotIndex.value];
-                    String formattedDate = DateFormat('yyyy-MM-dd')
-                        .format(scheduleController.selectedDate.value);
-
+                    // String formattedDate = DateFormat('yyyy-MM-dd')
+                    //     .format(scheduleController.selectedDate.value);
+                    final selectedDate = scheduleController.selectedDate.value;
                     final postBookingPayload = FollowUpModal(
                       bookingId: selectedBooking?.bookingId ?? "",
                       doctorId: selectedBooking?.doctorId ?? "",
-                      visitType: selectedType,
+                      visitType: "follow-up",
                       mobileNumber: widget.mobileNumber,
-                      serviceDate: formattedDate,
+                      serviceDate:
+                          DateFormat('yyyy-MM-dd').format(selectedDate),
                       servicetime: scheduleController.selectedSlotText.value,
                       patientId: patientId,
                       bookingFor: selectedBooking?.bookingFor ?? "",
+                      branchId: selectedBooking?.branchId ?? "",
                     );
-
+                    print("📅 Booking Payload:");
+                    print("Booking ID: ${postBookingPayload.bookingId}");
+                    print("Doctor ID: ${postBookingPayload.doctorId}");
+                    print("Visit Type: ${postBookingPayload.visitType}");
+                    print("Mobile: ${postBookingPayload.mobileNumber}");
+                    print("Service Date: ${postBookingPayload.serviceDate}");
+                    print("Service Time: ${postBookingPayload.servicetime}");
+                    print("Patient ID: ${postBookingPayload.patientId}");
+                    print("Booking For: ${postBookingPayload.bookingFor}");
+                    print("Branch ID: ${postBookingPayload.branchId}");
                     var resData = await followUpBookings(postBookingPayload);
+                    print("resData: $resData");
 
-                    if (resData != null &&
-                        (resData['statusCode'] == 200 ||
-                            resData['statusCode'] == 201)) {
-                      // ✅ Show success before navigation
-                      Get.snackbar(
-                        "Success",
-                        "Appointment Booked on ${DateFormat('dd MMM').format(scheduleController.selectedDate.value)}",
-                        backgroundColor: Colors.green,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
+                    if (resData != null) {
+                      final statusCode = resData['statusCode'] ?? 0;
+                      final message =
+                          resData['message'] ?? "Booking failed. Try again";
 
-                      // Clear selection
-                      scheduleController.selectedSlotIndex.value = -1;
-                      scheduleController.currentSlots.clear();
+                      if (statusCode == 200 || statusCode == 201) {
+                        // Show success snackbar
+                        // showSnackbar(
+                        //   "Success",
+                        //   "",
+                        //   "success",
+                        // );
+                        ScaffoldMessageSnackbar.show(
+                          context: context,
+                          message:
+                              "Appointment Booked on ${DateFormat('dd MMM').format(scheduleController.selectedDate.value)}",
+                          type: SnackbarType.success,
+                        );
+                        // Clear selection
+                        scheduleController.selectedSlotIndex.value = -1;
+                        scheduleController.currentSlots.clear();
 
-                      // Navigate after showing snackbar
-                      await Future.delayed(
-                          const Duration(seconds: 1)); // optional delay
-                      Get.back();
-                      Get.to(BottomNavController(
-                        mobileNumber: widget.mobileNumber,
-                        username: widget.username,
-                        index: 1,
-                      ));
+                        Get.offAll(() => BottomNavController(
+                              mobileNumber: widget.mobileNumber,
+                              username: widget.username,
+                              index: 1,
+                            ));
+                      } else {
+                        ScaffoldMessageSnackbar.show(
+                          context: context,
+                          message: message,
+                          type: SnackbarType.error,
+                        );
+                        // showSnackbar("Error", message, "error");
+                      }
                     } else {
-                      Get.snackbar(
-                        "Error",
-                        resData?['message'] ?? "Booking failed. Try again",
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
+                      ScaffoldMessageSnackbar.show(
+                        context: context,
+                        message: "Unexpected error occurred",
+                        type: SnackbarType.error,
                       );
+                      // showSnackbar(
+                      //     "Error", "Unexpected error occurred", "error");
                     }
                   } catch (e) {
                     print('[❌] Exception booking appointment: $e');
-                    Get.snackbar(
-                      "Error",
-                      "Unexpected error occurred",
-                      backgroundColor: mainColor,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.TOP,
+                    ScaffoldMessageSnackbar.show(
+                      context: context,
+                      message: "Unexpected error occurred",
+                      type: SnackbarType.error,
                     );
+                    // showSnackbar("Error", "Unexpected error occurred", "error");
                   }
                 },
                 child: const Text(

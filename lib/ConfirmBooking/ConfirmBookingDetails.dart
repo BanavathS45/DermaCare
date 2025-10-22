@@ -689,7 +689,7 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                   MaterialPageRoute(
                     builder: (ctx) => SuccessScreen(
                         serviceDetails: widget.doctor,
-                        clinicName: clinicName ?? "",
+                        clinicData: widget.doctor,
                         paymentId: "pay_at_hospital",
                         patient: widget.patient,
                         mobileNumber: widget.patient.mobileNumber,
@@ -720,7 +720,12 @@ class _ConfirmbookingdetailsState extends State<Confirmbookingdetails> {
                         : (consultationFee + consultationFee * 0.18)
                             .toStringAsFixed(0),
                     onPaymentInitiated: () {
-                      showSnackbar("Info", "Payment Initiated", "info");
+                      ScaffoldMessageSnackbar.show(
+                            context: context,
+                            message: "Payment Initiated",
+                            type: SnackbarType.warning,
+                          );
+                     
                     },
                     serviceDetails: widget.doctor,
                     patient: widget.patient,

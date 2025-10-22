@@ -53,6 +53,9 @@ class _OnlysubserviceviewState extends State<Onlysubserviceview>
     print("Blood sample collection categoryName${widget.categoryName}");
     print("Blood sample collection categoryId${widget.categoryId}");
 
+    serviceselectioncontroller.services.clear();
+    serviceselectioncontroller.filteredServices.clear();
+
     serviceselectioncontroller.fetchImages();
     serviceselectioncontroller.fetchServices(widget.categoryId).then((_) {
       serviceselectioncontroller.filteredServices.assignAll(

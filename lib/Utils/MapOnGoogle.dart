@@ -13,4 +13,15 @@ class MapUtils {
       throw 'Could not open the Map';
     }
   }
+
+  static void openMapByCoordinates(double latitude, double longitude) async {
+    final Uri googleMapUrl = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude');
+
+    if (await canLaunchUrl(googleMapUrl)) {
+      await launchUrl(googleMapUrl, mode: LaunchMode.externalApplication);
+    } else {
+      print("❌ Could not launch map for coordinates: $latitude, $longitude");
+    }
+  }
 }

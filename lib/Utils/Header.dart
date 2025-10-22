@@ -29,6 +29,7 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final NotificationController notificationController = Get.find();
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -54,7 +55,7 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
                     title!,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -81,45 +82,37 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
           ),
           // Notification Icon
           if (onNotificationPressed != null)
-            Obx(() {
-              final count =
-                  Get.find<NotificationController>().unreadCount.value;
-              return Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.notifications, color: Colors.white),
-                    onPressed: () {
-                      Get.to(NotificationScreen());
-                    },
-                  ),
-                  if (count > 0)
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 18,
-                          minHeight: 18,
-                        ),
-                        child: Text(
-                          '$count',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+            Obx(() => Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications_outlined),
+                      onPressed: () {
+                        Get.to(() => NotificationScreen());
+                      },
+                    ),
+                    if (notificationController.unreadCount.value > 0)
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            notificationController.unreadCount.value.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              );
-            }),
+                  ],
+                )),
 
           // WhatsApp Icon
           if (onSettingPressed != null)
@@ -136,6 +129,7 @@ class CommonHeader extends StatelessWidget implements PreferredSizeWidget {
           // onHelpPressed
         ],
       ),
+   
     );
   }
 

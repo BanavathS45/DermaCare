@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cutomer_app/Booings/BooingService.dart';
-import 'package:cutomer_app/Booings/FollowUpModal.dart';
+
 import 'package:cutomer_app/BottomNavigation/Appoinments/GetAppointmentModel.dart';
 import 'package:cutomer_app/BottomNavigation/BottomNavigation.dart';
-import 'package:cutomer_app/ConfirmBooking/ConfirmBookingDetails.dart';
+
+import 'package:cutomer_app/Consultations/SymptomsController.dart';
 import 'package:cutomer_app/Controller/CustomerController.dart';
 import 'package:cutomer_app/Doctors/Schedules/ConsentFormAPI.dart';
 import 'package:cutomer_app/Doctors/Schedules/ConsentFromModal.dart';
@@ -13,7 +14,7 @@ import 'package:cutomer_app/Doctors/Schedules/consent_form_model.dart';
 import 'package:cutomer_app/Help/Numbers.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
-import 'package:cutomer_app/Utils/SavePdfToDownloads.dart';
+
 import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
 import 'package:flutter/gestures.dart';
@@ -27,7 +28,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signature/signature.dart';
 
-import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../ListOfDoctors/HospitalAndDoctorModel.dart';
 import 'dart:io';
@@ -35,7 +35,7 @@ import 'package:path_provider/path_provider.dart';
 
 class SkinCareConsentFormScreen extends StatefulWidget {
   final HospitalDoctorModel doctor;
-  final PatientModel? patient;
+  // final PatientModel? patient;
   final String? bookingId;
   final String? pID;
   final Getappointmentmodel? doctorBookings;
@@ -43,7 +43,7 @@ class SkinCareConsentFormScreen extends StatefulWidget {
   const SkinCareConsentFormScreen({
     Key? key,
     required this.doctor,
-    required this.patient,
+    // required this.patient,
     this.bookingId,
     this.pID,
     this.doctorBookings,
@@ -61,7 +61,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
   DateTime _procedureDate = DateTime.now();
   final selectedServicesController = Get.find<SelectedServicesController>();
   // consent points
-
+  final scontroller = SymptomsController();
   final Map<String, bool> _consentPoints = {
     "I consent to the procedure": true,
     "I consent to the use of my data": true,
@@ -88,7 +88,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
     print("Doctor signuture ${widget.doctor.doctor.doctorSignature}");
     setState(() {
       userData =
-          "I, ${widget.patient?.name}, hereby give my voluntary and informed consent for the collection, storage, and use of my medical records, personal health information, and diagnostic images for purposes including research, education, training, and improving medical services. I understand that all information will be handled in accordance with applicable privacy laws and regulations, and that my identity will be protected unless I provide separate written authorization. I acknowledge that participation is voluntary and that I may withdraw my consent at any time, without affecting the medical care I receive.";
+          "I, ${widget.doctorBookings!.name}, hereby give my voluntary and informed consent for the collection, storage, and use of my medical records, personal health information, and diagnostic images for purposes including research, education, training, and improving medical services. I understand that all information will be handled in accordance with applicable privacy laws and regulations, and that my identity will be protected unless I provide separate written authorization. I acknowledge that participation is voluntary and that I may withdraw my consent at any time, without affecting the medical care I receive.";
     });
   }
 
@@ -246,7 +246,6 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
       //     builder: (_) => ConsentFormScreen(consentFormData: consentFormData!),
       //   ),
       // );
-      print("ConsentFormData: ${consentFormData!.hospitalId}");
     } else {
       ScaffoldMessageSnackbar.show(
         context: context,
@@ -333,13 +332,10 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
               style:
                   pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
           pw.SizedBox(height: 6),
-          pw.Text(
-              "Name: ${widget.doctorBookings?.name ?? widget.patient?.name}"),
-          pw.Text(
-              "Mobile: ${widget.doctorBookings?.mobileNumber ?? widget.patient?.mobileNumber}"),
-          pw.Text(
-              "Gender: ${widget.doctorBookings?.gender ?? widget.patient?.gender}"),
-          pw.Text("Age: ${widget.doctorBookings?.age ?? widget.patient?.age}"),
+          pw.Text("Name: ${widget.doctorBookings?.name ?? ""}"),
+          pw.Text("Mobile: ${widget.doctorBookings?.mobileNumber ?? ""}"),
+          pw.Text("Gender: ${widget.doctorBookings?.gender ?? ""}"),
+          pw.Text("Age: ${widget.doctorBookings?.age ?? ""}"),
           // pw.Text("Address: ${widget.patient.}"),
           pw.Text("Procedure Date: ${dateFmt.format(_procedureDate)}"),
           pw.SizedBox(height: 12),
@@ -482,9 +478,9 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
 
     // Prepare payload
     final payload = {
-      "bookingId": widget.bookingId!,
+      "bookingId": widget.bookingId,
       "consentFormPdf": pdfBase64,
-      "followupStatus": "dfd", // TODO: Remove after deploy
+      // "followupStatus": "dfd", // TODO: Remove after deploy
     };
 
     // Update consent form
@@ -666,7 +662,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         Text(
-                            "${capitalizeEachWord(widget.doctorBookings?.name ?? widget.patient?.name ?? "")}"),
+                            "${capitalizeEachWord(widget.doctorBookings?.name ?? "")}"),
                       ],
                     ),
                     SizedBox(
@@ -680,8 +676,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                           "Age : ",
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
-                        Text(
-                            "${widget.doctorBookings?.age ?? widget.patient?.age}"),
+                        Text("${widget.doctorBookings?.age ?? ""}"),
                       ],
                     ),
                     SizedBox(
@@ -695,8 +690,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                           "Mobile Number : ",
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
-                        Text(
-                            "${widget.doctorBookings?.mobileNumber ?? widget.patient?.mobileNumber}"),
+                        Text("${widget.doctorBookings?.mobileNumber ?? ""}"),
                       ],
                     ),
                   ]),
@@ -738,7 +732,7 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (_) => UserDataConsentScreen(
-                                  patientname: widget.patient!.name),
+                                  patientname: widget.doctorBookings!.name),
                             ),
                           );
                         }
@@ -825,7 +819,8 @@ class _SkinCareConsentFormScreenState extends State<SkinCareConsentFormScreen> {
 
                   // WhatsApp Button
                   ElevatedButton.icon(
-                    onPressed: whatsUpChat,
+                    onPressed: () => whatsUpChat(
+                        scontroller.selectedBranch.value?.contactNumber),
                     icon: Icon(
                       Icons.whatshot,
                       color: Colors.white,

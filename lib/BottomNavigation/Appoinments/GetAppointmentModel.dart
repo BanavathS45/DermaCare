@@ -130,42 +130,57 @@ class Getappointmentmodel {
   final String? branchId;
   final String? consentFormPdf;
   final String? doctorRefCode;
+  final String? followupDate;
 
-  Getappointmentmodel(
-      {required this.bookingId,
-      required this.relation,
-      required this.bookingFor,
-      required this.name,
-      required this.age,
-      required this.gender,
-      required this.mobileNumber,
-      required this.problem,
-      required this.subServiceName,
-      required this.subServiceId,
-      required this.doctorId,
-      required this.clinicId,
-      required this.serviceDate,
-      required this.servicetime,
-      required this.consultationType,
-      required this.consultationFee,
-      this.channelId,
-      this.reasonForCancel,
-      this.notes,
-      this.reports,
-      required this.status,
-      required this.totalFee,
-      required this.bookedAt,
-      required this.patientId,
-      required this.freeFollowUps,
-      required this.freeFollowUpsLeft,
-      required this.clinicName,
-      required this.doctorName,
-      // required this.customerId,
-      this.branchname,
-      this.consentFormPdf,
-      this.doctorRefCode,
-      this.branchId,
-      this.prescriptionPdf});
+  final int? totalSittings;
+  final int? takenSittings;
+  final int? pendingSittings;
+  final int? currentSitting;
+
+  final Map<String, TreatmentData>? treatments;
+
+  Getappointmentmodel({
+    required this.bookingId,
+    required this.relation,
+    required this.bookingFor,
+    required this.name,
+    required this.age,
+    required this.gender,
+    required this.mobileNumber,
+    required this.problem,
+    required this.subServiceName,
+    required this.subServiceId,
+    required this.doctorId,
+    required this.clinicId,
+    required this.serviceDate,
+    required this.servicetime,
+    required this.consultationType,
+    required this.consultationFee,
+    this.channelId,
+    this.reasonForCancel,
+    this.notes,
+    this.reports,
+    required this.status,
+    required this.totalFee,
+    required this.bookedAt,
+    required this.patientId,
+    required this.freeFollowUps,
+    required this.freeFollowUpsLeft,
+    required this.clinicName,
+    required this.doctorName,
+    // required this.customerId,
+    this.branchname,
+    this.consentFormPdf,
+    this.doctorRefCode,
+    this.branchId,
+    this.prescriptionPdf,
+    this.followupDate,
+    this.totalSittings,
+    this.takenSittings,
+    this.pendingSittings,
+    this.currentSitting,
+    this.treatments,
+  });
 
   factory Getappointmentmodel.fromJson(Map<String, dynamic> json) {
     try {
@@ -193,6 +208,13 @@ class Getappointmentmodel {
         branchId: json['branchId'],
         consentFormPdf: json['consentFormPdf'],
         doctorRefCode: json['doctorRefCode'],
+        followupDate: json['followupDate'],
+
+        totalSittings: json['totalSittings'],
+        takenSittings: json['takenSittings'],
+        pendingSittings: json['pendingSittings'],
+        currentSitting: json['currentSitting'],
+
         prescriptionPdf: json['prescriptionPdf'] != null
             ? List<String>.from(json['prescriptionPdf'])
             : [],
@@ -217,11 +239,77 @@ class Getappointmentmodel {
         totalFee: double.tryParse(json['totalFee'].toString()) ?? 0.0,
 
         bookedAt: json['bookedAt']?.toString() ?? '',
+        treatments: json['treatments']?['generatedData'] != null
+            ? (json['treatments']['generatedData'] as Map<String, dynamic>).map(
+                (key, value) =>
+                    MapEntry(key, TreatmentData.fromJson(value ?? {})),
+              )
+            : null,
       );
     } catch (e) {
       print('❌ Error parsing Getappointmentmodel: $e\nData: $json');
       rethrow;
     }
+  }
+}
+
+class TreatmentData {
+  final String? reason;
+  final String? frequency;
+  final int? sittings;
+  final String? startDate;
+  final int? totalSittings;
+  final int? takenSittings;
+  final int? pendingSittings;
+  final int? currentSitting;
+  final List<TreatmentDate>? dates;
+
+  TreatmentData({
+    this.reason,
+    this.frequency,
+    this.sittings,
+    this.startDate,
+    this.totalSittings,
+    this.takenSittings,
+    this.pendingSittings,
+    this.currentSitting,
+    this.dates,
+  });
+
+  factory TreatmentData.fromJson(Map<String, dynamic> json) {
+    return TreatmentData(
+      reason: json['reason']?.toString(),
+      frequency: json['frequency']?.toString(),
+      sittings: json['sittings'] is int
+          ? json['sittings']
+          : int.tryParse(json['sittings']?.toString() ?? '0'),
+      startDate: json['startDate']?.toString(),
+      totalSittings: json['totalSittings'],
+      takenSittings: json['takenSittings'],
+      pendingSittings: json['pendingSittings'],
+      currentSitting: json['currentSitting'],
+      dates: (json['dates'] as List?)
+          ?.map((e) => TreatmentDate.fromJson(e))
+          .toList(),
+    );
+  }
+}
+
+class TreatmentDate {
+  final String? date;
+  final int? sitting;
+  final String? status;
+
+  TreatmentDate({this.date, this.sitting, this.status});
+
+  factory TreatmentDate.fromJson(Map<String, dynamic> json) {
+    return TreatmentDate(
+      date: json['date']?.toString(),
+      sitting: json['sitting'] is int
+          ? json['sitting']
+          : int.tryParse(json['sitting']?.toString() ?? '0'),
+      status: json['status']?.toString(),
+    );
   }
 }
 

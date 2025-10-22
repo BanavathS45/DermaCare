@@ -6,6 +6,7 @@ import 'package:cutomer_app/Doctors/Schedules/ConsentForm.dart';
 import 'package:cutomer_app/Doctors/Schedules/ScheduleController.dart';
 import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/Header.dart';
+import 'package:cutomer_app/Utils/ScaffoldMessageSnacber.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:cutomer_app/Widget/GobelTimer.dart';
 import 'package:cutomer_app/Widget/TimerController.dart';
@@ -259,8 +260,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             scheduleController.selectedSlotText.value;
 
                         if (slotIndex == -1 || slotText.isEmpty) {
-                          showSnackbar(
-                              "Warning", "Please select a slot", "warning");
+                          ScaffoldMessageSnackbar.show(
+                            context: context,
+                            message: "Please select a slot",
+                            type: SnackbarType.warning,
+                          );
+                          // showSnackbar(
+                          //     "Warning", "Please select a slot", "warning");
                           return;
                         }
 
@@ -284,11 +290,25 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             doctorId: widget.doctorData.doctor.doctorId,
                             slot: slotText,
                             context: context);
+                        final String enteredName =
+                            patientdetailsformcontroller.selectedFor == 'Self'
+                                ? (fullName ?? widget.username ?? '')
+                                : patientdetailsformcontroller
+                                    .nameController.text
+                                    .trim();
 
                         // ✅ Slot successfully selected, continue to next screen
                         String formattedDate = DateFormat('yyyy-MM-dd')
                             .format(scheduleController.selectedDate.value);
+                        if (enteredName.isEmpty) {
+                          ScaffoldMessageSnackbar.show(
+                            context: context,
+                            message: "Please provide patient information",
+                            type: SnackbarType.warning,
+                          );
 
+                          return; // Stop navigation
+                        }
                         PatientModel patientmodel = PatientModel(
                           name: patientdetailsformcontroller.selectedFor ==
                                   'Self'
@@ -309,7 +329,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               ? "${patientdetailsformcontroller.age} Yrs"
                               : "${patientdetailsformcontroller.ageController.text} Yrs",
                           gender: registercontroller.selectedGender,
-                          bookingFor: patientdetailsformcontroller.selectedFor.value,
+                          bookingFor:
+                              patientdetailsformcontroller.selectedFor.value,
                           problem: consultationController.selectedConsultation
                                       .value!.consultationType
                                       .toLowerCase() ==

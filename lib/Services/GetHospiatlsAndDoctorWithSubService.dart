@@ -60,7 +60,7 @@ Future<List<HospitalDoctorModel>> fetchHospitalDoctorBySubServiceId(
 
 Future<List<HospitalDoctorModel>> fetchHospitalDoctor() async {
   final url =
-      Uri.parse('${clinicUrl}/clinics/getAllDoctorWithRespectiveClinics');
+      Uri.parse('${clinicUrl}/clinics/getAllDoctorWithRespectiveClinics'); //TODO: keep 1/2 pass
   print('API URL: $url');
 
   final response = await http.get(url);

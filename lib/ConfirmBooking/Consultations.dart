@@ -42,6 +42,7 @@ class ConsultationsTypeState extends State<ConsultationsType> {
   double? longitude;
   String? fullname;
   String selectedVisitType = "First Time"; // 👈 store visit type here
+  final NotificationController notificationController = Get.find();
   @override
   void initState() {
     super.initState();
@@ -218,51 +219,64 @@ class ConsultationsTypeState extends State<ConsultationsType> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Hi, Welcome Back",
-                style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16)),
+            const Text(
+              "Hi, Welcome Back",
+              style: TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 16,
+              ),
+            ),
             const SizedBox(height: 5),
-            Text(
-              capitalizeFirstLetter(widget.username),
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+            // Username Text
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.5, // max width
+              child: Text(
+                capitalizeFirstLetter(widget.username),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+                maxLines: 2, // limit to 2 lines
+                overflow:
+                    TextOverflow.ellipsis, // add ellipsis if text too long
+              ),
             ),
           ],
         ),
         const Spacer(),
         Obx(() {
           final count = Get.find<NotificationController>().unreadCount.value;
-          return Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications, color: Colors.white),
-                onPressed: () => Get.to(() => NotificationScreen()),
-              ),
-              if (count > 0)
-                Positioned(
-                  right: 6,
-                  top: 6,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
-                    ),
-                    child: Text(
-                      '$count',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+          return Obx(() => Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () {
+                      Get.to(() => NotificationScreen());
+                    },
+                  ),
+                  if (notificationController.unreadCount.value > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          notificationController.unreadCount.value.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-            ],
-          );
+                ],
+              ));
         }),
         GestureDetector(
           onTap: () => Get.to(() => ReferralWalletPage()),
