@@ -51,7 +51,7 @@ class CarouselSliderService {
         final data = json.decode(response.body);
         print("carouselPicture ${response.statusCode}");
         print("carouselPicture body ${response}");
-        print("carouselPicture data ${data}");
+        print("carouselPictures data ${data}");
 
         // Assuming the API returns an array of objects, each containing 'carouselPicture'
         List<String> imageUrls = [];

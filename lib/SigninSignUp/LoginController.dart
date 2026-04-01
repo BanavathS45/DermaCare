@@ -1,10 +1,17 @@
+import 'dart:convert';
+
+import 'package:cutomer_app/APIs/BaseUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../ConfirmBooking/Consultations.dart';
 import '../OTP/OtpScreen.dart';
+import '../Registration/RegisterScreen.dart';
 import 'LoginService.dart';
+import 'package:http/http.dart' as http;
 
 class SiginSignUpController extends GetxController {
-  var getOTPButton = "GET OTP".obs;
+  var getOTPButton = "SIGN IN".obs;
   var isLoading = false.obs;
   var errorMessage = ''.obs;
   final formKey = GlobalKey<FormState>();
@@ -32,27 +39,27 @@ class SiginSignUpController extends GetxController {
     }
     return null; // ✅ Valid input
   }
+
   String? validateAge(String? value) {
-  if (value == null || value.isEmpty) {
-    return "Please enter your age";
-  }
+    if (value == null || value.isEmpty) {
+      return "Please enter your age";
+    }
 
-  final numericRegex = RegExp(r'^\d+$'); // Only digits
-  if (!numericRegex.hasMatch(value)) {
-    return "Age must be a number";
-  }
+    final numericRegex = RegExp(r'^\d+$'); // Only digits
+    if (!numericRegex.hasMatch(value)) {
+      return "Age must be a number";
+    }
 
-  final age = int.tryParse(value);
-  if (age == null || age <= 0) {
-    return "Enter a valid age";
-  }
-  if (age > 120) {
-    return "Age must be less than or equal to 120";
-  }
+    final age = int.tryParse(value);
+    if (age == null || age <= 0) {
+      return "Enter a valid age";
+    }
+    if (age > 120) {
+      return "Age must be less than or equal to 120";
+    }
 
-  return null; // ✅ Valid
-}
-
+    return null; // ✅ Valid
+  }
 
   String? validateMobileNumber(String? value) {
     value = value?.trim();
@@ -70,38 +77,52 @@ class SiginSignUpController extends GetxController {
 
   void submitForm(BuildContext context) async {
     if (formKey.currentState!.validate() && agreeToTerms) {
-      getOTPButton.value = "Sending OTP...";
-      isLoading.value = true; // Start loading
-      await Future.delayed(const Duration(seconds: 2));
-      isLoading.value = false; // Set loading to false
-      getOTPButton.value = "SENT OTP"; // Reset button text
+      getOTPButton.value = "Signing in...";
+      isLoading.value = true;
 
-      phoneNumber = mobileController.text.trim();
       final fullname = nameController.text.trim();
       final mobileNumber = mobileController.text.trim();
+
       try {
-        final response =
-            await _loginapiService.signInOrSignUp(fullname, mobileNumber);
-        if (response['status'] == 200) {
-          getOTPButton.value = "GET OTP";
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (ctx) => Otpscreencustomer(
-                PhoneNumberstored: phoneNumber!,
-                username: fullname,
-              ),
-            ),
-          );
+        // STEP 1: Check if user already exists
+        final response = await http.get(
+          Uri.parse('${registerUrl}/getBasicDetails/$mobileNumber'),
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+
+          // STEP 2: Navigate based on user data availability
+          if (data != null && data['success'] == true && data['data'] != null) {
+            // ✅ Existing user – go to ConsultationsType
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('isAuthenticated', true);
+            await prefs.setString('username', fullname);
+            await prefs.setString('mobileNumber', mobileNumber);
+
+            Get.offAll(() => ConsultationsType(
+                  mobileNumber: mobileNumber,
+                  username: fullname,
+                ));
+          } else {
+            // 🆕 New user – go to registration
+            Get.to(RegisterScreen(
+              fullName: fullname,
+              mobileNumber: mobileNumber,
+            ));
+          }
         } else {
-          getOTPButton.value = "GET OTP";
+          // Unexpected response
+          Get.snackbar("Error", "Failed to verify user. Try again later.");
         }
       } catch (e) {
-        getOTPButton.value = "GET OTP";
+        Get.snackbar("Exception", e.toString());
       } finally {
-        isLoading.value = false; // Hide loading state
+        getOTPButton.value = "SIGN IN";
+        isLoading.value = false;
       }
     }
+
     if (!agreeToTerms) {
       errorMessage.value = "Please agree to terms and conditions";
     }

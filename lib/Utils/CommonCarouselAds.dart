@@ -25,6 +25,12 @@ class _CommonCarouselAdsState extends State<CommonCarouselAds> {
   @override
   Widget build(BuildContext context) {
     print("🎯 Media List: ${widget.media}");
+    if (widget.media.isEmpty) {
+      return SizedBox(
+        height: widget.height,
+        child: Center(child: CircularProgressIndicator()), // Or a placeholder
+      );
+    }
 
     return CarouselSlider.builder(
       itemCount: widget.media.length,
@@ -149,7 +155,7 @@ class _CommonCarouselAdsState extends State<CommonCarouselAds> {
     );
   }
 }
- 
+
 class VideoPlayerWidget extends StatefulWidget {
   final String videoPath;
 
@@ -212,7 +218,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       looping: true,
       allowFullScreen: true, // ✅ Enables Full-Screen Mode
       showControls: true, // ✅ Shows Play/Pause/Fullscreen Button
-      aspectRatio: _videoController.value.aspectRatio, // ✅ Keep correct aspect ratio
+      aspectRatio:
+          _videoController.value.aspectRatio, // ✅ Keep correct aspect ratio
       materialProgressColors: ChewieProgressColors(
         playedColor: Colors.red,
         handleColor: Colors.redAccent,
@@ -231,7 +238,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FullScreenVideoPlayer(videoController: _videoController),
+        builder: (context) =>
+            FullScreenVideoPlayer(videoController: _videoController),
       ),
     );
   }
@@ -243,7 +251,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     }
 
     if (_chewieController == null) {
-      return Center(child: CircularProgressIndicator()); // ✅ Show loading spinner
+      return Center(
+          child: CircularProgressIndicator()); // ✅ Show loading spinner
     }
 
     return ClipRRect(

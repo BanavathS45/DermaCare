@@ -188,29 +188,29 @@ class DoctorDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             /// Career Path
-            const Text(
-              "Career Path",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, color: mainColor, fontSize: 16),
-            ),
-            const SizedBox(height: 8),
+            // const Text(
+            //   "Career Path",
+            //   style: TextStyle(
+            //       fontWeight: FontWeight.bold, color: mainColor, fontSize: 16),
+            // ),
+            // const SizedBox(height: 8),
 
-            const SizedBox(height: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: doctor.careerPath.asMap().entries.map((entry) {
-                int index = entry.key + 1;
-                String step = entry.value;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Text(
-                    "$index. $step",
-                    style: const TextStyle(color: mainColor),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
+            // const SizedBox(height: 8),
+            // Column(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: doctor.careerPath.asMap().entries.map((entry) {
+            //     int index = entry.key + 1;
+            //     String step = entry.value;
+            //     return Padding(
+            //       padding: const EdgeInsets.symmetric(vertical: 4),
+            //       child: Text(
+            //         "$index. $step",
+            //         style: const TextStyle(color: mainColor),
+            //       ),
+            //     );
+            //   }).toList(),
+            // ),
+            // const SizedBox(height: 20),
 
             /// Highlights
             const Text(

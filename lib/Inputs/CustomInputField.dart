@@ -19,7 +19,6 @@ class CustomTextField extends StatelessWidget {
   final String? hintText;
   final bool obscureText;
   final void Function(String)? onSubmitted;
- 
 
   // final bool isPassword; // ✅ Add this flag
 
@@ -111,5 +110,3 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
-
-

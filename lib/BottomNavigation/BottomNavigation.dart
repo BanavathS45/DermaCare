@@ -1,10 +1,13 @@
+import 'package:cutomer_app/BottomNavigation/Profile/Profile.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Dashboard/Dashboard.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import 'Appoinments/Appoinments.dart';
-import 'Profile/Profile.dart';
-import 'Wellness/Wellness.dart';
+import 'Appoinments/AppointmentController.dart';
+import 'Profile/Profiles.dart';
+import 'OnlineCounsultation/OnlineCounsultation.dart';
 
 class BottomNavController extends StatefulWidget {
   final String mobileNumber;
@@ -25,6 +28,9 @@ class BottomNavController extends StatefulWidget {
 class _BottomNavControllerState extends State<BottomNavController> {
   late int _selectedIndex;
   final doctorController = Get.find<DoctorController>();
+
+  final appointmentcontroller = Get.find<AppointmentController>();
+
   late List<Widget> _pages;
 
   @override
@@ -32,6 +38,7 @@ class _BottomNavControllerState extends State<BottomNavController> {
     super.initState();
     print(
         "doctorController.appointmentCount ${doctorController.appointmentCount}");
+    print("doctorController.mobileNumber ${widget.mobileNumber}");
     _selectedIndex = widget.index;
 
     // Initialize pages
@@ -43,11 +50,10 @@ class _BottomNavControllerState extends State<BottomNavController> {
       AppointmentPage(
         mobileNumber: widget.mobileNumber,
       ),
-      ProfilePage(
-        customerLatitude: 17.368784,
-        customerLongitude: 78.524673,
+      OnlineCounsultation(
+        mobileNumber: widget.mobileNumber,
       ),
-      WellnessPage(),
+      CustomerProfilePage(),
     ];
   }
 
@@ -66,101 +72,95 @@ class _BottomNavControllerState extends State<BottomNavController> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF456F62), // Top-left
-              Color(0xFF82D1B8), // Bottom-right
-            ],
+            colors: [mainColor, secondaryColor],
           ),
         ),
         child: BottomNavigationBar(
-          backgroundColor:
-              Colors.transparent, // Make it transparent to show gradient
+          backgroundColor: Colors.transparent,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          selectedItemColor: Colors.amber,
+          selectedItemColor: const Color.fromARGB(255, 1, 17, 61),
           unselectedItemColor: Colors.white,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
+              icon: const Icon(Icons.home_outlined),
               label: 'Services',
             ),
             BottomNavigationBarItem(
-              icon: Stack(
-                children: [
-                  const Icon(Icons.calendar_month),
-                  if (doctorController.appointmentCount.value > 0)
-                    Positioned(
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        child: Text(
-                          doctorController.appointmentCount.value > 10
-                              ? '10+'
-                              : '${doctorController.appointmentCount.value}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
+              icon: Obx(() => Stack(
+                    children: [
+                      const Icon(Icons.calendar_month),
+                      if (appointmentcontroller.upcomingCountRx.value > 0)
+                        Positioned(
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              appointmentcontroller.upcomingCountRx.value > 10
+                                  ? '10+'
+                                  : '${appointmentcontroller.upcomingCountRx.value}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ),
-                ],
-              ),
+                    ],
+                  )),
               label: 'Appointment',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_2_outlined),
+              icon: Obx(() => Stack(
+                    children: [
+                      const Icon(Icons.video_call),
+                      if (appointmentcontroller.videoConsultationCountRx.value >
+                          0)
+                        Positioned(
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              appointmentcontroller
+                                          .videoConsultationCountRx.value >
+                                      10
+                                  ? '10+'
+                                  : '${appointmentcontroller.videoConsultationCountRx.value}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  )),
+              label: 'Online Consultation',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_2_outlined),
               label: 'Profile',
             ),
-
-            BottomNavigationBarItem(
-              icon: Stack(
-                children: [
-                  const Icon(Icons.video_call),
-                  if (doctorController.appointmentCount.value > 0)
-                    Positioned(
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        child: Text(
-                          doctorController.appointmentCount.value > 10
-                              ? '10+'
-                              : '${doctorController.appointmentCount.value}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              label: 'Video Consultation',
-            ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.video_call),
-            //   label: 'Video Consultation',
-            // ),
           ],
         ),
       ),

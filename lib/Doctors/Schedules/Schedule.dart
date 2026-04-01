@@ -4,7 +4,6 @@ import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:timeago/timeago.dart';
 import '../../Controller/CustomerController.dart';
 import '../../PatientsDetails/PatientDetailsFormController.dart';
 import '../../PatientsDetails/PatientModel.dart';
@@ -12,8 +11,6 @@ import '../../PatientsDetails/PatientsDetails.dart';
 import '../../Registration/RegisterController.dart';
 import '../../ConfirmBooking/ConfirmBookingDetails.dart';
 import '../../ConfirmBooking/ConsultationController.dart';
-
-import '../../Utils/DateConverter.dart';
 import '../../Utils/GradintColor.dart';
 import '../../Widget/Bottomsheet.dart';
 import '../ListOfDoctors/DoctorModel.dart';
@@ -21,8 +18,9 @@ import 'package:intl/intl.dart';
 
 class ScheduleScreen extends StatefulWidget {
   final HospitalDoctorModel doctorData;
-
-  const ScheduleScreen({super.key, required this.doctorData});
+  final String mobileNumber;
+  const ScheduleScreen(
+      {super.key, required this.doctorData, required this.mobileNumber});
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -37,7 +35,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   final selectedServicesController = Get.find<SelectedServicesController>();
   final consultationController = Get.find<Consultationcontroller>();
   final registercontroller = Get.put(Registercontroller());
-  int? id;
+  String? id;
   List<DoctorSlot>? slots;
 
   @override
@@ -48,7 +46,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
     //  controller.setDoctorSlots(widget.doctor.slots);
 
-    id = consultationController.consultationId.value;
+    id = consultationController.selectedConsultation.value!.consultationId;
+    timeslots();
   }
 
   @override
@@ -93,28 +92,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               showDays(),
 
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        DateFormat('MMMM yyyy')
-                            .format(scheduleController.selectedDate.value),
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        DateFormat('EEEE, dd MMMM')
-                            .format(scheduleController.selectedDate.value),
-                        style: TextStyle(
-                            fontSize: 14, color: Colors.grey.shade600),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
 
               const SizedBox(height: 24),
               timeslots(),
@@ -126,18 +103,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               Divider(color: secondaryColor),
 
               PatientDetailsForm(), // ✅ Add your working form here
-
-              // const SizedBox(height: 40),
-              // Obx(() => Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       children: selectedServicesController.selectedServices
-              //           .map((service) {
-              //         return Text(
-              //           "${service.serviceName} (Qty: ${service.discountedCost})",
-              //           style: TextStyle(fontSize: 16),
-              //         );
-              //       }).toList(),
-              //     )),
             ],
           ),
         ),
@@ -154,20 +119,19 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   if (scheduleController.selectedSlotText.value.isNotEmpty) {
                     showSnackbar("Success", "Form Validated", "success");
 
-                    Patientmodel patientmodel = Patientmodel(
-                        patientName:
-                            patientdetailsformcontroller.nameController.text,
-                        patientAge:
-                            patientdetailsformcontroller.ageController.text,
+                    PatientModel patientmodel = PatientModel(
+                        name: patientdetailsformcontroller.nameController.text,
+                        age: patientdetailsformcontroller.ageController.text,
                         gender: registercontroller.selectedGender,
                         bookingFor: patientdetailsformcontroller.selectedFor,
                         problem:
                             patientdetailsformcontroller.notesController.text,
                         monthYear: DateFormat('MMMM dd, yyyy')
                             .format(scheduleController.selectedDate.value),
-                        dayDate: DateFormat('EEEE')
+                        serviceDate: DateFormat('EEEE')
                             .format(scheduleController.selectedDate.value),
-                        slot: scheduleController.selectedSlotText.value);
+                        servicetime: scheduleController.selectedSlotText.value,
+                        mobileNumber: widget.mobileNumber);
 
                     print("patientmodel ${patientmodel.toJson()}");
                     Get.to(Confirmbookingdetails(
@@ -409,6 +373,4 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ),
     );
   }
-
-
 }

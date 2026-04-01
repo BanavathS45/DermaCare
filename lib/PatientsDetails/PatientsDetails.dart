@@ -31,7 +31,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
           const Text(
             "Patient Details",
             style: TextStyle(
-              color: mainColor,
+              color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -158,7 +158,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
           const Text(
             "Describe your problem",
             style: TextStyle(
-              color: mainColor,
+              color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -169,7 +169,7 @@ class _PatientDetailsFormState extends State<PatientDetailsForm> {
             child: CustomTextAera(
               controller: patientdetailsformcontroller.notesController,
               labelText: "Enter Your problem....",
-               autovalidateMode: AutovalidateMode.onUnfocus,
+              autovalidateMode: AutovalidateMode.onUnfocus,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return "Please enter notes";

@@ -1,6 +1,7 @@
 import 'package:cutomer_app/Registration/RegisterAPI.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 import '../BottomNavigation/BottomNavigation.dart';
@@ -15,6 +16,7 @@ class Registercontroller extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController dateOfBirthController = TextEditingController();
+  final TextEditingController referralController = TextEditingController();
 
   //API
   final ApiService apiService = ApiService();
@@ -83,14 +85,16 @@ class Registercontroller extends GetxController {
     if (formKey.currentState!.validate()) {
       context.loaderOverlay.show(); // Show loading overlay
 
+      String formattedDate = DateFormat('dd-MM-yyyy')
+          .format(DateFormat('dd/MM/yyyy').parse(dateOfBirthController.text));
+
       final RegisterModel user = RegisterModel(
         fullName: fullName,
         mobileNumber: mobileNumber,
         emailId: emailController.text,
-        // age: dateOfBirthController.text as int, // Handle parsing error
-        age: 20,
+        referCode: referralController.text,
         gender: selectedGender,
-        bloodGroup: bloodGroup,
+        dateOfBirth: formattedDate,
       );
 
       try {
@@ -106,11 +110,11 @@ class Registercontroller extends GetxController {
           ));
         } else {
           // Handle cases where the server responds with an error status
-
-          showSnackbar(
-              "Error",
-              "${response['message'] ?? "Failed to register. Please try again."}",
-              "errror");
+          showSnackbar("Error", "${response['message']}", "errror");
+          // showSnackbar(
+          //     "Error",
+          //     "${response['message'] ?? "Failed to register. Please try again."}",
+          //     "errror");
         }
       } catch (e) {
         context.loaderOverlay.hide(); // Hide loading overlay on error

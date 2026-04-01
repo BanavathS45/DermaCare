@@ -13,3 +13,5 @@
 # General Android rules (if not already present)
 -dontwarn android.arch.**
 -keep class android.support.** { *; }
+
+-keep class **.zego.** { *; }

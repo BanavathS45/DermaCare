@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class CustomDropdownField extends StatelessWidget {
-  final String? value;
+class CustomDropdownField<T> extends StatelessWidget {
+  final T? value; // Change to nullable type
   final String labelText;
-  final List<String> items;
-  final Function(String?) onChanged;
-  final String? Function(String?)? validator;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+  final String? Function(T?)? validator;
   final bool readOnly;
   final IconData? icon;
   final AutovalidateMode? autovalidateMode;
@@ -27,21 +27,18 @@ class CustomDropdownField extends StatelessWidget {
     var theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 15, vertical: 10), // ✅ Consistent padding
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white, // ✅ Adaptive background
+          color: Colors.white,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: DropdownButtonFormField<String>(
-          value: value?.isNotEmpty == true
-              ? value
-              : null, // ✅ Ensure a non-null value
+        child: DropdownButtonFormField<T>(
+          value: value, // No need to check for null here
           autovalidateMode: autovalidateMode,
           decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 15, vertical: 16), // ✅ Inner padding
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
             labelText: labelText,
             labelStyle: TextStyle(fontSize: 16, color: Colors.grey.shade700),
             border: OutlineInputBorder(
@@ -60,22 +57,13 @@ class CustomDropdownField extends StatelessWidget {
                 icon != null ? Icon(icon, color: theme.primaryColor) : null,
           ),
           dropdownColor: theme.cardColor,
-          icon: const Icon(Icons.arrow_drop_down,
-              color: Colors.black, size: 28), // ✅ Match icon color
+          icon:
+              const Icon(Icons.arrow_drop_down, color: Colors.black, size: 28),
           style: const TextStyle(fontSize: 16, color: Colors.black),
-
-          items: items
-              .map((item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(item,
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.black)),
-                  ))
-              .toList(),
-
-          onChanged: readOnly ? null : onChanged, // ✅ Disable if read-only
-          borderRadius: BorderRadius.circular(12), // ✅ Rounded dropdown menu
-          menuMaxHeight: 300, // ✅ Restrict dropdown max height
+          items: items,
+          onChanged: readOnly ? null : onChanged,
+          borderRadius: BorderRadius.circular(12),
+          menuMaxHeight: 300,
           validator: validator,
         ),
       ),

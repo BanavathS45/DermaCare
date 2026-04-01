@@ -8,11 +8,11 @@ class ApiService {
 
   // Method to register the user
   Future<Map<String, dynamic>> registerUser(RegisterModel user) async {
-    final url = Uri.parse('$baseUrl/basic-details');
+    final url = Uri.parse('$registerUrl/saveBasicDetails');
 
     try {
       // Log: Starting API call
- 
+
       print('URL: $url');
 
       // Log: Sending data
@@ -37,9 +37,7 @@ class ApiService {
         print('User registered successfully. Returning response data.');
         print('User registration complete. Basic information saved.');
         return jsonDecode(response.body);
-      }
-
-      else {
+      } else {
         // Log: Error in registration
         print(
             'Error: Failed to register user. Status code: ${response.statusCode}');

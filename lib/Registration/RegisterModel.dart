@@ -1,36 +1,37 @@
 class RegisterModel {
-  String? fullName;
-  String? mobileNumber;
-  String? gender;
-  String? bloodGroup;
-  int? age;
-  String? emailId;
+  late String fullName;
+  late String mobileNumber;
+  late String gender;
+  late String dateOfBirth;
+  String? referCode;
+  late String emailId;
 
-  RegisterModel(
-      {this.fullName,
-      this.mobileNumber,
-      this.gender,
-      this.bloodGroup,
-      this.age,
-      this.emailId});
+  RegisterModel({
+    required this.fullName,
+    required this.mobileNumber,
+    required this.gender,
+    required this.dateOfBirth,
+    this.referCode,
+    required this.emailId,
+  });
 
   RegisterModel.fromJson(Map<String, dynamic> json) {
     fullName = json['fullName'];
     mobileNumber = json['mobileNumber'];
     gender = json['gender'];
-    bloodGroup = json['bloodGroup'];
-    age = json['age'];
+    dateOfBirth = json['dateOfBirth'];
+    referCode = json['referCode'];
     emailId = json['emailId'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['fullName'] =  fullName;
+    data['fullName'] = fullName;
     data['mobileNumber'] = mobileNumber;
-    data['gender'] =  gender;
-    data['bloodGroup'] =  bloodGroup;
-    data['age'] =  age;
-    data['emailId'] =  emailId;
+    data['gender'] = gender;
+    data['dateOfBirth'] = dateOfBirth;
+    data['referCode'] = referCode;
+    data['emailId'] = emailId;
     return data;
   }
 }

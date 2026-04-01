@@ -1,8 +1,10 @@
+import 'package:cutomer_app/BottomNavigation/Appoinments/PostBooingModel.dart';
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
 import 'package:cutomer_app/Utils/Header.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:flutter/material.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import '../Booings/BooingService.dart';
 import '../PatientsDetails/PatientModel.dart';
 import '../Screens/BookingSuccess.dart';
 import '../Utils/ScaffoldMessageSnacber.dart';
@@ -11,8 +13,10 @@ class RazorpaySubscription extends StatefulWidget {
   final VoidCallback? onPaymentInitiated;
   final HospitalDoctorModel serviceDetails;
   final String amount;
+  final String mobileNumber;
   final BuildContext context;
-  final Patientmodel patient;
+  final PatientModel patient;
+  final PostBookingModel bookingDetails;
 
   const RazorpaySubscription({
     super.key,
@@ -21,6 +25,7 @@ class RazorpaySubscription extends StatefulWidget {
     required this.amount,
     required this.context,
     required this.patient,
+    required this.bookingDetails, required this.mobileNumber,
   });
 
   @override
@@ -40,7 +45,8 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
     // Payment options
     options = {
       'key': 'rzp_test_2z0PiIllMZDHrE',
-      'amount': (widget.amount * 100), // Amount in paise
+      'amount': (double.parse(widget.amount) * 100).toInt(), // Amount in paise
+
       'name': 'Derma Care',
       'description': 'Service Charges',
       'prefill': {
@@ -85,16 +91,21 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
     paymentId = response.paymentId;
     print("Payment Successful: ${response.paymentId}");
 
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (ctx) => SuccessScreen(
-            serviceDetails: widget.serviceDetails,
-            paymentId: paymentId.toString(),
-            patient: widget.patient,
+    var responseData = await postBookings(widget.bookingDetails);
+
+    if (responseData != null) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (ctx) => SuccessScreen(
+              serviceDetails: widget.serviceDetails,
+              paymentId: paymentId.toString(),
+              patient: widget.patient,
+              mobileNumber:widget.mobileNumber
+            ),
           ),
-        ),
-        (route) => false);
+          (route) => false);
+    }
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -145,7 +156,6 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
   }
 }
 
-
 // =================PhonePay==============
 
 // import 'dart:convert' show base64Encode, jsonEncode, utf8;
@@ -156,11 +166,23 @@ class _RazorpaySubscriptionState extends State<RazorpaySubscription> {
 
 // import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 
-// class PhonepePg {
-//   final int amount;
-//   final BuildContext context;
+// import '../Doctors/ListOfDoctors/DoctorModel.dart';
+// import '../PatientsDetails/PatientModel.dart';
 
-//   PhonepePg({required this.context, required this.amount});
+// class PhonepePg {
+//   final VoidCallback? onPaymentInitiated;
+//   final HospitalDoctorModel serviceDetails;
+//   final String amount;
+//   final BuildContext context;
+//   final Patientmodel patient;
+
+//   PhonepePg({
+//     required this.context,
+//     required this.amount,
+//     required this.onPaymentInitiated,
+//     required this.serviceDetails,
+//     required this.patient,
+//   });
 
 //   final String merchantId = "PGTESTPAYUAT";
 //   final String salt = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";

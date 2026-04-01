@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cutomer_app/Modals/ServiceModal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import '../APIs/BaseUrl.dart';
+import '../APIs/FetchServices.dart';
 import '../BottomNavigation/Appoinments/AppointmentService.dart';
 import '../BottomNavigation/Appoinments/BookingModal.dart';
 import '../Services/CarouselSliderService.dart';
@@ -24,8 +26,34 @@ class Dashboardcontroller extends GetxController {
   final RxList<Serviceb> services = <Serviceb>[].obs;
   final RxList<AppointmentData> allAppointments = <AppointmentData>[].obs;
   final RxList<String> carouselImages = <String>[].obs;
+  final selectedService = Rxn<Serviceb>();
+
+  var selectedSubService = Rxn<Service>();
+  var selectedSubSubService = Rxn<SubService>();
+  var serviceList = <Serviceb>[];
+
+  var subServiceList = <Service>[].obs;
+  var subServiceArray = <SubService>[].obs;
 
   String statusMessage = "";
+  
+  RxString mobileNumber = ''.obs;
+  void setMobileNumber(String number) {
+    mobileNumber.value = number;
+  }
+
+  void fetchSubServices(String categoryId) async {
+    print("categoryId ${categoryId}");
+    final result = await ServiceFetcher().fetchServices(categoryId);
+    subServiceList.assignAll(result);
+    print("subServiceList ${subServiceList}");
+  }
+   void fetchSubSubServices(String serviceId) async {
+    print("categoryId ${serviceId}");
+    final result = await ServiceFetcher().fetchsubServices(serviceId);
+    subServiceArray.assignAll(result);
+    print("subServiceArray ${subServiceArray}");
+  }
 
   /// Store user session data
   void storeUserData(String mobileNumber, String username) async {

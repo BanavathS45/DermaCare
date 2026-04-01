@@ -1,24 +1,23 @@
 import 'package:cutomer_app/Doctors/ListOfDoctors/DoctorModel.dart';
 import 'package:cutomer_app/PatientsDetails/PatientModel.dart';
-import 'package:cutomer_app/ServiceSumarry/ServiceIDModal.dart';
 import 'package:cutomer_app/Utils/GradintColor.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../BottomNavigation/BottomNavigation.dart';
 import '../Doctors/ListOfDoctors/DoctorController.dart';
 import '../Doctors/ListOfDoctors/DoctorService.dart';
-import '../Utils/AdreessFormat.dart';
 
 class SuccessScreen extends StatefulWidget {
   final HospitalDoctorModel serviceDetails;
-  final Patientmodel patient;
+  final PatientModel patient;
   final String paymentId;
-
+  final String mobileNumber;
   const SuccessScreen({
     super.key,
     required this.serviceDetails,
     required this.paymentId,
     required this.patient,
+    required this.mobileNumber,
   });
 
   @override
@@ -143,7 +142,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
                                   width: 5,
                                 ),
                                 Text(
-                                  "${widget.patient.dayDate}, ${widget.patient.slot}",
+                                  "${widget.patient.serviceDate}, ${widget.patient.servicetime}",
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ],
@@ -167,9 +166,9 @@ class _SuccessScreenState extends State<SuccessScreen> {
         decoration: BoxDecoration(gradient: appGradient()),
         child: TextButton(
           onPressed: () {
-            Get.to(
+            Get.offAll(
               BottomNavController(
-                mobileNumber: widget.serviceDetails.hospital.contactNumber,
+                mobileNumber: widget.mobileNumber,
                 username: widget.serviceDetails.doctor.name,
                 index: 1,
               ),

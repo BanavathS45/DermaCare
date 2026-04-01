@@ -2,6 +2,7 @@ import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../Services/OnlySUbServiceView.dart';
 import '../TreatmentAndServices/ServiceSelectionScreen.dart';
 import '../Services/serviceb.dart';
 
@@ -32,7 +33,14 @@ class _ServiceCardState extends State<ServiceCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => SelectServicesPage(
+        // Get.to(() => SelectServicesPage(
+        //       categoryId: widget.service.categoryId,
+        //       categoryName: widget.service.categoryName,
+        //       mobileNumber: widget.mobileNumber,
+        //       username: widget.username,
+        //     ));
+
+        Get.to(() => Onlysubserviceview(
               categoryId: widget.service.categoryId,
               categoryName: widget.service.categoryName,
               mobileNumber: widget.mobileNumber,

@@ -1,3 +1,6 @@
+import 'package:cutomer_app/ConfirmBooking/ConsultationServices.dart';
+import 'package:cutomer_app/Dashboard/DashBoardController.dart';
+import 'package:cutomer_app/Utils/Constant.dart';
 import 'package:cutomer_app/Utils/CopyRigths.dart';
 import 'package:cutomer_app/Utils/ShowSnackBar%20copy.dart';
 import 'package:cutomer_app/Utils/capitalizeFirstLetter.dart';
@@ -5,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import '../BottomNavigation/BottomNavigation.dart';
+import '../Screens/CategoryAndServicesForm.dart';
+import '../Utils/GradientTextWidget .dart';
 import 'ConfirmBookingDetails.dart';
 import 'ConsultationController.dart';
 
@@ -24,6 +29,32 @@ class ConsultationsType extends StatefulWidget {
 
 class ConsultationsTypeState extends State<ConsultationsType> {
   final consultationcontroller = Get.find<Consultationcontroller>();
+  List<ConsultationModel> _consultations = [];
+  bool loading = true;
+  final  dashboardcontroller =
+      Get.put(Dashboardcontroller());
+  @override
+  void initState() {
+    super.initState();
+dashboardcontroller.setMobileNumber(widget.mobileNumber);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final consultations = await getConsultationDetails();
+      try {
+        if (consultations.isNotEmpty) {
+          setState(() {
+            _consultations = consultations;
+            loading = false;
+          });
+        } else {
+          loading = false;
+        }
+      } catch (e) {
+        loading = false;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,121 +67,110 @@ class ConsultationsTypeState extends State<ConsultationsType> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF679B75),
-              Color(0xFF84D8C1),
-              Color(0xFFCFAF96),
-            ],
+            colors: [Colors.white, secondaryColor, mainColor],
           ),
         ),
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 80),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 40),
 
-                    // Top Banner
-                    Center(
-                      child: Column(
-                        children: [
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.05),
-                          Container(
-                            width: 110,
-                            height: 98,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: Image.network(
-                                "https://storage.googleapis.com/tagjs-prod.appspot.com/85ADYlVskG/hiota0r5.png",
-                                fit: BoxFit.fill,
-                              ),
+                  // Top Banner
+                  Center(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.05),
+                        Container(
+                          height: 120,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: Image.asset(
+                              'assets/DermaText.png',
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            "Dermatology center",
+                        ),
+                        const SizedBox(height: 10),
+                        const SizedBox(height: 16),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40),
+                          child: Text(
+                            "Daily skincare is essential to maintain healthy, glowing skin and prevent premature aging.",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 36),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 40),
-                            child: Text(
-                              "Daily skincare is essential to maintain healthy, glowing skin and prevent premature aging.",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
+                        ),
+                        const SizedBox(height: 26),
+                        Text(
+                          "Hi, Welcome",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.white, // Fill color
+                          ),
+                        ),
+                        Text(
+                          "${capitalizeEachWord(widget.username)}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 28,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(2, 2),
+                                blurRadius: 4,
+                                color: Colors.black45,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
+                            ], // Placeholder color for ShaderMask
                           ),
-                          const SizedBox(height: 46),
-                          const Text(
-                            "Welcome ",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white, // Fill color
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(2, 2),
-                                  blurRadius: 4,
-                                  color: Colors.black45,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            "${capitalizeFirstLetter(widget.username)}",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white, // Fill color
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(2, 2),
-                                  blurRadius: 4,
-                                  color: Colors.black45,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
                     ),
+                  ),
 
-                    // Buttons Section
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Column(
-                        children: [
-                          _serviceButton("Services and Treatments",
-                              const Color(0xFF426C5F), 1),
-                          _serviceButton(
-                              "In-Clinic", const Color(0xFF679B75), 2),
-                          _serviceButton(
-                              "Video Consultation", const Color(0xFFCFAF96), 3),
-                        ],
-                      ),
-                    ),
+                  // Buttons Section
+                  loading
+                      ? Center(child: CircularProgressIndicator())
+                      : _consultations.isEmpty
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.35,
+                              child: Center(
+                                  child: Text(
+                                "No service available",
+                                style: TextStyle(color: Colors.white),
+                              )),
+                            )
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Column(
+                                children: _consultations.map((consultation) {
+                                  return _serviceButton(
+                                    consultation.consultationType,
+                                    Colors.white,
+                                    consultation.consultationId,
+                                    _getIconForType(
+                                        consultation.consultationType),
+                                    consultation,
+                                  );
+                                }).toList(),
+                              ),
+                            ),
 
-                    const SizedBox(height: 40),
-                  ],
-                ),
+                  const SizedBox(height: 40),
+                ],
               ),
             ),
           ],
@@ -159,70 +179,75 @@ class ConsultationsTypeState extends State<ConsultationsType> {
       bottomNavigationBar: BottomAppBar(
         color: Colors.transparent,
         elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Copyrights(
-            color: Colors.white,
-          ),
+        child: Copyrights(
+          color: Colors.white,
+          padding: EdgeInsets.all(0),
         ),
       ),
     );
   }
 
-  Widget _serviceButton(String title, Color backgroundColor, int id) {
+  IconData _getIconForType(String type) {
+    if (type.toLowerCase().contains("clinic")) {
+      return Icons.local_hospital_outlined;
+    } else if (type.toLowerCase().contains("online")) {
+      return Icons.video_call_outlined;
+    } else {
+      return Icons.medical_services_outlined;
+    }
+  }
+
+  Widget _serviceButton(String title, Color backgroundColor, String id,
+      IconData icon, ConsultationModel consultation) {
     return GestureDetector(
       onTap: () {
-        switch (id) {
-          case 1:
-            showSnackbar("Success", "Service and Treatment ${id}", "success");
+        consultationcontroller.setConsultation(consultation);
 
-            consultationcontroller.setConsultationId(1);
+        showSnackbar("Selected", "$title [$id]", "success");
+        String firstId = _consultations.first.consultationId;
 
-            Get.offAll(BottomNavController(
-              mobileNumber: widget.mobileNumber,
-              username: widget.username,
-              index: 0,
-            ));
-            break;
-          case 2:
-            consultationcontroller.setConsultationId(2);
-            showSnackbar("Warning", "In-Clinic ${id}", "warning");
-            // Get.to(Confirmbookingdetails(
-            //     // doctor: widget.doctorData,
-            //     ));
-            break;
-          case 3:
-            consultationcontroller.setConsultationId(3);
-            showSnackbar("Success", "Video Consultation ${id}", "success");
-            // Get.to(Confirmbookingdetails(
-            //     // doctor: widget.doctorData,
-            //     ));
-            break;
+        // Check if the 'id' matches the first consultationId in any consultation
+        if (firstId == id) {
+          Get.to(BottomNavController(
+            mobileNumber: widget.mobileNumber,
+            username: widget.username,
+            index: 0,
+          ));
+        } else {
+          Get.to(CategoryAndServicesForm(
+            mobileNumber: widget.mobileNumber,
+            username: widget.username,
+            consulationType: title,
+          ));
         }
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: Colors.transparent,
+          border: Border.all(color: Colors.white),
           borderRadius: BorderRadius.circular(10),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x40000000),
-              blurRadius: 11,
-              offset: Offset(0, 0),
-            )
-          ],
         ),
-        child: Center(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: Colors.white),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.white),
+          ],
         ),
       ),
     );
